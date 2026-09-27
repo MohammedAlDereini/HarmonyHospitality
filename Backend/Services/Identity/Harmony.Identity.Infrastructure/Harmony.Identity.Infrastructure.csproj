@@ -18,10 +18,4 @@
 		<PackageReference Include="Harmony.Core.Notification" Version="*" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Update="applicationSettings.*.json">
-			<DependentUpon>applicationSettings.json</DependentUpon>
-		</None>
-	</ItemGroup>
-
 </Project>

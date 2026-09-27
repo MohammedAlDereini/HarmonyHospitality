@@ -2,6 +2,7 @@
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Domain.Aggregates.LookupModule;
 using Microsoft.EntityFrameworkCore;
+using Harmony.Identity.Domain.Aggregates.RoleModule;
 
 namespace Harmony.Identity.Infrastructure.Persistence;
 
@@ -13,6 +14,7 @@ public sealed class IdentityDbContext : DbBaseContext
 
     public DbSet<LookupCategory> LookupCategories { get; set; }
     public DbSet<LookupValue> LookupValues { get; set; }
+    public DbSet<Role> Roles { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);

@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Harmony.Core.EventBus.Abstractions;
 using Harmony.Core.Models;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Harmony.Identity.Domain.Aggregates.RoleModule;
 
 namespace Harmony.Identity.Infrastructure.DI;
 
@@ -30,6 +31,7 @@ public static class DependenciesConfigurator
         services.AddCore(configuration);
         services.AddScoped<ILookupCategoryRepository, LookupCategoryRepository>();
         services.AddScoped<ILookupValueRepository, LookupValueRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
     }
 
     public static void ConfigureAppLogging(this IApplicationBuilder app)
@@ -56,7 +58,7 @@ public static class DependenciesConfigurator
             config.AddDatabaseContext<IdentityDbContext>(ServiceLifetime.Scoped);
             config.AddReadOnlyRepository<LookupCategory, IdentityDbContext>();
             config.AddReadOnlyRepository<LookupValue, IdentityDbContext>();
-
+            config.AddReadOnlyRepository<Role, IdentityDbContext>();
             config.AddMediatR(mediatRConfig =>
             {
                 mediatRConfig.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
@@ -67,7 +69,7 @@ public static class DependenciesConfigurator
 
     private static void AddCore(this IServiceCollection services, IConfiguration configuration)
     {
-        var tenantId = configuration["ApplicationSettings:ApplicationKeys:DefaultTenantId"]!;
+        var tenantId = configuration["ApplicationSettings:ApplicationKeys:PlatformTenantId"]!;
 
         Harmony.Core.DI.DependenciesConfigurator.AddCore(services, configuration, coreServicesConfig =>
         {

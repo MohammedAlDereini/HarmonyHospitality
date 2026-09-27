@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Harmony.Identity.Infrastructure.EntityConfigurations;
+namespace Harmony.Identity.Infrastructure.EntityConfigurations.Lookup;
 
 public class LookupValueConfiguration : IEntityTypeConfiguration<LookupValue>
 {

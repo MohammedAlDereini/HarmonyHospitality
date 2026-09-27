@@ -18,7 +18,7 @@ public partial class Program
 
         var app = builder.Build();
 
-        app.MigrateDbContext<IdentityDbContext>();
+        app.MigrateDbContext<IdentityDbContext, IdentityDbContextSeed>();
 
         ConfigureApp(app);
 

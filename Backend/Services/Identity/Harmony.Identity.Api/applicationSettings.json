@@ -2,7 +2,7 @@
   "ApplicationSettings": {
     "ApplicationKeys": {
       "DefaultDbEngine": "MSSql",
-      "DefaultTenantId": "11111111-1111-1111-1111-111111111111"
+      "PlatformTenantId": "01a0e265-0cad-77e1-b31c-98fed11919e1"
     },
     "ConnectionStrings": {
       "Default": "Server=localhost;Database=HarmonyIdentity;Trusted_Connection=True;TrustServerCertificate=True"

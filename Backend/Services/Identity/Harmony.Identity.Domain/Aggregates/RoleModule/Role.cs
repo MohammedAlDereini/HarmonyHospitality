@@ -5,7 +5,7 @@ using Harmony.Identity.Domain.Common;
 
 namespace Harmony.Identity.Domain.Aggregates.RoleModule;
 
-public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntity
+public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntity, IConcurrentEntity
 {
     private readonly List<string> _permissionCodes = [];
     private Role()
