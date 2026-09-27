@@ -1,0 +1,10 @@
+{
+  "ApplicationSettings": {
+    "ApplicationKeys": {
+      "DefaultDbEngine": "MSSql"
+    },
+    "ConnectionStrings": {
+      "Default": "Server=localhost;Database=HarmonyIdentity;Trusted_Connection=True;TrustServerCertificate=True"
+    }
+  }
+}

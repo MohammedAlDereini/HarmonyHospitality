@@ -1,0 +1,14 @@
+{
+  "ApplicationSettings": {
+    "ApplicationKeys": {
+      "DefaultDbEngine": "MSSql",
+      "DefaultTenantId": "11111111-1111-1111-1111-111111111111"
+    },
+    "ConnectionStrings": {
+      "Default": "Server=localhost;Database=HarmonyIdentity;Trusted_Connection=True;TrustServerCertificate=True"
+    }
+  },
+  "ValidationSettings": {
+    "Errors": []
+  }
+}

@@ -1,0 +1,1217 @@
+<title>Identity ERD</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground:#F3F5F7; --plane:#FFFFFF; --plane-2:#FAFBFC;
+    --ink:#16202B; --ink-2:#44535F; --muted:#6E7E8B;
+    --rule:#D5DDE4; --rule-2:#E7ECF1;
+    --steel:#2C6394; --steel-soft:#E5EEF7;
+    --ochre:#8A5F0F; --ochre-soft:#F8EFDA;
+    --green:#1B6B4C; --green-soft:#E1F1EA;
+    --shadow:0 1px 2px rgba(22,32,43,.05),0 8px 24px rgba(22,32,43,.06);
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ground:#0D1319; --plane:#151E26; --plane-2:#1A242D;
+    --ink:#E7EDF3; --ink-2:#B3C1CE; --muted:#8596A4;
+    --rule:#29353F; --rule-2:#212C35;
+    --steel:#82B4DF; --steel-soft:#1A2D3D;
+    --ochre:#D9AC52; --ochre-soft:#2F2716;
+    --green:#63C39A; --green-soft:#11291F;
+    --shadow:0 1px 2px rgba(0,0,0,.45),0 8px 24px rgba(0,0,0,.32);
+  }}
+  :root[data-theme="dark"]{
+    --ground:#0D1319; --plane:#151E26; --plane-2:#1A242D;
+    --ink:#E7EDF3; --ink-2:#B3C1CE; --muted:#8596A4;
+    --rule:#29353F; --rule-2:#212C35;
+    --steel:#82B4DF; --steel-soft:#1A2D3D;
+    --ochre:#D9AC52; --ochre-soft:#2F2716;
+    --green:#63C39A; --green-soft:#11291F;
+    --shadow:0 1px 2px rgba(0,0,0,.45),0 8px 24px rgba(0,0,0,.32);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+    font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:40px 72px}
+
+  header{border-bottom:2px solid var(--ink);padding-bottom:20px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--steel);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.08;margin:10px 0 12px;letter-spacing:-.025em;
+    font-weight:600;text-wrap:balance}
+  .sub{color:var(--ink-2);max-width:70ch;margin:0}
+
+  .counts{display:flex;flex-wrap:wrap;gap:28px;margin-top:22px}
+  .counts div{display:flex;flex-direction:column}
+  .counts b{font-family:var(--mono);font-size:27px;font-weight:600;color:var(--steel);
+    line-height:1.1;font-variant-numeric:tabular-nums}
+  .counts.good b{color:var(--green)}
+  .counts span{font-size:12.5px;color:var(--muted)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:12px 26px;margin-top:24px;padding:14px 18px;
+    border:1px solid var(--rule);border-radius:3px;background:var(--plane);box-shadow:var(--shadow)}
+  .lg{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-2)}
+  .lg svg{flex:none;color:var(--ink-2)}
+  .lg b{color:var(--ink);font-weight:600}
+
+  section{margin-top:44px}
+  h2{margin:0 0 4px;font-size:13px;font-family:var(--mono);letter-spacing:.12em;
+    text-transform:uppercase;color:var(--steel);font-weight:600}
+  h2 em{font-style:normal;color:var(--muted);font-weight:400}
+  h3{margin:0 0 10px;font-size:23px;letter-spacing:-.02em;font-weight:600;text-wrap:balance}
+  .lede{color:var(--ink-2);max-width:70ch;margin:0 0 18px}
+  p{max-width:70ch;color:var(--ink-2)}
+  p strong{color:var(--ink);font-weight:600}
+
+  .frame{border:1px solid var(--rule);border-radius:3px;background:var(--plane);
+    box-shadow:var(--shadow);padding:14px;overflow-x:auto}
+  .frame pre.mermaid{margin:0;background:transparent}
+  .tall{max-height:80vh;overflow:auto}
+  .zoomable{min-width:0}
+
+  .zoombar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px;
+    font-size:13px;color:var(--ink-2)}
+  .zoombar button{font:600 13px var(--mono);color:var(--ink);background:var(--plane);
+    border:1px solid var(--rule);border-radius:3px;padding:5px 11px;cursor:pointer;min-width:38px}
+  .zoombar button:hover{background:var(--steel-soft);border-color:var(--steel)}
+  .zoombar button:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
+  .zoombar .zlevel{font:600 13px var(--mono);color:var(--ink);background:var(--plane);
+    border:1px solid var(--rule);border-radius:3px;padding:5px 8px;width:auto;
+    font-variant-numeric:tabular-nums;cursor:pointer}
+  .zoombar .zlevel:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
+  .zoombar .hint{color:var(--muted)}
+
+  table.dict{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+  table.dict th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);font-weight:600;padding:0 12px 7px 0;
+    border-bottom:1px solid var(--rule)}
+  table.dict td{padding:9px 12px 9px 0;border-bottom:1px solid var(--rule-2);vertical-align:top;
+    color:var(--ink-2)}
+  table.dict td:first-child{font-family:var(--mono);font-size:12.5px;color:var(--ink);
+    font-weight:500;white-space:nowrap;width:1%}
+  table.dict tr:last-child td{border-bottom:none}
+  .dictwrap{overflow-x:auto}
+
+  code{font-family:var(--mono);font-size:12.5px;background:var(--steel-soft);color:var(--steel);
+    padding:1px 5px;border-radius:2px}
+  .flag{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;border-radius:2px;padding:0 5px;vertical-align:1px}
+  .flag.casc{background:var(--ochre-soft);color:var(--ochre);border:1px solid var(--ochre)}
+  .flag.new{background:var(--green-soft);color:var(--green);border:1px solid var(--green)}
+
+  .callout{border:1px solid var(--steel);border-left-width:4px;border-radius:3px;
+    background:var(--plane);padding:16px 18px;margin-top:22px}
+  .callout.good{border-color:var(--green)}
+  .callout h4{margin:0 0 6px;font-size:16px;font-weight:600}
+  .callout p{margin:0 0 8px;font-size:14.5px}
+  .callout p:last-child{margin-bottom:0}
+
+  pre.sql{margin:18px 0 0;padding:15px 17px;overflow-x:auto;border:1px solid var(--rule);
+    border-radius:3px;background:var(--plane-2);font-family:var(--mono);font-size:12.5px;
+    line-height:1.7;color:var(--ink-2)}
+  pre.sql b{color:var(--ochre);font-weight:600}
+
+  footer{margin-top:52px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);
+    font-size:12.5px;max-width:74ch}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">REMY &#183; Identity, with Platform merged in</span>
+    <h1>The final entity relationship diagram</h1>
+    <p class="sub">All fifty-eight tables of the rebuilt Identity service. Ten readable cluster views, then the whole schema at full size &mdash; the reference data, the organisation tables, the standards registry, and every table Identity already had.</p>
+    <div class="counts">
+      <div><b>58</b><span>tables</span></div>
+      <div><b>10</b><span>clusters</span></div>
+      <div><b>10</b><span>reference tables, seeded once</span></div>
+      <div><b>2</b><span>dropped</span></div>
+    </div>
+    <div class="counts good" style="margin-top:14px">
+      <div><b>0</b><span>unenforced links remain</span></div>
+      <div><b>0</b><span>free-text codes left</span></div>
+      <div><b>0</b><span>rows that can cross a tenant</span></div>
+    </div>
+  </header>
+
+  <div class="legend">
+    <span class="lg">
+      <svg width="52" height="14" viewBox="0 0 52 14" aria-hidden="true">
+        <line x1="2" y1="7" x2="37" y2="7" stroke="currentColor" stroke-width="1.6"/>
+        <line x1="8" y1="2" x2="8" y2="12" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M37,7 L49,2 M37,7 L49,7 M37,7 L49,12" stroke="currentColor" stroke-width="1.6" fill="none"/>
+      </svg>
+      <span><b>Every line is an enforced foreign key</b></span>
+    </span>
+    <span class="lg">the fork sits at the <b>many</b> end</span>
+    <span class="lg"><code>PK</code> key &nbsp; <code>FK</code> foreign key &nbsp; <code>UK</code> unique</span>
+    <span class="lg"><span class="flag casc">cascade</span> parent delete removes children</span>
+    <span class="lg"><span class="flag new">new</span> added in the rebuild</span>
+  </div>
+
+  <div class="callout good" style="margin-top:20px">
+    <h4>The headline changed since the first draft of this diagram</h4>
+    <p>That earlier version had dashed lines everywhere: Platform had <strong>zero</strong> foreign keys, and four links inside Identity were unenforced. One database later, <strong>there are no dashed lines left</strong>. <code>Properties.TenantId</code> points at <code>Tenants</code>, <code>RoleAssignments.PropertyId</code> points at <code>Properties</code>, <code>OperatorSessions</code> and <code>AccessGrants</code> point at <code>UserAccounts</code>, and every key is composite with <code>TenantId</code> so a row can never reference another tenant's row.</p>
+    <p>That is the whole argument for the merge, visible as the absence of a line style.</p>
+  </div>
+
+  <!-- ============ 0 REFERENCE ============ -->
+  <section>
+    <h2>Cluster one <em>&#183; 10 tables, seeded not per-tenant</em></h2>
+    <h3>Reference data</h3>
+    <p class="lede">Every code that used to be a string is now a row with a foreign key pointing at it. These tables carry no <code>TenantId</code> &mdash; they are seeded once and shared by every customer, the same way <code>PropertyGroupTypes</code> always was.</p>
+
+    <div class="frame">
+<div class="zoomable">
+<pre class="mermaid">
+erDiagram
+  Countries {
+    nvarchar Code PK "ISO 3166-1 alpha-2"
+    nvarchar Alpha3
+    nvarchar NameEn
+    nvarchar NameAr
+    nvarchar DialCode
+    nvarchar DefaultCurrency FK
+    bit IsActive
+  }
+  CountrySubdivisions {
+    nvarchar Code PK "ISO 3166-2, JO-AM"
+    nvarchar CountryCode FK
+    nvarchar NameEn
+    nvarchar NameAr
+    nvarchar Kind "governorate state province"
+  }
+  Cities {
+    uniqueidentifier Id PK
+    nvarchar CountryCode FK
+    nvarchar SubdivisionCode FK
+    nvarchar NameEn
+    nvarchar NameAr
+    nvarchar TimeZoneId FK "the city knows its zone"
+    decimal Latitude
+    decimal Longitude
+    bit IsActive
+  }
+  TimeZones {
+    nvarchar Id PK "IANA, Asia/Amman"
+    nvarchar NameEn
+    nvarchar NameAr
+    bit IsActive
+  }
+  Languages {
+    nvarchar Code PK "ISO 639-1"
+    nvarchar NameEn
+    nvarchar NameNative
+    bit IsRightToLeft
+    bit IsActive
+  }
+  Currencies {
+    nvarchar Code PK "ISO 4217"
+    nvarchar NameEn
+    nvarchar NameAr
+    int MinorUnits "JOD is 3"
+    bit IsActive
+  }
+  PropertyTypes {
+    nvarchar Code PK "Hotel Hostel Resort Villas Apartment"
+    nvarchar NameEn
+    nvarchar NameAr
+    int DisplayOrder
+    bit IsActive
+  }
+  PropertyGroupTypes {
+    nvarchar Code PK "Brand Region Owner Custom"
+    nvarchar NameEn
+    nvarchar NameAr
+    bit IsExclusive
+    bit IsSystem
+  }
+  RegulatoryEnvironments {
+    nvarchar Code PK "JO-ASEZ SA-VAT"
+    nvarchar Kind "Legal Tax Accounting Accommodation"
+    nvarchar CountryCode FK
+    nvarchar NameEn
+    nvarchar NameAr
+    nvarchar OwnerService "Fiscal registers these"
+  }
+  Capabilities {
+    nvarchar Code PK "pms.core multi.property"
+    nvarchar NameEn
+    nvarchar OwnerService
+    bit HasLimit
+  }
+
+  Currencies ||--o{ Countries : "default for"
+  Countries ||--o{ CountrySubdivisions : "divided into"
+  Countries ||--o{ Cities : "contains"
+  CountrySubdivisions ||--o{ Cities : "contains"
+  TimeZones ||--o{ Cities : "keeps time in"
+  Countries ||--o{ RegulatoryEnvironments : "legislates"
+</pre>
+</div>
+    </div>
+
+    <div class="dictwrap">
+      <table class="dict">
+        <thead><tr><th>Table</th><th>What it replaces, and what it buys</th></tr></thead>
+        <tbody>
+          <tr><td>Countries <span class="flag new">new</span></td><td>Was <code>CountryCode nvarchar(2)</code> on three tables with nothing behind it. Now carries the Arabic name, the dial code and the default currency, so creating a property in Jordan proposes JOD without anyone typing it.</td></tr>
+          <tr><td>CountrySubdivisions <span class="flag new">new</span></td><td>Was <code>StateProvince</code>, free text. Governorates in Jordan, regions in Saudi Arabia. A real parent for the city.</td></tr>
+          <tr><td>Cities <span class="flag new">new</span></td><td>Was a free-text column, which is how you end up with Amman, amman and &#1593;&#1605;&#1575;&#1606; as three different cities in one report. Mews makes this a dropdown for the same reason. <strong>The city knows its time zone and its country</strong>, so choosing it fills both &mdash; and a hotel in Jordan can no longer be saved with a Riyadh clock.</td></tr>
+          <tr><td>TimeZones <span class="flag new">new</span></td><td>Was an IANA string validated only at runtime. A typo used to become a property that cannot compute a business date.</td></tr>
+          <tr><td>Languages <span class="flag new">new</span></td><td><code>IsRightToLeft</code> lives here rather than being inferred from the code in five different services.</td></tr>
+          <tr><td>Currencies</td><td>Moved here from the organisation cluster, where it never belonged. <code>MinorUnits</code> is a fact about the dinar, not about a hotel.</td></tr>
+          <tr><td>PropertyTypes <span class="flag new">new</span></td><td>Was a string. Now it grows without a migration, carries its Arabic name, and can narrow which standards apply &mdash; a resort default that a hostel never sees.</td></tr>
+          <tr><td>PropertyGroupTypes</td><td>Already a reference table. It was the pattern the other nine follow.</td></tr>
+          <tr><td>RegulatoryEnvironments <span class="flag new">new</span></td><td>One table for all four codes, separated by <code>Kind</code>. Identity owns the table so the foreign key is real; <strong>Fiscal owns the contents</strong> and fills it through <code>fiscal.environment.registered.v1</code>. A new tax regime stays a Fiscal release.</td></tr>
+          <tr><td>Capabilities <span class="flag new">new</span></td><td><code>Entitlements.CapabilityCode</code> was free text, so a typo silently granted nothing. Services register their capabilities exactly as they register settings.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <h4>The rule, and its one limit</h4>
+      <p><strong>A value becomes a reference table when it is chosen from a curated set and something needs to hang off the members.</strong> City earns it because it carries a time zone and coordinates. Property type earns it because standards narrow by it. Capability earns it because a service owns it.</p>
+      <p>The limit: <code>SecurityAuditEvents.Action</code> stays free text on purpose. An audit log must record whatever happened, including an action from a service version newer than the reference table &mdash; a foreign key there would drop audit records, which is the one place a dropped row is unforgivable. <code>ExternalIdentifier</code> stays free for the same reason: it is somebody else's key and we do not get to curate it.</p>
+    </div>
+  </section>
+
+  <!-- ============ 1 ORGANISATION ============ -->
+  <section>
+    <h2>Cluster two <em>&#183; 7 tables</em></h2>
+    <h3>Organisation</h3>
+    <p class="lede">Who the customer is, which hotels they run, and how those hotels are grouped. <code>Brands</code> and <code>ServicePlacements</code> are gone; seven tables are new.</p>
+
+    <div class="frame">
+<div class="zoomable">
+<pre class="mermaid">
+erDiagram
+  Tenants {
+    uniqueidentifier Id PK
+    nvarchar Code UK
+    nvarchar ExternalIdentifier
+    nvarchar LegalNameEn
+    nvarchar LegalNameAr
+    nvarchar CountryCode FK
+    nvarchar DefaultCurrency FK
+    int Status
+    int Tier
+    date OnboardedOn
+    date ExportWindowEndsOn
+  }
+
+  Properties {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    nvarchar Code UK
+    nvarchar ExternalIdentifier
+    nvarchar NameEn
+    nvarchar NameAr
+    nvarchar ShortName
+    nvarchar UniqueName
+    nvarchar PropertyTypeCode FK
+    nvarchar AddressLine
+    uniqueidentifier CityId FK
+    nvarchar PostalCode
+    nvarchar SubdivisionCode FK
+    nvarchar CountryCode FK
+    decimal Latitude
+    decimal Longitude
+    nvarchar TimeZoneId FK "defaulted from the city"
+    nvarchar BusinessId
+    nvarchar BusinessRegistrationCode "prints on the invoice"
+    nvarchar BusinessPremiseId "ZATCA, JoFotara"
+    int FiscalYearBeginMonth
+    int FiscalYearBeginDay
+    nvarchar LegalEnvironmentCode FK
+    nvarchar TaxEnvironmentCode FK
+    nvarchar AccountingEnvironmentCode FK
+    nvarchar AccommodationEnvironmentCode FK
+    nvarchar DefaultCurrency FK
+    nvarchar DefaultLanguageCode FK
+    nvarchar DefaultCulture
+    int StarRating
+    int TotalRooms
+    nvarchar Email
+    nvarchar Telephone
+    nvarchar WebsiteUrl
+    nvarchar ProductChampionEmail
+    nvarchar LegalOwnerName
+    int DisplayOrder
+    bit IsActive
+  }
+  PropertyContacts {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier PropertyId FK
+    nvarchar Name
+    nvarchar Role
+    nvarchar Email
+    nvarchar Telephone
+    bit IsPrimary
+  }
+  PropertyGroupTypes {
+    nvarchar Code PK
+  }
+  PropertyGroups {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    nvarchar TypeCode FK
+    nvarchar Code UK
+    nvarchar ExternalIdentifier
+    nvarchar NameEn
+    nvarchar NameAr
+    nvarchar Description
+    int Precedence "higher wins a standards tie"
+    int DisplayOrder
+    bit IsActive
+  }
+  PropertyGroupMembers {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier PropertyGroupId FK
+    uniqueidentifier PropertyId FK
+    nvarchar TypeCode FK "copy, held honest by the FK"
+    datetimeoffset FromUtc
+    datetimeoffset ToUtc "null means current"
+  }
+  BrandDetails {
+    uniqueidentifier PropertyGroupId PK
+    uniqueidentifier TenantId FK
+    nvarchar TypeCode FK "CHECK equals Brand"
+    nvarchar ThemeReference
+    uniqueidentifier LogoFileId
+    nvarchar WebsiteUrl
+    nvarchar FranchisorName
+    date AgreementStartsOn
+    date AgreementEndsOn
+    decimal RoyaltyPercent
+  }
+  Cities {
+    uniqueidentifier Id PK
+  }
+  PropertyTypes {
+    nvarchar Code PK
+  }
+  RegulatoryEnvironments {
+    nvarchar Code PK
+  }
+  Currencies {
+    nvarchar Code PK
+  }
+  Languages {
+    nvarchar Code PK
+  }
+  Capabilities {
+    nvarchar Code PK
+  }
+  Entitlements {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    nvarchar CapabilityCode FK
+    bit IsEnabled
+    int MaxProperties
+    int MaxRooms
+    int MaxTerminals
+    date ExpiresOn
+  }
+
+  Cities ||--o{ Properties : "located in"
+  PropertyTypes ||--o{ Properties : "classified as"
+  RegulatoryEnvironments ||--o{ Properties : "governed by"
+  Currencies ||--o{ Properties : "books kept in"
+  Languages ||--o{ Properties : "operates in"
+  Capabilities ||--o{ Entitlements : "sold as"
+  Tenants ||--o{ Properties : "runs"
+  Tenants ||--o{ PropertyGroups : "defines"
+  Tenants ||--o{ Entitlements : "is licensed for"
+  Properties ||--o{ PropertyContacts : "reached through"
+  PropertyGroupTypes ||--o{ PropertyGroups : "classifies"
+  PropertyGroups ||--o{ PropertyGroupMembers : "contains"
+  Properties ||--o{ PropertyGroupMembers : "belongs to many"
+  PropertyGroups ||--o| BrandDetails : "extended by, when Brand"
+</pre>
+</div>
+    </div>
+
+    <div class="dictwrap">
+      <table class="dict">
+        <thead><tr><th>Table</th><th>What it actually does</th></tr></thead>
+        <tbody>
+          <tr><td>Tenants</td><td>One row per hotel company that bought REMY. The contract, the bill and the security wall. A chain of forty hotels is still one row.</td></tr>
+          <tr><td>Currencies <span class="flag new">new</span></td><td>ISO 4217 reference, seeded and shared by every tenant. <code>MinorUnits</code> lives here because three decimal places is a fact about the Jordanian dinar, not about a hotel in Amman. Both competitors store it per property, where two hotels can disagree about what JOD is.</td></tr>
+          <tr><td>Properties</td><td>One hotel. Carries its own time zone, its four environment codes and its registration identifiers &mdash; because Aqaba sits in a special economic zone and needs a different tax regime from Amman in the same country.</td></tr>
+          <tr><td>PropertyContacts <span class="flag new">new</span></td><td>Named people at the organisation, one flagged primary. Distinct from guests.</td></tr>
+          <tr><td>PropertyGroupTypes <span class="flag new">new</span></td><td>The kinds of grouping that exist. <code>IsExclusive</code> is what the one-brand rule reads, so the word "Brand" is never hardcoded in a constraint.</td></tr>
+          <tr><td>PropertyGroups <span class="flag new">new</span></td><td>Replaces <code>Brands</code>. Any named set of hotels. <code>Precedence</code> decides who wins when two groups set the same standard &mdash; a number the customer controls, where Opera has a fixed two-level rule.</td></tr>
+          <tr><td>PropertyGroupMembers <span class="flag new">new</span></td><td>The join that makes the whole design work. Dated, so a February invoice still resolves to February's brand after a March rebrand.</td></tr>
+          <tr><td>BrandDetails <span class="flag new">new</span></td><td>Brand-only columns hung off the group's own key, the way <code>DirPartyTable</code> subtypes work in D365. Nothing else has to know brands are special.</td></tr>
+          <tr><td>Entitlements</td><td>What the client bought, with limits. REMY's version of what Mews calls subscription level.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 2 STANDARDS ============ -->
+  <section>
+    <h2>Cluster three <em>&#183; 2 tables, both new</em></h2>
+    <h3>Standards registry</h3>
+    <p class="lede">The mechanism that beats Opera at configuration inheritance without Identity learning anything about another service's domain.</p>
+
+    <div class="frame">
+<div class="zoomable">
+<pre class="mermaid">
+erDiagram
+  ConfigSettings {
+    nvarchar Key PK "frontoffice.checkInTime"
+    nvarchar OwnerService "PropertyConfig"
+    nvarchar DataType "time int bool decimal string"
+    nvarchar SystemDefault
+    nvarchar AppliesToTypes "optional narrowing"
+    bit IsActive
+  }
+  ConfigValues {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    int Scope "Tenant PropertyGroup Property"
+    uniqueidentifier ScopeId
+    nvarchar Key FK
+    nvarchar Value
+  }
+  Tenants {
+    uniqueidentifier Id PK
+  }
+  PropertyGroups {
+    uniqueidentifier Id PK
+  }
+  Properties {
+    uniqueidentifier Id PK
+  }
+
+  ConfigSettings ||--o{ ConfigValues : "typed by"
+  Tenants ||--o{ ConfigValues : "default for"
+  PropertyGroups ||--o{ ConfigValues : "overridden by"
+  Properties ||--o{ ConfigValues : "overridden by"
+</pre>
+</div>
+    </div>
+
+    <pre class="sql">Identity never parses a value. It stores a string and resolves which one wins.
+
+  <b>resolve(propertyId, key)</b>
+    property override
+      &#8594; highest-precedence group that sets it
+        &#8594; tenant default
+          &#8594; ConfigSettings.SystemDefault
+
+    ties at equal precedence are an error, never a coin toss
+
+PropertyConfig decides that frontoffice.checkInTime is a time and that
+15:00 is sane. Adding a setting is a row, not a platform release.</pre>
+
+    <div class="callout">
+      <h4>Why this is only two tables</h4>
+      <p>Opera can template only what Oracle built a control for, and every one is a column Oracle had to ship. Mews cannot template anything at all. Here any service registers a key and immediately gets chain-wide, brand-wide and region-wide inheritance, with a trace showing where the winning value came from.</p>
+    </div>
+  </section>
+
+  <!-- ============ 3 ACCOUNTS ============ -->
+  <section>
+    <h2>Cluster four <em>&#183; 5 tables</em></h2>
+    <h3>Accounts and access</h3>
+    <p class="lede">Ten tables reference <code>UserAccounts</code> &mdash; the busiest table in the schema. <code>RoleAssignments</code> gains the column that fixes the token.</p>
+
+    <div class="frame">
+<div class="zoomable">
+<pre class="mermaid">
+erDiagram
+  UserAccounts {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    nvarchar Issuer
+    nvarchar Subject
+    int SecurityVersion "bump kills every token"
+    bit IsServicePrincipal
+    bit IsMfaEnrolled
+    uniqueidentifier SupersededByUserAccountId FK
+  }
+  RoleAssignments {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier UserAccountId FK
+    nvarchar RoleCode FK
+    uniqueidentifier PropertyId FK "one hotel"
+    uniqueidentifier PropertyGroupId FK "many hotels"
+    datetimeoffset EndsAtUtc
+  }
+  Roles {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    nvarchar Code UK
+    int PrivilegeLevel "cannot grant above self"
+    bit IsSystemRole
+  }
+  Permissions {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier RoleId FK
+    nvarchar Code
+  }
+  AccessGrants {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier UserAccountId FK
+    nvarchar Reason "required"
+    datetimeoffset ExpiresAtUtc
+  }
+  Tenants {
+    uniqueidentifier Id PK
+  }
+  Properties {
+    uniqueidentifier Id PK
+  }
+  PropertyGroups {
+    uniqueidentifier Id PK
+  }
+
+  Tenants ||--o{ UserAccounts : "employs"
+  Tenants ||--o{ Roles : "defines"
+  UserAccounts ||--o{ RoleAssignments : "holds"
+  UserAccounts |o--o{ UserAccounts : "superseded by"
+  Roles ||--o{ RoleAssignments : "granted as"
+  Roles ||--o{ Permissions : "carries"
+  Properties ||--o{ RoleAssignments : "scoped to one"
+  PropertyGroups ||--o{ RoleAssignments : "scoped to many"
+  UserAccounts ||--o{ AccessGrants : "temporarily elevated by"
+</pre>
+</div>
+    </div>
+
+    <pre class="sql">the token, before and after
+
+  today   property_ids: [ 40 guids ]        <b>&#8592; grows with the customer</b>
+  after   property_group: "gulf-ops"        <b>&#8592; one claim, any estate size</b>
+
+TokenSizeTests already says a group manager over forty properties
+is not comfortable. This is the fix, not a nice-to-have.
+
+CHECK ((PropertyId IS NULL) &lt;&gt; (PropertyGroupId IS NULL))
+  a role is scoped to a hotel or a group, never both, never neither</pre>
+  </section>
+
+  <!-- ============ 4 SIGNING IN ============ -->
+  <section>
+    <h2>Cluster five <em>&#183; 6 tables</em></h2>
+    <h3>Signing in</h3>
+    <p class="lede">No password column anywhere. Local staff arrive by sponsored invitation, everyone else through a federated provider.</p>
+
+    <div class="frame">
+<div class="zoomable">
+<pre class="mermaid">
+erDiagram
+  FederatedAuthorities {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    nvarchar Scheme "oidc local"
+    nvarchar Issuer
+    nvarchar Audience
+    bit IsEnabled
+  }
+  ExternalIdentityLinks {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier UserAccountId FK
+    uniqueidentifier FederatedAuthorityId FK
+    nvarchar ProviderSubject UK
+    nvarchar LinkedBy
+  }
+  ExternalIdentityLinkPeriods {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier LinkId FK
+    uniqueidentifier UserAccountId FK
+    datetimeoffset FromUtc
+    datetimeoffset ToUtc
+  }
+  OperatorSessions {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier UserAccountId FK
+    bit MultiFactorSatisfied
+    datetimeoffset StartedAtUtc
+    datetimeoffset EndedAtUtc
+  }
+  StepUpAuthorizations {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier OperatorUserAccountId FK
+    uniqueidentifier FederatedAuthorityId FK
+    datetimeoffset ExpiresAtUtc "minutes, not hours"
+  }
+  LocalStaffEnrolments {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier SponsorUserAccountId FK
+    uniqueidentifier FederatedAuthorityId FK
+    nvarchar InviteeHandleDigest "hashed, never plain"
+    int State
+    datetimeoffset ExpiresAtUtc
+  }
+  UserAccounts {
+    uniqueidentifier Id PK
+  }
+
+  UserAccounts ||--o{ ExternalIdentityLinks : "signs in as"
+  FederatedAuthorities ||--o{ ExternalIdentityLinks : "vouched by"
+  ExternalIdentityLinks ||--o{ ExternalIdentityLinkPeriods : "history of"
+  UserAccounts ||--o{ ExternalIdentityLinkPeriods : "held by"
+  UserAccounts ||--o{ OperatorSessions : "is signed in as"
+  UserAccounts ||--o{ StepUpAuthorizations : "re-proved by"
+  FederatedAuthorities ||--o{ StepUpAuthorizations : "proved at"
+  UserAccounts ||--o{ LocalStaffEnrolments : "sponsors"
+  FederatedAuthorities ||--o{ LocalStaffEnrolments : "redeemed at"
+</pre>
+</div>
+    </div>
+  </section>
+
+  <!-- ============ 5 REVOCATION ============ -->
+  <section>
+    <h2>Cluster six <em>&#183; 5 tables</em></h2>
+    <h3>Revocation</h3>
+    <p class="lede">Tokens are signed and self-contained, so killing one early needs a feed every service reads &mdash; plus the machinery that stops it growing forever.</p>
+
+    <div class="frame">
+<div class="zoomable">
+<pre class="mermaid">
+erDiagram
+  AuthorizationRevocationSequence {
+    uniqueidentifier TenantId PK
+    bigint HighWatermark "the clock"
+    bigint MinimumRetainedSequence
+  }
+  AuthorizationRevocationFeed {
+    bigint Sequence PK
+    uniqueidentifier TenantId PK
+    uniqueidentifier UserAccountId FK
+    uniqueidentifier CorrelationId FK
+    int Kind "account session role"
+    datetimeoffset OccurredAtUtc
+  }
+  RevocationSnapshots {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    bigint TakenAtSequence
+    datetimeoffset ExpiresAtUtc
+  }
+  RevocationSnapshotItems {
+    bigint PageKey PK
+    uniqueidentifier SnapshotId FK
+    uniqueidentifier TenantId FK
+  }
+  RevocationGapTombstones {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    bigint ThroughSequence
+    nvarchar Reason
+  }
+  UserAccounts {
+    uniqueidentifier Id PK
+  }
+  SecurityOperations {
+    uniqueidentifier Id PK
+  }
+
+  UserAccounts ||--o{ AuthorizationRevocationFeed : "revoked in"
+  SecurityOperations ||--o{ AuthorizationRevocationFeed : "caused"
+  RevocationSnapshots ||--o{ RevocationSnapshotItems : "paged as"
+</pre>
+</div>
+    </div>
+
+    <div class="dictwrap">
+      <table class="dict">
+        <thead><tr><th>Table</th><th>What it actually does</th></tr></thead>
+        <tbody>
+          <tr><td>AuthorizationRevocationSequence</td><td>One row per tenant holding the high-water mark. The monotonic clock the feed is ordered by.</td></tr>
+          <tr><td>AuthorizationRevocationFeed</td><td>Append-only log of "this credential is now dead". Every service polls it.</td></tr>
+          <tr><td>RevocationSnapshots</td><td>A compaction, so a service offline for a day does not replay the whole feed.</td></tr>
+          <tr><td>RevocationSnapshotItems <span class="flag casc">cascade</span></td><td>The pages of one snapshot.</td></tr>
+          <tr><td>RevocationGapTombstones</td><td>Records that a range was pruned. Without it a reader that skipped a range cannot tell "nothing happened" from "I missed it" &mdash; and would fail open.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 6 APPROVALS ============ -->
+  <section>
+    <h2>Cluster seven <em>&#183; 8 tables</em></h2>
+    <h3>Approvals and audit</h3>
+    <p class="lede">Nothing dangerous happens on one person's say-so.</p>
+
+    <div class="frame">
+<div class="zoomable">
+<pre class="mermaid">
+erDiagram
+  MakerCheckerRequests {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier RequestedByUserAccountId FK
+    uniqueidentifier MakerStepUpAuthorizationId FK
+    nvarchar Kind
+    int State "pending approved void"
+  }
+  MakerCheckerExecutions {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier RequestId FK
+    uniqueidentifier CheckerUserAccountId FK
+    datetimeoffset ExecutedAtUtc
+  }
+  MakerCheckerExecutionItems {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier ExecutionId FK
+    uniqueidentifier UserAccountId FK
+  }
+  MakerCheckerExpectedVersions {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier RequestId FK
+    int ExpectedVersion "void if the target moved"
+  }
+  MergeApprovals {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier ProposedUserAccountId FK
+  }
+  QuarantineReleases {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier MakerCheckerRequestId FK
+  }
+  SecurityOperations {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    nvarchar Kind
+  }
+  SecurityAuditEvents {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    nvarchar Action
+    nvarchar ActorSubject
+    nvarchar SourceAddress
+    datetimeoffset OccurredAtUtc
+  }
+  UserAccounts {
+    uniqueidentifier Id PK
+  }
+  StepUpAuthorizations {
+    uniqueidentifier Id PK
+  }
+
+  UserAccounts ||--o{ MakerCheckerRequests : "raised by"
+  StepUpAuthorizations ||--o{ MakerCheckerRequests : "proved by"
+  MakerCheckerRequests ||--o{ MakerCheckerExecutions : "executed as"
+  MakerCheckerRequests ||--o{ MakerCheckerExpectedVersions : "guarded by"
+  MakerCheckerRequests ||--o{ QuarantineReleases : "releases"
+  MakerCheckerExecutions ||--o{ MakerCheckerExecutionItems : "changed"
+  UserAccounts ||--o{ MakerCheckerExecutionItems : "affected in"
+  UserAccounts ||--o{ MakerCheckerExecutions : "approved by"
+  UserAccounts ||--o{ MergeApprovals : "proposed as"
+  UserAccounts ||--o{ SecurityAuditEvents : "acted in"
+</pre>
+</div>
+    </div>
+  </section>
+
+  <!-- ============ 7 SYNC ============ -->
+  <section>
+    <h2>Cluster eight <em>&#183; 12 tables</em></h2>
+    <h3>Directory sync</h3>
+    <p class="lede">The largest cluster. Pulling staff out of a hotel's directory is not a nightly script &mdash; it is a resumable, leased, fenced, paged, auditable job, and every one of those words is a table.</p>
+
+    <div class="frame">
+<div class="zoomable">
+<pre class="mermaid">
+erDiagram
+  ProvisioningConnections {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier FederatedAuthorityId FK
+    bit IsEnabled
+    nvarchar Schedule
+  }
+  ApprovedProvisioningGroups {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier ConnectionId FK
+    nvarchar DirectoryGroupId "the allowlist"
+    nvarchar MapsToRoleCode
+  }
+  DirectoryGroupMemberships {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier ConnectionId FK
+    nvarchar MemberSubject
+  }
+  DirectorySyncRuns {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier ConnectionId FK
+    bigint RunNumber
+    int Outcome
+  }
+  DirectorySyncRunItems {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier RunId FK
+    uniqueidentifier ConnectionId FK
+    uniqueidentifier SupersededByItemId FK
+    int Action "created changed held"
+  }
+  DirectorySyncRunStreams {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier RunId FK
+    uniqueidentifier ConnectionId FK
+    uniqueidentifier ApprovedProvisioningGroupId FK
+    uniqueidentifier DirectorySyncStreamStateId FK
+  }
+  DirectorySyncRunPages {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier RunId FK
+    uniqueidentifier RunStreamId FK
+    int PageNumber
+  }
+  DirectorySyncStreamStates {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier ConnectionId FK
+    uniqueidentifier ApprovedProvisioningGroupId FK
+    nvarchar DeltaToken "resume point"
+  }
+  DirectorySyncRunSequence {
+    uniqueidentifier TenantId PK
+    bigint Next
+  }
+  ProvisioningLeases {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier ConnectionId FK
+    datetimeoffset ExpiresAtUtc
+  }
+  ProvisioningFencingSequence {
+    uniqueidentifier TenantId PK
+    uniqueidentifier ConnectionId FK
+    bigint Token
+  }
+  MigrationAmbiguities {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId FK
+    uniqueidentifier UserAccountId FK
+    int State "waiting on a human"
+  }
+  FederatedAuthorities {
+    uniqueidentifier Id PK
+  }
+  UserAccounts {
+    uniqueidentifier Id PK
+  }
+
+  FederatedAuthorities ||--o{ ProvisioningConnections : "synced from"
+  ProvisioningConnections ||--o{ ApprovedProvisioningGroups : "allows only"
+  ProvisioningConnections ||--o{ DirectoryGroupMemberships : "read back"
+  ProvisioningConnections ||--o{ DirectorySyncRuns : "ran"
+  ProvisioningConnections ||--o{ DirectorySyncRunItems : "touched"
+  ProvisioningConnections ||--o{ DirectorySyncRunStreams : "streamed"
+  ProvisioningConnections ||--o{ DirectorySyncStreamStates : "cursor for"
+  ProvisioningConnections ||--o{ ProvisioningLeases : "locked by"
+  ProvisioningConnections ||--o{ ProvisioningFencingSequence : "fenced by"
+  DirectorySyncRuns ||--o{ DirectorySyncRunItems : "processed"
+  DirectorySyncRuns ||--o{ DirectorySyncRunStreams : "opened"
+  DirectorySyncRuns ||--o{ DirectorySyncRunPages : "fetched"
+  DirectorySyncRunStreams ||--o{ DirectorySyncRunPages : "page of"
+  DirectorySyncRunItems |o--o{ DirectorySyncRunItems : "superseded by"
+  ApprovedProvisioningGroups ||--o{ DirectorySyncRunStreams : "for group"
+  ApprovedProvisioningGroups ||--o{ DirectorySyncStreamStates : "for group"
+  DirectorySyncStreamStates ||--o{ DirectorySyncRunStreams : "resumed from"
+  DirectorySyncRunSequence ||--o{ DirectorySyncRuns : "numbers"
+  UserAccounts ||--o{ MigrationAmbiguities : "could not match"
+</pre>
+</div>
+    </div>
+  </section>
+
+  <!-- ============ 8 PLUMBING ============ -->
+  <section>
+    <h2>Cluster nine <em>&#183; 3 tables</em></h2>
+    <h3>Plumbing</h3>
+    <p class="lede">Present identically in both databases today, which is why the merge nets fifty rather than fifty-three.</p>
+
+    <div class="frame">
+<div class="zoomable">
+<pre class="mermaid">
+erDiagram
+  OutboxMessages {
+    uniqueidentifier Id PK
+    uniqueidentifier TenantId
+    nvarchar Type
+    nvarchar Status
+    datetimeoffset PublishedAtUtc
+  }
+  InboxMessages {
+    nvarchar MessageId PK
+    nvarchar Consumer PK
+    uniqueidentifier TenantId
+    datetimeoffset ProcessedAtUtc
+  }
+  RequestIdempotency {
+    nvarchar Key PK
+    uniqueidentifier TenantId
+    nvarchar ResponseHash
+  }
+</pre>
+</div>
+    </div>
+    <p style="margin-top:16px"><code>OutboxMessages</code> is what makes the whole estate work without synchronous calls: events are written in the same transaction as the data that caused them, then published. A tenant is never created without the event that tells the other forty-five services about it.</p>
+  </section>
+
+  <!-- ============ FULL ============ -->
+  <section>
+    <h2>All of it <em>&#183; 58 tables</em></h2>
+    <h3>The whole schema</h3>
+    <p class="lede">Full size &mdash; use the zoom and scroll inside the frame. Reading it top to bottom is not the point; the point is seeing how much of the graph converges on four tables.</p>
+
+
+    <div class="frame tall">
+      <div id="big" class="zoomable">
+<pre class="mermaid">
+%%{init: {"er": {"useMaxWidth": false, "entityPadding": 12}} }%%
+erDiagram
+  Countries ||--o{ CountrySubdivisions : "divided into"
+  Countries ||--o{ Cities : "contains"
+  CountrySubdivisions ||--o{ Cities : "contains"
+  TimeZones ||--o{ Cities : "keeps time in"
+  Countries ||--o{ RegulatoryEnvironments : "legislates"
+  Currencies ||--o{ Countries : "default for"
+  Cities ||--o{ Properties : "located in"
+  PropertyTypes ||--o{ Properties : "classified as"
+  RegulatoryEnvironments ||--o{ Properties : "governed by"
+  TimeZones ||--o{ Properties : "runs on"
+  Languages ||--o{ Properties : "operates in"
+  Currencies ||--o{ Properties : "books in"
+  Currencies ||--o{ Tenants : "books in"
+  Countries ||--o{ Tenants : "registered in"
+  Capabilities ||--o{ Entitlements : "sold as"
+  Tenants ||--o{ Properties : "runs"
+  Tenants ||--o{ PropertyGroups : "defines"
+  Tenants ||--o{ Entitlements : "licensed"
+  Tenants ||--o{ UserAccounts : "employs"
+  Tenants ||--o{ Roles : "defines"
+  Tenants ||--o{ ConfigValues : "default for"
+  Properties ||--o{ PropertyContacts : "reached via"
+  PropertyGroupTypes ||--o{ PropertyGroups : "classifies"
+  PropertyGroups ||--o{ PropertyGroupMembers : "contains"
+  Properties ||--o{ PropertyGroupMembers : "member of"
+  PropertyGroups ||--o| BrandDetails : "extended by"
+
+  ConfigSettings ||--o{ ConfigValues : "typed by"
+  PropertyGroups ||--o{ ConfigValues : "overridden by"
+  Properties ||--o{ ConfigValues : "overridden by"
+
+  UserAccounts ||--o{ RoleAssignments : "holds"
+  UserAccounts |o--o{ UserAccounts : "superseded by"
+  Roles ||--o{ RoleAssignments : "granted as"
+  Roles ||--o{ Permissions : "carries"
+  Properties ||--o{ RoleAssignments : "scoped to one"
+  PropertyGroups ||--o{ RoleAssignments : "scoped to many"
+  UserAccounts ||--o{ AccessGrants : "elevated"
+
+  UserAccounts ||--o{ ExternalIdentityLinks : "signs in as"
+  FederatedAuthorities ||--o{ ExternalIdentityLinks : "vouched by"
+  ExternalIdentityLinks ||--o{ ExternalIdentityLinkPeriods : "history"
+  UserAccounts ||--o{ ExternalIdentityLinkPeriods : "held by"
+  UserAccounts ||--o{ OperatorSessions : "signed in"
+  UserAccounts ||--o{ StepUpAuthorizations : "re-proved"
+  FederatedAuthorities ||--o{ StepUpAuthorizations : "proved at"
+  UserAccounts ||--o{ LocalStaffEnrolments : "sponsors"
+  FederatedAuthorities ||--o{ LocalStaffEnrolments : "redeemed at"
+
+  UserAccounts ||--o{ AuthorizationRevocationFeed : "revoked"
+  SecurityOperations ||--o{ AuthorizationRevocationFeed : "caused"
+  AuthorizationRevocationSequence ||--o{ AuthorizationRevocationFeed : "clocks"
+  RevocationSnapshots ||--o{ RevocationSnapshotItems : "paged"
+  AuthorizationRevocationSequence ||--o{ RevocationGapTombstones : "pruned to"
+
+  UserAccounts ||--o{ MakerCheckerRequests : "raised by"
+  StepUpAuthorizations ||--o{ MakerCheckerRequests : "proved by"
+  MakerCheckerRequests ||--o{ MakerCheckerExecutions : "executed"
+  MakerCheckerRequests ||--o{ MakerCheckerExpectedVersions : "guarded"
+  MakerCheckerRequests ||--o{ QuarantineReleases : "releases"
+  MakerCheckerExecutions ||--o{ MakerCheckerExecutionItems : "changed"
+  UserAccounts ||--o{ MakerCheckerExecutionItems : "affected"
+  UserAccounts ||--o{ MakerCheckerExecutions : "approved by"
+  UserAccounts ||--o{ MergeApprovals : "proposed"
+  UserAccounts ||--o{ SecurityAuditEvents : "acted"
+
+  FederatedAuthorities ||--o{ ProvisioningConnections : "synced from"
+  ProvisioningConnections ||--o{ ApprovedProvisioningGroups : "allows"
+  ProvisioningConnections ||--o{ DirectoryGroupMemberships : "read back"
+  ProvisioningConnections ||--o{ DirectorySyncRuns : "ran"
+  ProvisioningConnections ||--o{ DirectorySyncRunItems : "touched"
+  ProvisioningConnections ||--o{ DirectorySyncRunStreams : "streamed"
+  ProvisioningConnections ||--o{ DirectorySyncStreamStates : "cursor"
+  ProvisioningConnections ||--o{ ProvisioningLeases : "locked"
+  ProvisioningConnections ||--o{ ProvisioningFencingSequence : "fenced"
+  DirectorySyncRuns ||--o{ DirectorySyncRunItems : "processed"
+  DirectorySyncRuns ||--o{ DirectorySyncRunStreams : "opened"
+  DirectorySyncRuns ||--o{ DirectorySyncRunPages : "fetched"
+  DirectorySyncRunStreams ||--o{ DirectorySyncRunPages : "page of"
+  DirectorySyncRunItems |o--o{ DirectorySyncRunItems : "superseded"
+  ApprovedProvisioningGroups ||--o{ DirectorySyncRunStreams : "for group"
+  ApprovedProvisioningGroups ||--o{ DirectorySyncStreamStates : "for group"
+  DirectorySyncStreamStates ||--o{ DirectorySyncRunStreams : "resumed"
+  DirectorySyncRunSequence ||--o{ DirectorySyncRuns : "numbers"
+  UserAccounts ||--o{ MigrationAmbiguities : "unmatched"
+
+  Tenants ||--o{ OutboxMessages : "stamped"
+  Tenants ||--o{ InboxMessages : "stamped"
+  Tenants ||--o{ RequestIdempotency : "stamped"
+</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RULES ============ -->
+  <section>
+    <h2>What a foreign key cannot say</h2>
+    <h3>Three rules, each with its own constraint</h3>
+    <pre class="sql"><b>one brand per hotel</b>
+  UNIQUE (TenantId, PropertyId)
+    WHERE ToUtc IS NULL AND TypeCode = 'Brand'
+
+  the TypeCode copy on the member row is what makes this a single-table
+  filtered index. Without it the rule needs a trigger, and a trigger is
+  a rule you find out about at three in the morning.
+
+<b>a role is scoped to a hotel or a group, never both</b>
+  CHECK ((PropertyId IS NULL) &lt;&gt; (PropertyGroupId IS NULL))
+
+<b>BrandDetails may only extend a Brand group</b>
+  TypeCode column, CHECK (TypeCode = 'Brand'), and a composite FK
+  against UNIQUE (TenantId, Id, TypeCode) on PropertyGroups
+
+  attach brand detail to a Region group and the insert fails,
+  not the code review</pre>
+
+    <div class="callout">
+      <h4>Where to start</h4>
+      <p><strong>Organisation and Currencies first</strong> &mdash; money and law before anything else, because retrofitting a tax regime after real folios exist means migrating money. Then <code>UserAccounts</code> (ten tables reference it), <code>FederatedAuthorities</code> (every login path starts there), and <code>ProvisioningConnections</code> (seven tables, and the hardest to retrofit).</p>
+      <p>The migration traps, in order of how quietly they fail: <code>NameAr</code> on the group, <code>ThemeReference</code> on the details, <code>IsActive</code>. Each is a working feature that disappears without an error.</p>
+    </div>
+  </section>
+
+  <footer>
+    Updated 22 September 2026. Existing tables and columns read from the live <span style="font-family:var(--mono)">remy_identity</span> and <span style="font-family:var(--mono)">remy_platform</span> databases and from <span style="font-family:var(--mono)">Remy.Platform.Domain</span>; new fields are justified in the gap analysis and placed by the boundary analysis. Attribute lists are trimmed to keys and the columns that carry meaning &mdash; audit columns and the <span style="font-family:var(--mono)">Version</span> rowversion are on every table and are not repeated.
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var STEPS = [0.5, 0.65, 0.8, 1, 1.25, 1.6, 2, 2.6, 3.4, 4.4, 5.6, 7, 8.5, 10];
+    var BASE = 3;
+
+    function controls(target, frame) {
+      var i = BASE;
+      var bar = document.createElement('div');
+      bar.className = 'zoombar';
+
+      function btn(label, aria) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = label;
+        if (aria) b.setAttribute('aria-label', aria);
+        return b;
+      }
+      var out = document.createElement('select');
+      out.className = 'zlevel';
+      out.setAttribute('aria-label', 'Zoom level');
+      for (var z = 0; z < STEPS.length; z++) {
+        var o = document.createElement('option');
+        o.value = String(z);
+        o.textContent = Math.round(STEPS[z] * 100) + '%';
+        out.appendChild(o);
+      }
+      out.addEventListener('change', function () { i = +out.value; apply(); });
+      var minus = btn('\u2212', 'Zoom out');
+      var plus = btn('+', 'Zoom in');
+      var reset = btn('Reset');
+      var hint = document.createElement('span');
+      hint.className = 'hint';
+      hint.textContent = 'up to 1000% · scroll inside the frame to pan';
+
+      var natural = 0;
+
+      function apply() {
+        var k = STEPS[i];
+        out.value = String(i);
+        minus.disabled = i === 0;
+        plus.disabled = i === STEPS.length - 1;
+
+        // Mermaid renders the svg at width:100% of its box, so scaling the box is a
+        // no-op: the svg simply re-fits. Size the svg itself instead. The viewBox
+        // does the rest, so it stays vector-sharp at any level.
+        var svg = target.querySelector('svg');
+        if (svg) {
+          if (!natural) natural = svg.getBoundingClientRect().width || svg.clientWidth;
+          if (natural) {
+            svg.style.maxWidth = 'none';
+            svg.style.width = Math.round(natural * k) + 'px';
+            svg.style.height = 'auto';
+          }
+        }
+
+        // above 100% the diagram would push the page open, so cap the frame and let it scroll
+        if (k > 1 && !frame.classList.contains('tall')) {
+          frame.style.maxHeight = '78vh';
+          frame.style.overflow = 'auto';
+        } else if (!frame.classList.contains('tall')) {
+          frame.style.maxHeight = '';
+          frame.style.overflow = '';
+        }
+      }
+
+      // mermaid renders after this script runs, so measure once it has
+      if (window.requestAnimationFrame) {
+        var tries = 0;
+        (function settle() {
+          if (target.querySelector('svg') || tries++ > 120) { apply(); return; }
+          requestAnimationFrame(settle);
+        })();
+      }
+      minus.addEventListener('click', function () { if (i > 0) { i--; apply(); } });
+      plus.addEventListener('click', function () { if (i < STEPS.length - 1) { i++; apply(); } });
+      reset.addEventListener('click', function () { i = BASE; apply(); frame.scrollLeft = 0; frame.scrollTop = 0; });
+
+      bar.appendChild(minus);
+      bar.appendChild(out);
+      bar.appendChild(plus);
+      bar.appendChild(reset);
+      bar.appendChild(hint);
+      frame.parentNode.insertBefore(bar, frame);
+      apply();
+    }
+
+    var zoomables = document.querySelectorAll('.zoomable');
+    for (var k = 0; k < zoomables.length; k++) {
+      var z = zoomables[k];
+      var frame = z.closest ? z.closest('.frame') : z.parentNode;
+      if (frame) controls(z, frame);
+    }
+  })();
+</script>

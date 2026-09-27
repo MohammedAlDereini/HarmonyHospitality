@@ -1,0 +1,667 @@
+<title>Identity Aggregates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#F3F5F7; --plane:#FFFFFF; --plane-2:#FAFBFC;
+    --ink:#16202B; --ink-2:#44535F; --muted:#6E7E8B;
+    --rule:#D5DDE4; --rule-2:#E7ECF1;
+    --steel:#2C6394; --steel-soft:#E5EEF7;
+    --ochre:#8A5F0F; --ochre-soft:#F8EFDA;
+    --green:#1B6B4C; --green-soft:#E1F1EA;
+    --red:#A62A21; --red-soft:#FBEAE8;
+    --shadow:0 1px 2px rgba(22,32,43,.05),0 8px 24px rgba(22,32,43,.06);
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ground:#0D1319; --plane:#151E26; --plane-2:#1A242D;
+    --ink:#E7EDF3; --ink-2:#B3C1CE; --muted:#8596A4;
+    --rule:#29353F; --rule-2:#212C35;
+    --steel:#82B4DF; --steel-soft:#1A2D3D;
+    --ochre:#D9AC52; --ochre-soft:#2F2716;
+    --green:#63C39A; --green-soft:#11291F;
+    --red:#EE8F87; --red-soft:#311917;
+    --shadow:0 1px 2px rgba(0,0,0,.45),0 8px 24px rgba(0,0,0,.32);
+  }}
+  :root[data-theme="dark"]{
+    --ground:#0D1319; --plane:#151E26; --plane-2:#1A242D;
+    --ink:#E7EDF3; --ink-2:#B3C1CE; --muted:#8596A4;
+    --rule:#29353F; --rule-2:#212C35;
+    --steel:#82B4DF; --steel-soft:#1A2D3D;
+    --ochre:#D9AC52; --ochre-soft:#2F2716;
+    --green:#63C39A; --green-soft:#11291F;
+    --red:#EE8F87; --red-soft:#311917;
+    --shadow:0 1px 2px rgba(0,0,0,.45),0 8px 24px rgba(0,0,0,.32);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+    font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1160px;margin:0 auto;padding-inline:20px;padding-block:40px 80px}
+
+  header{border-bottom:2px solid var(--ink);padding-bottom:20px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--steel);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.08;margin:10px 0 12px;letter-spacing:-.025em;
+    font-weight:600;text-wrap:balance}
+  .sub{color:var(--ink-2);max-width:70ch;margin:0}
+  .counts{display:flex;flex-wrap:wrap;gap:28px;margin-top:22px}
+  .counts div{display:flex;flex-direction:column}
+  .counts b{font-family:var(--mono);font-size:27px;font-weight:600;color:var(--steel);
+    line-height:1.1;font-variant-numeric:tabular-nums}
+  .counts span{font-size:12.5px;color:var(--muted)}
+
+  section{margin-top:46px}
+  h2{margin:0 0 4px;font-size:13px;font-family:var(--mono);letter-spacing:.12em;
+    text-transform:uppercase;color:var(--steel);font-weight:600}
+  h3{margin:0 0 10px;font-size:24px;letter-spacing:-.02em;font-weight:600;text-wrap:balance}
+  .lede{color:var(--ink-2);max-width:72ch;margin:0 0 18px}
+  p{max-width:72ch;color:var(--ink-2)}
+  p strong{color:var(--ink);font-weight:600}
+
+  .wave{margin-top:26px;border:1px solid var(--rule);border-radius:3px;background:var(--plane);
+    box-shadow:var(--shadow);overflow:hidden}
+  .wave > .whead{padding:15px 20px;border-bottom:1px solid var(--rule);background:var(--plane-2);
+    display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .wave .wn{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;
+    font-weight:600;color:var(--steel)}
+  .wave .wt{font-size:19px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+  .wave .wd{font-size:13px;color:var(--muted);flex:1;min-width:16ch}
+
+  .mod{padding:17px 20px;border-bottom:1px solid var(--rule-2)}
+  .mod:last-child{border-bottom:none}
+  .mod h4{margin:0 0 4px;font-family:var(--mono);font-size:15.5px;font-weight:600;
+    letter-spacing:-.01em;color:var(--ink)}
+  .mod .why{margin:0 0 11px;font-size:14px;color:var(--ink-2);max-width:74ch}
+  .mod .why b{color:var(--ink)}
+  .grid2{display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1.2fr);gap:14px 22px}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
+  .box{min-width:0}
+  .box .bl{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;display:block;margin-bottom:5px}
+  .files{font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--ink-2);margin:0;
+    white-space:pre-wrap}
+  .files b{color:var(--ink);font-weight:600}
+  .tbls{font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--ink-2);margin:0;
+    white-space:pre-wrap}
+  .tbls b{color:var(--steel);font-weight:600}
+
+  .inv{margin-top:11px;font-size:13.5px;color:var(--ink-2);border-left:3px solid var(--ochre);
+    padding-left:12px;max-width:74ch}
+  .inv b{color:var(--ink);font-weight:600}
+
+  .frame{border:1px solid var(--rule);border-radius:3px;background:var(--plane);
+    box-shadow:var(--shadow);padding:14px;overflow-x:auto;margin-top:18px}
+  .frame pre.mermaid{margin:0;background:transparent}
+
+  pre.sql{margin:18px 0 0;padding:15px 17px;overflow-x:auto;border:1px solid var(--rule);
+    border-radius:3px;background:var(--plane-2);font-family:var(--mono);font-size:12.5px;
+    line-height:1.7;color:var(--ink-2)}
+  pre.sql b{color:var(--steel);font-weight:600}
+  pre.sql u{color:var(--red);text-decoration:none;font-weight:600}
+  pre.sql i{color:var(--green);font-style:normal;font-weight:600}
+
+  code{font-family:var(--mono);font-size:12.5px;background:var(--steel-soft);color:var(--steel);
+    padding:1px 5px;border-radius:2px}
+
+  .note{border:1px solid var(--rule);border-left-width:4px;border-radius:3px;background:var(--plane);
+    padding:16px 18px;margin-top:20px}
+  .note.red{border-left-color:var(--red)}
+  .note.green{border-left-color:var(--green)}
+  .note.steel{border-left-color:var(--steel)}
+  .note b{display:block;margin-bottom:5px;font-size:16px;color:var(--ink)}
+  .note p{margin:0 0 8px;font-size:14.5px}
+  .note p:last-child{margin-bottom:0}
+
+  footer{margin-top:54px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);
+    font-size:12.5px;max-width:76ch}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">REMY &#183; Identity rebuild &#183; domain layout</span>
+    <h1>The same 58 tables, ordered as code</h1>
+    <p class="sub">The ERD groups tables into clusters so a reader can take them in. That is a documentation device. This page regroups the identical set into <strong>aggregates</strong> &mdash; transaction boundaries &mdash; and puts them in the order they should be written. Follow the folder convention <code>Remy.Folio.Domain</code> already uses: <code>Aggregates/&lt;Name&gt;Module/</code>, holding the root, the children it owns, and its events.</p>
+    <div class="counts">
+      <div><b>20</b><span>aggregate modules</span></div>
+      <div><b>5</b><span>build waves</span></div>
+      <div><b>10</b><span>reference types, not aggregates</span></div>
+      <div><b>3</b><span>tables that never reach Domain</span></div>
+    </div>
+  </header>
+
+  <!-- ============ THE RULE ============ -->
+  <section>
+    <h2>Before the folders</h2>
+    <h3>A cluster is not an aggregate</h3>
+    <p class="lede">Ten clusters became twenty modules, and the mapping is not one to one. The clusters answer &ldquo;what should I read together&rdquo;. Aggregates answer a harder question.</p>
+    <pre class="sql"><b>the only test</b>
+  if two rows must be correct together inside one transaction,
+  they are one aggregate
+
+  otherwise they are two, and they reference each other by id
+
+<b>what follows from it</b>
+  load an aggregate whole, save it whole
+  never hold a reference to another aggregate's object &#8212; hold its Guid
+  one aggregate per transaction, always</pre>
+
+    <div class="note steel">
+      <b>Three places the clusters split or merged</b>
+      <p><strong>Approvals split nothing and merged five.</strong> <code>MakerCheckerRequest</code> owns its executions, the items they changed, the version guard and the quarantine release. Request &#8594; approval &#8594; effect is one lifecycle that must be atomic, so it is one aggregate holding five tables.</p>
+      <p><strong>Organisation split into four.</strong> Tenant, Property and PropertyGroup each change on their own schedule and for different reasons.</p>
+      <p><strong>Membership came out on its own.</strong> It is the join between two aggregates, and it earns a module because of the reason in Wave 1.</p>
+    </div>
+  </section>
+
+  <!-- ============ DEPENDENCY MAP ============ -->
+  <section>
+    <h2>Why this order</h2>
+    <h3>What depends on what</h3>
+    <div class="frame">
+<pre class="mermaid">
+flowchart LR
+  R[Reference<br/>seeded lookups] --> T[TenantModule]
+  R --> P[PropertyModule]
+  T --> P
+  T --> G[PropertyGroupModule]
+  P --> M[GroupMembershipModule]
+  G --> M
+  T --> U[UserAccountModule]
+  T --> RO[RoleModule]
+  RO --> U
+  P --> U
+  G --> U
+  T --> FA[FederatedAuthorityModule]
+  U --> L[IdentityLinkModule]
+  FA --> L
+  U --> S[SessionModule]
+  U --> SU[StepUpModule]
+  FA --> SU
+  U --> E[EnrolmentModule]
+  U --> RV[RevocationModule]
+  SU --> MC[MakerCheckerModule]
+  U --> MC
+  U --> MA[MergeApprovalModule]
+  U --> SA[SecurityAuditModule]
+  T --> C[ConfigModule]
+  G --> C
+  FA --> PC[ProvisioningConnectionModule]
+  PC --> DR[DirectorySyncRunModule]
+  PC --> SS[StreamStateModule]
+  U --> AM[MigrationAmbiguityModule]
+</pre>
+    </div>
+    <p style="margin-top:16px"><strong>Everything flows out of Tenant.</strong> Nothing points back into it, which is why it is written first and why getting its columns wrong is expensive.</p>
+  </section>
+
+  <!-- ============ WAVE 0 ============ -->
+  <section>
+    <h2>Wave one</h2>
+    <h3>Foundation &#183; the organisation graph</h3>
+    <p class="lede">Money and law before anything else. Retrofitting a tax regime after real folios exist means migrating money, so these go first even though nothing visible works yet.</p>
+
+    <div class="wave">
+      <div class="whead">
+        <span class="wn">1.0</span><span class="wt">Reference/</span>
+        <span class="wd">not under Aggregates &#8212; no behaviour to protect</span>
+      </div>
+      <div class="mod">
+        <h4>Reference/</h4>
+        <p class="why">Ten seeded lookups with <b>no TenantId</b>. Shared by every customer, installed once, never edited by a hotel. They have no invariants, so they are not aggregates &mdash; plain entities, or value objects where the code only ever reads them.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>Country.cs</b>
+<b>CountrySubdivision.cs</b>
+<b>City.cs</b>
+<b>TimeZoneRef.cs</b>
+<b>Language.cs</b>
+<b>Currency.cs</b>
+<b>PropertyTypeRef.cs</b>
+<b>PropertyGroupTypeRef.cs</b>
+<b>RegulatoryEnvironment.cs</b>
+<b>Capability.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>Countries</b>
+<b>CountrySubdivisions</b>
+<b>Cities</b>
+<b>TimeZones</b>
+<b>Languages</b>
+<b>Currencies</b>
+<b>PropertyTypes</b>
+<b>PropertyGroupTypes</b>
+<b>RegulatoryEnvironments</b>
+<b>Capabilities</b></pre></div>
+        </div>
+        <p class="inv"><b>Watch the name clash.</b> <code>TimeZone</code> and <code>Currency</code> collide with BCL types. Suffix the reference ones (<code>TimeZoneRef</code>) or your usings will fight you for the rest of the project.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">1.1</span><span class="wt">TenantModule</span>
+        <span class="wd">first real aggregate &#183; everything flows from here</span></div>
+      <div class="mod">
+        <h4>Aggregates/TenantModule/</h4>
+        <p class="why">The customer. Tenant and its entitlements change together &mdash; a contract change moves both &mdash; so they are <b>one aggregate</b>.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>Tenant.cs</b>            the root
+<b>Entitlement.cs</b>       owned child
+<b>TenantEvents.cs</b>
+<b>TenantStatus.cs</b>      enum</pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>Tenants</b>
+<b>Entitlements</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> a terminated tenant cannot be granted an entitlement, and an entitlement limit can never be set below what the tenant already uses. The second half needs a count from Property, which is a different aggregate &mdash; so that check belongs in the handler, not in Tenant.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">1.2</span><span class="wt">PropertyModule</span>
+        <span class="wd">the hotel &#183; the widest table in the service</span></div>
+      <div class="mod">
+        <h4>Aggregates/PropertyModule/</h4>
+        <p class="why">One hotel, plus the named people at it. Contacts have no life of their own, so they are owned children.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>Property.cs</b>          the root
+<b>PropertyContact.cs</b>   owned child
+<b>PropertyEvents.cs</b>
+<b>OperatingHours.cs</b>    value object
+<b>RegulatoryProfile.cs</b> value object &#8212;
+                     the four env codes</pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>Properties</b>
+<b>PropertyContacts</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> exactly one primary contact, at most. And the property's time zone must belong to its country &mdash; which the City reference already knows, so take both from the city rather than letting them be typed independently. That is the bug this design exists to kill.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">1.3</span><span class="wt">PropertyGroupModule</span>
+        <span class="wd">brands, regions, owners, anything</span></div>
+      <div class="mod">
+        <h4>Aggregates/PropertyGroupModule/</h4>
+        <p class="why">The group and, when it is a brand, its extra columns. <code>BrandDetails</code> shares the group's key, so it is an owned child, not a separate aggregate.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>PropertyGroup.cs</b>     the root
+<b>BrandDetail.cs</b>       owned child
+<b>PropertyGroupEvents.cs</b>
+<b>Precedence.cs</b>        value object</pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>PropertyGroups</b>
+<b>BrandDetails</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> brand detail may only exist when the type is Brand. Changing a group's type away from Brand must drop the detail; changing it <em>to</em> Brand must check no member already has one &mdash; a cross-aggregate check, so it lives in the handler.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">1.4</span><span class="wt">GroupMembershipModule</span>
+        <span class="wd">its own module, and here is why</span></div>
+      <div class="mod">
+        <h4>Aggregates/GroupMembershipModule/</h4>
+        <p class="why">The obvious move is to nest membership inside Property or inside PropertyGroup. <b>Do neither.</b> Nest it in the group and adding forty hotels loads one enormous aggregate; nest it in the property and &ldquo;who is in this group&rdquo; needs every property loaded. It is a relationship with its own lifetime and its own dates, so it gets its own small root.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>PropertyGroupMember.cs</b>
+<b>MembershipEvents.cs</b>
+<b>MembershipPeriod.cs</b>  value object
+                     FromUtc / ToUtc</pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>PropertyGroupMembers</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant &mdash; and the one the database holds:</b> one brand per hotel. No aggregate can enforce it, because the rule spans every membership row for a property. The filtered unique index does it instead. Let the insert fail and translate the error; do not read-then-write and hope.</p>
+      </div>
+    </div>
+
+    <div class="note green">
+      <b>End of wave one, you can do something real</b>
+      <p>Create a client, add hotels, group them, and have the database refuse a second brand. That is the whole onboarding prototype, backed by code. Stop here and prove it before going further.</p>
+    </div>
+  </section>
+
+  <!-- ============ WAVE 2 ============ -->
+  <section>
+    <h2>Wave two</h2>
+    <h3>Access &#183; who exists and what they may do</h3>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">2.1</span><span class="wt">RoleModule</span>
+        <span class="wd">before accounts &#8212; an account grants roles that must exist</span></div>
+      <div class="mod">
+        <h4>Aggregates/RoleModule/</h4>
+        <p class="why">The catalogue. Permissions belong to a role and change with it.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>Role.cs</b>              the root
+<b>Permission.cs</b>        owned child
+<b>RoleEvents.cs</b>
+<b>PrivilegeLevel.cs</b>    value object</pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>Roles</b>
+<b>Permissions</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> a system role cannot be deleted or have its privilege level changed.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">2.2</span><span class="wt">UserAccountModule</span>
+        <span class="wd">ten tables reference this one</span></div>
+      <div class="mod">
+        <h4>Aggregates/UserAccountModule/</h4>
+        <p class="why">A person or a machine, their role grants, and any temporary elevation. All three change together and all three are about <b>this account</b>, so one aggregate.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>UserAccount.cs</b>       the root
+<b>RoleAssignment.cs</b>    owned child
+<b>AccessGrant.cs</b>       owned child
+<b>UserAccountEvents.cs</b>
+<b>AssignmentScope.cs</b>   value object &#8212;
+                     property XOR group
+<b>SecurityVersion.cs</b>   value object</pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>UserAccounts</b>
+<b>RoleAssignments</b>
+<b>AccessGrants</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariants:</b> a role assignment is scoped to one property or one group, never both and never neither &mdash; make that a value object so it cannot be constructed wrong. A grantor may not assign a role above their own privilege level. And <code>SecurityVersion</code> only ever increases; that single rule is what the entire revocation design rests on.</p>
+      </div>
+    </div>
+
+    <div class="note steel">
+      <b>You already made this folder</b>
+      <p><code>Aggregates/UserModule</code> exists in the project. Rename it <code>UserAccountModule</code> to match the table and the ubiquitous language &mdash; &ldquo;user&rdquo; is vague in a system that also has guests, and the entity is <code>UserAccount</code>.</p>
+      <p>It also means starting at wave two. That compiles fine, because a <code>UserAccount</code> holds <code>TenantId</code> as a plain Guid with no reference to the Tenant class. But the migrations and the seed need Tenant first, so expect to come back.</p>
+    </div>
+  </section>
+
+  <!-- ============ WAVE 3 ============ -->
+  <section>
+    <h2>Wave three</h2>
+    <h3>Sign-in &#183; the first thing a user sees</h3>
+    <p class="lede">Five small aggregates. None of them owns much, because each represents one short-lived fact.</p>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">3.1</span><span class="wt">FederatedAuthorityModule</span>
+        <span class="wd">every login path starts here</span></div>
+      <div class="mod">
+        <h4>Aggregates/FederatedAuthorityModule/</h4>
+        <p class="why">One configured provider &mdash; Entra, Google, or the built-in local one. Modelling the local authority as just another authority is what keeps the login code single-path.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>FederatedAuthority.cs</b>
+<b>FederatedAuthorityEvents.cs</b>
+<b>AuthorityScheme.cs</b>   enum</pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>FederatedAuthorities</b></pre></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">3.2</span><span class="wt">IdentityLinkModule</span>
+        <span class="wd">what a login actually resolves against</span></div>
+      <div class="mod">
+        <h4>Aggregates/IdentityLinkModule/</h4>
+        <p class="why">The binding between a provider's subject claim and an account, plus the history of that binding. The periods exist only for the link, so they are owned.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>ExternalIdentityLink.cs</b>
+<b>IdentityLinkPeriod.cs</b>
+<b>IdentityLinkEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>ExternalIdentityLinks</b>
+<b>ExternalIdentityLinkPeriods</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> one open period at a time, and closing a period must precede opening the next. This is what lets a token issued last week be judged against the link as it was then.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">3.3</span><span class="wt">EnrolmentModule</span>
+        <span class="wd">local staff, no password anywhere</span></div>
+      <div class="mod">
+        <h4>Aggregates/EnrolmentModule/</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>LocalStaffEnrolment.cs</b>
+<b>EnrolmentEvents.cs</b>
+<b>HandleDigest.cs</b>      value object
+<b>EnrolmentState.cs</b>    enum</pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>LocalStaffEnrolments</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> the handle is stored only as a digest, and the value object should make the plain value impossible to persist by accident. An expired invitation can never be redeemed.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">3.4</span><span class="wt">SessionModule</span>
+        <span class="wd">who is on the system right now</span></div>
+      <div class="mod">
+        <h4>Aggregates/SessionModule/</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>OperatorSession.cs</b>
+<b>SessionEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>OperatorSessions</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> a session ends once. Ending an ended session is a no-op, not an error &mdash; sign-out arrives twice more often than you would think.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">3.5</span><span class="wt">StepUpModule</span>
+        <span class="wd">minutes, not hours</span></div>
+      <div class="mod">
+        <h4>Aggregates/StepUpModule/</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>StepUpAuthorization.cs</b>
+<b>StepUpEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>StepUpAuthorizations</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> expiry is set at creation and never extended. If it could be extended it would be a session, and the whole point is that it is not.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WAVE 4 ============ -->
+  <section>
+    <h2>Wave four</h2>
+    <h3>Control &#183; revocation, approvals, audit</h3>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">4.1</span><span class="wt">RevocationModule</span>
+        <span class="wd">an append-only stream, not a normal aggregate</span></div>
+      <div class="mod">
+        <h4>Aggregates/RevocationModule/</h4>
+        <p class="why">Five tables that behave as one mechanism. The <b>sequence is the aggregate root</b> &mdash; it guards the high-water mark, and guarding a monotonic counter is the only real invariant here. Feed entries are appended under it; snapshots and tombstones are compaction.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>RevocationSequence.cs</b>   root
+<b>RevocationEntry.cs</b>
+<b>RevocationSnapshot.cs</b>
+<b>RevocationSnapshotItem.cs</b>
+<b>RevocationGapTombstone.cs</b>
+<b>RevocationEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>AuthorizationRevocationSequence</b>
+<b>AuthorizationRevocationFeed</b>
+<b>RevocationSnapshots</b>
+<b>RevocationSnapshotItems</b>
+<b>RevocationGapTombstones</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> the sequence only increases, and pruning must leave a tombstone. Skip the tombstone and a reader cannot tell &ldquo;nothing happened&rdquo; from &ldquo;I missed it&rdquo; &mdash; and it will fail open, which is the worst outcome in this whole service.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">4.2</span><span class="wt">MakerCheckerModule</span>
+        <span class="wd">five tables, one lifecycle, one transaction</span></div>
+      <div class="mod">
+        <h4>Aggregates/MakerCheckerModule/</h4>
+        <p class="why">The biggest aggregate in the service, and correctly so. Raising, guarding, approving, executing and recording what was touched must all be atomic &mdash; a half-executed approval is unauditable.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>MakerCheckerRequest.cs</b>  root
+<b>MakerCheckerExecution.cs</b>
+<b>ExecutionItem.cs</b>
+<b>ExpectedVersion.cs</b>
+<b>QuarantineRelease.cs</b>
+<b>MakerCheckerEvents.cs</b>
+<b>RequestState.cs</b>         enum</pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>MakerCheckerRequests</b>
+<b>MakerCheckerExecutions</b>
+<b>MakerCheckerExecutionItems</b>
+<b>MakerCheckerExpectedVersions</b>
+<b>QuarantineReleases</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariants:</b> the checker is never the maker. The maker held a live step-up when raising it. If any expected version no longer matches, the request is void rather than applied &mdash; it was reviewed against something that has since moved.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">4.3</span><span class="wt">MergeApprovalModule</span>
+        <span class="wd">two accounts that turned out to be one person</span></div>
+      <div class="mod">
+        <h4>Aggregates/MergeApprovalModule/</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>MergeApproval.cs</b>
+<b>MergeApprovalEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>MergeApprovals</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> the loser is superseded, never deleted. Deleting it would orphan every audit row that names it.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">4.4</span><span class="wt">SecurityAuditModule</span>
+        <span class="wd">append-only, and deliberately dumb</span></div>
+      <div class="mod">
+        <h4>Aggregates/SecurityAuditModule/</h4>
+        <p class="why">Two tables that only ever grow. <code>SecurityOperation</code> is the named thing that happened; <code>SecurityAuditEvent</code> is the trail. Neither has behaviour beyond being written.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>SecurityOperation.cs</b>
+<b>SecurityAuditEvent.cs</b>
+<b>AuditEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>SecurityOperations</b>
+<b>SecurityAuditEvents</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> nothing is ever updated or deleted. And <code>Action</code> stays a free string &mdash; no reference table, no foreign key. An audit log must record an action from a service version newer than any list you seeded, and a constraint there would drop the record.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WAVE 5 ============ -->
+  <section>
+    <h2>Wave five</h2>
+    <h3>Standards and provisioning &#183; the long tail</h3>
+    <p class="lede">Nothing here blocks a login. Build it when the estate is real enough to need it.</p>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">5.1</span><span class="wt">ConfigModule</span>
+        <span class="wd">the mechanism, never the meanings</span></div>
+      <div class="mod">
+        <h4>Aggregates/ConfigModule/</h4>
+        <p class="why">Two tiny roots and one domain service. <code>ConfigSetting</code> is a registration another service owns; <code>ConfigValue</code> is something somebody set. <b>Resolution is a domain service, not an aggregate method</b> &mdash; it reads across a tenant, its groups and a property, which no single aggregate may do.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>ConfigSetting.cs</b>     root
+<b>ConfigValue.cs</b>       root
+<b>ConfigScope.cs</b>       value object
+<b>SettingResolver.cs</b>   domain service
+<b>ResolutionTrace.cs</b>   value object
+<b>ConfigEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>ConfigSettings</b>
+<b>ConfigValues</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> two groups setting the same key at equal precedence is an <b>error</b>, never a coin toss. Return the trace, not just the winner &mdash; the trace is the feature neither competitor has, and building it after the fact is much harder.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">5.2</span><span class="wt">ProvisioningConnectionModule</span>
+        <span class="wd">seven tables point at this root</span></div>
+      <div class="mod">
+        <h4>Aggregates/ProvisioningConnectionModule/</h4>
+        <p class="why">The connection owns its allowlist, the membership it last read, its lease and its fencing token. All four are meaningless without it and all four change with it.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>ProvisioningConnection.cs</b>
+<b>ApprovedProvisioningGroup.cs</b>
+<b>DirectoryGroupMembership.cs</b>
+<b>ProvisioningLease.cs</b>
+<b>FencingToken.cs</b>
+<b>ProvisioningEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>ProvisioningConnections</b>
+<b>ApprovedProvisioningGroups</b>
+<b>DirectoryGroupMemberships</b>
+<b>ProvisioningLeases</b>
+<b>ProvisioningFencingSequence</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> one live lease per connection, and the fencing token increases on every lease. A worker that stalls and wakes up late carries an old token and must be refused &mdash; this is the hardest thing in the service to retrofit, so write it now rather than later.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">5.3</span><span class="wt">DirectorySyncRunModule</span>
+        <span class="wd">one execution and everything it touched</span></div>
+      <div class="mod">
+        <h4>Aggregates/DirectorySyncRunModule/</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>DirectorySyncRun.cs</b>   root
+<b>SyncRunItem.cs</b>
+<b>SyncRunStream.cs</b>
+<b>SyncRunPage.cs</b>
+<b>SyncRunSequence.cs</b>
+<b>SyncRunEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>DirectorySyncRuns</b>
+<b>DirectorySyncRunItems</b>
+<b>DirectorySyncRunStreams</b>
+<b>DirectorySyncRunPages</b>
+<b>DirectorySyncRunSequence</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> a run holds the fencing token it started with and every write checks it. A finished run is immutable.</p>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">5.4</span><span class="wt">StreamStateModule</span>
+        <span class="wd">outlives the runs that use it</span></div>
+      <div class="mod">
+        <h4>Aggregates/StreamStateModule/</h4>
+        <p class="why">The delta token per group. Separate from the run because it <b>survives</b> the run &mdash; that is the whole reason the second sync reads changes instead of the entire directory.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>DirectorySyncStreamState.cs</b>
+<b>DeltaToken.cs</b>        value object
+<b>StreamStateEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>DirectorySyncStreamStates</b></pre></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wave">
+      <div class="whead"><span class="wn">5.5</span><span class="wt">MigrationAmbiguityModule</span>
+        <span class="wd">held for a human</span></div>
+      <div class="mod">
+        <h4>Aggregates/MigrationAmbiguityModule/</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>MigrationAmbiguity.cs</b>
+<b>AmbiguityEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>MigrationAmbiguities</b></pre></div>
+        </div>
+        <p class="inv"><b>Invariant:</b> it is never resolved automatically. A directory user matching two accounts is held, not guessed &mdash; guessing merges two real people.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NOT DOMAIN ============ -->
+  <section>
+    <h2>Last thing</h2>
+    <h3>Three tables that never reach Domain</h3>
+    <pre class="sql"><u>OutboxMessages</u>        <u>InboxMessages</u>        <u>RequestIdempotency</u>
+
+infrastructure, not domain. They belong in
+  Remy.Identity.Infrastructure/Messaging/
+
+no aggregate, no entity in the domain project, no folder under
+Aggregates. A domain model that knows it is delivered over a
+message bus has already leaked.</pre>
+
+    <div class="note red">
+      <b>Two shapes to keep out of Domain as you go</b>
+      <p><strong>No navigation property to another aggregate.</strong> <code>RoleAssignment</code> holds <code>PropertyId</code>, never a <code>Property</code>. The moment one aggregate can walk into another, one transaction starts loading half the schema.</p>
+      <p><strong>No repository call inside an aggregate.</strong> If a rule needs data the aggregate does not hold &mdash; the entitlement check against property count, the brand check when a group's type changes &mdash; that rule lives in the handler. Both are listed above where they occur.</p>
+    </div>
+
+    <div class="note green">
+      <b>The order, in one line</b>
+      <p>Reference &#8594; Tenant &#8594; Property &#8594; PropertyGroup &#8594; Membership &#8594; Role &#8594; UserAccount &#8594; FederatedAuthority &#8594; IdentityLink &#8594; Enrolment &#8594; Session &#8594; StepUp &#8594; Revocation &#8594; MakerChecker &#8594; MergeApproval &#8594; SecurityAudit &#8594; Config &#8594; ProvisioningConnection &#8594; DirectorySyncRun &#8594; StreamState &#8594; MigrationAmbiguity</p>
+    </div>
+  </section>
+
+  <footer>
+    Written 22 September 2026 for the rebuild at <span style="font-family:var(--mono)">D:\PMS System\Remy</span>. Table set and constraints match <span style="font-family:var(--mono)">identity-erd.html</span> in this folder, which stays the reference for columns and keys. Folder convention follows <span style="font-family:var(--mono)">Remy.Folio.Domain/Aggregates/&lt;Name&gt;Module/</span> in the main repository. Aggregate boundaries are architectural judgement &mdash; each is stated with the invariant that justifies it, so it can be argued with.
+  </footer>
+
+</div>
