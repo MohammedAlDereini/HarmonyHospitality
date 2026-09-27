@@ -1,6 +1,6 @@
 ﻿using Harmony.Identity.Domain.Common;
 
-namespace Harmony.Identity.Domain.Aggregates.RoleModule;
+namespace Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 
 public static class SystemRoles
 {

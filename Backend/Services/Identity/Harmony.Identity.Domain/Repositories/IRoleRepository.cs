@@ -1,5 +1,5 @@
 ﻿using Harmony.Core.BuildingBlocks.Domain.Abstractions;
-using Harmony.Identity.Domain.Aggregates.RoleModule;
+using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 
 namespace Harmony.Identity.Domain.Repositories;
 

@@ -1,4 +1,4 @@
-﻿using Harmony.Identity.Domain.Aggregates.LookupModule;
+﻿using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

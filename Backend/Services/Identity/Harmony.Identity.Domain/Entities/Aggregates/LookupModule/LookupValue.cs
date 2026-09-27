@@ -1,6 +1,6 @@
 using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 
-namespace Harmony.Identity.Domain.Aggregates.LookupModule;
+namespace Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 
 public class LookupValue : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntity, ISoftDeleteEntity, IConcurrentEntity
 {

@@ -1,4 +1,4 @@
-﻿using Harmony.Identity.Domain.Aggregates.RoleModule;
+﻿using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

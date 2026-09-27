@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Harmony.Core.BuildingBlocks.Domain.Abstractions;
-using Harmony.Identity.Domain.Aggregates.LookupModule;
+using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 
 namespace Harmony.Identity.Domain.Repositories;
 

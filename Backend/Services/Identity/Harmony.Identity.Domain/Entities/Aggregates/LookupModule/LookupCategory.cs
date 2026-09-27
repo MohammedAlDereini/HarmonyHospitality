@@ -1,7 +1,7 @@
 using System.Text;
 using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 
-namespace Harmony.Identity.Domain.Aggregates.LookupModule;
+namespace Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 
 public sealed class LookupCategory : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntity, ISoftDeleteEntity, IConcurrentEntity
 {

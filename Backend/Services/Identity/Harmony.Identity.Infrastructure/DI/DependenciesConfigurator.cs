@@ -4,7 +4,7 @@ using Harmony.Core.Identity.DI;
 using Harmony.Core.Localization.DI;
 using Harmony.Core.Logging.DI;
 using Harmony.Core.Notification.DI;
-using Harmony.Identity.Domain.Aggregates.LookupModule;
+using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Infrastructure.Persistence;
 using Harmony.Identity.Infrastructure.Repositories;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Harmony.Core.EventBus.Abstractions;
 using Harmony.Core.Models;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Harmony.Identity.Domain.Aggregates.RoleModule;
+using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 
 namespace Harmony.Identity.Infrastructure.DI;
 

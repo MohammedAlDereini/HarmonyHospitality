@@ -1,7 +1,7 @@
 ﻿namespace Harmony.Identity.Handler.Commands.RoleModule.Create;
 
-using Harmony.Identity.Domain.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Common;
+using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Repositories;
 
 public class CreateRoleCommandHandler : RoleCommandHandlerBase, IRequestHandler<CreateRoleCommand, CallResponse<Guid>>

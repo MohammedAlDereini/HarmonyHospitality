@@ -1,6 +1,6 @@
 ﻿namespace Harmony.Identity.Handler.Commands.RoleModule.Create;
 
-using Harmony.Identity.Domain.Aggregates.RoleModule;
+using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 
 public class CreateRoleCommand : BaseCommandRequest<CallResponse<Guid>>
 {

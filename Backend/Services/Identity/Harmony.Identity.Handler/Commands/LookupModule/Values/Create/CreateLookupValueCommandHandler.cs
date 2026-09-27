@@ -1,6 +1,6 @@
 ﻿namespace Harmony.Identity.Handler.Commands.LookupModule.Values.Create;
 
-using Harmony.Identity.Domain.Aggregates.LookupModule;
+using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 using Harmony.Identity.Domain.Repositories;
 
 public class CreateLookupValueCommandHandler : LookupValueCommandHandlerBase, IRequestHandler<CreateLookupValueCommand, CallResponse>
