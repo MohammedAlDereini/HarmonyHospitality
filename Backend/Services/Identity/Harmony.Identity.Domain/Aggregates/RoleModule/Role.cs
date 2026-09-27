@@ -42,7 +42,7 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
     {
         return new Role
         {
-            Code = IdentityText.RoleCode(code),
+            Code = AssignableCode(code),
             NameEn = RequireName(nameEn),
             NameAr = IdentityText.Blank(nameAr),
             PrivilegeLevel = RequireLevel(privilegeLevel),
@@ -56,7 +56,7 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
 
         var role = new Role
         {
-            Code = IdentityText.RoleCode(code),
+            Code = AssignableCode(code),
             NameEn = RequireName(nameEn),
             NameAr = IdentityText.Blank(nameAr),
             PrivilegeLevel = RequireLevel(privilegeLevel),
@@ -114,7 +114,7 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
     public void ChangeCode(string code)
     {
         AssertEditable();
-        Code = IdentityText.RoleCode(code);
+        Code = AssignableCode(code);
     }
 
     public void SetPrivilegeLevel(PrivilegeLevel privilegeLevel)
@@ -154,6 +154,15 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
         {
             throw new BusinessException($"'{Code}' is a system role. Create your own role instead of changing a shipped one.", Error.New(IdentityErrorCodes.SystemRoleImmutable));
         }
+    }
+
+    private static string AssignableCode(string code)
+    {
+        var normalized = IdentityText.RoleCode(code);
+
+        return SystemRoles.IsReserved(normalized)
+            ? throw new BusinessException($"'{normalized}' is reserved for the system.", Error.New(IdentityErrorCodes.ReservedRoleCode))
+            : normalized;
     }
 
     private static string RequireName(string nameEn)

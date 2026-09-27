@@ -28,6 +28,10 @@ Layering: `Domain → Handler → Api`, `Infrastructure → Domain`, `Api` refer
 | M19 | **Development bootstrap** | Dev-only catalogue seeding + `POST /Tokens/development`. | Optional |
 | M20 | **Cutover / migration** | Cutover validation, link backfill, legacy-status migration, migration review queue, duplicate repair, read-cut ledger, dual-read resolution. ~6,500 lines prod + ~5,000 test. | ❌ **Drop — greenfield doesn't migrate** |
 
+> **Harmony decisions, 27 Sep 2026 (they override the table above):**
+> - **M4 no longer means "no super-admin".** Every installation ships one standing `SUPERADMIN` role in the platform tenant, with full access to everything across all tenants. It is used for demos and to manage system configuration for other tenants. Break-glass stays for everyone else.
+> - **M2/M15 local sign-in uses a password.** It is held by the local authority, never on `UserAccount`. Microsoft and Google come later as more authorities.
+
 ## Core domain model (short form)
 
 - **UserAccount**: `Issuer`, `Subject`, profile fields, `DirectoryState` × `AdministrativeState` (two axes, never write each other), `IsMfaEnrolled`, `IsServicePrincipal`, `ServiceCredentialSecretHash`, `SecurityVersion`. Unique on `(TenantId, Issuer, Subject)` under **binary collation**. Owns `RoleAssignment[]` (`RoleCode`, `PropertyId`, valid-from/until, revocation fields).

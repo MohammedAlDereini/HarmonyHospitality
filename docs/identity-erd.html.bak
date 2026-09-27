@@ -552,7 +552,6 @@ erDiagram
     nvarchar Code UK
     int PrivilegeLevel "cannot grant above self"
     bit IsSystemRole
-    bit IsSuperRole "platform owner, one only"
   }
   Permissions {
     uniqueidentifier Id PK
@@ -606,7 +605,7 @@ CHECK ((PropertyId IS NULL) &lt;&gt; (PropertyGroupId IS NULL))
   <section>
     <h2>Cluster five <em>&#183; 6 tables</em></h2>
     <h3>Signing in</h3>
-    <p class="lede">No password column on <code>UserAccounts</code>. The built-in local authority keeps its own password credential (Harmony decision, 27 Sep 2026); local staff are invited to it, everyone else signs in through a federated provider.</p>
+    <p class="lede">No password column anywhere. Local staff arrive by sponsored invitation, everyone else through a federated provider.</p>
 
     <div class="frame">
 <div class="zoomable">
@@ -1216,40 +1215,3 @@ erDiagram
     }
   })();
 </script>
-
-<script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-
-  var css = getComputedStyle(document.documentElement);
-  var v = function (n) { return css.getPropertyValue(n).trim(); };
-
-  mermaid.initialize({
-    startOnLoad: true,
-    securityLevel: 'loose',
-    theme: 'base',
-    themeVariables: {
-      fontFamily: v('--sans'),
-      fontSize: '14px',
-      background: 'transparent',
-      primaryColor: v('--plane-2'),
-      primaryTextColor: v('--ink'),
-      primaryBorderColor: v('--rule'),
-      secondaryColor: v('--steel-soft'),
-      tertiaryColor: v('--plane'),
-      lineColor: v('--steel'),
-      textColor: v('--ink-2'),
-      mainBkg: v('--plane-2'),
-      nodeBorder: v('--rule'),
-      clusterBkg: v('--plane-2'),
-      clusterBorder: v('--rule'),
-      edgeLabelBackground: v('--plane'),
-      attributeBackgroundColorOdd: v('--plane'),
-      attributeBackgroundColorEven: v('--plane-2')
-    },
-    er: { useMaxWidth: false, entityPadding: 10 },
-    flowchart: { useMaxWidth: false, curve: 'basis' }
-  });
-</script>
-
-</body>
-</html>

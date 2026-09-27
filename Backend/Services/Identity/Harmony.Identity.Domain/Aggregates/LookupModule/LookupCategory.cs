@@ -3,7 +3,7 @@ using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 
 namespace Harmony.Identity.Domain.Aggregates.LookupModule;
 
-public sealed class LookupCategory : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntity, ISoftDeleteEntity
+public sealed class LookupCategory : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntity, ISoftDeleteEntity, IConcurrentEntity
 {
     public string Name { get; private set; } = null!;
 

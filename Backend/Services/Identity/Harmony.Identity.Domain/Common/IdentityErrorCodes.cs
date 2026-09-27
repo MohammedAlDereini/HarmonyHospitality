@@ -11,4 +11,7 @@ public static class IdentityErrorCodes
     public const string SystemRoleImmutable = "00012";
     public const string SystemRoleNotDeletable = "00013";
     public const string InvalidPrivilegeLevel = "00014";
+    public const string RoleNotFound = "00015";
+    public const string RoleCodeInUse = "00016";
+    public const string ReservedRoleCode = "00017";
 }
