@@ -1,8 +1,20 @@
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
+  "ApplicationSettings": {
+    "ApplicationKeys": {
+      "DefaultDbEngine": "MSSql",
+      "PlatformTenantId": "01a0e265-0cad-77e1-b31c-98fed11919e1"
+    },
+    "ConnectionStrings": {
+      "Default": "Server=localhost;Database=HarmonyIdentity;Trusted_Connection=True;TrustServerCertificate=True"
     }
+  },
+  "ValidationSettings": {
+    "Errors": []
+  },
+  "TokenIssuerSettings": {
+    "Issuer": "https://localhost:5000",
+    "SigningKeyPem": null,
+    "SigningKeyPath": "/run/secrets/identity-signing-key.pem",
+    "PreviousSigningKeyPems": []
   }
 }

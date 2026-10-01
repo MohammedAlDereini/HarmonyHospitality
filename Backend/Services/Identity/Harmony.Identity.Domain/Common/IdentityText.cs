@@ -33,6 +33,38 @@ public static class IdentityText
         return trimmed;
     }
 
+    /// <summary>A service principal's code, as its Subject: 3–64 chars of a-z, 0-9, '-' or '.'; stored lower-case.</summary>
+    public static string ServicePrincipalCode(string? value)
+    {
+        var trimmed = Blank(value)?.ToLowerInvariant();
+
+        if (trimmed is null || trimmed.Length < 3 || trimmed.Length > 64
+            || !trimmed.All(c => char.IsAsciiLetterLower(c) || char.IsAsciiDigit(c) || c == '-' || c == '.'))
+        {
+            throw new BusinessException($"'{value}' is not a valid service principal code.", Error.New(IdentityErrorCodes.InvalidServicePrincipalCode));
+        }
+
+        return trimmed;
+    }
+
+    public static string DisplayName(string? value)
+    {
+        var trimmed = Blank(value);
+
+        if (trimmed is null || trimmed.Length > 128)
+        {
+            throw new BusinessException("A display name of 1 to 128 characters is required.", Error.New(IdentityErrorCodes.DisplayNameRequired));
+        }
+
+        return trimmed;
+    }
+
+    public static string? Reason(string? value)
+    {
+        var trimmed = Blank(value);
+        return trimmed is { Length: > 500 } ? trimmed[..500] : trimmed;
+    }
+
     public static bool SameCode(string? left, string? right)
         => string.Equals(left?.Trim(), right?.Trim(), StringComparison.OrdinalIgnoreCase);
 }

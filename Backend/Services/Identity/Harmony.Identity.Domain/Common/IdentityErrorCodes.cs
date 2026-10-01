@@ -14,4 +14,14 @@ public static class IdentityErrorCodes
     public const string RoleNotFound = "00015";
     public const string RoleCodeInUse = "00016";
     public const string ReservedRoleCode = "00017";
+
+
+    // 00018–00035 belong to the Organisation ticket; 00070–00073 to the Tenant ticket.
+    public const string UserAccountNotFound = "00036";
+    public const string InvalidServicePrincipalCode = "00037";
+    public const string DisplayNameRequired = "00038";
+    public const string ServicePrincipalCodeInUse = "00039";
+    public const string NotAServicePrincipal = "00040";
+    public const string UserAccountTerminated = "00041";
+    public const string IdentityStoreRefused = "00042";
 }

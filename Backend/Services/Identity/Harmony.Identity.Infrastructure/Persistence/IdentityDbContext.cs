@@ -1,9 +1,10 @@
 ﻿using Harmony.Core.BuildingBlocks;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
-using Microsoft.EntityFrameworkCore;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
+using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Entities.Reference;
+using Microsoft.EntityFrameworkCore;
 
 namespace Harmony.Identity.Infrastructure.Persistence;
 
@@ -26,6 +27,8 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<PropertyGroupTypeRef> PropertyGroupTypes { get; set; }
     public DbSet<RegulatoryEnvironment> RegulatoryEnvironments { get; set; }
     public DbSet<Capability> Capabilities { get; set; }
+
+    public DbSet<HarmonyUser> UserAccounts { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);

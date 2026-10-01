@@ -10,5 +10,11 @@
   },
   "ValidationSettings": {
     "Errors": []
+  },
+  "TokenIssuerSettings": {
+    "Issuer": "https://localhost:5000",
+    "SigningKeyPem": null,
+    "SigningKeyPath": "D:/PMS System/secrets/identity-signing-key.pem",
+    "PreviousSigningKeyPems": []
   }
 }

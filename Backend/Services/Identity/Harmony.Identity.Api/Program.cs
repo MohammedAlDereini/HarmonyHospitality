@@ -45,6 +45,7 @@ public partial class Program
         {
             app.UseRouting();
             app.ConfigureAppLogging();
+            app.ConfigureIdentityServer();
             app.MapControllers();
         }
     }
