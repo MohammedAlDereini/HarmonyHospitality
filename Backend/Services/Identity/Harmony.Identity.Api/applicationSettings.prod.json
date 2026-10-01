@@ -15,6 +15,19 @@
     "Issuer": "https://identity.harmony.local",
     "SigningKeyPem": null,
     "SigningKeyPath": "/run/secrets/identity-signing-key.pem",
-    "PreviousSigningKeyPems": []
+    "PreviousSigningKeyPems": [],
+    "BootstrapPrincipal": {
+      "Code": "harmony-bootstrap",
+      "DisplayName": "Harmony bootstrap",
+      "SecretPath": "/run/secrets/identity-bootstrap-secret"
+    }
+  },
+  "IdentitySettings": {
+    "Platform": {
+      "Issuer": "https://identity.harmony.local",
+      "MetadataAddress": "https://identity.harmony.local/.well-known/openid-configuration",
+      "RequireHttpsMetadata": true,
+      "ValidAudiences": [ "harmony" ]
+    }
   }
 }

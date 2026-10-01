@@ -1,9 +1,11 @@
-﻿using Harmony.Core.DI;
+using Harmony.Core.DI;
 using Harmony.Core.Enums;
+using Harmony.Core.Exceptions;
 using Harmony.Core.Identity.DI;
 using Harmony.Core.Localization.DI;
 using Harmony.Core.Logging.DI;
 using Harmony.Core.Notification.DI;
+using Harmony.Identity.Domain.Common;
 using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Infrastructure.Persistence;
@@ -40,12 +42,17 @@ public static class DependenciesConfigurator
         services.AddScoped<IUserAccountRepository, UserAccountRepository>();
         services.AddUserAccounts();
         services.AddIdentityServerHost(configuration);
+        services.AddPlatformAuthentication(configuration);
     }
 
-    /// <summary>Duende's endpoints (discovery, jwks, token). After routing, before the controllers.</summary>
+    /// <summary>
+    /// Duende's endpoints (discovery, jwks, token) first: they are the one anonymous door. Then the platform
+    /// authentication every controller sits behind. After routing, before the controllers.
+    /// </summary>
     public static void ConfigureIdentityServer(this IApplicationBuilder app)
     {
         app.UseIdentityServer();
+        app.UseIdentity(identity => identity.UsePlatformAuthentication());
     }
 
     /// <summary>
@@ -71,12 +78,26 @@ public static class DependenciesConfigurator
         services.AddSingleton(sp => KeyRingStores.Validation(sp.GetRequiredService<RsaSigningKeyProvider>()));
     }
 
+    /// <summary>
+    /// Identity protects its own API the way every Harmony service does: the framework validates the Bearer
+    /// token against this issuer's own discovery document (IdentitySettings:Platform), deny by default.
+    /// Registered after Duende so Bearer is the default scheme, not one of Duende's cookies.
+    /// </summary>
+    private static void AddPlatformAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        Harmony.Core.Identity.DI.DependenciesConfigurator.AddIdentity(services, configuration, identity =>
+        {
+            identity.AddPlatformAuthentication();
+        });
+    }
+
     public static void ConfigureAppLogging(this IApplicationBuilder app)
     {
         app.UseCore(coreBuilderConfig =>
         {
             coreBuilderConfig.UseExceptionHandling();
             coreBuilderConfig.UseSwagger();
+            coreBuilderConfig.UseHealthChecks();
         });
     }
 
@@ -106,7 +127,8 @@ public static class DependenciesConfigurator
     }
 
     /// <summary>
-    /// The signing keys, checked at start: a bad issuer or key stops the service before it signs anything.
+    /// The signing keys and the bootstrap principal, checked at start: a bad issuer, key or secret file
+    /// stops the service before it signs anything or seeds anyone.
     /// </summary>
     private static void AddTokenSigning(this IServiceCollection services, IConfiguration configuration)
     {
@@ -115,7 +137,7 @@ public static class DependenciesConfigurator
             .Validate(
                 settings => Uri.TryCreate(settings.Issuer, UriKind.Absolute, out var issuer) && issuer.Scheme == Uri.UriSchemeHttps,
                 $"{TokenIssuerSettings.Section}:Issuer must be an absolute https URL.")
-                        .Validate(
+            .Validate(
                 settings => !string.IsNullOrWhiteSpace(settings.SigningKeyPem) || !string.IsNullOrWhiteSpace(settings.SigningKeyPath),
                 $"{TokenIssuerSettings.Section}:SigningKeyPem or :SigningKeyPath is required.")
             .Validate(
@@ -124,6 +146,15 @@ public static class DependenciesConfigurator
             .Validate(
                 settings => ConfiguredKeys(settings).All(pem => !RsaSigningKeyProvider.TryDescribeProblem(pem, out _)),
                 $"{TokenIssuerSettings.Section}: a signing key is not a readable RSA private key of at least {RsaSigningKeyProvider.MinimumKeyBits} bits.")
+            .Validate(
+                settings => BootstrapNameIsUsable(settings.BootstrapPrincipal),
+                $"{TokenIssuerSettings.Section}:BootstrapPrincipal needs a Code (3–64 characters of a-z, 0-9, '-' or '.') and a DisplayName.")
+            .Validate(
+                settings => !string.IsNullOrWhiteSpace(settings.BootstrapPrincipal?.SecretPath) && File.Exists(settings.BootstrapPrincipal.SecretPath),
+                $"{TokenIssuerSettings.Section}:BootstrapPrincipal:SecretPath is required and must exist.")
+            .Validate(
+                settings => BootstrapSecretIsUsable(settings.BootstrapPrincipal),
+                $"{TokenIssuerSettings.Section}:BootstrapPrincipal: the secret file must hold one line of at least {ServiceSecret.MinimumLength} characters.")
             .ValidateOnStart();
 
         services.AddSingleton<RsaSigningKeyProvider>();
@@ -146,6 +177,42 @@ public static class DependenciesConfigurator
         }
     }
 
+    private static bool BootstrapNameIsUsable(BootstrapPrincipalSettings? bootstrap)
+    {
+        if (bootstrap is null || string.IsNullOrWhiteSpace(bootstrap.DisplayName))
+        {
+            return false;
+        }
+
+        try
+        {
+            IdentityText.ServicePrincipalCode(bootstrap.Code);
+            return true;
+        }
+        catch (BusinessException)
+        {
+            return false;
+        }
+    }
+
+    private static bool BootstrapSecretIsUsable(BootstrapPrincipalSettings? bootstrap)
+    {
+        if (bootstrap is null || string.IsNullOrWhiteSpace(bootstrap.SecretPath) || !File.Exists(bootstrap.SecretPath))
+        {
+            return false;
+        }
+
+        try
+        {
+            ServiceSecret.EnsureUsable(File.ReadAllText(bootstrap.SecretPath).Trim());
+            return true;
+        }
+        catch (BusinessException)
+        {
+            return false;
+        }
+    }
+
     /// <summary>
     /// ASP.NET Core Identity for users, stored in OUR DbContext: UserOnlyStore needs only a DbContext
     /// that maps Identity's four tables, so the framework's tenant filter, audit and rowversion apply
@@ -165,9 +232,15 @@ public static class DependenciesConfigurator
 
         Harmony.Core.DI.DependenciesConfigurator.AddCore(services, configuration, coreServicesConfig =>
         {
+            // The tenant comes from the token now, not from a header: Swagger gets an Authorize button instead.
             coreServicesConfig.AddSwagger(conf =>
             {
-                conf.AddHeader(Harmony.Core.Constants.ContextValues.TenantId, isRequired: true, defaultValue: tenantId);
+                conf.EnableJWTAuthorization();
+            });
+
+            coreServicesConfig.AddHealthChecks(healthChecksConfig =>
+            {
+                healthChecksConfig.AddHealthCheck("Database", eHealthChecksType.SqlServer);
             });
 
             coreServicesConfig.AddAppInfo(appInfoConfig =>

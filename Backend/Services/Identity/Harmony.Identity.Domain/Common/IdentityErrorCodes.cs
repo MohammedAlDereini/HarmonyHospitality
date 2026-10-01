@@ -24,4 +24,5 @@ public static class IdentityErrorCodes
     public const string NotAServicePrincipal = "00040";
     public const string UserAccountTerminated = "00041";
     public const string IdentityStoreRefused = "00042";
+    public const string InvalidServiceSecret = "00043";
 }

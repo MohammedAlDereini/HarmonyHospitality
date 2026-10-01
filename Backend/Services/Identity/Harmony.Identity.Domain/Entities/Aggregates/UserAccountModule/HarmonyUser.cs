@@ -41,17 +41,23 @@ public sealed class HarmonyUser : IdentityUser<Guid>, IBaseEntity, IAuditableEnt
     /// <summary>A machine account: its code is the user name, it has no password, and its secret is returned exactly once.</summary>
     public static HarmonyUser CreateServicePrincipal(string code, string displayName, DateTime nowUtc, out string secret)
     {
-        var user = new HarmonyUser
-        {
-            Id = Uid.New(),
-            UserName = IdentityText.ServicePrincipalCode(code),
-            DisplayName = IdentityText.DisplayName(displayName),
-            IsServicePrincipal = true,
-            State = AdministrativeState.Active,
-            SecurityVersion = 1,
-        };
-
+        var user = NewServicePrincipal(code, displayName);
         secret = user.IssueSecret(nowUtc);
+        return user;
+    }
+
+    /// <summary>
+    /// A machine account whose secret is supplied rather than generated: the bootstrap principal, which has
+    /// to exist before anyone can call the API to create one. The secret must be one line of at least
+    /// <see cref="ServiceSecret.MinimumLength"/> characters; only its digest is kept.
+    /// </summary>
+    public static HarmonyUser CreateServicePrincipal(string code, string displayName, DateTime nowUtc, string secret)
+    {
+        ServiceSecret.EnsureUsable(secret);
+
+        var user = NewServicePrincipal(code, displayName);
+        user.ServiceCredentialDigest = ServiceSecret.Digest(secret);
+        user.ServiceCredentialIssuedOn = nowUtc;
         return user;
     }
 
@@ -107,6 +113,16 @@ public sealed class HarmonyUser : IdentityUser<Guid>, IBaseEntity, IAuditableEnt
         PasswordHash = null;
         BumpSecurityVersion();
     }
+
+    private static HarmonyUser NewServicePrincipal(string code, string displayName) => new()
+    {
+        Id = Uid.New(),
+        UserName = IdentityText.ServicePrincipalCode(code),
+        DisplayName = IdentityText.DisplayName(displayName),
+        IsServicePrincipal = true,
+        State = AdministrativeState.Active,
+        SecurityVersion = 1,
+    };
 
     private string IssueSecret(DateTime nowUtc)
     {
