@@ -7,7 +7,6 @@ using Harmony.Core.Logging.DI;
 using Harmony.Core.Notification.DI;
 using Harmony.Identity.Domain.Common;
 using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
-using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Infrastructure.Persistence;
 using Harmony.Identity.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -70,6 +69,7 @@ public static class DependenciesConfigurator
             config.AddReadOnlyRepository<LookupValue, IdentityDbContext>();
             config.AddReadOnlyRepository<Role, IdentityDbContext>();
             config.AddReadOnlyRepository<HarmonyUser, IdentityDbContext>();
+            config.AddRepositoriesFromAssemblyContaining<RoleRepository>();
             config.AddMediatR(mediatRConfig =>
             {
                 mediatRConfig.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
@@ -175,10 +175,6 @@ public static class DependenciesConfigurator
 
     private static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.TryAddScoped<ILookupCategoryRepository, LookupCategoryRepository>();
-        services.TryAddScoped<ILookupValueRepository, LookupValueRepository>();
-        services.TryAddScoped<IRoleRepository, RoleRepository>();
-        services.TryAddScoped<IUserAccountRepository, UserAccountRepository>();
         services.AddUserAccounts();
         services.AddTokenSigning(configuration);
     }
