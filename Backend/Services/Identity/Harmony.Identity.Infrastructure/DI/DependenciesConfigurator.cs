@@ -294,6 +294,9 @@ public static class DependenciesConfigurator
             options.IssuerUri = configuration[$"{TokenIssuerSettings.Section}:{nameof(TokenIssuerSettings.Issuer)}"];
             options.KeyManagement.Enabled = false;
             options.EmitStaticAudienceClaim = false;
+
+            // Our grant carries the secret in a parameter Duende does not know; without this it is logged in clear.
+            options.Logging.TokenRequestSensitiveValuesFilter.Add(ServicePrincipalGrant.SecretParameter);
         })
         .AddInMemoryApiScopes(IdentityServerResources.ApiScopes)
         .AddInMemoryApiResources(IdentityServerResources.ApiResources)
