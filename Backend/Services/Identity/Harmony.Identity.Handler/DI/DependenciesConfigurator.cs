@@ -26,6 +26,7 @@ public static class DependenciesConfigurator
         Harmony.Core.Validation.DI.DependenciesConfigurator.AddValidation(services, configuration, validationServicesConfig =>
         {
             validationServicesConfig.RegisterValidatorsFromAssemblyContaining<ApplicationClass>();
+            validationServicesConfig.AddFluentValidationFilter();
         });
     }
 }
