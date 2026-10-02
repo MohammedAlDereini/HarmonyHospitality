@@ -162,6 +162,11 @@ public static class DependenciesConfigurator
     /// </summary>
     private static void AddJwtServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Duende FIRST. Both calls register an authentication default and the last one registered wins:
+        // with Duende last, its cookie scheme becomes the default and every API call is sent to a login
+        // page instead of Bearer validation. Verified live on 2026-10-02.
+        services.AddIdentityServerHost(configuration);
+
         services.AddIdentity(configuration, identityConfig =>
         {
             identityConfig.AddPlatformAuthentication();
@@ -176,7 +181,6 @@ public static class DependenciesConfigurator
         services.TryAddScoped<IUserAccountRepository, UserAccountRepository>();
         services.AddUserAccounts();
         services.AddTokenSigning(configuration);
-        services.AddIdentityServerHost(configuration);
     }
 
     /// <summary>
