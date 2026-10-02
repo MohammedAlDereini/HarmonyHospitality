@@ -29,5 +29,34 @@
       "RequireHttpsMetadata": true,
       "ValidAudiences": [ "harmony" ]
     }
+  },
+  "CacheSettings": {
+    "CacheProviders": {
+      "Redis": {
+        "Connection": "localhost",
+        "Port": 6379,
+        "User": "identity",
+        "Password": "61vBEgthSzXndY9IMprOCxFL2cRDmKN7",
+        "AllowAdmin": false,
+        "Ssl": false,
+        "DistributedLockMode": "RedLock"
+      }
+    },
+    "InterceptionSettings": {
+      "CachingEnabled": false,
+      "DefaultCacheProvider": "Redis",
+      "DefaultCacheAccessLevel": "Private",
+      "CachingMethods": [
+        {
+          "TypeName": "",
+          "CacheProvider": "Memory",
+          "Name": "",
+          "ExpiryInMinutes": 0,
+          "Enabled": false,
+          "CacheAccessLevel": null
+        }
+      ]
+    }
   }
 }
+

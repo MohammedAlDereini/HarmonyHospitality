@@ -20,8 +20,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Infrastructure.Signing;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
-using Duende.IdentityServer.Stores;
 using Harmony.Identity.Infrastructure.IdentityServer;
+using System.IO;
+using System.Reflection;
 namespace Harmony.Identity.Infrastructure.DI;
 
 
@@ -30,65 +31,8 @@ public static class DependenciesConfigurator
     public static void AddInfrastructureService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddBuildingBlocks(configuration);
-
-        // Needs RabbitMQ + Redis; remove until the event bus is wired.
-        services.RemoveAll<IIntegrationEventHandler<SystemEvent>>();
-
         services.AddCore(configuration);
-        services.AddTokenSigning(configuration);
-        services.AddScoped<ILookupCategoryRepository, LookupCategoryRepository>();
-        services.AddScoped<ILookupValueRepository, LookupValueRepository>();
-        services.AddScoped<IRoleRepository, RoleRepository>();
-        services.AddScoped<IUserAccountRepository, UserAccountRepository>();
-        services.AddUserAccounts();
-        services.AddIdentityServerHost(configuration);
-        services.AddPlatformAuthentication(configuration);
-    }
-
-    /// <summary>
-    /// Duende's endpoints (discovery, jwks, token) first: they are the one anonymous door. Then the platform
-    /// authentication every controller sits behind. After routing, before the controllers.
-    /// </summary>
-    public static void ConfigureIdentityServer(this IApplicationBuilder app)
-    {
-        app.UseIdentityServer();
-        app.UseIdentity(identity => identity.UsePlatformAuthentication());
-    }
-
-    /// <summary>
-    /// Duende IdentityServer as the token engine. It signs with our key ring (S3a) — automatic key
-    /// management is off — and issues service tokens through the harmony:service grant. No licence key:
-    /// in non-production Duende runs in trial mode and only logs a notice. Production needs a licence.
-    /// </summary>
-    private static void AddIdentityServerHost(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddIdentityServer(options =>
-        {
-            options.IssuerUri = configuration[$"{TokenIssuerSettings.Section}:{nameof(TokenIssuerSettings.Issuer)}"];
-            options.KeyManagement.Enabled = false;
-            options.EmitStaticAudienceClaim = false;
-        })
-        .AddInMemoryApiScopes(IdentityServerResources.ApiScopes)
-        .AddInMemoryApiResources(IdentityServerResources.ApiResources)
-        .AddInMemoryClients(IdentityServerResources.Clients)
-        .AddExtensionGrantValidator<ServicePrincipalGrantValidator>();
-
-        // Registered after AddIdentityServer so these win over Duende's automatic key stores.
-        services.AddSingleton(sp => KeyRingStores.Signing(sp.GetRequiredService<RsaSigningKeyProvider>()));
-        services.AddSingleton(sp => KeyRingStores.Validation(sp.GetRequiredService<RsaSigningKeyProvider>()));
-    }
-
-    /// <summary>
-    /// Identity protects its own API the way every Harmony service does: the framework validates the Bearer
-    /// token against this issuer's own discovery document (IdentitySettings:Platform), deny by default.
-    /// Registered after Duende so Bearer is the default scheme, not one of Duende's cookies.
-    /// </summary>
-    private static void AddPlatformAuthentication(this IServiceCollection services, IConfiguration configuration)
-    {
-        Harmony.Core.Identity.DI.DependenciesConfigurator.AddIdentity(services, configuration, identity =>
-        {
-            identity.AddPlatformAuthentication();
-        });
+        services.AddFrameworkServices(configuration);
     }
 
     public static void ConfigureAppLogging(this IApplicationBuilder app)
@@ -98,6 +42,14 @@ public static class DependenciesConfigurator
             coreBuilderConfig.UseExceptionHandling();
             coreBuilderConfig.UseSwagger();
             coreBuilderConfig.UseHealthChecks();
+        });
+
+        // Duende's endpoints (discovery, jwks, token) are the one anonymous door; everything after sits behind the platform token.
+        app.UseIdentityServer();
+
+        app.UseIdentity(identityBuilderConfig =>
+        {
+            identityBuilderConfig.UsePlatformAuthentication();
         });
     }
 
@@ -124,6 +76,119 @@ public static class DependenciesConfigurator
                 mediatRConfig.AddValidationBehavior();
             });
         });
+
+        // Needs RabbitMQ + Redis; remove until the event bus is wired.
+        services.RemoveAll<IIntegrationEventHandler<SystemEvent>>();
+    }
+
+    private static void AddCore(this IServiceCollection services, IConfiguration configuration)
+    {
+        var tenantId = configuration["ApplicationSettings:ApplicationKeys:PlatformTenantId"]!;
+
+        Harmony.Core.DI.DependenciesConfigurator.AddCore(services, configuration, coreServicesConfig =>
+        {
+            coreServicesConfig.AddTransactionService();
+            coreServicesConfig.AddSensitiveDataResolver();
+            coreServicesConfig.AddSensitiveDataSerialization();
+
+            // The tenant comes from the token now, not from a header: Swagger gets an Authorize button instead.
+            coreServicesConfig.AddSwagger(conf =>
+            {
+                conf.EnableJWTAuthorization();
+
+                var infrastructureXmlPath = Path.Combine(System.AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+                if (File.Exists(infrastructureXmlPath))
+                {
+                    conf.IncludeXmlComments(infrastructureXmlPath);
+                }
+
+                var apiXmlPath = Path.Combine(System.AppContext.BaseDirectory, "Harmony.Identity.Api.xml");
+                if (File.Exists(apiXmlPath))
+                {
+                    conf.IncludeXmlComments(apiXmlPath);
+                }
+            });
+
+            coreServicesConfig.AddHealthChecks(healthChecksConfig =>
+            {
+                healthChecksConfig.AddHealthCheck("Database", eHealthChecksType.SqlServer);
+            });
+
+            coreServicesConfig.AddAppInfo(appInfoConfig =>
+            {
+                appInfoConfig.Name = "Identity";
+                appInfoConfig.Title = "Harmony.Identity";
+                appInfoConfig.Description = "Harmony Identity API";
+                appInfoConfig.ApiTitle = "Harmony Identity API";
+                appInfoConfig.ApiDescription = "Harmony Identity API HTTP";
+            });
+
+            coreServicesConfig.AddMultiTenancy((serviceProvider, multiTenancyConfig) =>
+            {
+                var dbEngine = Enum.Parse<eDbEngine>(configuration["ApplicationSettings:ApplicationKeys:DefaultDbEngine"]!);
+                var connectionString = configuration["ApplicationSettings:ConnectionStrings:Default"]!;
+
+                multiTenancyConfig.AddOrUpdateTenant(
+                    tenantId,
+                    "Harmony",
+                    "en",
+                    database => { database.Configure(dbEngine, connectionString); });
+            });
+        });
+    }
+
+    private static void AddFrameworkServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHttpContextAccessor();
+        services.AddCache(configuration);
+        services.AddJwtServices(configuration);
+        services.AddInfrastructureServices(configuration);
+    }
+
+    private static void AddCache(this IServiceCollection services, IConfiguration configuration)
+    {
+        Harmony.Core.Cache.DI.DependenciesConfigurator.AddCache(services, configuration, config =>
+        {
+            config.AddMemoryCache();
+            config.AddRedisCache();
+            config.AddRedisDistributedLock();
+            config.AddMemoryWithRedisInvalidatorCache();
+        });
+    }
+
+    /// <summary>
+    /// Identity protects its own API the way every Harmony service does: the framework validates the Bearer
+    /// token against this issuer's own discovery document (IdentitySettings:Platform), deny by default.
+    /// </summary>
+    private static void AddJwtServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddIdentity(configuration, identityConfig =>
+        {
+            identityConfig.AddPlatformAuthentication();
+        });
+    }
+
+    private static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.TryAddScoped<ILookupCategoryRepository, LookupCategoryRepository>();
+        services.TryAddScoped<ILookupValueRepository, LookupValueRepository>();
+        services.TryAddScoped<IRoleRepository, RoleRepository>();
+        services.TryAddScoped<IUserAccountRepository, UserAccountRepository>();
+        services.AddUserAccounts();
+        services.AddTokenSigning(configuration);
+        services.AddIdentityServerHost(configuration);
+    }
+
+    /// <summary>
+    /// ASP.NET Core Identity for users, stored in OUR DbContext: UserOnlyStore needs only a DbContext
+    /// that maps Identity's four tables, so the framework's tenant filter, audit and rowversion apply
+    /// to users too. No Identity roles: Harmony's Role aggregate carries the rules Identity's roles lack.
+    /// </summary>
+    private static void AddUserAccounts(this IServiceCollection services)
+    {
+        // Fully qualified: Identity's package also has a type named IdentityDbContext.
+        services.AddIdentityCore<HarmonyUser>()
+            .AddUserStore<Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserOnlyStore<HarmonyUser, IdentityDbContext, Guid>>();
     }
 
     /// <summary>
@@ -214,55 +279,25 @@ public static class DependenciesConfigurator
     }
 
     /// <summary>
-    /// ASP.NET Core Identity for users, stored in OUR DbContext: UserOnlyStore needs only a DbContext
-    /// that maps Identity's four tables, so the framework's tenant filter, audit and rowversion apply
-    /// to users too. No Identity roles: Harmony's Role aggregate carries the rules Identity's roles lack.
+    /// Duende IdentityServer as the token engine. It signs with our key ring (S3a) — automatic key
+    /// management is off — and issues service tokens through the harmony:service grant. No licence key:
+    /// in non-production Duende runs in trial mode and only logs a notice. Production needs a licence.
     /// </summary>
-    private static void AddUserAccounts(this IServiceCollection services)
+    private static void AddIdentityServerHost(this IServiceCollection services, IConfiguration configuration)
     {
-        // Fully qualified: Identity's package also has a type named IdentityDbContext.
-        services.AddIdentityCore<HarmonyUser>()
-            .AddUserStore<Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserOnlyStore<HarmonyUser, IdentityDbContext, Guid>>();
-    }
-
-
-    private static void AddCore(this IServiceCollection services, IConfiguration configuration)
-    {
-        var tenantId = configuration["ApplicationSettings:ApplicationKeys:PlatformTenantId"]!;
-
-        Harmony.Core.DI.DependenciesConfigurator.AddCore(services, configuration, coreServicesConfig =>
+        services.AddIdentityServer(options =>
         {
-            // The tenant comes from the token now, not from a header: Swagger gets an Authorize button instead.
-            coreServicesConfig.AddSwagger(conf =>
-            {
-                conf.EnableJWTAuthorization();
-            });
+            options.IssuerUri = configuration[$"{TokenIssuerSettings.Section}:{nameof(TokenIssuerSettings.Issuer)}"];
+            options.KeyManagement.Enabled = false;
+            options.EmitStaticAudienceClaim = false;
+        })
+        .AddInMemoryApiScopes(IdentityServerResources.ApiScopes)
+        .AddInMemoryApiResources(IdentityServerResources.ApiResources)
+        .AddInMemoryClients(IdentityServerResources.Clients)
+        .AddExtensionGrantValidator<ServicePrincipalGrantValidator>();
 
-            coreServicesConfig.AddHealthChecks(healthChecksConfig =>
-            {
-                healthChecksConfig.AddHealthCheck("Database", eHealthChecksType.SqlServer);
-            });
-
-            coreServicesConfig.AddAppInfo(appInfoConfig =>
-            {
-                appInfoConfig.Name = "Identity";
-                appInfoConfig.Title = "Harmony.Identity";
-                appInfoConfig.Description = "Harmony Identity API";
-                appInfoConfig.ApiTitle = "Harmony Identity API";
-                appInfoConfig.ApiDescription = "Harmony Identity API HTTP";
-            });
-
-            coreServicesConfig.AddMultiTenancy((serviceProvider, multiTenancyConfig) =>
-            {
-                var dbEngine = Enum.Parse<eDbEngine>(configuration["ApplicationSettings:ApplicationKeys:DefaultDbEngine"]!);
-                var connectionString = configuration["ApplicationSettings:ConnectionStrings:Default"]!;
-
-                multiTenancyConfig.AddOrUpdateTenant(
-                    tenantId,
-                    "Harmony",
-                    "en",
-                    database => { database.Configure(dbEngine, connectionString); });
-            });
-        });
+        // Registered after AddIdentityServer so these win over Duende's automatic key stores.
+        services.AddSingleton(sp => KeyRingStores.Signing(sp.GetRequiredService<RsaSigningKeyProvider>()));
+        services.AddSingleton(sp => KeyRingStores.Validation(sp.GetRequiredService<RsaSigningKeyProvider>()));
     }
 }

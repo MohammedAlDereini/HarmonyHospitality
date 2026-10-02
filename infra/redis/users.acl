@@ -1,0 +1,5 @@
+user default off
+user identity     on >61vBEgthSzXndY9IMprOCxFL2cRDmKN7     ~Identity:*     ~Global:identity:*  %R~Global:*  +@all -@dangerous
+user reservations on >HWwszvtgUbORprqmBCF871k2XEKLNifG ~Reservations:* %R~Global:*                       +@all -@dangerous
+user folio        on >nzYktKvcfbemE7LJUFBSgZo6iWNxrM4V        ~Folio:*        %R~Global:*                       +@all -@dangerous
+user housekeeping on >p9MWSVE43GrU7u2tzQmkAZ0foFjxRJOH ~Housekeeping:* %R~Global:*                       +@all -@dangerous
