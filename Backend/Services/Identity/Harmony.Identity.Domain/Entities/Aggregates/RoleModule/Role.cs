@@ -4,7 +4,7 @@ using Harmony.Core.Exceptions;
 using Harmony.Core.Models;
 using Harmony.Identity.Domain.Common;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
-using Harmony.Identity.Shared.Enums;
+using Harmony.Core.Identity.Permissions;
 
 namespace Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 
