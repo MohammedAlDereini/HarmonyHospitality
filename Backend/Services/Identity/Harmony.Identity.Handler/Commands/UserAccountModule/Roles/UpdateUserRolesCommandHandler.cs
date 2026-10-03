@@ -19,7 +19,7 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
         var user = await this.userAccounts.GetWithRolesAsync(command.Id, cancellationToken);
         if (user is null)
         {
-            return Fail(IdentityErrorCodes.UserAccountNotFound);
+            return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
         }
 
         // Every id must be a role of this tenant; the tenant filter on the query is the wall.
@@ -27,7 +27,7 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
         var known = await this.roles.Query().Where(r => wanted.Contains(r.Id)).Select(r => r.Id).ToListAsync(cancellationToken);
         if (known.Count != wanted.Count)
         {
-            return Fail(IdentityErrorCodes.RoleNotFound);
+            return Fail(BusinessErrorCodes.Identity.Role.NotFound);
         }
 
         user.UpdateRoles(wanted);

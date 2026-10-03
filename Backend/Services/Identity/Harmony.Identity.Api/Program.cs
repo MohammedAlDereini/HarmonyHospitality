@@ -1,6 +1,7 @@
 using Harmony.Core.BuildingBlocks;
 using Harmony.Identity.Api.Checks;
 using Harmony.Identity.Handler.DI;
+using Harmony.Identity.Infrastructure.Caching;
 using Harmony.Identity.Infrastructure.DI;
 using Harmony.Identity.Infrastructure.Persistence;
 
@@ -24,6 +25,8 @@ public partial class Program
         // Every tenant must hold a row for every PermissionEnum value, or the service does not start.
         await PermissionEnumIntegrityCheck.ValidateAsync(app);
 
+        await ConfigureCacheSeedingAsync(app);
+
         ConfigureApp(app);
 
         await app.RunAsync();
@@ -43,6 +46,13 @@ public partial class Program
         {
             builder.Services.AddApplicationService(builder.Configuration);
             builder.Services.AddInfrastructureService(builder.Configuration);
+        }
+
+        static async Task ConfigureCacheSeedingAsync(WebApplication app)
+        {
+            using var scope = app.Services.CreateScope();
+            var seeder = scope.ServiceProvider.GetRequiredService<ICacheSeeder>();
+            await seeder.InitializeAsync();
         }
 
         static void ConfigureApp(WebApplication app)

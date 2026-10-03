@@ -9,7 +9,7 @@ public class DeleteRoleCommand : BaseCommandRequest<CallResponse>
         public DeleteRoleCommandValidation()
         {
             this.RuleFor(e => e.Id)
-                .NotEmpty().WithMessage("This field is required.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Role.IdRequired);
         }
     }
 }

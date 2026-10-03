@@ -25,7 +25,7 @@ namespace Harmony.Identity.Handler.Queries.RoleModule.Detail
 
             if (role is null)
             {
-                return CallResponseBuilder.CreateResponse<RoleDetailModel>(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(IdentityErrorCodes.RoleNotFound));
+                return CallResponseBuilder.CreateResponse<RoleDetailModel>(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Role.NotFound));
             }
 
             // A super role holds no rows: it has every active permission of the tenant.

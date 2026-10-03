@@ -1,3 +1,4 @@
+using Harmony.Core.Errors;
 using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 using Harmony.Core.Exceptions;
 using Harmony.Core.Models;
@@ -102,7 +103,7 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
     {
         if (State == AdministrativeState.Terminated)
         {
-            throw new BusinessException($"'{DisplayName}' is terminated.", Error.New(IdentityErrorCodes.UserAccountTerminated));
+            throw new BusinessException($"'{DisplayName}' is terminated.", Error.New(BusinessErrorCodes.Identity.UserAccount.Terminated));
         }
     }
 }

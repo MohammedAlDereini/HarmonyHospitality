@@ -24,15 +24,15 @@ namespace Harmony.Identity.Handler.Queries.LookupModule.Values.List
             {
                 this.RuleFor(e => e.LookupCategoryId)
                     .NotEmpty()
-                    .WithMessage("This field is required.");
+                    .WithErrorCode(ModelValidationErrorCodes.Identity.Lookup.ValueCategoryIdRequired);
 
                 this.RuleFor(e => e.PageNumber)
                     .GreaterThan(0)
-                    .WithMessage("Page Number must be Greater Than 0.");
+                    .WithErrorCode(ModelValidationErrorCodes.General.PageNumberOutOfRange);
 
                 this.RuleFor(e => e.PageSize)
                     .GreaterThan(0)
-                    .WithMessage("Page Size must be Greater Than 0.");
+                    .WithErrorCode(ModelValidationErrorCodes.General.PageSizeOutOfRange);
             }
         }
     }

@@ -19,6 +19,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Infrastructure.Signing;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Services;
+using Harmony.Identity.Infrastructure.Caching;
+using Harmony.Identity.Infrastructure.Services;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using System.IO;
 using System.Reflection;
@@ -175,6 +178,9 @@ public static class DependenciesConfigurator
 
     private static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Scoped like the Redis cache and the DbContext it wraps.
+        services.TryAddScoped<ICacheService, CacheService>();
+        services.TryAddScoped<ICacheSeeder, CacheSeeder>();
         services.AddUserAccounts();
         services.AddTokenSigning(configuration);
     }

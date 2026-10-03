@@ -2,6 +2,7 @@
 global using Harmony.Core.BuildingBlocks;
 global using Harmony.Core.BuildingBlocks.Application.Abstractions;
 global using Harmony.Core.Enums;
+global using Harmony.Core.Errors;
 global using Harmony.Core.Implementations;
 global using Harmony.Core.Models;
 global using Harmony.Core.Utilities;

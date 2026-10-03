@@ -29,15 +29,15 @@ namespace Harmony.Identity.Handler.Queries.RoleModule.List
             {
                 this.RuleFor(e => e.PageNumber)
                     .GreaterThan(0)
-                    .WithMessage("Page Number must be Greater Than 0.");
+                    .WithErrorCode(ModelValidationErrorCodes.General.PageNumberOutOfRange);
 
                 this.RuleFor(e => e.PageSize)
                     .InclusiveBetween(1, 100)
-                    .WithMessage("Page Size must be between 1 and 100.");
+                    .WithErrorCode(ModelValidationErrorCodes.General.PageSizeOutOfRange);
 
                 this.RuleForEach(e => e.SortOrder)
                     .Must(s => s is not null && SortableMembers.Contains(s.MemberName, StringComparer.OrdinalIgnoreCase))
-                    .WithMessage($"Sort by one of: {string.Join(", ", SortableMembers)}.");
+                    .WithErrorCode(ModelValidationErrorCodes.General.SortMemberInvalid);
             }
         }
     }

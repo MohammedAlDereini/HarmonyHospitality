@@ -16,7 +16,7 @@ public class EditRoleCommandHandler : RoleCommandHandlerBase, IRequestHandler<Ed
 
         if (role is null)
         {
-            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(IdentityErrorCodes.RoleNotFound));
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Role.NotFound));
         }
 
         // Only touch what changed, so renaming a system role is not refused for a code it kept.
@@ -27,7 +27,7 @@ public class EditRoleCommandHandler : RoleCommandHandlerBase, IRequestHandler<Ed
 
             if (await this.IsCodeInUseAsync(role.Code, excludeId: role.Id, cancellationToken))
             {
-                return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(IdentityErrorCodes.RoleCodeInUse));
+                return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Role.CodeInUse));
             }
         }
 

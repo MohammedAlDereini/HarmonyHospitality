@@ -1,4 +1,4 @@
-using Harmony.Identity.Shared.Enums;
+using Harmony.Core.Identity.Permissions;
 
 namespace Harmony.Identity.Domain.Models.RoleModule;
 

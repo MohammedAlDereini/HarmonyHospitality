@@ -11,10 +11,10 @@ public class UpdateUserRolesCommand : BaseCommandRequest<CallResponse>
         public UpdateUserRolesCommandValidation()
         {
             this.RuleFor(e => e.Id)
-                .NotEmpty().WithMessage("This field is required.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.UserAccount.IdRequired);
 
             this.RuleFor(e => e.RoleIds)
-                .NotNull().WithMessage("This field is required.");
+                .NotNull().WithErrorCode(ModelValidationErrorCodes.Identity.UserAccount.RoleIdsRequired);
         }
     }
 }

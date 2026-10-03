@@ -9,7 +9,7 @@ public class DeleteLookupValueCommand : BaseCommandRequest<CallResponse>
         public DeleteLookupValueCommandValidation()
         {
             this.RuleFor(e => e.Id)
-                .NotEmpty().WithMessage("This field is required.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Lookup.ValueIdRequired);
         }
     }
 }

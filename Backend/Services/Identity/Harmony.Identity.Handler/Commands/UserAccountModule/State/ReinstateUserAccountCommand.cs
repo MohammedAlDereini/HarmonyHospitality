@@ -9,7 +9,7 @@ public class ReinstateUserAccountCommand : BaseCommandRequest<CallResponse>
         public ReinstateUserAccountCommandValidation()
         {
             this.RuleFor(e => e.Id)
-                .NotEmpty().WithMessage("This field is required.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.UserAccount.IdRequired);
         }
     }
 }

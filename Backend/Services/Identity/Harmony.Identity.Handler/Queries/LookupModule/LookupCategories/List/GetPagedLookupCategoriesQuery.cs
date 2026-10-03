@@ -20,11 +20,11 @@ namespace Harmony.Identity.Handler.Queries.LookupModule.LookupCategories.List
             {
                 this.RuleFor(e => e.PageNumber)
                     .GreaterThan(0)
-                    .WithMessage("Page Number must be Greater Than 0.");
+                    .WithErrorCode(ModelValidationErrorCodes.General.PageNumberOutOfRange);
 
                 this.RuleFor(e => e.PageSize)
                     .GreaterThan(0)
-                    .WithMessage("Page Size must be Greater Than 0.");
+                    .WithErrorCode(ModelValidationErrorCodes.General.PageSizeOutOfRange);
             }
         }
     }

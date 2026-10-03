@@ -23,7 +23,7 @@ namespace Harmony.Identity.Handler.Queries.UserAccountModule.Detail
 
             if (model is null)
             {
-                return CallResponseBuilder.CreateResponse<UserAccountModel>(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(IdentityErrorCodes.UserAccountNotFound));
+                return CallResponseBuilder.CreateResponse<UserAccountModel>(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.UserAccount.NotFound));
             }
 
             return CallResponseBuilder.CreateResponse<UserAccountModel>(eCallResponseStatus.Success).HasData(model);

@@ -16,7 +16,7 @@ public class SuspendUserAccountCommandHandler : UserAccountCommandHandlerBase, I
         var user = await this.LoadAsync(command.Id);
         if (user is null)
         {
-            return Fail(IdentityErrorCodes.UserAccountNotFound);
+            return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
         }
 
         user.Suspend(command.Reason);

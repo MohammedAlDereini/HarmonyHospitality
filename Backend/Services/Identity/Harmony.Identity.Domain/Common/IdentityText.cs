@@ -1,4 +1,5 @@
 ﻿using Harmony.Core.Exceptions;
+using Harmony.Core.Errors;
 using Harmony.Core.Models;
 
 namespace Harmony.Identity.Domain.Common;
@@ -15,7 +16,7 @@ public static class IdentityText
         if (trimmed is null || trimmed.Length < 2 || trimmed.Length > 32
             || !trimmed.All(c => char.IsAsciiLetterOrDigit(c) || c == '-'))
         {
-            throw new BusinessException($"'{value}' is not a valid role code.", Error.New(IdentityErrorCodes.InvalidRoleCode));
+            throw new BusinessException($"'{value}' is not a valid role code.", Error.New(BusinessErrorCodes.Identity.Role.InvalidCode));
         }
 
         return trimmed.ToUpperInvariant();
@@ -27,7 +28,7 @@ public static class IdentityText
 
         if (trimmed is null || trimmed.Length > 128)
         {
-            throw new BusinessException("A display name of 1 to 128 characters is required.", Error.New(IdentityErrorCodes.DisplayNameRequired));
+            throw new BusinessException("A display name of 1 to 128 characters is required.", Error.New(BusinessErrorCodes.Identity.UserAccount.DisplayNameRequired));
         }
 
         return trimmed;

@@ -16,7 +16,7 @@ public class ReinstateUserAccountCommandHandler : UserAccountCommandHandlerBase,
         var user = await this.LoadAsync(command.Id);
         if (user is null)
         {
-            return Fail(IdentityErrorCodes.UserAccountNotFound);
+            return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
         }
 
         user.Reinstate();

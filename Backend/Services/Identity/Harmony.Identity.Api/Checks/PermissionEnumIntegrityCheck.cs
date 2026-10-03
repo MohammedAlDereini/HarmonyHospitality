@@ -1,16 +1,14 @@
-using Harmony.Core;
-using Harmony.Core.Abstractions;
 using Harmony.Core.BuildingBlocks.Infrastructure;
-using Harmony.Core.Utilities;
 using Harmony.Identity.Infrastructure.Persistence;
-using Harmony.Identity.Shared.Enums;
+using Harmony.Core.Identity.Permissions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harmony.Identity.Api.Checks;
 
 /// <summary>
-/// Startup check: every tenant holds a row for every <see cref="PermissionEnum"/> value. A tenant with a hole would let
-/// a role reference a permission that does not exist for it, so the service refuses to start and names the gap.
+/// Startup check (PropX PermissionEnumIntegrityCheck): every configured tenant holds a row for every
+/// <see cref="PermissionEnum"/> value. A tenant with a hole would let a role reference a permission that does not exist
+/// for it, so the service refuses to start and names the gap.
 /// </summary>
 public static class PermissionEnumIntegrityCheck
 {
@@ -24,26 +22,22 @@ public static class PermissionEnumIntegrityCheck
             throw new InvalidOperationException("PermissionEnumIntegrityCheck: no tenants are configured.");
         }
 
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+
+        // One pass over every tenant's rows: the tenant filter is dropped by name (PropX IgnoreQueryFilters()).
+        var rows = await dbContext.Permissions
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .AsNoTracking()
+            .Select(p => new { p.TenantId, p.PermissionValue })
+            .ToListAsync(cancellationToken);
+
         foreach (var tenant in tenants)
         {
-            // Same shape as the framework's seeding: a scope whose call context names the tenant.
-            using var scope = app.Services.CreateScope();
-            var httpContext = scope.ServiceProvider.CreateDefaultHttpContext();
-            httpContext.Request.Headers[Constants.ContextValues.UserId] = "System";
-            httpContext.Request.Headers[Constants.ContextValues.TenantId] = tenant.Id;
-            httpContext.Request.Headers[Constants.ContextValues.CorrelationId] = Guid.CreateVersion7().ToString("N");
-            scope.ServiceProvider.GetRequiredService<ICallContext>().OverrideContextHolder(httpContext);
-
             var tenantId = Guid.Parse(tenant.Id);
-            var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-
-            var present = await dbContext.Permissions
-                .IgnoreQueryFilters([QueryFilterNames.Tenant])
-                .Where(p => p.TenantId == tenantId)
-                .Select(p => p.PermissionValue)
-                .ToListAsync(cancellationToken);
-
+            var present = rows.Where(r => r.TenantId == tenantId).Select(r => r.PermissionValue).ToHashSet();
             var missing = expected.Except(present).OrderBy(v => v).ToList();
+
             if (missing.Count > 0)
             {
                 throw new InvalidOperationException(

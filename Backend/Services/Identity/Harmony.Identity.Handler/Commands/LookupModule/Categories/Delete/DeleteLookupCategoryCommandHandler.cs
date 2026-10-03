@@ -17,7 +17,7 @@ public class DeleteLookupCategoryCommandHandler : IRequestHandler<DeleteLookupCa
 
         if (category is null)
         {
-            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New("00002"));
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Lookup.CategoryNotFound));
         }
 
         category.Delete();

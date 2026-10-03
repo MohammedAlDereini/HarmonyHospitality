@@ -17,7 +17,7 @@ public class DeleteLookupValueCommandHandler : IRequestHandler<DeleteLookupValue
 
         if (value is null)
         {
-            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New("00004"));
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Lookup.ValueNotFound));
         }
 
         value.Delete();

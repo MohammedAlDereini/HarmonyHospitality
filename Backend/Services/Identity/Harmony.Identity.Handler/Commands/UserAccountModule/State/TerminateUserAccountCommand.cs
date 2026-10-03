@@ -11,11 +11,11 @@ public class TerminateUserAccountCommand : BaseCommandRequest<CallResponse>
         public TerminateUserAccountCommandValidation()
         {
             this.RuleFor(e => e.Id)
-                .NotEmpty().WithMessage("This field is required.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.UserAccount.IdRequired);
 
             this.RuleFor(e => e.Reason)
-                .NotEmpty().WithMessage("This field is required.")
-                .MaximumLength(500).WithMessage("Reason must not exceed 500 characters.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.UserAccount.ReasonRequired)
+                .MaximumLength(500).WithErrorCode(ModelValidationErrorCodes.Identity.UserAccount.ReasonTooLong);
         }
     }
 }

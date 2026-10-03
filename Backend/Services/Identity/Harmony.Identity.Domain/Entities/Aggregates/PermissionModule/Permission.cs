@@ -1,6 +1,6 @@
 using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
-using Harmony.Identity.Shared.Enums;
+using Harmony.Core.Identity.Permissions;
 
 namespace Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 

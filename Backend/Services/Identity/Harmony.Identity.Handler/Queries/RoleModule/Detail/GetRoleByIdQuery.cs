@@ -11,7 +11,7 @@ namespace Harmony.Identity.Handler.Queries.RoleModule.Detail
             public GetRoleByIdQueryValidator()
             {
                 this.RuleFor(e => e.Id)
-                    .NotEmpty().WithMessage("This field is required.");
+                    .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Role.IdRequired);
             }
         }
     }

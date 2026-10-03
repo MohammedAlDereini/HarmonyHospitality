@@ -19,22 +19,22 @@ public class EditRoleCommand : BaseCommandRequest<CallResponse>
         public EditRoleCommandValidation()
         {
             this.RuleFor(e => e.Id)
-                .NotEmpty().WithMessage("This field is required.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Role.IdRequired);
 
             this.RuleFor(e => e.Code)
-                .NotEmpty().WithMessage("This field is required.")
-                .MaximumLength(32).WithMessage("Role code must not exceed 32 characters.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Role.CodeRequired)
+                .MaximumLength(32).WithErrorCode(ModelValidationErrorCodes.Identity.Role.CodeTooLong);
 
             this.RuleFor(e => e.NameEn)
-                .NotEmpty().WithMessage("This field is required.")
-                .MaximumLength(128).WithMessage("Role name must not exceed 128 characters.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Role.NameEnRequired)
+                .MaximumLength(128).WithErrorCode(ModelValidationErrorCodes.Identity.Role.NameEnTooLong);
 
             this.RuleFor(e => e.NameAr)
-                .MaximumLength(128).WithMessage("Arabic name must not exceed 128 characters.")
+                .MaximumLength(128).WithErrorCode(ModelValidationErrorCodes.Identity.Role.NameArTooLong)
                 .When(e => !string.IsNullOrWhiteSpace(e.NameAr));
 
             this.RuleFor(e => e.PrivilegeLevel)
-                .IsInEnum().WithMessage("Privilege level is not valid.");
+                .IsInEnum().WithErrorCode(ModelValidationErrorCodes.Identity.Role.PrivilegeLevelInvalid);
         }
     }
 }

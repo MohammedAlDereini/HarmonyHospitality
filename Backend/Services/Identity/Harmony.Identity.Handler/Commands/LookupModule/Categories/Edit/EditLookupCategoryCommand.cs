@@ -13,14 +13,14 @@ public class EditLookupCategoryCommand : BaseCommandRequest<CallResponse>
         public EditLookupCategoryCommandValidation()
         {
             this.RuleFor(e => e.Id)
-                .NotEmpty().WithMessage("This field is required.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Lookup.CategoryIdRequired);
 
             this.RuleFor(e => e.Name)
-                .NotEmpty().WithMessage("This field is required.")
-                .MaximumLength(200).WithMessage("Category name must not exceed 200 characters.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Lookup.CategoryNameRequired)
+                .MaximumLength(200).WithErrorCode(ModelValidationErrorCodes.Identity.Lookup.CategoryNameTooLong);
 
             this.RuleFor(e => e.Description)
-                .MaximumLength(500).WithMessage("Description must not exceed 500 characters.")
+                .MaximumLength(500).WithErrorCode(ModelValidationErrorCodes.Identity.Lookup.CategoryDescriptionTooLong)
                 .When(e => !string.IsNullOrWhiteSpace(e.Description));
         }
     }

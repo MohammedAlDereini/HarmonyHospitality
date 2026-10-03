@@ -16,7 +16,7 @@ public class EditLookupCategoryCommandHandler : LookupCategoryCommandHandlerBase
 
         if (category is null)
         {
-            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New("00002"));
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Lookup.CategoryNotFound));
         }
 
         var name = command.Name.Trim();
@@ -24,7 +24,7 @@ public class EditLookupCategoryCommandHandler : LookupCategoryCommandHandlerBase
 
         if (await this.IsNameInUseAsync(normalized, excludeId: category.Id, cancellationToken))
         {
-            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New("00001"));
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Lookup.CategoryNameInUse));
         }
 
         var description = string.IsNullOrWhiteSpace(command.Description) ? null : command.Description.Trim();

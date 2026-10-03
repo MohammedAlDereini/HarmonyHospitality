@@ -37,7 +37,7 @@ public abstract class UserAccountCommandHandlerBase
         }
 
         var codes = string.Join(", ", result.Errors.Select(e => e.Code));
-        throw new BusinessException($"The identity store refused the change: {codes}.", Error.New(IdentityErrorCodes.IdentityStoreRefused));
+        throw new BusinessException($"The identity store refused the change: {codes}.", Error.New(BusinessErrorCodes.Identity.UserAccount.StoreRefused));
     }
 
     protected static CallResponse Ok()

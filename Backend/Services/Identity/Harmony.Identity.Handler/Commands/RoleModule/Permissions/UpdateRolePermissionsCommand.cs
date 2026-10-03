@@ -12,13 +12,13 @@ public class UpdateRolePermissionsCommand : BaseCommandRequest<CallResponse>
         public UpdateRolePermissionsCommandValidation()
         {
             this.RuleFor(e => e.RoleId)
-                .NotEmpty().WithMessage("This field is required.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Role.IdRequired);
 
             this.RuleFor(e => e.PermissionIds)
-                .NotNull().WithMessage("This field is required.");
+                .NotNull().WithErrorCode(ModelValidationErrorCodes.Identity.Role.PermissionIdsRequired);
 
             this.RuleForEach(e => e.PermissionIds)
-                .NotEmpty().WithMessage("Permission id must not be empty.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Role.PermissionIdEmpty);
         }
     }
 }

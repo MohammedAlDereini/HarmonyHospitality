@@ -22,12 +22,12 @@ public class CreateLookupValueCommandHandler : LookupValueCommandHandlerBase, IR
 
         if (category is null)
         {
-            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New("00002"));
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Lookup.CategoryNotFound));
         }
 
         if (command.IsGlobal && !category.IsGlobal)
         {
-            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New("00005"));
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Lookup.GlobalValueInTenantCategory));
         }
 
         var name = command.Name.Trim();
@@ -35,7 +35,7 @@ public class CreateLookupValueCommandHandler : LookupValueCommandHandlerBase, IR
 
         if (await this.IsNameInUseInCategoryAsync(command.LookupCategoryId, normalized, excludeId: null, cancellationToken))
         {
-            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New("00003"));
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Lookup.ValueNameInUse));
         }
 
         var description = string.IsNullOrWhiteSpace(command.Description) ? null : command.Description.Trim();

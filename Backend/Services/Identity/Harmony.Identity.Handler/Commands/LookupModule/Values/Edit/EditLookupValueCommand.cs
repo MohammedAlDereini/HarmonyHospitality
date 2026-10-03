@@ -15,14 +15,14 @@ public class EditLookupValueCommand : BaseCommandRequest<CallResponse>
         public EditLookupValueCommandValidation()
         {
             this.RuleFor(e => e.Id)
-                .NotEmpty().WithMessage("This field is required.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Lookup.ValueIdRequired);
 
             this.RuleFor(e => e.Name)
-                .NotEmpty().WithMessage("This field is required.")
-                .MaximumLength(200).WithMessage("Value name must not exceed 200 characters.");
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Lookup.ValueNameRequired)
+                .MaximumLength(200).WithErrorCode(ModelValidationErrorCodes.Identity.Lookup.ValueNameTooLong);
 
             this.RuleFor(e => e.Description)
-                .MaximumLength(500).WithMessage("Description must not exceed 500 characters.")
+                .MaximumLength(500).WithErrorCode(ModelValidationErrorCodes.Identity.Lookup.ValueDescriptionTooLong)
                 .When(e => !string.IsNullOrWhiteSpace(e.Description));
         }
     }

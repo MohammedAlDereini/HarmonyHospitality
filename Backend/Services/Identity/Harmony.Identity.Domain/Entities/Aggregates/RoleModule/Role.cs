@@ -1,8 +1,10 @@
+using Harmony.Core.Errors;
 using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 using Harmony.Core.Exceptions;
 using Harmony.Core.Models;
 using Harmony.Identity.Domain.Common;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Shared.Enums;
 
 namespace Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 
@@ -90,6 +92,20 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
     public bool Has(Guid permissionId)
         => IsSuperRole || Permissions.Any(rp => rp.PermissionId == permissionId);
 
+    /// <summary>
+    /// What the role may do, as published to the cache: every value of the enum for the super role, otherwise the
+    /// values of its active permission rows. Needs the Permission navigation loaded.
+    /// </summary>
+    public IReadOnlyList<PermissionEnum> EffectivePermissions()
+        => IsSuperRole
+            ? Enum.GetValues<PermissionEnum>().Order().ToList()
+            : Permissions
+                .Where(rp => rp.Permission is { IsActive: true })
+                .Select(rp => rp.Permission.PermissionValue)
+                .Distinct()
+                .Order()
+                .ToList();
+
     /// <summary>The role holds exactly these permissions afterwards: missing ones are added, others removed. System roles refuse.</summary>
     public void UpdatePermissions(IEnumerable<Guid> permissionIds)
     {
@@ -132,7 +148,7 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
     {
         if (IsSystemRole)
         {
-            throw new BusinessException($"'{Code}' is a system role and cannot be deleted.", Error.New(IdentityErrorCodes.SystemRoleNotDeletable));
+            throw new BusinessException($"'{Code}' is a system role and cannot be deleted.", Error.New(BusinessErrorCodes.Identity.Role.SystemRoleNotDeletable));
         }
     }
 
@@ -140,7 +156,7 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
     {
         if (IsSystemRole)
         {
-            throw new BusinessException($"'{Code}' is a system role. Create your own role instead of changing a shipped one.", Error.New(IdentityErrorCodes.SystemRoleImmutable));
+            throw new BusinessException($"'{Code}' is a system role. Create your own role instead of changing a shipped one.", Error.New(BusinessErrorCodes.Identity.Role.SystemRoleImmutable));
         }
     }
 
@@ -149,16 +165,16 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
         var normalized = IdentityText.RoleCode(code);
 
         return SystemRoles.IsReserved(normalized)
-            ? throw new BusinessException($"'{normalized}' is reserved for the system.", Error.New(IdentityErrorCodes.ReservedRoleCode))
+            ? throw new BusinessException($"'{normalized}' is reserved for the system.", Error.New(BusinessErrorCodes.Identity.Role.ReservedCode))
             : normalized;
     }
 
     private static string RequireName(string nameEn)
         => IdentityText.Blank(nameEn)
-            ?? throw new BusinessException("A role name is required.", Error.New(IdentityErrorCodes.RoleNameRequired));
+            ?? throw new BusinessException("A role name is required.", Error.New(BusinessErrorCodes.Identity.Role.NameRequired));
 
     private static PrivilegeLevel RequireLevel(PrivilegeLevel privilegeLevel)
         => Enum.IsDefined(privilegeLevel)
             ? privilegeLevel
-            : throw new BusinessException($"'{privilegeLevel}' is not a valid privilege level.", Error.New(IdentityErrorCodes.InvalidPrivilegeLevel));
+            : throw new BusinessException($"'{privilegeLevel}' is not a valid privilege level.", Error.New(BusinessErrorCodes.Identity.Role.InvalidPrivilegeLevel));
 }

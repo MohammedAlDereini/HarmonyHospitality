@@ -16,7 +16,7 @@ public class EditLookupValueCommandHandler : LookupValueCommandHandlerBase, IReq
 
         if (value is null)
         {
-            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New("00004"));
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Lookup.ValueNotFound));
         }
 
         var name = command.Name.Trim();
@@ -24,7 +24,7 @@ public class EditLookupValueCommandHandler : LookupValueCommandHandlerBase, IReq
 
         if (await this.IsNameInUseInCategoryAsync(value.LookupCategoryId, normalized, excludeId: value.Id, cancellationToken))
         {
-            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New("00003"));
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Lookup.ValueNameInUse));
         }
 
         var description = string.IsNullOrWhiteSpace(command.Description) ? null : command.Description.Trim();
