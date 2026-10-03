@@ -1,4 +1,5 @@
 using Harmony.Core.BuildingBlocks;
+using Harmony.Identity.Api.Checks;
 using Harmony.Identity.Handler.DI;
 using Harmony.Identity.Infrastructure.DI;
 using Harmony.Identity.Infrastructure.Persistence;
@@ -19,6 +20,9 @@ public partial class Program
         var app = builder.Build();
 
         app.MigrateDbContext<IdentityDbContext, IdentityDbContextSeed>();
+
+        // Every tenant must hold a row for every PermissionEnum value, or the service does not start.
+        await PermissionEnumIntegrityCheck.ValidateAsync(app);
 
         ConfigureApp(app);
 

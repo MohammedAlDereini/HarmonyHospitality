@@ -17,6 +17,7 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<LookupCategory> LookupCategories { get; set; }
     public DbSet<LookupValue> LookupValues { get; set; }
     public DbSet<Role> Roles { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
     public DbSet<Country> Countries { get; set; }
     public DbSet<CountrySubdivision> CountrySubdivisions { get; set; }
     public DbSet<City> Cities { get; set; }

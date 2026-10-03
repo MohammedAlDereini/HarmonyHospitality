@@ -6,6 +6,7 @@
     <Project Path="Backend/Services/Identity/Harmony.Identity.Domain/Harmony.Identity.Domain.csproj" Id="beb6eb15-6f9d-4982-8e99-8090434d2361" />
     <Project Path="Backend/Services/Identity/Harmony.Identity.Handler/Harmony.Identity.Handler.csproj" Id="d85d7230-69d8-42c6-959e-76523354e073" />
     <Project Path="Backend/Services/Identity/Harmony.Identity.Infrastructure/Harmony.Identity.Infrastructure.csproj" Id="80b4ba10-5b6b-4eea-94bb-9d4b9da728e0" />
+    <Project Path="Backend/Services/Identity/Harmony.Identity.Shared/Harmony.Identity.Shared.csproj" Id="3f6c2a9e-7d41-4b8a-9c05-2e1f8a6b4d73" />
   </Folder>
   <Folder Name="/Frontend/" />
 </Solution>

@@ -11,4 +11,8 @@
 	  <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="10.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Harmony.Identity.Shared\Harmony.Identity.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -18,6 +18,7 @@ public class IdentityDbContextSeed : IDbSeeds<IdentityDbContext>
     {
         return
         [
+            new PermissionSeedV1(),
             new SuperAdminRoleSeedV1(),
         ];
     }
