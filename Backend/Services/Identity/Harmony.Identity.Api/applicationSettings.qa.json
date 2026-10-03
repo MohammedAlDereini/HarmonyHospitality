@@ -23,6 +23,11 @@
       "MetadataAddress": "https://identity.harmony.local/.well-known/openid-configuration",
       "RequireHttpsMetadata": true,
       "ValidAudiences": [ "harmony" ]
+    },
+    "SuperAdmin": {
+      "Email": "admin@harmony.local",
+      "Password": "",
+      "DisplayName": "Platform Admin"
     }
   },
   "Duende": {

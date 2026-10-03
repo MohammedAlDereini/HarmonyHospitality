@@ -2,6 +2,7 @@ using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Infrastructure.Seeds.Permissions;
 using Harmony.Identity.Infrastructure.Seeds.Reference;
 using Harmony.Identity.Infrastructure.Seeds.Roles;
+using Harmony.Identity.Infrastructure.Seeds.Users;
 
 namespace Harmony.Identity.Infrastructure.Persistence;
 
@@ -21,6 +22,7 @@ public class IdentityDbContextSeed : IDbSeeds<IdentityDbContext>
         [
             new PermissionSeedV1(),
             new SuperAdminRoleSeedV1(),
+            new SuperAdminUserSeedV1(),
         ];
     }
 }

@@ -1,3 +1,4 @@
+using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
 using Harmony.Core.Identity.Implementations.Platform;
 
@@ -36,5 +37,32 @@ public static class IdentityServerResources
         },
     ];
 
-    public static IEnumerable<Client> Clients => [];
+    /// <summary>The web client people sign in with: PropX email + password, issued by Duende as the password grant.</summary>
+    public const string WebClientId = "harmony-web";
+
+    /// <summary>15 minutes: a token is short-lived; a demoted or terminated user is stopped sooner by security_version anyway.</summary>
+    public static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromMinutes(15);
+
+    /// <summary>The design docs session rule: 30 minutes idle, 12 hours absolute, enforced by the refresh token.</summary>
+    public static readonly TimeSpan RefreshIdleLifetime = TimeSpan.FromMinutes(30);
+    public static readonly TimeSpan RefreshAbsoluteLifetime = TimeSpan.FromHours(12);
+
+    public static IEnumerable<Client> Clients =>
+    [
+        new Client
+        {
+            ClientId = WebClientId,
+            ClientName = "Harmony web",
+            AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+            RequireClientSecret = false,
+            AllowedScopes = { PlatformScope, IdentityServerConstants.StandardScopes.OfflineAccess },
+            AllowOfflineAccess = true,
+            AccessTokenLifetime = (int)AccessTokenLifetime.TotalSeconds,
+            RefreshTokenUsage = TokenUsage.OneTimeOnly,
+            RefreshTokenExpiration = TokenExpiration.Sliding,
+            SlidingRefreshTokenLifetime = (int)RefreshIdleLifetime.TotalSeconds,
+            AbsoluteRefreshTokenLifetime = (int)RefreshAbsoluteLifetime.TotalSeconds,
+            UpdateAccessTokenClaimsOnRefresh = true,
+        },
+    ];
 }

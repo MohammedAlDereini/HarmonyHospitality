@@ -34,6 +34,22 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
 
     public bool IsTransient() => Id == Guid.Empty;
 
+    /// <summary>A person who may sign in. The password is set by Identity (UserManager) at creation, never here.</summary>
+    public static User Create(string displayName, string userName, string email)
+    {
+        return new User
+        {
+            Id = Guid.CreateVersion7(),
+            UserName = userName,
+            Email = email,
+            DisplayName = IdentityText.DisplayName(displayName),
+            State = AdministrativeState.Active,
+            SecurityVersion = 1,
+            SecurityStamp = Guid.NewGuid().ToString("N"),
+            LockoutEnabled = true,
+        };
+    }
+
     /// <summary>Blocks sign-in and kills current tokens. Suspending twice is a no-op.</summary>
     public void Suspend(string reason)
     {

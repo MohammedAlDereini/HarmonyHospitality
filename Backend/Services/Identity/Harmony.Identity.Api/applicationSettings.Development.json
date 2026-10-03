@@ -12,17 +12,22 @@
     "Errors": []
   },
   "TokenIssuerSettings": {
-    "Issuer": "https://localhost:5000",
+    "Issuer": "https://identity.harmony.local",
     "SigningKeyPem": null,
-    "SigningKeyPath": "D:/PMS System/secrets/identity-signing-key.pem",
+    "SigningKeyPath": "/run/secrets/identity-signing-key.pem",
     "PreviousSigningKeyPems": []
   },
   "IdentitySettings": {
     "Platform": {
-      "Issuer": "https://localhost:5000",
-      "MetadataAddress": "https://localhost:5000/.well-known/openid-configuration",
+      "Issuer": "https://identity.harmony.local",
+      "MetadataAddress": "https://identity.harmony.local/.well-known/openid-configuration",
       "RequireHttpsMetadata": true,
       "ValidAudiences": [ "harmony" ]
+    },
+    "SuperAdmin": {
+      "Email": "admin@harmony.local",
+      "Password": "Harmony-Admin-Dev-2026",
+      "DisplayName": "Platform Admin"
     }
   },
   "Duende": {
@@ -34,11 +39,11 @@
     "CacheProviders": {
       "Redis": {
         "Connection": "localhost",
-        "Port": 6379,
+        "Port": 6380,
         "User": "identity",
-        "Password": "61vBEgthSzXndY9IMprOCxFL2cRDmKN7",
+        "Password": "CHANGE-ME-identity",
         "AllowAdmin": false,
-        "Ssl": false,
+        "Ssl": true,
         "DistributedLockMode": "RedLock"
       }
     },
@@ -59,4 +64,3 @@
     }
   }
 }
-

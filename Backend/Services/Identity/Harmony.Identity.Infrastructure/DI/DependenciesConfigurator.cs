@@ -199,7 +199,16 @@ public static class DependenciesConfigurator
     private static void AddUserAccounts(this IServiceCollection services)
     {
         // Fully qualified: Identity's package also has a type named IdentityDbContext.
-        services.AddIdentityCore<User>()
+        // PropX rules: five wrong passwords in a row lock the account for five minutes; passwords are 12+ characters.
+        services.AddIdentityCore<User>(options =>
+        {
+            options.Lockout.AllowedForNewUsers = true;
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+            options.Password.RequiredLength = 12;
+            options.Password.RequireNonAlphanumeric = false;
+            options.User.RequireUniqueEmail = false;
+        })
             .AddUserStore<Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserOnlyStore<User, IdentityDbContext, Guid>>();
     }
 
@@ -259,7 +268,10 @@ public static class DependenciesConfigurator
         })
         .AddInMemoryApiScopes(IdentityServerResources.ApiScopes)
         .AddInMemoryApiResources(IdentityServerResources.ApiResources)
-        .AddInMemoryClients(IdentityServerResources.Clients);
+        .AddInMemoryClients(IdentityServerResources.Clients)
+        // S5: PropX sign-in rules and token claims, run by Duende on /connect/token.
+        .AddResourceOwnerValidator<HarmonyPasswordValidator>()
+        .AddProfileService<HarmonyProfileService>();
 
         // Registered after AddIdentityServer so these win over Duende's automatic key stores.
         services.AddSingleton(sp => KeyRingStores.Signing(sp.GetRequiredService<RsaSigningKeyProvider>()));
