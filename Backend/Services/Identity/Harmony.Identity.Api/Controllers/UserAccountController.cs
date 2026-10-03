@@ -11,6 +11,7 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
 {
     [HttpPut("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageUsers)]
     public async Task<IActionResult> Suspend([FromBody] SuspendUserAccountCommand command)
     {
         var response = await this.Mediator.Send(command);
@@ -19,6 +20,7 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
 
     [HttpPut("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageUsers)]
     public async Task<IActionResult> Reinstate([FromBody] ReinstateUserAccountCommand command)
     {
         var response = await this.Mediator.Send(command);
@@ -27,6 +29,7 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
 
     [HttpPut("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageUsers)]
     public async Task<IActionResult> Terminate([FromBody] TerminateUserAccountCommand command)
     {
         var response = await this.Mediator.Send(command);
@@ -35,6 +38,7 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
 
     [HttpPost("get-all")]
     [ProducesResponseType(typeof(PagedResult<UserAccountModel>), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewUsers)]
     public async Task<IActionResult> GetAllPaged([FromBody] GetPagedUserAccountsQuery query)
     {
         var response = await this.Mediator.Send(query);
@@ -43,6 +47,7 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(UserAccountModel), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewUsers)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var response = await this.Mediator.Send(new GetUserAccountByIdQuery { Id = id });
@@ -52,6 +57,7 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     /// <summary>Sets the account's roles to exactly this list (id + roleIds in the body, like Suspend). The next token carries their ids.</summary>
     [HttpPut("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.AssignUsersToRole)]
     public async Task<IActionResult> UpdateRoles([FromBody] UpdateUserRolesCommand command)
     {
         var response = await this.Mediator.Send(command);

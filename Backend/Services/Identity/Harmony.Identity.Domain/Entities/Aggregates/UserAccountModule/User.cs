@@ -85,9 +85,17 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
             UserRoles.Add(UserRole.New(roleId));
         }
 
+        var changed = wanted.Except(current).Any() || current.Except(wanted).Any();
+
         foreach (var userRole in UserRoles.Where(ur => !wanted.Contains(ur.RoleId)).ToList())
         {
             UserRoles.Remove(userRole);
+        }
+
+        // Roles travel inside the token: a removed role must kill the tokens that still carry it.
+        if (changed)
+        {
+            BumpSecurityVersion();
         }
     }
 

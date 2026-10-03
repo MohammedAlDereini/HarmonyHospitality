@@ -1,22 +1,28 @@
 namespace Harmony.Identity.Handler.Commands.UserAccountModule;
 
 using Harmony.Core.Exceptions;
-using Harmony.Identity.Domain.Common;
+using Harmony.Core.Identity.Permissions;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 
 /// <summary>
 /// Writes go through Identity's UserManager: it normalises names, checks uniqueness (inside the tenant,
 /// because the store is tenant-filtered), keeps the security stamp, and saves through our DbContext.
+/// After a save that bumped the user's SecurityVersion, the new number is published so every service refuses
+/// the user's older tokens at the next request.
 /// </summary>
 public abstract class UserAccountCommandHandlerBase
 {
-    protected UserAccountCommandHandlerBase(UserManager<User> userManager)
+    protected UserAccountCommandHandlerBase(UserManager<User> userManager, ICacheService cacheService)
     {
         this.UserManager = userManager;
+        this.CacheService = cacheService;
     }
 
     protected UserManager<User> UserManager { get; }
+
+    protected ICacheService CacheService { get; }
 
     protected async Task<User?> LoadAsync(Guid id)
     {
@@ -26,6 +32,16 @@ public abstract class UserAccountCommandHandlerBase
     protected async Task SaveAsync(User user)
     {
         EnsureSucceeded(await this.UserManager.UpdateAsync(user));
+    }
+
+    /// <summary>PropX: the cache follows the database at once. Called after the save, never before.</summary>
+    protected async Task PublishSecurityVersionAsync(User user, CancellationToken cancellationToken)
+    {
+        await this.CacheService.AddAsync(
+            SecurityVersionCacheKeys.UserVersionKey(user.TenantId, user.Id),
+            user.SecurityVersion,
+            SecurityVersionCacheKeys.UserVersionLifetime,
+            cancellationToken);
     }
 
     /// <summary>An Identity refusal is a bug or a race, never user input, so it surfaces as an exception with the codes.</summary>

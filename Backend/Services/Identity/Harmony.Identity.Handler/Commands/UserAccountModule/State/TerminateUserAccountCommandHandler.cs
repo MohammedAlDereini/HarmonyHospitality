@@ -1,13 +1,13 @@
 namespace Harmony.Identity.Handler.Commands.UserAccountModule.State;
 
-using Harmony.Identity.Domain.Common;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 
 public class TerminateUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<TerminateUserAccountCommand, CallResponse>
 {
-    public TerminateUserAccountCommandHandler(UserManager<User> userManager)
-        : base(userManager)
+    public TerminateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService)
+        : base(userManager, cacheService)
     {
     }
 
@@ -21,6 +21,9 @@ public class TerminateUserAccountCommandHandler : UserAccountCommandHandlerBase,
 
         user.Terminate(command.Reason);
         await this.SaveAsync(user);
+
+        // Terminate bumped the version: every token this user holds dies at its next request.
+        await this.PublishSecurityVersionAsync(user, cancellationToken);
 
         return Ok();
     }

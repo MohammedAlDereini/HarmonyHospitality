@@ -25,6 +25,9 @@ public partial class Program
         // Every tenant must hold a row for every PermissionEnum value, or the service does not start.
         await PermissionEnumIntegrityCheck.ValidateAsync(app);
 
+        // PropX: every endpoint must declare who may call it, or the service does not start.
+        AuthorizationConventionCheck.Validate(app.Services);
+
         await ConfigureCacheSeedingAsync(app);
 
         ConfigureApp(app);

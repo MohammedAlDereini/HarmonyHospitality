@@ -1,13 +1,13 @@
 namespace Harmony.Identity.Handler.Commands.UserAccountModule.State;
 
-using Harmony.Identity.Domain.Common;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 
 public class ReinstateUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<ReinstateUserAccountCommand, CallResponse>
 {
-    public ReinstateUserAccountCommandHandler(UserManager<User> userManager)
-        : base(userManager)
+    public ReinstateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService)
+        : base(userManager, cacheService)
     {
     }
 
@@ -19,6 +19,7 @@ public class ReinstateUserAccountCommandHandler : UserAccountCommandHandlerBase,
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
         }
 
+        // Reinstate kills nothing, so the version stays and nothing is published: the user signs in again.
         user.Reinstate();
         await this.SaveAsync(user);
 

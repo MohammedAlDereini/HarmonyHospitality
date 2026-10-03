@@ -9,6 +9,7 @@ public class LookupCategoryController(IMediator mediator, ICallResponseManager c
 {
     [HttpPost("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.Created)]
+    [RequirePermission(PermissionEnum.ManageLookups)]
     public async Task<IActionResult> Create([FromBody] CreateLookupCategoryCommand command)
     {
         var response = await this.Mediator.Send(command);
@@ -17,6 +18,7 @@ public class LookupCategoryController(IMediator mediator, ICallResponseManager c
 
     [HttpPut("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageLookups)]
     public async Task<IActionResult> Update([FromBody] EditLookupCategoryCommand command)
     {
         var response = await this.Mediator.Send(command);
@@ -25,6 +27,7 @@ public class LookupCategoryController(IMediator mediator, ICallResponseManager c
 
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageLookups)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var response = await this.Mediator.Send(new DeleteLookupCategoryCommand { Id = id });
@@ -33,6 +36,7 @@ public class LookupCategoryController(IMediator mediator, ICallResponseManager c
 
     [HttpPost("get-all")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewLookups)]
     public async Task<IActionResult> GetAllPaged([FromBody] GetPagedLookupCategoriesQuery query)
     {
         var response = await this.Mediator.Send(query);

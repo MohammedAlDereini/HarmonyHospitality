@@ -14,6 +14,7 @@ public class RoleController(IMediator mediator, ICallResponseManager callRespons
 {
     [HttpPost("[action]")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
+    [RequirePermission(PermissionEnum.CreateRole)]
     public async Task<IActionResult> Create([FromBody] CreateRoleCommand command)
     {
         var response = await this.Mediator.Send(command);
@@ -22,6 +23,7 @@ public class RoleController(IMediator mediator, ICallResponseManager callRespons
 
     [HttpPut("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.EditRole)]
     public async Task<IActionResult> Update([FromBody] EditRoleCommand command)
     {
         var response = await this.Mediator.Send(command);
@@ -30,6 +32,7 @@ public class RoleController(IMediator mediator, ICallResponseManager callRespons
 
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.DeleteRole)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var response = await this.Mediator.Send(new DeleteRoleCommand { Id = id });
@@ -39,6 +42,7 @@ public class RoleController(IMediator mediator, ICallResponseManager callRespons
     /// <summary>Sets the role's permissions to exactly this list of ids (PropX AssignPermissions).</summary>
     [HttpPost("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageRolePermissions)]
     public async Task<IActionResult> UpdatePermissions([FromBody] UpdateRolePermissionsCommand command)
     {
         var response = await this.Mediator.Send(command);
@@ -47,6 +51,7 @@ public class RoleController(IMediator mediator, ICallResponseManager callRespons
 
     [HttpPost("get-all")]
     [ProducesResponseType(typeof(PagedResult<RoleListModel>), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewRoles)]
     public async Task<IActionResult> GetAllPaged([FromBody] GetPagedRolesQuery query)
     {
         var response = await this.Mediator.Send(query);
@@ -55,6 +60,7 @@ public class RoleController(IMediator mediator, ICallResponseManager callRespons
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(RoleDetailModel), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewRoles)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var response = await this.Mediator.Send(new GetRoleByIdQuery { Id = id });
@@ -64,6 +70,7 @@ public class RoleController(IMediator mediator, ICallResponseManager callRespons
     /// <summary>The permission catalogue of the caller's tenant: what a role can be given.</summary>
     [HttpGet("permissions")]
     [ProducesResponseType(typeof(List<PermissionModel>), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewRoles)]
     public async Task<IActionResult> GetPermissions()
     {
         var response = await this.Mediator.Send(new GetPermissionCatalogQuery());

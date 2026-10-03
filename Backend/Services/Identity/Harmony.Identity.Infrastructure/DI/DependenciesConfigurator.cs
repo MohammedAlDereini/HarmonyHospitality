@@ -20,6 +20,7 @@ using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Infrastructure.Signing;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Services;
+using Harmony.Core.Identity.Permissions;
 using Harmony.Identity.Infrastructure.Caching;
 using Harmony.Identity.Infrastructure.Services;
 using Harmony.Identity.Infrastructure.IdentityServer;
@@ -181,6 +182,11 @@ public static class DependenciesConfigurator
         // Scoped like the Redis cache and the DbContext it wraps.
         services.TryAddScoped<ICacheService, CacheService>();
         services.TryAddScoped<ICacheSeeder, CacheSeeder>();
+
+        // PropX: Identity answers a cache miss from its own database and rewrites the key. The framework readers in the
+        // other services cannot, so Identity also republishes everything the first time it finds Redis wiped.
+        services.Replace(ServiceDescriptor.Scoped<IPlatformPermissionResolver, DatabaseBackedPermissionResolver>());
+        services.Replace(ServiceDescriptor.Scoped<ISecurityVersionResolver, DatabaseBackedSecurityVersionResolver>());
         services.AddUserAccounts();
         services.AddTokenSigning(configuration);
     }
