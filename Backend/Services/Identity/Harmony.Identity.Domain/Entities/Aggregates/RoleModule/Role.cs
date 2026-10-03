@@ -2,6 +2,7 @@
 using Harmony.Core.Exceptions;
 using Harmony.Core.Models;
 using Harmony.Identity.Domain.Common;
+using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 
 namespace Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 
@@ -23,6 +24,8 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
     public bool IsSystemRole { get; private set; }
 
     public bool IsSuperRole { get; private set; }
+
+    public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
 
     public IReadOnlyCollection<string> PermissionCodes => IsSuperRole ? PermissionCatalog.All : _permissionCodes.AsReadOnly();
 

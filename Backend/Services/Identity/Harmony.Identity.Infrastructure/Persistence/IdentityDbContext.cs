@@ -28,7 +28,8 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<RegulatoryEnvironment> RegulatoryEnvironments { get; set; }
     public DbSet<Capability> Capabilities { get; set; }
 
-    public DbSet<HarmonyUser> UserAccounts { get; set; }
+    public DbSet<User> UserAccounts { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);

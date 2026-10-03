@@ -1,7 +1,6 @@
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Infrastructure.Seeds.Reference;
 using Harmony.Identity.Infrastructure.Seeds.Roles;
-using Harmony.Identity.Infrastructure.Seeds.UserAccounts;
 
 namespace Harmony.Identity.Infrastructure.Persistence;
 
@@ -20,7 +19,6 @@ public class IdentityDbContextSeed : IDbSeeds<IdentityDbContext>
         return
         [
             new SuperAdminRoleSeedV1(),
-            new BootstrapServicePrincipalSeedV1(),
         ];
     }
 }

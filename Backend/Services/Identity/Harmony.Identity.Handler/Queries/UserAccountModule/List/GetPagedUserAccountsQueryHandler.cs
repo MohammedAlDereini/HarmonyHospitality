@@ -8,18 +8,16 @@ namespace Harmony.Identity.Handler.Queries.UserAccountModule.List
     public class GetPagedUserAccountsQueryHandler : IRequestHandler<GetPagedUserAccountsQuery, CallResponse<PagedResult<UserAccountModel>>>
     {
         /// <summary>One projection for list and detail, so neither can ever select a hash or digest by accident.</summary>
-        public static readonly Expression<Func<HarmonyUser, UserAccountModel>> Projection = a => new UserAccountModel
+        public static readonly Expression<Func<User, UserAccountModel>> Projection = a => new UserAccountModel
         {
             Id = a.Id,
             UserName = a.UserName!,
             Email = a.Email,
             DisplayName = a.DisplayName,
-            IsServicePrincipal = a.IsServicePrincipal,
             TwoFactorEnabled = a.TwoFactorEnabled,
             State = a.State,
             StateReason = a.StateReason,
             SecurityVersion = a.SecurityVersion,
-            ServiceCredentialIssuedOn = a.ServiceCredentialIssuedOn,
             CreatedDate = a.CreatedDate,
             CreatedBy = a.CreatedBy,
             ModifiedDate = a.ModifiedDate,
@@ -37,8 +35,6 @@ namespace Harmony.Identity.Handler.Queries.UserAccountModule.List
         {
             var keyword = request.SearchText?.Trim();
             var query = this.userAccounts.Query();
-
-            query = query.WhereIf(request.IsServicePrincipal.HasValue, a => a.IsServicePrincipal == request.IsServicePrincipal!.Value);
 
             query = query.WhereIf(
                 keyword.IsNotNullOrEmpty() && keyword!.Length >= 2,

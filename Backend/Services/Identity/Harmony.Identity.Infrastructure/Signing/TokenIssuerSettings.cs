@@ -23,22 +23,4 @@ public class TokenIssuerSettings
     /// signing to it, and keeps the old one here until every token it signed has expired.
     /// </summary>
     public string[] PreviousSigningKeyPems { get; set; } = [];
-
-    /// <summary>
-    /// The first machine account, created once on an empty database so the API is not locked out before it
-    /// has a caller. Its secret is a file outside the repository, kept like the signing key.
-    /// </summary>
-    public BootstrapPrincipalSettings BootstrapPrincipal { get; set; } = new();
-}
-
-/// <summary>Code and secret file of the bootstrap service principal.</summary>
-public class BootstrapPrincipalSettings
-{
-    /// <summary>The principal's code and user name: 3–64 characters of a-z, 0-9, '-' or '.'.</summary>
-    public string Code { get; set; } = string.Empty;
-
-    public string DisplayName { get; set; } = string.Empty;
-
-    /// <summary>A file holding the secret: one line of at least 32 characters. Read once, when the principal is created.</summary>
-    public string? SecretPath { get; set; }
 }

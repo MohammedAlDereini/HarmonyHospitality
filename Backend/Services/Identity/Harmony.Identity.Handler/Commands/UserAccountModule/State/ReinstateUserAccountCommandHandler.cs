@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 public class ReinstateUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<ReinstateUserAccountCommand, CallResponse>
 {
-    public ReinstateUserAccountCommandHandler(UserManager<HarmonyUser> userManager)
+    public ReinstateUserAccountCommandHandler(UserManager<User> userManager)
         : base(userManager)
     {
     }

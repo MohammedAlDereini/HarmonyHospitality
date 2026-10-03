@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -21,6 +21,10 @@
 				<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.3" />
 		<PackageReference Include="Duende.IdentityServer" Version="8.0.9" />
 		<PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="8.0.9" />		
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Seeds\UserAccounts\" />
 	</ItemGroup>
 
 </Project>

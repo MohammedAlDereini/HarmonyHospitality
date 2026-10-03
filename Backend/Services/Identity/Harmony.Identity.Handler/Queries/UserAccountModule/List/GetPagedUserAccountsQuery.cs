@@ -24,9 +24,6 @@ namespace Harmony.Identity.Handler.Queries.UserAccountModule.List
 
         public string? SearchText { get; set; }
 
-        /// <summary>Null = everyone; true = machines only; false = people only.</summary>
-        public bool? IsServicePrincipal { get; set; }
-
         public class GetPagedUserAccountsQueryValidator : AbstractValidator<GetPagedUserAccountsQuery>
         {
             public GetPagedUserAccountsQueryValidator()

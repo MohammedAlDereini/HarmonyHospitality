@@ -1,4 +1,3 @@
-using Harmony.Core.BuildingBlocks.Infrastructure;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
@@ -7,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harmony.Identity.Infrastructure.Repositories;
 
-public class UserAccountRepository : BaseRepository<HarmonyUser>, IUserAccountRepository
+public class UserAccountRepository : BaseRepository<User>, IUserAccountRepository
 {
     private readonly IdentityDbContext context;
 
@@ -17,33 +16,21 @@ public class UserAccountRepository : BaseRepository<HarmonyUser>, IUserAccountRe
         this.context = context;
     }
 
-    public override async Task<HarmonyUser> GetByIdAsync(object id, CancellationToken cancellationToken = default)
+    public override async Task<User> GetByIdAsync(object id, CancellationToken cancellationToken = default)
     {
         return (await this.context.UserAccounts
             .FirstOrDefaultAsync(a => a.Id == (Guid)id, cancellationToken))!;
     }
 
-    public IQueryable<HarmonyUser> Query()
+    public IQueryable<User> Query()
     {
         return this.context.UserAccounts.AsNoTracking();
     }
 
-    public async Task<HarmonyUser?> FindServicePrincipalAsync(Guid tenantId, string code, CancellationToken cancellationToken)
+    public async Task<User?> GetWithRolesAsync(Guid id, CancellationToken cancellationToken)
     {
-        if (tenantId == Guid.Empty || string.IsNullOrWhiteSpace(code))
-        {
-            return null;
-        }
-
-        var normalized = code.Trim().ToUpperInvariant();
-
-        // The tenant wall is dropped by name and replaced by the explicit tenant: the token endpoint
-        // has no call-context tenant to filter on. Nothing else about the row changes.
         return await this.context.UserAccounts
-            .IgnoreQueryFilters([QueryFilterNames.Tenant])
-            .AsNoTracking()
-            .FirstOrDefaultAsync(
-                a => a.TenantId == tenantId && a.IsServicePrincipal && a.NormalizedUserName == normalized,
-                cancellationToken);
+            .Include(u => u.UserRoles)
+            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 }

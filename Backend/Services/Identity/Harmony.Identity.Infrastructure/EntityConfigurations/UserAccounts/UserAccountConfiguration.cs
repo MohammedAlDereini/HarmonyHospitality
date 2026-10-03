@@ -10,9 +10,9 @@ namespace Harmony.Identity.Infrastructure.EntityConfigurations.UserAccounts;
 /// DbBaseContext (tenant filter, audit, rowversion), not Identity's. Same shape Identity expects,
 /// with one change: user names and emails are unique per tenant, not platform-wide.
 /// </summary>
-public class UserAccountConfiguration : IEntityTypeConfiguration<HarmonyUser>
+public class UserAccountConfiguration : IEntityTypeConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<HarmonyUser> builder)
+    public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("UserAccounts");
 
@@ -30,9 +30,6 @@ public class UserAccountConfiguration : IEntityTypeConfiguration<HarmonyUser>
             .IsRequired()
             .HasMaxLength(128);
 
-        builder.Property(e => e.IsServicePrincipal)
-            .IsRequired();
-
         builder.Property(e => e.State)
             .IsRequired()
             .HasConversion<string>()
@@ -44,10 +41,6 @@ public class UserAccountConfiguration : IEntityTypeConfiguration<HarmonyUser>
         builder.Property(e => e.SecurityVersion)
             .IsRequired();
 
-        // SHA-256 as hex. The secret itself is never a column.
-        builder.Property(e => e.ServiceCredentialDigest)
-            .HasMaxLength(64);
-
         builder.Ignore(e => e.CanSignIn);
 
         builder.HasIndex(e => new { e.TenantId, e.NormalizedUserName })
@@ -56,8 +49,6 @@ public class UserAccountConfiguration : IEntityTypeConfiguration<HarmonyUser>
 
         builder.HasIndex(e => new { e.TenantId, e.NormalizedEmail })
             .HasDatabaseName("IX_UserAccounts_Tenant_Email");
-
-        builder.HasIndex(e => new { e.TenantId, e.IsServicePrincipal });
 
         builder.HasMany<IdentityUserClaim<Guid>>().WithOne().HasForeignKey(c => c.UserId).IsRequired();
         builder.HasMany<IdentityUserLogin<Guid>>().WithOne().HasForeignKey(l => l.UserId).IsRequired();

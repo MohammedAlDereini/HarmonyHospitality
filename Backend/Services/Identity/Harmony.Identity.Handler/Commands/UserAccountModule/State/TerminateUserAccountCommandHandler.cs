@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 public class TerminateUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<TerminateUserAccountCommand, CallResponse>
 {
-    public TerminateUserAccountCommandHandler(UserManager<HarmonyUser> userManager)
+    public TerminateUserAccountCommandHandler(UserManager<User> userManager)
         : base(userManager)
     {
     }

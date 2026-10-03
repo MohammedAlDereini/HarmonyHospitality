@@ -68,7 +68,7 @@ public static class DependenciesConfigurator
             config.AddReadOnlyRepository<LookupCategory, IdentityDbContext>();
             config.AddReadOnlyRepository<LookupValue, IdentityDbContext>();
             config.AddReadOnlyRepository<Role, IdentityDbContext>();
-            config.AddReadOnlyRepository<HarmonyUser, IdentityDbContext>();
+            config.AddReadOnlyRepository<User, IdentityDbContext>();
             config.AddRepositoriesFromAssemblyContaining<RoleRepository>();
             config.AddMediatR(mediatRConfig =>
             {
@@ -187,13 +187,12 @@ public static class DependenciesConfigurator
     private static void AddUserAccounts(this IServiceCollection services)
     {
         // Fully qualified: Identity's package also has a type named IdentityDbContext.
-        services.AddIdentityCore<HarmonyUser>()
-            .AddUserStore<Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserOnlyStore<HarmonyUser, IdentityDbContext, Guid>>();
+        services.AddIdentityCore<User>()
+            .AddUserStore<Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserOnlyStore<User, IdentityDbContext, Guid>>();
     }
 
     /// <summary>
-    /// The signing keys and the bootstrap principal, checked at start: a bad issuer, key or secret file
-    /// stops the service before it signs anything or seeds anyone.
+    /// The signing keys, checked at start: a bad issuer or key file stops the service before it signs anything.
     /// </summary>
     private static void AddTokenSigning(this IServiceCollection services, IConfiguration configuration)
     {
@@ -211,15 +210,6 @@ public static class DependenciesConfigurator
             .Validate(
                 settings => ConfiguredKeys(settings).All(pem => !RsaSigningKeyProvider.TryDescribeProblem(pem, out _)),
                 $"{TokenIssuerSettings.Section}: a signing key is not a readable RSA private key of at least {RsaSigningKeyProvider.MinimumKeyBits} bits.")
-            .Validate(
-                settings => BootstrapNameIsUsable(settings.BootstrapPrincipal),
-                $"{TokenIssuerSettings.Section}:BootstrapPrincipal needs a Code (3–64 characters of a-z, 0-9, '-' or '.') and a DisplayName.")
-            .Validate(
-                settings => !string.IsNullOrWhiteSpace(settings.BootstrapPrincipal?.SecretPath) && File.Exists(settings.BootstrapPrincipal.SecretPath),
-                $"{TokenIssuerSettings.Section}:BootstrapPrincipal:SecretPath is required and must exist.")
-            .Validate(
-                settings => BootstrapSecretIsUsable(settings.BootstrapPrincipal),
-                $"{TokenIssuerSettings.Section}:BootstrapPrincipal: the secret file must hold one line of at least {ServiceSecret.MinimumLength} characters.")
             .ValidateOnStart();
 
         services.AddSingleton<RsaSigningKeyProvider>();
@@ -242,46 +232,10 @@ public static class DependenciesConfigurator
         }
     }
 
-    private static bool BootstrapNameIsUsable(BootstrapPrincipalSettings? bootstrap)
-    {
-        if (bootstrap is null || string.IsNullOrWhiteSpace(bootstrap.DisplayName))
-        {
-            return false;
-        }
-
-        try
-        {
-            IdentityText.ServicePrincipalCode(bootstrap.Code);
-            return true;
-        }
-        catch (BusinessException)
-        {
-            return false;
-        }
-    }
-
-    private static bool BootstrapSecretIsUsable(BootstrapPrincipalSettings? bootstrap)
-    {
-        if (bootstrap is null || string.IsNullOrWhiteSpace(bootstrap.SecretPath) || !File.Exists(bootstrap.SecretPath))
-        {
-            return false;
-        }
-
-        try
-        {
-            ServiceSecret.EnsureUsable(File.ReadAllText(bootstrap.SecretPath).Trim());
-            return true;
-        }
-        catch (BusinessException)
-        {
-            return false;
-        }
-    }
-
     /// <summary>
-    /// Duende IdentityServer as the token engine. It signs with our key ring (S3a) — automatic key
-    /// management is off — and issues service tokens through the harmony:service grant. No licence key:
-    /// in non-production Duende runs in trial mode and only logs a notice. Production needs a licence.
+    /// Duende IdentityServer as the token engine. It signs with our key ring (S3a); automatic key
+    /// management is off. The licence key is read from configuration (Duende:IdentityServer:LicenseKey).
+    /// Sign-in flows and clients arrive with S5. 🔴 SERVICES: the harmony:service grant lived here.
     /// </summary>
     private static void AddIdentityServerHost(this IServiceCollection services, IConfiguration configuration)
     {
@@ -290,14 +244,10 @@ public static class DependenciesConfigurator
             options.IssuerUri = configuration[$"{TokenIssuerSettings.Section}:{nameof(TokenIssuerSettings.Issuer)}"];
             options.KeyManagement.Enabled = false;
             options.EmitStaticAudienceClaim = false;
-
-            // Our grant carries the secret in a parameter Duende does not know; without this it is logged in clear.
-            options.Logging.TokenRequestSensitiveValuesFilter.Add(ServicePrincipalGrant.SecretParameter);
         })
         .AddInMemoryApiScopes(IdentityServerResources.ApiScopes)
         .AddInMemoryApiResources(IdentityServerResources.ApiResources)
-        .AddInMemoryClients(IdentityServerResources.Clients)
-        .AddExtensionGrantValidator<ServicePrincipalGrantValidator>();
+        .AddInMemoryClients(IdentityServerResources.Clients);
 
         // Registered after AddIdentityServer so these win over Duende's automatic key stores.
         services.AddSingleton(sp => KeyRingStores.Signing(sp.GetRequiredService<RsaSigningKeyProvider>()));

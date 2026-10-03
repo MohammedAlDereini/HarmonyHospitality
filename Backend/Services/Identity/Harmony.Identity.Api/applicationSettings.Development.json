@@ -15,12 +15,7 @@
     "Issuer": "https://localhost:5000",
     "SigningKeyPem": null,
     "SigningKeyPath": "D:/PMS System/secrets/identity-signing-key.pem",
-    "PreviousSigningKeyPems": [],
-    "BootstrapPrincipal": {
-      "Code": "harmony-bootstrap",
-      "DisplayName": "Harmony bootstrap",
-      "SecretPath": "D:/PMS System/secrets/identity-bootstrap-secret.txt"
-    }
+    "PreviousSigningKeyPems": []
   },
   "IdentitySettings": {
     "Platform": {
@@ -28,6 +23,11 @@
       "MetadataAddress": "https://localhost:5000/.well-known/openid-configuration",
       "RequireHttpsMetadata": true,
       "ValidAudiences": [ "harmony" ]
+    }
+  },
+  "Duende": {
+    "IdentityServer": {
+      "LicenseKey": "eyJhbGciOiJQUzI1NiIsInR5cCI6ImxpY2Vuc2Urand0In0.eyJhdWQiOiJJZGVudGl0eVNlcnZlciBDb21tdW5pdHkgRWRpdGlvbiAoVjIpIiwiaXNzIjoiaHR0cHM6Ly9kdWVuZGVzb2Z0d2FyZS5jb20iLCJleHAiOjE4MjI0MzUyMDAsImlhdCI6MTc5MDg5OTIwMCwicHJvZHVjdCI6IklkZW50aXR5U2VydmVyIENvbW11bml0eSBFZGl0aW9uIChWMikiLCJjb21wYW55X25hbWUiOiJNb2hhbW1lZCBBbC1EZXJlaWluaWkgLSBJbmRpdmlkdWFsIiwiY29udGFjdF9pbmZvIjoibW9oYW1tZWQuZGVyZWlpbmlpQGdtYWlsLmNvbSIsImlkIjoiMTIzODYiLCJza3VzIjoiW3tcImlkXCI6XCJQVEMtMDAxXCJ9LHtcImlkXCI6XCJQVEMtMDAyXCJ9LHtcImlkXCI6XCJQVEMtMDAzXCJ9LHtcImlkXCI6XCJQVEMtMDA0XCJ9LHtcImlkXCI6XCJQVEMtMDA1XCJ9LHtcImlkXCI6XCJQVEMtMDA2XCJ9LHtcImlkXCI6XCJJUy0wMDFcIn0se1wiaWRcIjpcIlBUQy0wMjRcIn0se1wiaWRcIjpcIlBUQy0wMjVcIn0se1wiaWRcIjpcIlBUQy0wMTdcIn0se1wiaWRcIjpcIlBUQy0wMTZcIn0se1wiaWRcIjpcIlBUQy0wMThcIn0se1wiaWRcIjpcIlBUQy0wMTlcIn0se1wiaWRcIjpcIlBUQy0wMjBcIn0se1wiaWRcIjpcIlBUQy0wMjFcIn0se1wiaWRcIjpcIlBUQy0wMjJcIn0se1wiaWRcIjpcIlBMVC0wMDZcIn0se1wiaWRcIjpcIlBMVC0wMDdcIn0se1wiaWRcIjpcIlBMVC0wMDhcIn0se1wiaWRcIjpcIlVNLTAwMlwifSx7XCJpZFwiOlwiVU0tMDAzXCJ9LHtcImlkXCI6XCJVTS0wMDRcIn0se1wiaWRcIjpcIlVNLTAwNVwifSx7XCJpZFwiOlwiVU0tMDA2XCJ9LHtcImlkXCI6XCJVTS0wMDdcIn0se1wiaWRcIjpcIlVNLTAwOFwifSx7XCJpZFwiOlwiVU0tMDA5XCJ9LHtcImlkXCI6XCJVTS0wMTBcIn0se1wiaWRcIjpcIlVNLTAxMVwifSx7XCJpZFwiOlwiVU0tMDEyXCJ9LHtcImlkXCI6XCJVTS0wMTNcIn0se1wiaWRcIjpcIlVNLTAxNFwifSx7XCJpZFwiOlwiQkZGLTAwMlwifSx7XCJpZFwiOlwiQkZGLTAwM1wifSx7XCJpZFwiOlwiQkZGLTAwNFwifSx7XCJpZFwiOlwiQkZGLTAwNVwifSx7XCJpZFwiOlwiQkZGLTAwNlwifSx7XCJpZFwiOlwiUExULTAyMFwiLFwibGltaXRcIjoxLFwiZ3JhY2VcIjozfSx7XCJpZFwiOlwiUExULTAyMVwifSx7XCJpZFwiOlwiUExULTAwMVwiLFwibGltaXRcIjoxLFwiZ3JhY2VcIjozfSx7XCJpZFwiOlwiUFRDLTAwOVwiLFwibGltaXRcIjoxMCxcImdyYWNlXCI6MTZ9LHtcImlkXCI6XCJVTS0wMDFcIixcImxpbWl0XCI6MTAwMDAsXCJncmFjZVwiOjEwMTgwfSx7XCJpZFwiOlwiQkZGLTAwMVwiLFwibGltaXRcIjoxMCxcImdyYWNlXCI6MTZ9XSIsImNhdGFsb2dfdmVyc2lvbiI6NCwibmJmIjoxNzkwOTY0MDMwfQ.UL07nWSkWlgdxYO25nUtvS-VXj7p2kJfQXT534n2Jt3Ul0x4WCwN5msMZ07KJSa9Xzm-3JRTxWQR3yZXu0_jicKkYEsjtovX3MeALHMIZHwMwB3VsknjLNWcFLhRYVt9V7Gpy5_5ZAINbBztMcc82vpJbItVWfa7CiWPEYCyJyWD0NRwrErKMXh-mryBJqb2ueEGovBKxldDhPycGkS-TYvfPAyGJ0Xpol_QTwrtI9VimEN1gtEej0eXySPSsaaURcqwH5_BeM7m4MA8GkNbEmqOvcveYblh2ZeBIFppGPgQMnDA6ZG1S4hsLbwd6zIy5uSXqWmoKfzPNj7USEQbiQ"
     }
   },
   "CacheSettings": {

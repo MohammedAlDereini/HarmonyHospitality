@@ -11,19 +11,19 @@ using Microsoft.AspNetCore.Identity;
 /// </summary>
 public abstract class UserAccountCommandHandlerBase
 {
-    protected UserAccountCommandHandlerBase(UserManager<HarmonyUser> userManager)
+    protected UserAccountCommandHandlerBase(UserManager<User> userManager)
     {
         this.UserManager = userManager;
     }
 
-    protected UserManager<HarmonyUser> UserManager { get; }
+    protected UserManager<User> UserManager { get; }
 
-    protected async Task<HarmonyUser?> LoadAsync(Guid id)
+    protected async Task<User?> LoadAsync(Guid id)
     {
         return await this.UserManager.FindByIdAsync(id.ToString());
     }
 
-    protected async Task SaveAsync(HarmonyUser user)
+    protected async Task SaveAsync(User user)
     {
         EnsureSucceeded(await this.UserManager.UpdateAsync(user));
     }

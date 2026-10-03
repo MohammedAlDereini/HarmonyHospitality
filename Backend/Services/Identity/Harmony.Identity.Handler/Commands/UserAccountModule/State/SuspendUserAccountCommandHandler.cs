@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 public class SuspendUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<SuspendUserAccountCommand, CallResponse>
 {
-    public SuspendUserAccountCommandHandler(UserManager<HarmonyUser> userManager)
+    public SuspendUserAccountCommandHandler(UserManager<User> userManager)
         : base(userManager)
     {
     }
