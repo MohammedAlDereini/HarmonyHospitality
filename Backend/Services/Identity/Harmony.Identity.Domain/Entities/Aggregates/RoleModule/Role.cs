@@ -1,4 +1,4 @@
-﻿using Harmony.Core.BuildingBlocks.Domain.Abstractions;
+using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 using Harmony.Core.Exceptions;
 using Harmony.Core.Models;
 using Harmony.Identity.Domain.Common;
@@ -8,7 +8,6 @@ namespace Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 
 public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntity, IConcurrentEntity
 {
-    private readonly List<string> _permissionCodes = [];
     private Role()
     {
     }
@@ -27,7 +26,8 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
 
     public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
 
-    public IReadOnlyCollection<string> PermissionCodes => IsSuperRole ? PermissionCatalog.All : _permissionCodes.AsReadOnly();
+    /// <summary>The permissions this role holds, as rows (PropX RolePermissions). The super role holds none: it passes every check.</summary>
+    public ICollection<RolePermission> Permissions { get; private set; } = new List<RolePermission>();
 
     public bool IsPrivileged => PrivilegeLevel >= PrivilegeLevel.Manager;
 
@@ -53,9 +53,9 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
         };
     }
 
-    public static Role CreateSystem(string code, string nameEn, string? nameAr, PrivilegeLevel privilegeLevel, IEnumerable<string> permissionCodes)
+    public static Role CreateSystem(string code, string nameEn, string? nameAr, PrivilegeLevel privilegeLevel, IEnumerable<Guid> permissionIds)
     {
-        ArgumentNullException.ThrowIfNull(permissionCodes);
+        ArgumentNullException.ThrowIfNull(permissionIds);
 
         var role = new Role
         {
@@ -66,9 +66,9 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
             IsSystemRole = true,
         };
 
-        foreach (var permissionCode in permissionCodes)
+        foreach (var permissionId in permissionIds.Distinct())
         {
-            role.AddPermission(permissionCode);
+            role.Permissions.Add(RolePermission.New(permissionId));
         }
 
         return role;
@@ -87,25 +87,27 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
         };
     }
 
-    public bool Has(string permissionCode)
-        => IsSuperRole
-            ? PermissionCatalog.TryGetCanonical(permissionCode, out _)
-            : _permissionCodes.Any(c => IdentityText.SameCode(c, permissionCode));
+    public bool Has(Guid permissionId)
+        => IsSuperRole || Permissions.Any(rp => rp.PermissionId == permissionId);
 
-    public void Grant(string permissionCode)
+    /// <summary>The role holds exactly these permissions afterwards: missing ones are added, others removed. System roles refuse.</summary>
+    public void UpdatePermissions(IEnumerable<Guid> permissionIds)
     {
-        AssertEditable();
-        AddPermission(permissionCode);
-    }
-
-    public void Revoke(string permissionCode)
-    {
+        ArgumentNullException.ThrowIfNull(permissionIds);
         AssertEditable();
 
-        var existing = _permissionCodes.FirstOrDefault(c => IdentityText.SameCode(c, permissionCode))
-            ?? throw new BusinessException($"'{Code}' does not hold '{permissionCode}'.", Error.New(IdentityErrorCodes.PermissionNotHeld));
+        var wanted = permissionIds.Distinct().ToList();
+        var current = Permissions.Select(rp => rp.PermissionId).ToList();
 
-        _permissionCodes.Remove(existing);
+        foreach (var permissionId in wanted.Except(current))
+        {
+            Permissions.Add(RolePermission.New(permissionId));
+        }
+
+        foreach (var rolePermission in Permissions.Where(rp => !wanted.Contains(rp.PermissionId)).ToList())
+        {
+            Permissions.Remove(rolePermission);
+        }
     }
 
     public void Rename(string nameEn, string? nameAr)
@@ -132,23 +134,6 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
         {
             throw new BusinessException($"'{Code}' is a system role and cannot be deleted.", Error.New(IdentityErrorCodes.SystemRoleNotDeletable));
         }
-    }
-
-    private void AddPermission(string permissionCode)
-    {
-        var code = IdentityText.PermissionCode(permissionCode);
-
-        if (!PermissionCatalog.TryGetCanonical(code, out var canonical))
-        {
-            throw new BusinessException($"'{code}' is not in the permission catalogue.", Error.New(IdentityErrorCodes.UnknownPermission));
-        }
-
-        if (Has(canonical))
-        {
-            throw new BusinessException($"'{Code}' already holds '{canonical}'.", Error.New(IdentityErrorCodes.PermissionAlreadyGranted));
-        }
-
-        _permissionCodes.Add(canonical);
     }
 
     private void AssertEditable()

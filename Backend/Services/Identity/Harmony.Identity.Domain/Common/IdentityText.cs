@@ -21,18 +21,6 @@ public static class IdentityText
         return trimmed.ToUpperInvariant();
     }
 
-    public static string PermissionCode(string? value)
-    {
-        var trimmed = Blank(value);
-
-        if (trimmed is null || trimmed.Contains('*') || trimmed.Contains('%'))
-        {
-            throw new BusinessException($"'{value}' is not a valid permission code.", Error.New(IdentityErrorCodes.InvalidPermissionCode));
-        }
-
-        return trimmed;
-    }
-
     public static string DisplayName(string? value)
     {
         var trimmed = Blank(value);

@@ -1,5 +1,6 @@
 using Harmony.Core.Abstractions;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Infrastructure.Persistence;
 using Harmony.Identity.Shared.Enums;
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Harmony.Identity.Infrastructure.Seeds.Roles;
+namespace Harmony.Identity.Infrastructure.Seeds.Permissions;
 
 /// <summary>
 /// The permission catalogue as rows, per tenant: one per <see cref="PermissionEnum"/> value. Runs at every start

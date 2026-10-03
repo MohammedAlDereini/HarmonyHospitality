@@ -36,17 +36,10 @@ public class RoleController(IMediator mediator, ICallResponseManager callRespons
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 
+    /// <summary>Sets the role's permissions to exactly this list of ids (PropX AssignPermissions).</summary>
     [HttpPost("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> GrantPermission([FromBody] GrantRolePermissionCommand command)
-    {
-        var response = await this.Mediator.Send(command);
-        return await this.CallResponseManager.AsActionResultAsync(response);
-    }
-
-    [HttpPost("[action]")]
-    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> RevokePermission([FromBody] RevokeRolePermissionCommand command)
+    public async Task<IActionResult> UpdatePermissions([FromBody] UpdateRolePermissionsCommand command)
     {
         var response = await this.Mediator.Send(command);
         return await this.CallResponseManager.AsActionResultAsync(response);
@@ -68,8 +61,9 @@ public class RoleController(IMediator mediator, ICallResponseManager callRespons
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 
+    /// <summary>The permission catalogue of the caller's tenant: what a role can be given.</summary>
     [HttpGet("permissions")]
-    [ProducesResponseType(typeof(List<string>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(List<PermissionModel>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> GetPermissions()
     {
         var response = await this.Mediator.Send(new GetPermissionCatalogQuery());

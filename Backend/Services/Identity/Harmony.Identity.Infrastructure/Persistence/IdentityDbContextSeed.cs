@@ -1,4 +1,5 @@
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
+using Harmony.Identity.Infrastructure.Seeds.Permissions;
 using Harmony.Identity.Infrastructure.Seeds.Reference;
 using Harmony.Identity.Infrastructure.Seeds.Roles;
 

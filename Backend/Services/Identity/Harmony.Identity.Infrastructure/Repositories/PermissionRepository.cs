@@ -1,4 +1,5 @@
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Infrastructure.Persistence;

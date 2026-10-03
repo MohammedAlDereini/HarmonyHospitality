@@ -35,6 +35,13 @@ public class RoleRepository : BaseRepository<Role>, IRoleRepository
             .FirstOrDefaultAsync(r => r.Code == normalized, cancellationToken);
     }
 
+    public async Task<Role?> GetWithPermissionsAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await this.context.Roles
+            .Include(r => r.Permissions)
+            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+    }
+
     public IQueryable<Role> Query()
     {
         return this.context.Roles.AsNoTracking();

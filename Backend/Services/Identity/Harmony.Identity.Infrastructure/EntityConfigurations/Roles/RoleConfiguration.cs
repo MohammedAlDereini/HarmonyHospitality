@@ -34,12 +34,6 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.Property(e => e.IsSuperRole)
             .IsRequired();
 
-        builder.PrimitiveCollection<List<string>>("_permissionCodes")
-            .HasColumnName("PermissionCodes")
-            .IsRequired()
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.Ignore(e => e.PermissionCodes);
         builder.Ignore(e => e.IsPrivileged);
 
         builder.HasIndex(e => new { e.TenantId, e.Code })

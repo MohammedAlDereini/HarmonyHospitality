@@ -1,4 +1,4 @@
-﻿namespace Harmony.Identity.Handler.Commands.RoleModule.Create;
+namespace Harmony.Identity.Handler.Commands.RoleModule.Create;
 
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 
@@ -12,7 +12,8 @@ public class CreateRoleCommand : BaseCommandRequest<CallResponse<Guid>>
 
     public PrivilegeLevel PrivilegeLevel { get; set; } = PrivilegeLevel.Standard;
 
-    public List<string> PermissionCodes { get; set; } = [];
+    /// <summary>Ids from GET api/Role/permissions. Empty list = a role with no permissions yet.</summary>
+    public List<Guid> PermissionIds { get; set; } = [];
 
     public class CreateRoleCommandValidation : AbstractValidator<CreateRoleCommand>
     {
@@ -33,11 +34,11 @@ public class CreateRoleCommand : BaseCommandRequest<CallResponse<Guid>>
             this.RuleFor(e => e.PrivilegeLevel)
                 .IsInEnum().WithMessage("Privilege level is not valid.");
 
-            this.RuleFor(e => e.PermissionCodes)
-                .NotNull().WithMessage("Permission codes must be a list.");
+            this.RuleFor(e => e.PermissionIds)
+                .NotNull().WithMessage("Permission ids must be a list.");
 
-            this.RuleForEach(e => e.PermissionCodes)
-                .NotEmpty().WithMessage("Permission code must not be empty.");
+            this.RuleForEach(e => e.PermissionIds)
+                .NotEmpty().WithMessage("Permission id must not be empty.");
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Harmony.Core.BuildingBlocks;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
+using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Entities.Reference;
@@ -18,6 +19,7 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<LookupValue> LookupValues { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
+    public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<Country> Countries { get; set; }
     public DbSet<CountrySubdivision> CountrySubdivisions { get; set; }
     public DbSet<City> Cities { get; set; }

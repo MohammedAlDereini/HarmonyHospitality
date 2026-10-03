@@ -1,8 +1,9 @@
+using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Harmony.Identity.Infrastructure.EntityConfigurations.Roles;
+namespace Harmony.Identity.Infrastructure.EntityConfigurations.Permissions;
 
 public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 {

@@ -1,7 +1,8 @@
 using Harmony.Core.BuildingBlocks.Domain.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Shared.Enums;
 
-namespace Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
+namespace Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 
 /// <summary>A permission as a row: one per <see cref="PermissionEnum"/> value per tenant, seeded, never created through the API.</summary>
 public sealed class Permission : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntity, IConcurrentEntity
@@ -21,6 +22,9 @@ public sealed class Permission : BaseEntity<Guid>, IAuditableEntity, IMultiTenan
     public string? EndPoint { get; private set; }
 
     public bool IsActive { get; private set; }
+
+    /// <summary>The roles that hold this permission (PropX Permission.Permissions).</summary>
+    public ICollection<RolePermission> RolePermissions { get; private set; } = new List<RolePermission>();
 
     public Guid TenantId { get; private set; }
 

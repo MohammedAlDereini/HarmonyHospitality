@@ -1,6 +1,9 @@
-﻿namespace Harmony.Identity.Handler.Queries.RoleModule.Permissions
+using Harmony.Identity.Domain.Models.RoleModule;
+
+namespace Harmony.Identity.Handler.Queries.RoleModule.Permissions
 {
-    public class GetPermissionCatalogQuery : BaseQueryRequest<CallResponse<List<string>>>
+    /// <summary>The permissions of the caller's tenant: what a role can be given.</summary>
+    public class GetPermissionCatalogQuery : BaseQueryRequest<CallResponse<List<PermissionModel>>>
     {
     }
 }
