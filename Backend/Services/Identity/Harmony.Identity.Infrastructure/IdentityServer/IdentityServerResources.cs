@@ -20,7 +20,8 @@ public static class IdentityServerResources
         PlatformClaimTypes.Org,
         PlatformClaimTypes.Role,
         "name",
-        "security_version",
+        PlatformClaimTypes.SecurityVersion,
+        PlatformClaimTypes.MustChangePassword,
     ];
 
     public static IEnumerable<ApiScope> ApiScopes =>

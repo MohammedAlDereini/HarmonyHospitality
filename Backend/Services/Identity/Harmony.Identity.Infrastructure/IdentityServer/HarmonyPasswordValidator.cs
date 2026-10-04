@@ -1,6 +1,9 @@
+using System.Globalization;
+using System.Security.Claims;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Validation;
 using Harmony.Core.BuildingBlocks.Infrastructure;
+using Harmony.Core.Identity.Implementations.Platform;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -96,7 +99,11 @@ public sealed class HarmonyPasswordValidator : IResourceOwnerPasswordValidator
         await this.userManager.ResetAccessFailedCountAsync(user);
         this.logger.LogInformation("Sign-in accepted for account {UserId} in tenant {Tenant}.", user.Id, user.TenantId);
 
-        // The claims come from HarmonyProfileService; here only who signed in and how.
-        context.Result = new GrantValidationResult(user.Id.ToString("D"), "pwd");
+        // The token claims come from HarmonyProfileService. The subject keeps one thing of its own: the SecurityVersion
+        // it signed in with, stored inside the refresh token, so a later bump ends that session at the next refresh.
+        context.Result = new GrantValidationResult(
+            user.Id.ToString("D"),
+            "pwd",
+            [new Claim(PlatformClaimTypes.SecurityVersion, user.SecurityVersion.ToString(CultureInfo.InvariantCulture))]);
     }
 }

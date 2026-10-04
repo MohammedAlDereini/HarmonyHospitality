@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Security.Claims;
+using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Harmony.Core.BuildingBlocks.Infrastructure;
@@ -12,9 +13,11 @@ namespace Harmony.Identity.Infrastructure.IdentityServer;
 
 /// <summary>
 /// PropX AuthClaimsBuilder, as Duende's profile service: what a Harmony token says about its subject. The claims are
-/// exactly the ones every service reads: tenant_id, role (one claim per role id), security_version and name.
-/// Duende asks again on every refresh, so a changed role set or a bumped version reaches the next token without a
-/// new login, and <see cref="IsActiveAsync"/> stops a suspended or terminated account from refreshing at all.
+/// exactly the ones every service reads: tenant_id, role (one claim per role id), security_version, name, and
+/// must_change_password while the person still has to replace a password somebody else chose.
+/// Duende asks again on every refresh, and <see cref="IsActiveAsync"/> is where a session ends: a suspended or
+/// terminated account cannot refresh, and neither can a refresh token issued before the SecurityVersion was bumped
+/// (password changed, roles changed, suspended): that session is over and the person signs in again.
 /// </summary>
 public sealed class HarmonyProfileService : IProfileService
 {
@@ -41,6 +44,11 @@ public sealed class HarmonyProfileService : IProfileService
         };
         claims.AddRange(user.UserRoles.Select(role => new Claim(PlatformClaimTypes.Role, role.RoleId.ToString("D"))));
 
+        if (user.MustChangePassword)
+        {
+            claims.Add(new Claim(PlatformClaimTypes.MustChangePassword, "1"));
+        }
+
         // Only what the requested scopes allow through (the harmony API resource lists these claim types).
         context.AddRequestedClaims(claims);
     }
@@ -48,7 +56,18 @@ public sealed class HarmonyProfileService : IProfileService
     public async Task IsActiveAsync(IsActiveContext context, CancellationToken cancellationToken)
     {
         var user = await this.LoadAsync(context.Subject, cancellationToken);
-        context.IsActive = user is not null && user.CanSignIn;
+        var active = user is not null && user.CanSignIn;
+
+        // A refresh token remembers the version it was issued with (the password grant puts it on the subject).
+        // A bump since then means every token of that session is dead, the refresh token included.
+        if (active && context.Caller == IdentityServerConstants.ProfileIsActiveCallers.RefreshTokenValidation)
+        {
+            var issuedWith = context.Subject.FindFirst(PlatformClaimTypes.SecurityVersion)?.Value;
+            active = int.TryParse(issuedWith, NumberStyles.None, CultureInfo.InvariantCulture, out var version)
+                && version == user!.SecurityVersion;
+        }
+
+        context.IsActive = active;
     }
 
     // Runs inside Duende's token pipeline, before any tenant is known: the lookup drops the tenant filter.

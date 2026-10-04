@@ -22,6 +22,9 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
     public AdministrativeState State { get; private set; }
     public string? StateReason { get; private set; }
     public int SecurityVersion { get; private set; }
+
+    /// <summary>True until the person replaces a password somebody else chose (the first-account seed, an admin). While true, a token can only change the password.</summary>
+    public bool MustChangePassword { get; private set; }
     public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
 
     public bool CanSignIn => State == AdministrativeState.Active;
@@ -48,6 +51,26 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
             SecurityStamp = Guid.NewGuid().ToString("N"),
             LockoutEnabled = true,
         };
+    }
+
+    /// <summary>The password was chosen by someone else; the person must replace it before doing anything else. For new accounts, so nothing to kill.</summary>
+    public void RequirePasswordChange()
+    {
+        AssertNotTerminated();
+
+        MustChangePassword = true;
+    }
+
+    /// <summary>
+    /// The domain side of a password change; Identity stores the hash. The must-change flag clears and the version bumps:
+    /// a changed password logs the account out everywhere, the caller included, and no refresh token survives it.
+    /// </summary>
+    public void MarkPasswordChanged()
+    {
+        AssertNotTerminated();
+
+        MustChangePassword = false;
+        BumpSecurityVersion();
     }
 
     /// <summary>Blocks sign-in and kills current tokens. Suspending twice is a no-op.</summary>

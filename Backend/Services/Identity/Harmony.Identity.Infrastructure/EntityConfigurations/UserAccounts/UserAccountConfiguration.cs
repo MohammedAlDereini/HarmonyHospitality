@@ -41,6 +41,9 @@ public class UserAccountConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.SecurityVersion)
             .IsRequired();
 
+        builder.Property(e => e.MustChangePassword)
+            .IsRequired();
+
         builder.Ignore(e => e.CanSignIn);
 
         builder.HasIndex(e => new { e.TenantId, e.NormalizedUserName })

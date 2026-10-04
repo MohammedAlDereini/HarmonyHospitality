@@ -1,5 +1,6 @@
 using Harmony.Core.Models;
 using Harmony.Identity.Domain.Models.UserAccountModule;
+using Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
 using Harmony.Identity.Handler.Commands.UserAccountModule.State;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Detail;
@@ -51,6 +52,16 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     public async Task<IActionResult> GetById(Guid id)
     {
         var response = await this.Mediator.Send(new GetUserAccountByIdQuery { Id = id });
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The caller replaces their own password. The one call a must-change-password token may make.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
+    {
+        var response = await this.Mediator.Send(command);
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 

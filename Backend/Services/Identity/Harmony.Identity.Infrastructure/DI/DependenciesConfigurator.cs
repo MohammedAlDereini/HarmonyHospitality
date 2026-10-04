@@ -205,7 +205,7 @@ public static class DependenciesConfigurator
             options.Lockout.AllowedForNewUsers = true;
             options.Lockout.MaxFailedAccessAttempts = 5;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-            options.Password.RequiredLength = 12;
+            options.Password.RequiredLength = PasswordRules.MinimumLength;
             options.Password.RequireNonAlphanumeric = false;
             options.User.RequireUniqueEmail = false;
         })

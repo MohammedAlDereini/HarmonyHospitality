@@ -20,7 +20,7 @@ namespace Harmony.Identity.Infrastructure.Seeds.Users;
 internal sealed class SuperAdminUserSeedV1 : IDbSeed<IdentityDbContext>
 {
     public const string Section = "IdentitySettings:SuperAdmin";
-    public const int MinimumPasswordLength = 12;
+    public const int MinimumPasswordLength = PasswordRules.MinimumLength;
 
     public int Version => 1;
 
@@ -70,6 +70,9 @@ internal sealed class SuperAdminUserSeedV1 : IDbSeed<IdentityDbContext>
 
         var user = User.Create(displayName, email, email);
         user.UpdateRoles([superRoleId]);
+
+        // The settings file chose this password; the first thing the person does is replace it.
+        user.RequirePasswordChange();
 
         var result = await userManager.CreateAsync(user, password);
         if (!result.Succeeded)
