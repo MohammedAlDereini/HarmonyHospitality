@@ -10,4 +10,10 @@ public interface IUserAccountRepository : IRepository<User>
 
     /// <summary>The account with its roles, tracked, for a roles change.</summary>
     public Task<User?> GetWithRolesAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Every account with this normalised user name in ANY tenant, tracked. For the anonymous doors (forgot / reset password),
+    /// where no tenant is known yet; the caller acts only when exactly one comes back.
+    /// </summary>
+    public Task<IReadOnlyList<User>> FindByUserNameAcrossTenantsAsync(string normalizedUserName, CancellationToken cancellationToken);
 }

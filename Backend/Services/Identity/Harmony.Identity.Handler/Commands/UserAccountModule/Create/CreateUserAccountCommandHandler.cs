@@ -7,20 +7,23 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
-/// An admin creates an account the PropX way (User.New + roles), with one bridge until e-mail exists: the admin types an
-/// initial password. The account is born with MustChangePassword, so that password works exactly once and the admin never
-/// knows the real one. The email is the user name and is unique inside the tenant (the store is tenant-filtered, the index
-/// is per tenant). Every role must be a role of this tenant. Identity hashes the password and applies the password rules.
+/// An admin creates an account the PropX way (User.New + roles). Two ways to give it a password: by default an invitation
+/// mail carries a one-time link and the person chooses the password, so nobody else ever knows it; or the admin types an
+/// initial password, and the account is born with MustChangePassword so that password works exactly once. If the invitation
+/// cannot be sent the account is not kept: no half-created person. The email is the user name and is unique inside the
+/// tenant. Every role must be a role of this tenant. Identity hashes the password and applies the password rules.
 /// </summary>
 public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<CreateUserAccountCommand, CallResponse<Guid>>
 {
     private readonly IRoleRepository roles;
+    private readonly IAccountMailer mailer;
     private readonly ILogger<CreateUserAccountCommandHandler> logger;
 
-    public CreateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, IRoleRepository roles, ILogger<CreateUserAccountCommandHandler> logger)
+    public CreateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, IRoleRepository roles, IAccountMailer mailer, ILogger<CreateUserAccountCommandHandler> logger)
         : base(userManager, cacheService, sessionRevoker)
     {
         this.roles = roles;
+        this.mailer = mailer;
         this.logger = logger;
     }
 
@@ -45,9 +48,16 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
 
         var user = User.Create(command.DisplayName, email, email);
         user.UpdateRoles(wanted);
-        user.RequirePasswordChange();
 
-        var result = await this.UserManager.CreateAsync(user, command.InitialPassword);
+        var byInvitation = string.IsNullOrEmpty(command.InitialPassword);
+        if (!byInvitation)
+        {
+            user.RequirePasswordChange();
+        }
+
+        var result = byInvitation
+            ? await this.UserManager.CreateAsync(user)
+            : await this.UserManager.CreateAsync(user, command.InitialPassword!);
         if (!result.Succeeded)
         {
             var codes = result.Errors.Select(e => e.Code).ToList();
@@ -66,9 +76,31 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
             return Fail<Guid>(BusinessErrorCodes.Identity.UserAccount.StoreRefused);
         }
 
+        if (byInvitation)
+        {
+            // The link carries a one-time token bound to the account's security stamp; it dies with the first password set.
+            var token = await this.UserManager.GeneratePasswordResetTokenAsync(user);
+            try
+            {
+                await this.mailer.SendInvitationAsync(user, token, cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                // No mail, no account: the admin sees the refusal and tries again, nobody is left half-created.
+                this.logger.LogError(exception, "Invitation mail could not be sent; the new account {UserId} is removed again.", user.Id);
+                await this.UserManager.DeleteAsync(user);
+                return Fail<Guid>(BusinessErrorCodes.Identity.UserAccount.InvitationNotSent);
+            }
+        }
+
         // PropX: the cache follows the database at once, so the first token this person gets finds its version.
         await this.PublishSecurityVersionAsync(user, cancellationToken);
-        this.logger.LogInformation("Account {UserId} created in tenant {Tenant} with {Roles} role(s); the password must be changed at first login.", user.Id, user.TenantId, wanted.Count);
+        this.logger.LogInformation(
+            "Account {UserId} created in tenant {Tenant} with {Roles} role(s); {How}.",
+            user.Id,
+            user.TenantId,
+            wanted.Count,
+            byInvitation ? "an invitation link was sent" : "the password must be changed at first login");
 
         return CallResponseBuilder.CreateResponse<Guid>(eCallResponseStatus.Created).HasData(user.Id);
     }

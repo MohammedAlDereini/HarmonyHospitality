@@ -17,6 +17,11 @@ public interface ICacheService
         TimeSpan? expiry = null,
         CancellationToken cancellationToken = default);
 
+    /// <summary>True while the key lives in the cache. For throttles and one-time markers.</summary>
+    public Task<bool> ExistsAsync(
+        string cacheKey,
+        CancellationToken cancellationToken = default);
+
     public Task DeleteAsync(
         string cacheKey,
         CancellationToken cancellationToken = default);

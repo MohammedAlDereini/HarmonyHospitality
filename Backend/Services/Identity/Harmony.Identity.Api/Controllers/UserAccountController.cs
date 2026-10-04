@@ -5,6 +5,7 @@ using Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Sessions;
 using Harmony.Identity.Handler.Commands.UserAccountModule.TwoFactor;
+using Microsoft.AspNetCore.Authorization;
 using Harmony.Identity.Handler.Commands.UserAccountModule.State;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Detail;
 using Harmony.Identity.Handler.Queries.UserAccountModule.List;
@@ -123,6 +124,26 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [RequirePermission(PermissionEnum.ManageUsers)]
     public async Task<IActionResult> ResetTwoFactor([FromBody] ResetTwoFactorCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>Anyone may ask. If exactly one active account has this e-mail, a one-time reset link goes to it. The answer is always 200.</summary>
+    [HttpPost("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>Sets a new password with the token from a reset or invitation link; every existing session of the account ends.</summary>
+    [HttpPost("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
     {
         var response = await this.Mediator.Send(command);
         return await this.CallResponseManager.AsActionResultAsync(response);

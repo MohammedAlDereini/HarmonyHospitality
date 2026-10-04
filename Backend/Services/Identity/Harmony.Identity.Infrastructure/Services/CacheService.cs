@@ -78,6 +78,14 @@ public class CacheService : ICacheService
         await this.WriteAsync(cacheKey, data, expiry, cancellationToken);
     }
 
+    public async Task<bool> ExistsAsync(
+        string cacheKey,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await this.redisCache.ExistsAsync(cacheKey, eCacheAccessLevel.Public, cancellationToken);
+        return result == eCacheOperationResult.Success;
+    }
+
     // =========================
     // DELETE (Remove cache)
     // =========================

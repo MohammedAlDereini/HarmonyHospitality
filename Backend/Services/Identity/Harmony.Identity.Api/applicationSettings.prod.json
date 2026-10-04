@@ -17,7 +17,22 @@
     "SigningKeyPath": "/run/secrets/identity-signing-key.pem",
     "PreviousSigningKeyPems": []
   },
+  "NotificationSettings": {
+    "EmailClient": {
+      "SmtpHost": "smtp.office365.com",
+      "SmtpPort": 587,
+      "SmtpSecurity": "StartTls",
+      "SmtpUserName": "",
+      "SmtpPassword": "",
+      "FromAddress": "no-reply@harmony.local",
+      "FromName": "Harmony"
+    }
+  },
   "IdentitySettings": {
+    "Web": {
+      "ResetPasswordUrl": "https://app.harmony.local/account/reset-password?email={email}&token={token}",
+      "InvitationUrl": "https://app.harmony.local/account/set-password?email={email}&token={token}"
+    },
     "Platform": {
       "Issuer": "https://identity.harmony.local",
       "MetadataAddress": "https://identity.harmony.local/.well-known/openid-configuration",

@@ -1,3 +1,4 @@
+using Harmony.Core.BuildingBlocks.Infrastructure;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
@@ -25,6 +26,14 @@ public class UserAccountRepository : BaseRepository<User>, IUserAccountRepositor
     public IQueryable<User> Query()
     {
         return this.context.UserAccounts.AsNoTracking();
+    }
+
+    public async Task<IReadOnlyList<User>> FindByUserNameAcrossTenantsAsync(string normalizedUserName, CancellationToken cancellationToken)
+    {
+        return await this.context.UserAccounts
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .Where(u => u.NormalizedUserName == normalizedUserName)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<User?> GetWithRolesAsync(Guid id, CancellationToken cancellationToken)

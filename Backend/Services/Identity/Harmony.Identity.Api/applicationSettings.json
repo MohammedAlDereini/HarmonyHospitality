@@ -12,21 +12,36 @@
     "Errors": []
   },
   "TokenIssuerSettings": {
-    "Issuer": "https://identity.harmony.local",
+    "Issuer": "https://localhost:5000",
     "SigningKeyPem": null,
-    "SigningKeyPath": "/run/secrets/identity-signing-key.pem",
+    "SigningKeyPath": "D:/PMS System/secrets/identity-signing-key.pem",
     "PreviousSigningKeyPems": []
   },
+  "NotificationSettings": {
+    "EmailClient": {
+      "SmtpHost": "smtp.gmail.com",
+      "SmtpPort": 587,
+      "SmtpSecurity": "StartTls",
+      "SmtpUserName": "mohammed.dereiinii@gmail.com",
+      "SmtpPassword": "hrmc kyvs rpkx wvvz",
+      "FromAddress": "mohammed.dereiinii@gmail.com",
+      "FromName": "Harmony"
+    }
+  },
   "IdentitySettings": {
+    "Web": {
+      "ResetPasswordUrl": "https://localhost:5173/account/reset-password?email={email}&token={token}",
+      "InvitationUrl": "https://localhost:5173/account/set-password?email={email}&token={token}"
+    },
     "Platform": {
-      "Issuer": "https://identity.harmony.local",
-      "MetadataAddress": "https://identity.harmony.local/.well-known/openid-configuration",
+      "Issuer": "https://localhost:5000",
+      "MetadataAddress": "https://localhost:5000/.well-known/openid-configuration",
       "RequireHttpsMetadata": true,
       "ValidAudiences": [ "harmony" ]
     },
     "SuperAdmin": {
-      "Email": "admin@harmony.local",
-      "Password": "",
+      "Email": "mohammed.magd@hotmail.com",
+      "Password": "Harmony12345",
       "DisplayName": "Platform Admin"
     }
   },
@@ -41,7 +56,7 @@
         "Connection": "localhost",
         "Port": 6380,
         "User": "identity",
-        "Password": "CHANGE-ME-identity",
+        "Password": "61vBEgthSzXndY9IMprOCxFL2cRDmKN7",
         "AllowAdmin": false,
         "Ssl": true,
         "DistributedLockMode": "RedLock"

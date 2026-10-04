@@ -5,6 +5,7 @@ using Harmony.Core.Identity.DI;
 using Harmony.Core.Localization.DI;
 using Harmony.Core.Logging.DI;
 using Harmony.Core.Notification.DI;
+using Harmony.Identity.Infrastructure.Mail;
 using Harmony.Identity.Domain.Common;
 using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 using Harmony.Identity.Infrastructure.Persistence;
@@ -150,6 +151,9 @@ public static class DependenciesConfigurator
         services.AddCache(configuration);
         services.AddJwtServices(configuration);
         services.AddInfrastructureServices(configuration);
+
+        // Mail over SMTP: the provider (a mailbox, Azure Communication Services, SES) is a settings change.
+        services.AddNotification(configuration, notification => notification.AddSmtpEmailClient());
     }
 
     private static void AddCache(this IServiceCollection services, IConfiguration configuration)
@@ -188,6 +192,12 @@ public static class DependenciesConfigurator
         services.TryAddScoped<ICacheSeeder, CacheSeeder>();
         services.TryAddScoped<ISessionRevoker, DuendeSessionRevoker>();
         services.TryAddScoped<MfaChallengeStore>();
+        services.TryAddScoped<IAccountMailer, AccountMailer>();
+        services.AddOptions<WebLinkSettings>()
+            .Bind(configuration.GetSection(WebLinkSettings.Section))
+            .Validate(settings => WebLinkSettings.IsValidTemplate(settings.ResetPasswordUrl), $"{WebLinkSettings.Section}:ResetPasswordUrl must be an absolute https URL containing {{email}} and {{token}}.")
+            .Validate(settings => WebLinkSettings.IsValidTemplate(settings.InvitationUrl), $"{WebLinkSettings.Section}:InvitationUrl must be an absolute https URL containing {{email}} and {{token}}.")
+            .ValidateOnStart();
 
         // PropX: Identity answers a cache miss from its own database and rewrites the key. The framework readers in the
         // other services cannot, so Identity also republishes everything the first time it finds Redis wiped.
@@ -217,7 +227,9 @@ public static class DependenciesConfigurator
         })
             .AddUserStore<HarmonyUserStore>()
             // RFC 6238 authenticator codes (Google / Microsoft Authenticator). The only token provider we need.
-            .AddTokenProvider<AuthenticatorTokenProvider<User>>(TokenOptions.DefaultAuthenticatorProvider);
+            .AddTokenProvider<AuthenticatorTokenProvider<User>>(TokenOptions.DefaultAuthenticatorProvider)
+            // One-time links (password reset, invitation): Data Protection tokens bound to the security stamp, 24 h.
+            .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
     }
 
     /// <summary>

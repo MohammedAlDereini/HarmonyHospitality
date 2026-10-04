@@ -13,7 +13,11 @@ public class CreateUserAccountCommand : BaseCommandRequest<CallResponse<Guid>>
     /// <summary>Ids from POST api/Role/get-all. At least one: an account with no role can do nothing.</summary>
     public List<Guid> RoleIds { get; set; } = [];
 
-    public string InitialPassword { get; set; } = null!;
+    /// <summary>
+    /// Optional. Empty means an invitation: the person gets a mail with a link and chooses the first password, nobody else
+    /// ever knows it. When given, the account is born with MustChangePassword and this password works exactly once.
+    /// </summary>
+    public string? InitialPassword { get; set; }
 
     public class CreateUserAccountCommandValidation : AbstractValidator<CreateUserAccountCommand>
     {
@@ -35,8 +39,8 @@ public class CreateUserAccountCommand : BaseCommandRequest<CallResponse<Guid>>
                 .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.UserAccount.RoleIdEmpty);
 
             this.RuleFor(e => e.InitialPassword)
-                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.UserAccount.InitialPasswordRequired)
-                .MinimumLength(PasswordRules.MinimumLength).WithErrorCode(ModelValidationErrorCodes.Identity.UserAccount.InitialPasswordTooShort);
+                .MinimumLength(PasswordRules.MinimumLength).WithErrorCode(ModelValidationErrorCodes.Identity.UserAccount.InitialPasswordTooShort)
+                .When(e => !string.IsNullOrEmpty(e.InitialPassword));
         }
     }
 }

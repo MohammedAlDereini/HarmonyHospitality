@@ -5,6 +5,8 @@ services:
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     ports:
       - "6379:6379"
+      - "6380:6380"
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
       - ./users.acl:/usr/local/etc/redis/users.acl:ro
+      - ./tls:/usr/local/etc/redis/tls:ro
