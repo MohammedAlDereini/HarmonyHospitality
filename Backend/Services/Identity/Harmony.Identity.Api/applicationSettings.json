@@ -14,7 +14,7 @@
   "TokenIssuerSettings": {
     "Issuer": "https://localhost:5000",
     "SigningKeyPem": null,
-    "SigningKeyPath": "D:/PMS System/secrets/identity-signing-key.pem",
+    "SigningKeyPath": "D:/PMS System/Harmony/secrets/identity-signing-key.pem",
     "PreviousSigningKeyPems": []
   },
   "NotificationSettings": {
@@ -27,6 +27,10 @@
       "FromAddress": "mohammed.dereiinii@gmail.com",
       "FromName": "Harmony"
     }
+  },
+  "DataProtectionSettings": {
+    "CertificatePath": "D:/PMS System/Harmony/secrets/identity-dataprotection.pem",
+    "PreviousCertificatePaths": []
   },
   "IdentitySettings": {
     "Web": {

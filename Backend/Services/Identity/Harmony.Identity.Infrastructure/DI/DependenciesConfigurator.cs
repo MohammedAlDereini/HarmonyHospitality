@@ -315,10 +315,17 @@ public static class DependenciesConfigurator
     /// </summary>
     private static void AddDataProtectionKeyRing(this IServiceCollection services, IConfiguration configuration)
     {
+        var settings = configuration.GetSection(DataProtectionSettings.Section).Get<DataProtectionSettings>() ?? new DataProtectionSettings();
+        var current = KeyRingCertificate.LoadCurrent(settings.CertificatePath);
+        var previous = settings.PreviousCertificatePaths.Select(KeyRingCertificate.LoadPrevious).ToArray();
+
         services.AddDbContext<DataProtectionKeysDbContext>(db => UseIdentityDatabase(db, configuration));
         services.AddDataProtection()
             .SetApplicationName("Harmony.Identity")
-            .PersistKeysToDbContext<DataProtectionKeysDbContext>();
+            .PersistKeysToDbContext<DataProtectionKeysDbContext>()
+            // The key ring rows are encrypted with this certificate; without its private key a database copy decrypts nothing.
+            .ProtectKeysWithCertificate(current)
+            .UnprotectKeysWithAnyCertificate([current, .. previous]);
     }
 
     /// <summary>The supporting stores (Duende grants, Data Protection keys) live in the Identity database: same engine, same connection.</summary>

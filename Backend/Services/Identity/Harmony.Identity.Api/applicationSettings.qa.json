@@ -28,6 +28,10 @@
       "FromName": "Harmony"
     }
   },
+  "DataProtectionSettings": {
+    "CertificatePath": "/run/secrets/identity-dataprotection.pem",
+    "PreviousCertificatePaths": []
+  },
   "IdentitySettings": {
     "Web": {
       "ResetPasswordUrl": "https://app.harmony.local/account/reset-password?email={email}&token={token}",

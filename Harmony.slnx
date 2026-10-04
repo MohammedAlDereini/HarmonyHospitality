@@ -9,13 +9,17 @@
   </Folder>
   <Folder Name="/SolutionItems/infra/" />
   <Folder Name="/SolutionItems/infra/redis/">
-    <File Path="infra/redis/docker-compose.yml" />
     <File Path="infra/redis/redis.conf" />
     <File Path="infra/redis/users.acl" />
     <File Path="infra/redis/tls/ca.crt" />
     <File Path="infra/redis/tls/ca.key" />
     <File Path="infra/redis/tls/redis.crt" />
     <File Path="infra/redis/tls/redis.key" />
+  </Folder>
+  <Folder Name="/SolutionItems/secrets/">
+    <File Path="secrets/identity-signing-key.pem" />
+    <File Path="secrets/identity-dataprotection.pem" />
+    <File Path="secrets/redis-identity.txt" />
   </Folder>
   <Folder Name="/Backend/" />
   <Folder Name="/Backend/Services/" />
