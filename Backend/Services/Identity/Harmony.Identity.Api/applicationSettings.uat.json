@@ -34,6 +34,7 @@
   },
   "IdentitySettings": {
     "Web": {
+      "AllowedOrigins": [ "https://app.harmony.local" ],
       "ResetPasswordUrl": "https://app.harmony.local/account/reset-password?email={email}&token={token}",
       "InvitationUrl": "https://app.harmony.local/account/set-password?email={email}&token={token}"
     },

@@ -48,10 +48,12 @@ public static class IdentityServerResources
     public static readonly TimeSpan RefreshIdleLifetime = TimeSpan.FromMinutes(30);
     public static readonly TimeSpan RefreshAbsoluteLifetime = TimeSpan.FromHours(12);
 
-    public static IEnumerable<Client> Clients =>
+    /// <param name="allowedCorsOrigins">The web app origins (IdentitySettings:Web:AllowedOrigins); the token endpoint answers browsers from nowhere else.</param>
+    public static IEnumerable<Client> Clients(IEnumerable<string> allowedCorsOrigins) =>
     [
         new Client
         {
+            AllowedCorsOrigins = [.. allowedCorsOrigins],
             ClientId = WebClientId,
             ClientName = "Harmony web",
             // Password first; when the account has two-factor on, the second call is the mfa_otp grant with the challenge and the code.

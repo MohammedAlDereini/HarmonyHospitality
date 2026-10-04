@@ -14,6 +14,20 @@ public class WebLinkSettings
     /// <summary>The page where an invited person sets the first password. Must contain {email} and {token}.</summary>
     public string InvitationUrl { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The web app origins (scheme + host + port, nothing after) a browser may call Identity from: CORS for the API and
+    /// Duende's token endpoint alike. Anything else gets no CORS headers and the browser refuses the call.
+    /// </summary>
+    public string[] AllowedOrigins { get; set; } = [];
+
+    /// <summary>An absolute https origin with no path: "https://app.example.com" or "https://localhost:5173".</summary>
+    public static bool IsValidOrigin(string? origin)
+        => Uri.TryCreate(origin, UriKind.Absolute, out var uri)
+           && uri.Scheme == Uri.UriSchemeHttps
+           && uri.AbsolutePath == "/"
+           && string.IsNullOrEmpty(uri.Query)
+           && origin!.TrimEnd('/') == uri.GetLeftPart(UriPartial.Authority);
+
     /// <summary>An absolute https URL carrying both placeholders. Checked at startup.</summary>
     public static bool IsValidTemplate(string? template)
         => !string.IsNullOrWhiteSpace(template)

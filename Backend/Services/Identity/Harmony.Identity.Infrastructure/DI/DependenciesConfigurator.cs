@@ -197,7 +197,14 @@ public static class DependenciesConfigurator
             .Bind(configuration.GetSection(WebLinkSettings.Section))
             .Validate(settings => WebLinkSettings.IsValidTemplate(settings.ResetPasswordUrl), $"{WebLinkSettings.Section}:ResetPasswordUrl must be an absolute https URL containing {{email}} and {{token}}.")
             .Validate(settings => WebLinkSettings.IsValidTemplate(settings.InvitationUrl), $"{WebLinkSettings.Section}:InvitationUrl must be an absolute https URL containing {{email}} and {{token}}.")
+            .Validate(settings => settings.AllowedOrigins.Length > 0 && settings.AllowedOrigins.All(WebLinkSettings.IsValidOrigin), $"{WebLinkSettings.Section}:AllowedOrigins must list at least one https origin without a path.")
             .ValidateOnStart();
+
+        // The browser side of the API: only the web app origins, with the Authorization header and the verbs we use.
+        services.AddCors(cors => cors.AddDefaultPolicy(policy => policy
+            .WithOrigins(WebOrigins(configuration))
+            .AllowAnyHeader()
+            .WithMethods("GET", "POST", "PUT", "DELETE")));
 
         // PropX: Identity answers a cache miss from its own database and rewrites the key. The framework readers in the
         // other services cannot, so Identity also republishes everything the first time it finds Redis wiped.
@@ -288,7 +295,7 @@ public static class DependenciesConfigurator
         })
         .AddInMemoryApiScopes(IdentityServerResources.ApiScopes)
         .AddInMemoryApiResources(IdentityServerResources.ApiResources)
-        .AddInMemoryClients(IdentityServerResources.Clients)
+        .AddInMemoryClients(IdentityServerResources.Clients(WebOrigins(configuration)))
         // S5: PropX sign-in rules and token claims, run by Duende on /connect/token.
         .AddResourceOwnerValidator<HarmonyPasswordValidator>()
         .AddProfileService<HarmonyProfileService>()
@@ -327,6 +334,10 @@ public static class DependenciesConfigurator
             .ProtectKeysWithCertificate(current)
             .UnprotectKeysWithAnyCertificate([current, .. previous]);
     }
+
+    /// <summary>The web app origins, read once at registration; the options validation above refuses a bad list at startup.</summary>
+    private static string[] WebOrigins(IConfiguration configuration)
+        => configuration.GetSection($"{WebLinkSettings.Section}:{nameof(WebLinkSettings.AllowedOrigins)}").Get<string[]>() ?? [];
 
     /// <summary>The supporting stores (Duende grants, Data Protection keys) live in the Identity database: same engine, same connection.</summary>
     private static void UseIdentityDatabase(DbContextOptionsBuilder db, IConfiguration configuration)

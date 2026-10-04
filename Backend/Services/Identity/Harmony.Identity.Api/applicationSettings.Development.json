@@ -34,6 +34,7 @@
   },
   "IdentitySettings": {
     "Web": {
+      "AllowedOrigins": [ "https://localhost:5173" ],
       "ResetPasswordUrl": "https://localhost:5173/account/reset-password?email={email}&token={token}",
       "InvitationUrl": "https://localhost:5173/account/set-password?email={email}&token={token}"
     },

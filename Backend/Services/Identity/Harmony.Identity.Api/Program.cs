@@ -73,6 +73,7 @@ public partial class Program
         static void ConfigureApp(WebApplication app)
         {
             app.UseRouting();
+            app.UseCors();
             app.ConfigureAppLogging();
             app.MapControllers();
         }
