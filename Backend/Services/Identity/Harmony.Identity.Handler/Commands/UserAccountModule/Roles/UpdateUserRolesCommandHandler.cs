@@ -9,12 +9,14 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
     private readonly IUserAccountRepository userAccounts;
     private readonly IRoleRepository roles;
     private readonly ICacheService cacheService;
+    private readonly ISessionRevoker sessionRevoker;
 
-    public UpdateUserRolesCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, ICacheService cacheService)
+    public UpdateUserRolesCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, ICacheService cacheService, ISessionRevoker sessionRevoker)
     {
         this.userAccounts = userAccounts;
         this.roles = roles;
         this.cacheService = cacheService;
+        this.sessionRevoker = sessionRevoker;
     }
 
     public async Task<CallResponse> Handle(UpdateUserRolesCommand command, CancellationToken cancellationToken)
@@ -43,6 +45,7 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
             user.SecurityVersion,
             SecurityVersionCacheKeys.UserVersionLifetime,
             cancellationToken);
+        await this.sessionRevoker.EndAllAsync(user.Id, cancellationToken);
 
         return CallResponseBuilder.CreateResponse(eCallResponseStatus.Success);
     }

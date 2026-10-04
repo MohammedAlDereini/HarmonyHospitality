@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Identity;
 
 public class SuspendUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<SuspendUserAccountCommand, CallResponse>
 {
-    public SuspendUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService)
-        : base(userManager, cacheService)
+    public SuspendUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker)
+        : base(userManager, cacheService, sessionRevoker)
     {
     }
 

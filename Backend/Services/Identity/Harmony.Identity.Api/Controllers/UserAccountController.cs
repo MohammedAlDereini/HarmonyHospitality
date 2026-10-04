@@ -3,6 +3,7 @@ using Harmony.Identity.Domain.Models.UserAccountModule;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Create;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
+using Harmony.Identity.Handler.Commands.UserAccountModule.Sessions;
 using Harmony.Identity.Handler.Commands.UserAccountModule.State;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Detail;
 using Harmony.Identity.Handler.Queries.UserAccountModule.List;
@@ -73,6 +74,16 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
     {
         var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>Ends every session of the caller on every device: the version bumps and the refresh tokens go. The person signs in again once.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> LogoutEverywhere()
+    {
+        var response = await this.Mediator.Send(new LogoutEverywhereCommand());
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 

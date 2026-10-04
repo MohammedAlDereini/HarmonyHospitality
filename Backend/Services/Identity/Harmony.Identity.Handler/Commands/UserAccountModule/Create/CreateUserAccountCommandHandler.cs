@@ -17,8 +17,8 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
     private readonly IRoleRepository roles;
     private readonly ILogger<CreateUserAccountCommandHandler> logger;
 
-    public CreateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, IRoleRepository roles, ILogger<CreateUserAccountCommandHandler> logger)
-        : base(userManager, cacheService)
+    public CreateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, IRoleRepository roles, ILogger<CreateUserAccountCommandHandler> logger)
+        : base(userManager, cacheService, sessionRevoker)
     {
         this.roles = roles;
         this.logger = logger;

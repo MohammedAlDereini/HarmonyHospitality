@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Identity;
 
 public class TerminateUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<TerminateUserAccountCommand, CallResponse>
 {
-    public TerminateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService)
-        : base(userManager, cacheService)
+    public TerminateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker)
+        : base(userManager, cacheService, sessionRevoker)
     {
     }
 

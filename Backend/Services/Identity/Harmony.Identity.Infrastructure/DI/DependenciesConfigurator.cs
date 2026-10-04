@@ -26,6 +26,7 @@ using Harmony.Identity.Infrastructure.Services;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using System.IO;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 namespace Harmony.Identity.Infrastructure.DI;
 
 
@@ -182,6 +183,7 @@ public static class DependenciesConfigurator
         // Scoped like the Redis cache and the DbContext it wraps.
         services.TryAddScoped<ICacheService, CacheService>();
         services.TryAddScoped<ICacheSeeder, CacheSeeder>();
+        services.TryAddScoped<ISessionRevoker, DuendeSessionRevoker>();
 
         // PropX: Identity answers a cache miss from its own database and rewrites the key. The framework readers in the
         // other services cannot, so Identity also republishes everything the first time it finds Redis wiped.
@@ -271,7 +273,29 @@ public static class DependenciesConfigurator
         .AddInMemoryClients(IdentityServerResources.Clients)
         // S5: PropX sign-in rules and token claims, run by Duende on /connect/token.
         .AddResourceOwnerValidator<HarmonyPasswordValidator>()
-        .AddProfileService<HarmonyProfileService>();
+        .AddProfileService<HarmonyProfileService>()
+        // S5 step 4: refresh tokens live in SQL (Duende operational store, same database as ours), so they survive a restart and
+        // a second instance sees them. Duende cleans expired and consumed rows itself (TokenCleanupHost, hourly).
+        .AddOperationalStore(store =>
+        {
+            var dbEngine = Enum.Parse<eDbEngine>(configuration["ApplicationSettings:ApplicationKeys:DefaultDbEngine"]!);
+            var connectionString = configuration["ApplicationSettings:ConnectionStrings:Default"]!;
+            var migrationsAssembly = typeof(DependenciesConfigurator).Assembly.GetName().Name;
+
+            store.ConfigureDbContext = db =>
+            {
+                if (dbEngine == eDbEngine.PostgreSql)
+                {
+                    db.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+                }
+                else
+                {
+                    db.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+                }
+            };
+            store.EnableTokenCleanup = true;
+            store.RemoveConsumedTokens = true;
+        });
 
         // Registered after AddIdentityServer so these win over Duende's automatic key stores.
         services.AddSingleton(sp => KeyRingStores.Signing(sp.GetRequiredService<RsaSigningKeyProvider>()));

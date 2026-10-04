@@ -73,6 +73,14 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
         BumpSecurityVersion();
     }
 
+    /// <summary>Logout everywhere: the version bumps, so every token on every device dies and no refresh token survives.</summary>
+    public void EndAllSessions()
+    {
+        AssertNotTerminated();
+
+        BumpSecurityVersion();
+    }
+
     /// <summary>Blocks sign-in and kills current tokens. Suspending twice is a no-op.</summary>
     public void Suspend(string reason)
     {

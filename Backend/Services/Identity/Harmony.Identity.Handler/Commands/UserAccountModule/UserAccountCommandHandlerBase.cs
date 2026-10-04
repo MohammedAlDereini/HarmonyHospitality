@@ -14,15 +14,18 @@ using Microsoft.AspNetCore.Identity;
 /// </summary>
 public abstract class UserAccountCommandHandlerBase
 {
-    protected UserAccountCommandHandlerBase(UserManager<User> userManager, ICacheService cacheService)
+    protected UserAccountCommandHandlerBase(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker)
     {
         this.UserManager = userManager;
         this.CacheService = cacheService;
+        this.SessionRevoker = sessionRevoker;
     }
 
     protected UserManager<User> UserManager { get; }
 
     protected ICacheService CacheService { get; }
+
+    protected ISessionRevoker SessionRevoker { get; }
 
     protected async Task<User?> LoadAsync(Guid id)
     {
@@ -34,7 +37,10 @@ public abstract class UserAccountCommandHandlerBase
         EnsureSucceeded(await this.UserManager.UpdateAsync(user));
     }
 
-    /// <summary>PropX: the cache follows the database at once. Called after the save, never before.</summary>
+    /// <summary>
+    /// PropX: the cache follows the database at once. Called after the save, never before. A bumped version ends every
+    /// session, so the refresh tokens the person holds go with it: nothing can be refreshed into a new token.
+    /// </summary>
     protected async Task PublishSecurityVersionAsync(User user, CancellationToken cancellationToken)
     {
         await this.CacheService.AddAsync(
@@ -42,6 +48,8 @@ public abstract class UserAccountCommandHandlerBase
             user.SecurityVersion,
             SecurityVersionCacheKeys.UserVersionLifetime,
             cancellationToken);
+
+        await this.SessionRevoker.EndAllAsync(user.Id, cancellationToken);
     }
 
     /// <summary>An Identity refusal is a bug or a race, never user input, so it surfaces as an exception with the codes.</summary>

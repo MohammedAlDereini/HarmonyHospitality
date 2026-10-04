@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Identity;
 
 public class ReinstateUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<ReinstateUserAccountCommand, CallResponse>
 {
-    public ReinstateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService)
-        : base(userManager, cacheService)
+    public ReinstateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker)
+        : base(userManager, cacheService, sessionRevoker)
     {
     }
 

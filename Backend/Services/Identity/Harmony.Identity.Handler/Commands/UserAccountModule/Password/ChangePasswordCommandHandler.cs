@@ -18,8 +18,8 @@ public class ChangePasswordCommandHandler : UserAccountCommandHandlerBase, IRequ
     private readonly ICallContext callContext;
     private readonly ILogger<ChangePasswordCommandHandler> logger;
 
-    public ChangePasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ICallContext callContext, ILogger<ChangePasswordCommandHandler> logger)
-        : base(userManager, cacheService)
+    public ChangePasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, ILogger<ChangePasswordCommandHandler> logger)
+        : base(userManager, cacheService, sessionRevoker)
     {
         this.callContext = callContext;
         this.logger = logger;

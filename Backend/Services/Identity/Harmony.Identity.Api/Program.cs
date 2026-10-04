@@ -1,9 +1,11 @@
+using Duende.IdentityServer.EntityFramework.DbContexts;
 using Harmony.Core.BuildingBlocks;
 using Harmony.Identity.Api.Checks;
 using Harmony.Identity.Handler.DI;
 using Harmony.Identity.Infrastructure.Caching;
 using Harmony.Identity.Infrastructure.DI;
 using Harmony.Identity.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 /// <summary>
 /// Entry point class for the Harmony Identity API application.
@@ -21,6 +23,9 @@ public partial class Program
         var app = builder.Build();
 
         app.MigrateDbContext<IdentityDbContext, IdentityDbContextSeed>();
+
+        // Duende keeps refresh tokens in our database; the framework migrates only our own context.
+        await MigrateOperationalStoreAsync(app);
 
         // Every tenant must hold a row for every PermissionEnum value, or the service does not start.
         await PermissionEnumIntegrityCheck.ValidateAsync(app);
@@ -49,6 +54,12 @@ public partial class Program
         {
             builder.Services.AddApplicationService(builder.Configuration);
             builder.Services.AddInfrastructureService(builder.Configuration);
+        }
+
+        static async Task MigrateOperationalStoreAsync(WebApplication app)
+        {
+            using var scope = app.Services.CreateScope();
+            await scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.MigrateAsync();
         }
 
         static async Task ConfigureCacheSeedingAsync(WebApplication app)
