@@ -1,5 +1,6 @@
 using Harmony.Core.Models;
 using Harmony.Identity.Domain.Models.UserAccountModule;
+using Harmony.Identity.Handler.Commands.UserAccountModule.Create;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
 using Harmony.Identity.Handler.Commands.UserAccountModule.State;
@@ -10,6 +11,16 @@ namespace Harmony.Identity.Api.Controllers;
 
 public class UserAccountController(IMediator mediator, ICallResponseManager callResponseManager) : BaseController(mediator, callResponseManager)
 {
+    /// <summary>An admin creates an account with its roles and an initial password that must be changed at first login.</summary>
+    [HttpPost("[action]")]
+    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
+    [RequirePermission(PermissionEnum.ManageUsers)]
+    public async Task<IActionResult> Create([FromBody] CreateUserAccountCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
     [HttpPut("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [RequirePermission(PermissionEnum.ManageUsers)]
