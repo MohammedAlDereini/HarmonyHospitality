@@ -54,7 +54,8 @@ public static class IdentityServerResources
         {
             ClientId = WebClientId,
             ClientName = "Harmony web",
-            AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+            // Password first; when the account has two-factor on, the second call is the mfa_otp grant with the challenge and the code.
+            AllowedGrantTypes = { GrantType.ResourceOwnerPassword, MfaOtpGrantValidator.GrantTypeName },
             RequireClientSecret = false,
             AllowedScopes = { PlatformScope, IdentityServerConstants.StandardScopes.OfflineAccess },
             AllowOfflineAccess = true,

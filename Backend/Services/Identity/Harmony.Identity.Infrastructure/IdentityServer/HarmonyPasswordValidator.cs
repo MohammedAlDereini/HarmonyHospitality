@@ -27,15 +27,19 @@ public sealed class HarmonyPasswordValidator : IResourceOwnerPasswordValidator
     public const string AccountNotActive = "account_not_active";
     public const string LockedOut = "locked_out";
     public const string TenantRequired = "tenant_required";
+    public const string MfaRequired = "mfa_required";
+    public const string MfaTokenField = "mfa_token";
 
     private readonly IdentityDbContext dbContext;
     private readonly UserManager<User> userManager;
+    private readonly MfaChallengeStore challenges;
     private readonly ILogger<HarmonyPasswordValidator> logger;
 
-    public HarmonyPasswordValidator(IdentityDbContext dbContext, UserManager<User> userManager, ILogger<HarmonyPasswordValidator> logger)
+    public HarmonyPasswordValidator(IdentityDbContext dbContext, UserManager<User> userManager, MfaChallengeStore challenges, ILogger<HarmonyPasswordValidator> logger)
     {
         this.dbContext = dbContext;
         this.userManager = userManager;
+        this.challenges = challenges;
         this.logger = logger;
     }
 
@@ -97,6 +101,15 @@ public sealed class HarmonyPasswordValidator : IResourceOwnerPasswordValidator
         }
 
         await this.userManager.ResetAccessFailedCountAsync(user);
+
+        // Two-factor on: the password alone earns a short-lived challenge, not a token. The mfa_otp grant finishes the sign-in.
+        if (user.TwoFactorEnabled)
+        {
+            var challenge = await this.challenges.IssueAsync(user.Id, cancellationToken);
+            this.logger.LogInformation("Sign-in needs a second factor for account {UserId}.", user.Id);
+            context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant, MfaRequired, new Dictionary<string, object> { [MfaTokenField] = challenge });
+            return;
+        }
         this.logger.LogInformation("Sign-in accepted for account {UserId} in tenant {Tenant}.", user.Id, user.TenantId);
 
         // The token claims come from HarmonyProfileService. The subject keeps one thing of its own: the SecurityVersion

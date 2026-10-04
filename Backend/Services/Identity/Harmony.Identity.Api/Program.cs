@@ -24,8 +24,8 @@ public partial class Program
 
         app.MigrateDbContext<IdentityDbContext, IdentityDbContextSeed>();
 
-        // Duende keeps refresh tokens in our database; the framework migrates only our own context.
-        await MigrateOperationalStoreAsync(app);
+        // Duende keeps refresh tokens and Data Protection keeps its keys in our database; the framework migrates only our own context.
+        await MigrateSupportingStoresAsync(app);
 
         // Every tenant must hold a row for every PermissionEnum value, or the service does not start.
         await PermissionEnumIntegrityCheck.ValidateAsync(app);
@@ -56,10 +56,11 @@ public partial class Program
             builder.Services.AddInfrastructureService(builder.Configuration);
         }
 
-        static async Task MigrateOperationalStoreAsync(WebApplication app)
+        static async Task MigrateSupportingStoresAsync(WebApplication app)
         {
             using var scope = app.Services.CreateScope();
             await scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.MigrateAsync();
+            await scope.ServiceProvider.GetRequiredService<DataProtectionKeysDbContext>().Database.MigrateAsync();
         }
 
         static async Task ConfigureCacheSeedingAsync(WebApplication app)

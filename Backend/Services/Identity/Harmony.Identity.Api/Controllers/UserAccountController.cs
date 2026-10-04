@@ -4,6 +4,7 @@ using Harmony.Identity.Handler.Commands.UserAccountModule.Create;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Sessions;
+using Harmony.Identity.Handler.Commands.UserAccountModule.TwoFactor;
 using Harmony.Identity.Handler.Commands.UserAccountModule.State;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Detail;
 using Harmony.Identity.Handler.Queries.UserAccountModule.List;
@@ -84,6 +85,46 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     public async Task<IActionResult> LogoutEverywhere()
     {
         var response = await this.Mediator.Send(new LogoutEverywhereCommand());
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>Step 1 of turning on an authenticator app: the shared key and the otpauth URI (QR) for the caller. Nothing is enabled yet.</summary>
+    [HttpPost("[action]")]
+    [ProducesResponseType(typeof(TwoFactorSetupModel), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> SetupTwoFactor()
+    {
+        var response = await this.Mediator.Send(new SetupTwoFactorCommand());
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>Step 2: a code from the app proves the setup; two-factor turns on and the recovery codes are shown once.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(TwoFactorRecoveryCodesModel), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> EnableTwoFactor([FromBody] EnableTwoFactorCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The caller turns two-factor off; the current password is required.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> DisableTwoFactor([FromBody] DisableTwoFactorCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>An admin removes a lost authenticator from an account; every session of that account ends.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageUsers)]
+    public async Task<IActionResult> ResetTwoFactor([FromBody] ResetTwoFactorCommand command)
+    {
+        var response = await this.Mediator.Send(command);
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 

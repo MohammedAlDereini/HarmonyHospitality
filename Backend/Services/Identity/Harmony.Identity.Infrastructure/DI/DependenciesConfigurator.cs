@@ -26,6 +26,8 @@ using Harmony.Identity.Infrastructure.Services;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using System.IO;
 using System.Reflection;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 namespace Harmony.Identity.Infrastructure.DI;
 
@@ -171,6 +173,7 @@ public static class DependenciesConfigurator
         // with Duende last, its cookie scheme becomes the default and every API call is sent to a login
         // page instead of Bearer validation. Verified live on 2026-10-02.
         services.AddIdentityServerHost(configuration);
+        services.AddDataProtectionKeyRing(configuration);
 
         services.AddIdentity(configuration, identityConfig =>
         {
@@ -184,6 +187,7 @@ public static class DependenciesConfigurator
         services.TryAddScoped<ICacheService, CacheService>();
         services.TryAddScoped<ICacheSeeder, CacheSeeder>();
         services.TryAddScoped<ISessionRevoker, DuendeSessionRevoker>();
+        services.TryAddScoped<MfaChallengeStore>();
 
         // PropX: Identity answers a cache miss from its own database and rewrites the key. The framework readers in the
         // other services cannot, so Identity also republishes everything the first time it finds Redis wiped.
@@ -211,7 +215,9 @@ public static class DependenciesConfigurator
             options.Password.RequireNonAlphanumeric = false;
             options.User.RequireUniqueEmail = false;
         })
-            .AddUserStore<Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserOnlyStore<User, IdentityDbContext, Guid>>();
+            .AddUserStore<HarmonyUserStore>()
+            // RFC 6238 authenticator codes (Google / Microsoft Authenticator). The only token provider we need.
+            .AddTokenProvider<AuthenticatorTokenProvider<User>>(TokenOptions.DefaultAuthenticatorProvider);
     }
 
     /// <summary>
@@ -274,25 +280,13 @@ public static class DependenciesConfigurator
         // S5: PropX sign-in rules and token claims, run by Duende on /connect/token.
         .AddResourceOwnerValidator<HarmonyPasswordValidator>()
         .AddProfileService<HarmonyProfileService>()
+        // S5 two-factor: the second half of a sign-in when the account has an authenticator.
+        .AddExtensionGrantValidator<MfaOtpGrantValidator>()
         // S5 step 4: refresh tokens live in SQL (Duende operational store, same database as ours), so they survive a restart and
         // a second instance sees them. Duende cleans expired and consumed rows itself (TokenCleanupHost, hourly).
         .AddOperationalStore(store =>
         {
-            var dbEngine = Enum.Parse<eDbEngine>(configuration["ApplicationSettings:ApplicationKeys:DefaultDbEngine"]!);
-            var connectionString = configuration["ApplicationSettings:ConnectionStrings:Default"]!;
-            var migrationsAssembly = typeof(DependenciesConfigurator).Assembly.GetName().Name;
-
-            store.ConfigureDbContext = db =>
-            {
-                if (dbEngine == eDbEngine.PostgreSql)
-                {
-                    db.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
-                }
-                else
-                {
-                    db.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
-                }
-            };
+            store.ConfigureDbContext = db => UseIdentityDatabase(db, configuration);
             store.EnableTokenCleanup = true;
             store.RemoveConsumedTokens = true;
         });
@@ -300,5 +294,35 @@ public static class DependenciesConfigurator
         // Registered after AddIdentityServer so these win over Duende's automatic key stores.
         services.AddSingleton(sp => KeyRingStores.Signing(sp.GetRequiredService<RsaSigningKeyProvider>()));
         services.AddSingleton(sp => KeyRingStores.Validation(sp.GetRequiredService<RsaSigningKeyProvider>()));
+    }
+
+    /// <summary>
+    /// ASP.NET Data Protection keys in SQL, next to our tables: Duende protects the stored refresh tokens with them and our user
+    /// store protects the authenticator secrets. On the machine (the default) they would die with the container, and with them
+    /// every stored token and every second factor. The application name pins the key ring to this service.
+    /// </summary>
+    private static void AddDataProtectionKeyRing(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<DataProtectionKeysDbContext>(db => UseIdentityDatabase(db, configuration));
+        services.AddDataProtection()
+            .SetApplicationName("Harmony.Identity")
+            .PersistKeysToDbContext<DataProtectionKeysDbContext>();
+    }
+
+    /// <summary>The supporting stores (Duende grants, Data Protection keys) live in the Identity database: same engine, same connection.</summary>
+    private static void UseIdentityDatabase(DbContextOptionsBuilder db, IConfiguration configuration)
+    {
+        var dbEngine = Enum.Parse<eDbEngine>(configuration["ApplicationSettings:ApplicationKeys:DefaultDbEngine"]!);
+        var connectionString = configuration["ApplicationSettings:ConnectionStrings:Default"]!;
+        var migrationsAssembly = typeof(DependenciesConfigurator).Assembly.GetName().Name;
+
+        if (dbEngine == eDbEngine.PostgreSql)
+        {
+            db.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+        }
+        else
+        {
+            db.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+        }
     }
 }
