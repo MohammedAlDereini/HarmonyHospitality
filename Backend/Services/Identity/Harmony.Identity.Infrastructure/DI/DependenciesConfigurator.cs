@@ -1,34 +1,38 @@
+using Duende.IdentityServer;
 using Harmony.Core.DI;
 using Harmony.Core.Enums;
+using Harmony.Core.EventBus.Abstractions;
 using Harmony.Core.Identity.DI;
+using Harmony.Core.Identity.Permissions;
 using Harmony.Core.Localization.DI;
 using Harmony.Core.Logging.DI;
-using Harmony.Core.Notification.DI;
-using Harmony.Identity.Infrastructure.Mail;
-using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
-using Harmony.Identity.Infrastructure.Persistence;
-using Harmony.Identity.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Harmony.Core.EventBus.Abstractions;
 using Harmony.Core.Models;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Harmony.Core.Notification.DI;
+using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
-using Harmony.Identity.Infrastructure.Signing;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Services;
-using Harmony.Core.Identity.Permissions;
 using Harmony.Identity.Infrastructure.Caching;
-using Harmony.Identity.Infrastructure.Services;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
-using System.Reflection;
+using Harmony.Identity.Infrastructure.Mail;
+using Harmony.Identity.Infrastructure.Persistence;
+using Harmony.Identity.Infrastructure.Repositories;
+using Harmony.Identity.Infrastructure.Services;
+using Harmony.Identity.Infrastructure.Signing;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using System.Reflection;
+
 namespace Harmony.Identity.Infrastructure.DI;
 
 
@@ -313,6 +317,23 @@ public static class DependenciesConfigurator
 
             // private_key_jwt: a client's signed proof must name exactly this server, so a proof made for another cannot be replayed here.
             options.StrictClientAssertionAudienceValidation = true;
+
+            // The sign-in pages (Razor, change 1.4). Duende sends the browser to these addresses.
+            options.UserInteraction.LoginUrl = "/account/login";
+            options.UserInteraction.LogoutUrl = "/account/logout";
+            options.UserInteraction.ErrorUrl = "/account/error";
+
+            // The APIs here use the platform token (Bearer, the default scheme). The sign-in session is Duende's own cookie, named, never guessed.
+            options.Authentication.CookieAuthenticationScheme = IdentityServerConstants.DefaultCookieAuthenticationScheme;
+
+            // The design rule: 30 minutes without activity ends the session (the same as the refresh token).
+            options.Authentication.CookieLifetime = IdentityServerResources.RefreshIdleLifetime;
+            options.Authentication.CookieSlidingExpiration = true;
+
+            // Lax: the cookie goes with a normal sign-in redirect, never with a POST, image or frame from another site.
+            // Duende's default (None) exists only for the check-session iframe; the BFF does not use it, so it is off.
+            options.Authentication.CookieSameSiteMode = SameSiteMode.Lax;
+            options.Endpoints.EnableCheckSessionEndpoint = false;
         })
         .AddInMemoryIdentityResources(IdentityServerResources.IdentityResources)
         .AddInMemoryApiScopes(IdentityServerResources.ApiScopes)
@@ -332,6 +353,16 @@ public static class DependenciesConfigurator
             store.ConfigureDbContext = db => UseIdentityDatabase(db, configuration);
             store.EnableTokenCleanup = true;
             store.RemoveConsumedTokens = true;
+        });
+
+        // The sign-in cookie. __Host- means HTTPS only, this host only, the whole site; HttpOnly means no script can read it.
+        services.PostConfigure<CookieAuthenticationOptions>(IdentityServerConstants.DefaultCookieAuthenticationScheme, cookie =>
+        {
+            cookie.Cookie.Name = "__Host-harmony-identity";
+            cookie.Cookie.HttpOnly = true;
+            cookie.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            cookie.Cookie.Path = "/";
+            cookie.Cookie.Domain = null;
         });
 
         // Registered after AddIdentityServer so these win over Duende's automatic key stores.
