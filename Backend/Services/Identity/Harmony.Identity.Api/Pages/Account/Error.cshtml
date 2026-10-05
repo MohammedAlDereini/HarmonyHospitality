@@ -1,0 +1,13 @@
+@page
+@model ErrorModel
+@{
+    ViewData["Title"] = "Sign-in problem";
+}
+
+<h1>Sign-in could not continue</h1>
+<p class="lead">Go back to Harmony and start again. If it happens again, give this reference to your administrator.</p>
+<p class="note">Reference: <span class="mono">@Model.Reference</span></p>
+@if (Model.Detail is not null)
+{
+    <p class="error">@Model.Detail</p>
+}

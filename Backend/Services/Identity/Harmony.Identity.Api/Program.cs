@@ -42,6 +42,9 @@ public partial class Program
         static void ConfigureMvc(WebApplicationBuilder builder)
         {
             builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.WriteIndented = true);
+
+            // The sign-in pages (Pages/Account): server-rendered, no script.
+            builder.Services.AddRazorPages();
         }
 
         static void ConfigureAppSettings(WebApplicationBuilder builder)
@@ -76,6 +79,12 @@ public partial class Program
             app.UseCors();
             app.ConfigureAppLogging();
             app.MapControllers();
+
+            // wwwroot (the sign-in pages' stylesheet), fingerprinted and compressed at build time. Open to anyone: it holds nothing secret.
+            app.MapStaticAssets().AllowAnonymous();
+
+            // The sign-in pages (Pages/Account).
+            app.MapRazorPages().WithStaticAssets();
         }
     }
 }
