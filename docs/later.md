@@ -336,3 +336,76 @@ Docker network such as `"172.18.0.0/16"`):
 - Microsoft Learn, Enforce HTTPS in ASP.NET Core (HSTS):
   https://learn.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-10.0
 - NIST SP 800-207, Zero Trust Architecture: https://csrc.nist.gov/pubs/sp/800/207/final
+
+---
+
+## L3. DPoP: tokens that only work for the server that holds them
+
+**Parked:** 2026-10-05, while building the web BFF client (change 1.2).
+
+**Why.** Today an access token is a bearer token: whoever holds a copy can use it until it expires (15 minutes), and a stolen
+refresh token works until it is used or expires. DPoP (RFC 9449) binds every token to a private key that never leaves the BFF.
+A copy taken from a log, a proxy or a memory dump is useless without that key. RFC 9700 §2.2 says sender-constrained tokens
+SHOULD be used, and FAPI 2.0 requires them.
+
+```
+ today:   thief copies token ──► calls the API ──► accepted
+ DPoP:    thief copies token ──► calls the API without the BFF's key ──► refused
+```
+
+**Decided.** Wanted, but after the BFF works end to end. The browser never sees a token with the BFF, so the risk is lower
+than before and the order is: BFF first, DPoP second.
+
+**What it needs.**
+1. Identity: `RequireDPoP = true` on the `harmony-web-bff` client (Duende 8 supports it; no migration).
+2. BFF: a second key just for DPoP proofs; Duende.AccessTokenManagement signs a proof for every token request and API call.
+3. Every API: check the DPoP proof next to the token (method, address, time, one use). This is a framework change in the
+   JwtBearer setup; check the licence of the validation package we pick.
+4. A shared replay cache for the one-use check (see L4).
+
+**Waits for.** BFF steps 2 to 5 done.
+
+**Tests.** A token sent with no proof is refused; a proof for another address or method is refused; a proof used twice is
+refused; a token with a proof from another key is refused.
+
+### Sources
+
+- RFC 9449, OAuth 2.0 Demonstrating Proof of Possession (DPoP): https://www.rfc-editor.org/rfc/rfc9449
+- RFC 9700, OAuth 2.0 Security Best Current Practice, §2.2: https://www.rfc-editor.org/rfc/rfc9700
+- Duende IdentityServer, Proof-of-Possession (DPoP): https://docs.duendesoftware.com/identityserver/tokens/pop/
+
+---
+
+## L4. A shared replay cache when Identity runs on two or more servers
+
+**Parked:** 2026-10-05, while building the web BFF client (change 1.2).
+
+**Why.** Every signed proof the BFF sends (private_key_jwt) carries a one-use id (`jti`). Duende remembers used ids so the same
+proof cannot be sent twice. Today it remembers them in memory, which is correct for one Identity server. With two servers behind
+a load balancer, a copied proof refused by server A could still be accepted by server B.
+
+```
+ one server:   proof ──► A (remembers jti) ──► same proof again ──► A: refused
+ two servers:  proof ──► A (remembers jti) ──► same proof again ──► B: never saw it ──► accepted
+```
+
+Everything else Duende keeps is already shared: pushed sign-in requests and refresh tokens in SQL, Data Protection keys in SQL,
+signing keys from files.
+
+**Decided.** When we run a second Identity server, the replay cache moves to Redis.
+
+**What it needs.**
+1. Register an `IDistributedCache` backed by Redis (Microsoft.Extensions.Caching.StackExchangeRedis), with the identity Redis
+   user and its own key prefix. Duende's replay cache uses it automatically.
+2. The Redis ACL for the identity user allows that prefix.
+3. The same cache serves DPoP's one-use check (L3).
+
+**Waits for.** A second Identity instance (scale-out or high availability).
+
+**Test.** Start two Identity servers on the same database and Redis. Send one proof to the first: accepted. Send the same proof
+to the second: `invalid_client`.
+
+### Sources
+
+- Duende IdentityServer, Distributed caching and the replay cache: https://docs.duendesoftware.com/identityserver/deployment/
+- RFC 7523 §3 (one-use `jti`): https://www.rfc-editor.org/rfc/rfc7523
