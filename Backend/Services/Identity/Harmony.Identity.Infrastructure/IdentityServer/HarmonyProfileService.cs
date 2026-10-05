@@ -58,9 +58,12 @@ public sealed class HarmonyProfileService : IProfileService
         var user = await this.LoadAsync(context.Subject, cancellationToken);
         var active = user is not null && user.CanSignIn;
 
-        // A refresh token remembers the version it was issued with (the password grant puts it on the subject).
-        // A bump since then means every token of that session is dead, the refresh token included.
-        if (active && context.Caller == IdentityServerConstants.ProfileIsActiveCallers.RefreshTokenValidation)
+        // Every session remembers the version it started with: the refresh token (the grants put it on the subject), the
+        // sign-in cookie and the one-time code (the sign-in pages put it there). A bump since then (password changed,
+        // roles changed, signed out everywhere, suspended) ends that session: no refresh, no code, the sign-in page again.
+        if (active && context.Caller is IdentityServerConstants.ProfileIsActiveCallers.RefreshTokenValidation
+                or IdentityServerConstants.ProfileIsActiveCallers.AuthorizeEndpoint
+                or IdentityServerConstants.ProfileIsActiveCallers.AuthorizationCodeValidation)
         {
             var issuedWith = context.Subject.FindFirst(PlatformClaimTypes.SecurityVersion)?.Value;
             active = int.TryParse(issuedWith, NumberStyles.None, CultureInfo.InvariantCulture, out var version)
