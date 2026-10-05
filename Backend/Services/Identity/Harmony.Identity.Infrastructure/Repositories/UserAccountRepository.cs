@@ -42,4 +42,11 @@ public class UserAccountRepository : BaseRepository<User>, IUserAccountRepositor
             .Include(u => u.UserRoles)
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
+
+    public async Task<User?> FindByIdAcrossTenantsAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await this.context.UserAccounts
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+    }
 }

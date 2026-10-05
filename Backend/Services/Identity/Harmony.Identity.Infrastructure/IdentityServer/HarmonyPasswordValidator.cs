@@ -2,23 +2,15 @@ using System.Globalization;
 using System.Security.Claims;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Validation;
-using Harmony.Core.BuildingBlocks.Infrastructure;
 using Harmony.Core.Identity.Implementations.Platform;
-using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
-using Harmony.Identity.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 
 namespace Harmony.Identity.Infrastructure.IdentityServer;
 
 /// <summary>
-/// PropX LoginCommandHandler, as Duende's password grant: the frontend posts username and password to /connect/token
-/// and Duende issues the tokens. This class decides only "may this person sign in": the account exists, is Active,
-/// is not locked out, and the password matches. Identity's own lockout counts the failures (5 in a row lock the
-/// account for 5 minutes, PropX's rule). An unknown name and a wrong password get the same answer, so nobody can
-/// learn which names exist. Sign-in runs before any tenant is known, so the lookup drops the tenant filter and
-/// an optional tenant_id in the request picks the account when the same name exists in several tenants.
+/// The password grant (ROPC) the current web app signs in with: /connect/token with username and password. The rules
+/// themselves live in <see cref="PasswordCheck"/>, shared with the sign-in page that replaces this grant (BFF, code + PKCE);
+/// this class only turns their outcome into Duende's answer. To be removed once the web app signs in through the BFF.
 /// </summary>
 public sealed class HarmonyPasswordValidator : IResourceOwnerPasswordValidator
 {
@@ -30,93 +22,39 @@ public sealed class HarmonyPasswordValidator : IResourceOwnerPasswordValidator
     public const string MfaRequired = "mfa_required";
     public const string MfaTokenField = "mfa_token";
 
-    private readonly IdentityDbContext dbContext;
-    private readonly UserManager<User> userManager;
+    private readonly PasswordCheck passwordCheck;
     private readonly MfaChallengeStore challenges;
-    private readonly ILogger<HarmonyPasswordValidator> logger;
 
-    public HarmonyPasswordValidator(IdentityDbContext dbContext, UserManager<User> userManager, MfaChallengeStore challenges, ILogger<HarmonyPasswordValidator> logger)
+    public HarmonyPasswordValidator(PasswordCheck passwordCheck, MfaChallengeStore challenges)
     {
-        this.dbContext = dbContext;
-        this.userManager = userManager;
+        this.passwordCheck = passwordCheck;
         this.challenges = challenges;
-        this.logger = logger;
     }
 
     public async Task ValidateAsync(ResourceOwnerPasswordValidationContext context, CancellationToken cancellationToken)
     {
-        var name = this.userManager.NormalizeName(context.UserName?.Trim() ?? string.Empty);
+        var result = await this.passwordCheck.CheckAsync(context.UserName, context.Password, context.Request?.Raw?[TenantParameter], cancellationToken);
 
-        if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(context.Password))
+        context.Result = result.Status switch
         {
-            context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant, InvalidCredentials);
-            return;
-        }
+            PasswordCheckStatus.TenantRequired => new GrantValidationResult(TokenRequestErrors.InvalidRequest, TenantRequired),
+            PasswordCheckStatus.AccountNotActive => new GrantValidationResult(TokenRequestErrors.InvalidGrant, AccountNotActive),
+            PasswordCheckStatus.LockedOut => new GrantValidationResult(TokenRequestErrors.InvalidGrant, LockedOut),
 
-        var candidates = await this.dbContext.UserAccounts
-            .IgnoreQueryFilters([QueryFilterNames.Tenant])
-            .Where(u => u.NormalizedUserName == name)
-            .ToListAsync(cancellationToken);
+            // Two-factor on: the password alone earns a short-lived challenge, not a token. The mfa_otp grant finishes the sign-in.
+            PasswordCheckStatus.SecondFactorRequired => new GrantValidationResult(
+                TokenRequestErrors.InvalidGrant,
+                MfaRequired,
+                new Dictionary<string, object> { [MfaTokenField] = await this.challenges.IssueAsync(result.User!.Id, cancellationToken) }),
 
-        var requestedTenant = context.Request?.Raw?[TenantParameter];
-        if (candidates.Count > 1 && !Guid.TryParse(requestedTenant, out _))
-        {
-            context.Result = new GrantValidationResult(TokenRequestErrors.InvalidRequest, TenantRequired);
-            return;
-        }
+            // The token claims come from HarmonyProfileService. The subject keeps one thing of its own: the SecurityVersion
+            // it signed in with, stored inside the refresh token, so a later bump ends that session at the next refresh.
+            PasswordCheckStatus.Accepted => new GrantValidationResult(
+                result.User!.Id.ToString("D"),
+                "pwd",
+                [new Claim(PlatformClaimTypes.SecurityVersion, result.User.SecurityVersion.ToString(CultureInfo.InvariantCulture))]),
 
-        var user = Guid.TryParse(requestedTenant, out var tenantId)
-            ? candidates.SingleOrDefault(u => u.TenantId == tenantId)
-            : candidates.SingleOrDefault();
-
-        if (user is null)
-        {
-            this.logger.LogInformation("Sign-in refused: unknown account.");
-            context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant, InvalidCredentials);
-            return;
-        }
-
-        if (!user.CanSignIn)
-        {
-            this.logger.LogInformation("Sign-in refused: account {UserId} is {State}.", user.Id, user.State);
-            context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant, AccountNotActive);
-            return;
-        }
-
-        if (await this.userManager.IsLockedOutAsync(user))
-        {
-            this.logger.LogWarning("Sign-in refused: account {UserId} is locked out.", user.Id);
-            context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant, LockedOut);
-            return;
-        }
-
-        if (!await this.userManager.CheckPasswordAsync(user, context.Password))
-        {
-            // Identity counts the failure; the fifth in a row locks the account for the configured window.
-            await this.userManager.AccessFailedAsync(user);
-            var locked = await this.userManager.IsLockedOutAsync(user);
-            this.logger.LogInformation("Sign-in refused: wrong password for account {UserId}. LockedOut={LockedOut}", user.Id, locked);
-            context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant, locked ? LockedOut : InvalidCredentials);
-            return;
-        }
-
-        await this.userManager.ResetAccessFailedCountAsync(user);
-
-        // Two-factor on: the password alone earns a short-lived challenge, not a token. The mfa_otp grant finishes the sign-in.
-        if (user.TwoFactorEnabled)
-        {
-            var challenge = await this.challenges.IssueAsync(user.Id, cancellationToken);
-            this.logger.LogInformation("Sign-in needs a second factor for account {UserId}.", user.Id);
-            context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant, MfaRequired, new Dictionary<string, object> { [MfaTokenField] = challenge });
-            return;
-        }
-        this.logger.LogInformation("Sign-in accepted for account {UserId} in tenant {Tenant}.", user.Id, user.TenantId);
-
-        // The token claims come from HarmonyProfileService. The subject keeps one thing of its own: the SecurityVersion
-        // it signed in with, stored inside the refresh token, so a later bump ends that session at the next refresh.
-        context.Result = new GrantValidationResult(
-            user.Id.ToString("D"),
-            "pwd",
-            [new Claim(PlatformClaimTypes.SecurityVersion, user.SecurityVersion.ToString(CultureInfo.InvariantCulture))]);
+            _ => new GrantValidationResult(TokenRequestErrors.InvalidGrant, InvalidCredentials),
+        };
     }
 }

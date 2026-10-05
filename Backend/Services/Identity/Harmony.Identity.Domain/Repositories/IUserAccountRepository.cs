@@ -16,4 +16,10 @@ public interface IUserAccountRepository : IRepository<User>
     /// where no tenant is known yet; the caller acts only when exactly one comes back.
     /// </summary>
     public Task<IReadOnlyList<User>> FindByUserNameAcrossTenantsAsync(string normalizedUserName, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// The account with this id in ANY tenant, tracked. For the sign-in's second step, where only the id from the
+    /// two-factor challenge is known and no tenant is chosen yet.
+    /// </summary>
+    public Task<User?> FindByIdAcrossTenantsAsync(Guid id, CancellationToken cancellationToken);
 }

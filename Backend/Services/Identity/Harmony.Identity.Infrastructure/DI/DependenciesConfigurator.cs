@@ -1,12 +1,10 @@
 using Harmony.Core.DI;
 using Harmony.Core.Enums;
-using Harmony.Core.Exceptions;
 using Harmony.Core.Identity.DI;
 using Harmony.Core.Localization.DI;
 using Harmony.Core.Logging.DI;
 using Harmony.Core.Notification.DI;
 using Harmony.Identity.Infrastructure.Mail;
-using Harmony.Identity.Domain.Common;
 using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 using Harmony.Identity.Infrastructure.Persistence;
 using Harmony.Identity.Infrastructure.Repositories;
@@ -25,7 +23,7 @@ using Harmony.Core.Identity.Permissions;
 using Harmony.Identity.Infrastructure.Caching;
 using Harmony.Identity.Infrastructure.Services;
 using Harmony.Identity.Infrastructure.IdentityServer;
-using System.IO;
+using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using System.Reflection;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -192,6 +190,9 @@ public static class DependenciesConfigurator
         services.TryAddScoped<ICacheSeeder, CacheSeeder>();
         services.TryAddScoped<ISessionRevoker, DuendeSessionRevoker>();
         services.TryAddScoped<MfaChallengeStore>();
+        // The sign-in rules, shared by the sign-in pages and the password grant they replace.
+        services.TryAddScoped<PasswordCheck>();
+        services.TryAddScoped<SecondFactorCheck>();
         services.TryAddScoped<IAccountMailer, AccountMailer>();
         services.AddOptions<WebLinkSettings>()
             .Bind(configuration.GetSection(WebLinkSettings.Section))
