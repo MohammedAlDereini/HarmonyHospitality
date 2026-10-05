@@ -4,6 +4,7 @@ import { claimsOf, completeMfa, login } from '../api'
 import { messageFor } from '../errors'
 import { setTokens } from '../session'
 import type { Tokens } from '../api'
+import { Lockup } from '../components/Logo'
 
 /**
  * Sign-in in one or two steps: password, then, only when the account has an authenticator, the 6-digit code
@@ -69,7 +70,8 @@ export default function LoginPage() {
 
   return (
     <form className="card" onSubmit={onPassword}>
-      <h1>Sign in to Harmony</h1>
+      <div className="brand"><Lockup height={20} /></div>
+      <h1>Sign in</h1>
       <p className="lead">Your work e-mail and password.</p>
       <label htmlFor="email">E-mail</label>
       <input id="email" name="email" type="email" autoComplete="username" autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
