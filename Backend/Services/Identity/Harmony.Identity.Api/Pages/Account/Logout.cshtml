@@ -1,0 +1,20 @@
+@page
+@model LogoutModel
+@{
+    ViewData["Title"] = Model.SignedOut ? "Signed out" : "Sign out";
+}
+
+@if (Model.SignedOut)
+{
+    <h1>Signed out</h1>
+    <p class="lead">You are signed out of Harmony. You can close this window.</p>
+}
+else
+{
+    <h1>Sign out</h1>
+    <p class="lead">Sign out of Harmony on this browser?</p>
+    <form method="post">
+        <input type="hidden" asp-for="LogoutId" />
+        <button type="submit">Sign out</button>
+    </form>
+}
