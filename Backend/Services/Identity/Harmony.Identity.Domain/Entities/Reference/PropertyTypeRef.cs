@@ -30,4 +30,18 @@ public sealed class PropertyTypeRef : ReferenceEntity
             IsActive = true,
         };
     }
+
+    public void Update(string nameEn, string nameAr, int displayOrder)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(displayOrder);
+
+        NameEn = ReferenceText.Name(nameEn, 128, nameof(nameEn));
+        NameAr = ReferenceText.Name(nameAr, 128, nameof(nameAr));
+        DisplayOrder = displayOrder;
+    }
+
+    public void SetActive(bool isActive)
+    {
+        IsActive = isActive;
+    }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Harmony.Identity.Domain.Entities.Reference;
 
-/// <summary>ISO 639-1.</summary>
+/// <summary>ISO 639-1. The code is stored lower-case (ar, en).</summary>
 public sealed class Language : ReferenceEntity
 {
     private Language()
@@ -27,5 +27,17 @@ public sealed class Language : ReferenceEntity
             IsRightToLeft = isRightToLeft,
             IsActive = true,
         };
+    }
+
+    public void Update(string nameEn, string nameNative, bool isRightToLeft)
+    {
+        NameEn = ReferenceText.Name(nameEn, 128, nameof(nameEn));
+        NameNative = ReferenceText.Name(nameNative, 128, nameof(nameNative));
+        IsRightToLeft = isRightToLeft;
+    }
+
+    public void SetActive(bool isActive)
+    {
+        IsActive = isActive;
     }
 }

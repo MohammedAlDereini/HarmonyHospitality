@@ -162,7 +162,7 @@
     <div class="frame">
 <pre class="mermaid">
 flowchart LR
-  R[Reference<br/>seeded lookups] --> T[TenantModule]
+  R[Reference<br/>managed lookups] --> T[TenantModule]
   R --> P[PropertyModule]
   T --> P
   T --> G[PropertyGroupModule]
@@ -209,7 +209,7 @@ flowchart LR
       </div>
       <div class="mod">
         <h4>Reference/</h4>
-        <p class="why">Ten seeded lookups with <b>no TenantId</b>. Shared by every customer, installed once, never edited by a hotel. They have no invariants, so they are not aggregates &mdash; plain entities, or value objects where the code only ever reads them.</p>
+        <p class="why">Ten reference tables with <b>no TenantId</b>. Shared by every customer and kept by the platform admin through the Reference API (ViewTenants reads, ManageTenants writes): nothing is seeded, a fresh installation starts empty and is filled through the API, and a hotel never edits them. They have no invariants beyond their keys, so they are not aggregates &mdash; plain entities, or value objects where the code only ever reads them.</p>
         <div class="grid2">
           <div class="box"><span class="bl">Files</span><pre class="files"><b>Country.cs</b>
 <b>CountrySubdivision.cs</b>

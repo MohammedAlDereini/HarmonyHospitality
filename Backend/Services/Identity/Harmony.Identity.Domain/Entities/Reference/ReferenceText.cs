@@ -1,8 +1,8 @@
 ﻿namespace Harmony.Identity.Domain.Entities.Reference;
 
 /// <summary>
-/// Checks for seeded values. Reference data is installed by code, not typed by users,
-/// so a bad value is a programming error and throws ArgumentException.
+/// Checks for reference values. The API validators refuse bad input before an entity is built,
+/// so a bad value reaching here is a programming error and throws ArgumentException.
 /// </summary>
 internal static class ReferenceText
 {

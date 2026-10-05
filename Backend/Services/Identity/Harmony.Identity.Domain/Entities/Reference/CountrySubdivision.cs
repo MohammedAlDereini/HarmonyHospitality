@@ -1,6 +1,6 @@
 ﻿namespace Harmony.Identity.Domain.Entities.Reference;
 
-/// <summary>ISO 3166-2: governorates, regions, emirates, states.</summary>
+/// <summary>ISO 3166-2: governorates, regions, emirates, states. The code carries the country (JO-AM), so both never change.</summary>
 public sealed class CountrySubdivision : ReferenceEntity
 {
     private CountrySubdivision()
@@ -36,5 +36,12 @@ public sealed class CountrySubdivision : ReferenceEntity
             NameAr = ReferenceText.Name(nameAr, 128, nameof(nameAr)),
             Kind = ReferenceText.Name(kind, 32, nameof(kind)),
         };
+    }
+
+    public void Update(string nameEn, string nameAr, string kind)
+    {
+        NameEn = ReferenceText.Name(nameEn, 128, nameof(nameEn));
+        NameAr = ReferenceText.Name(nameAr, 128, nameof(nameAr));
+        Kind = ReferenceText.Name(kind, 32, nameof(kind));
     }
 }

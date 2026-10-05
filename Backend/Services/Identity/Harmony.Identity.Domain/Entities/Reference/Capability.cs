@@ -1,6 +1,6 @@
 ﻿namespace Harmony.Identity.Domain.Entities.Reference;
 
-/// <summary>Something a tenant can buy. Services register their own, as they register settings.</summary>
+/// <summary>Something a tenant can buy. The code is what a service checks an entitlement against, so it never changes.</summary>
 public sealed class Capability : ReferenceEntity
 {
     private Capability()
@@ -24,5 +24,12 @@ public sealed class Capability : ReferenceEntity
             OwnerService = ReferenceText.Name(ownerService, 64, nameof(ownerService)),
             HasLimit = hasLimit,
         };
+    }
+
+    public void Update(string nameEn, string ownerService, bool hasLimit)
+    {
+        NameEn = ReferenceText.Name(nameEn, 128, nameof(nameEn));
+        OwnerService = ReferenceText.Name(ownerService, 64, nameof(ownerService));
+        HasLimit = hasLimit;
     }
 }

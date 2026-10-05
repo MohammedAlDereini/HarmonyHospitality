@@ -19,6 +19,12 @@ public sealed class CurrencyRef : ReferenceEntity
 
     public bool IsActive { get; private set; }
 
+    /// <summary>True when the framework Money registry knows the code; the API refuses an unknown one, with a code, before Create.</summary>
+    public static bool IsInRegistry(string? code)
+    {
+        return !string.IsNullOrWhiteSpace(code) && Currency.TryGet(code.Trim().ToUpperInvariant(), out _);
+    }
+
     // Minor units come from the framework's Currency registry, the one place they are defined,
     // so this table can never disagree with how Money rounds.
     public static CurrencyRef Create(string code, string nameEn, string nameAr)
@@ -33,5 +39,16 @@ public sealed class CurrencyRef : ReferenceEntity
             MinorUnits = currency.MinorUnitDigits,
             IsActive = true,
         };
+    }
+
+    public void Update(string nameEn, string nameAr)
+    {
+        NameEn = ReferenceText.Name(nameEn, 128, nameof(nameEn));
+        NameAr = ReferenceText.Name(nameAr, 128, nameof(nameAr));
+    }
+
+    public void SetActive(bool isActive)
+    {
+        IsActive = isActive;
     }
 }

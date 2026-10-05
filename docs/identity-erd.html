@@ -126,7 +126,7 @@
     <div class="counts">
       <div><b>58</b><span>tables</span></div>
       <div><b>10</b><span>clusters</span></div>
-      <div><b>10</b><span>reference tables, seeded once</span></div>
+      <div><b>10</b><span>reference tables, kept through the API</span></div>
       <div><b>2</b><span>dropped</span></div>
     </div>
     <div class="counts good" style="margin-top:14px">
@@ -159,9 +159,9 @@
 
   <!-- ============ 0 REFERENCE ============ -->
   <section>
-    <h2>Cluster one <em>&#183; 10 tables, seeded not per-tenant</em></h2>
+    <h2>Cluster one <em>&#183; 10 tables, platform-wide not per-tenant</em></h2>
     <h3>Reference data</h3>
-    <p class="lede">Every code that used to be a string is now a row with a foreign key pointing at it. These tables carry no <code>TenantId</code> &mdash; they are seeded once and shared by every customer, the same way <code>PropertyGroupTypes</code> always was.</p>
+    <p class="lede">Every code that used to be a string is now a row with a foreign key pointing at it. These tables carry no <code>TenantId</code> &mdash; they are filled through the Reference API by the platform admin and shared by every customer, the same way <code>PropertyGroupTypes</code> always was.</p>
 
     <div class="frame">
 <div class="zoomable">
@@ -441,7 +441,7 @@ erDiagram
         <thead><tr><th>Table</th><th>What it actually does</th></tr></thead>
         <tbody>
           <tr><td>Tenants</td><td>One row per hotel company that bought REMY. The contract, the bill and the security wall. A chain of forty hotels is still one row.</td></tr>
-          <tr><td>Currencies <span class="flag new">new</span></td><td>ISO 4217 reference, seeded and shared by every tenant. <code>MinorUnits</code> lives here because three decimal places is a fact about the Jordanian dinar, not about a hotel in Amman. Both competitors store it per property, where two hotels can disagree about what JOD is.</td></tr>
+          <tr><td>Currencies <span class="flag new">new</span></td><td>ISO 4217 reference, kept through the API and shared by every tenant. <code>MinorUnits</code> lives here because three decimal places is a fact about the Jordanian dinar, not about a hotel in Amman. Both competitors store it per property, where two hotels can disagree about what JOD is.</td></tr>
           <tr><td>Properties</td><td>One hotel. Carries its own time zone, its four environment codes and its registration identifiers &mdash; because Aqaba sits in a special economic zone and needs a different tax regime from Amman in the same country.</td></tr>
           <tr><td>PropertyContacts <span class="flag new">new</span></td><td>Named people at the organisation, one flagged primary. Distinct from guests.</td></tr>
           <tr><td>PropertyGroupTypes <span class="flag new">new</span></td><td>The kinds of grouping that exist. <code>IsExclusive</code> is what the one-brand rule reads, so the word "Brand" is never hardcoded in a constraint.</td></tr>
