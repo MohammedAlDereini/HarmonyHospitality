@@ -6,6 +6,7 @@
     <File Path="docs/identity-erd.html" />
     <File Path="docs/identity-analysis.md" />
     <File Path="docs/identity-backlog.md" />
+    <File Path="docs/later.md" />
   </Folder>
   <Folder Name="/SolutionItems/infra/" />
   <Folder Name="/SolutionItems/infra/redis/">
