@@ -45,6 +45,15 @@ public partial class Program
 
             // The sign-in pages (Pages/Account): server-rendered, no script.
             builder.Services.AddRazorPages();
+
+            // The sign-in forms' anti-forgery cookie: HTTPS only, this host only, never sent from another site, no script.
+            builder.Services.AddAntiforgery(options =>
+            {
+                options.Cookie.Name = "__Host-harmony-antiforgery";
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.HttpOnly = true;
+            });
         }
 
         static void ConfigureAppSettings(WebApplicationBuilder builder)
