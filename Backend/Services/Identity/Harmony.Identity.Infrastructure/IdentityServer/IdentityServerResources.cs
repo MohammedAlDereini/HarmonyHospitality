@@ -1,12 +1,13 @@
 using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
 using Harmony.Core.Identity.Implementations.Platform;
+using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
 
 namespace Harmony.Identity.Infrastructure.IdentityServer;
 
 /// <summary>
 /// What Duende may issue tokens for. In code, not in a database: one platform audience, a handful of clients.
-/// Clients arrive with the sign-in flows (S5). 🔴 SERVICES: the machine client lived here; decided at the services step.
+/// 🔴 SERVICES: the machine client lived here; decided at the services step.
 /// </summary>
 public static class IdentityServerResources
 {
@@ -38,7 +39,14 @@ public static class IdentityServerResources
         },
     ];
 
-    /// <summary>The web client people sign in with: PropX email + password, issued by Duende as the password grant.</summary>
+    /// <summary>OpenID Connect sign-in (sub) and the display name (profile → name), for the BFF's own session.</summary>
+    public static IEnumerable<IdentityResource> IdentityResources =>
+    [
+        new IdentityResources.OpenId(),
+        new IdentityResources.Profile(),
+    ];
+
+    /// <summary>The web client people sign in with today: PropX email + password, issued by Duende as the password grant.</summary>
     public const string WebClientId = "harmony-web";
 
     /// <summary>15 minutes: a token is short-lived; a demoted or terminated user is stopped sooner by security_version anyway.</summary>
@@ -48,8 +56,13 @@ public static class IdentityServerResources
     public static readonly TimeSpan RefreshIdleLifetime = TimeSpan.FromMinutes(30);
     public static readonly TimeSpan RefreshAbsoluteLifetime = TimeSpan.FromHours(12);
 
+    /// <summary>A pushed sign-in request is used within seconds; one minute is ample (RFC 9126 §2.2).</summary>
+    public static readonly TimeSpan PushedAuthorizationLifetime = TimeSpan.FromMinutes(1);
+
     /// <param name="allowedCorsOrigins">The web app origins (IdentitySettings:Web:AllowedOrigins); the token endpoint answers browsers from nowhere else.</param>
-    public static IEnumerable<Client> Clients(IEnumerable<string> allowedCorsOrigins) =>
+    /// <param name="bffOrigins">The BFF origins (IdentitySettings:WebBff:Origins).</param>
+    /// <param name="bffPublicKeys">The BFF's public keys as JSON Web Keys (current first, then those kept during a rotation).</param>
+    public static IEnumerable<Client> Clients(IEnumerable<string> allowedCorsOrigins, IReadOnlyCollection<string> bffOrigins, IEnumerable<string> bffPublicKeys) =>
     [
         new Client
         {
@@ -61,6 +74,49 @@ public static class IdentityServerResources
             RequireClientSecret = false,
             AllowedScopes = { PlatformScope, IdentityServerConstants.StandardScopes.OfflineAccess },
             AllowOfflineAccess = true,
+            AccessTokenLifetime = (int)AccessTokenLifetime.TotalSeconds,
+            RefreshTokenUsage = TokenUsage.OneTimeOnly,
+            RefreshTokenExpiration = TokenExpiration.Sliding,
+            SlidingRefreshTokenLifetime = (int)RefreshIdleLifetime.TotalSeconds,
+            AbsoluteRefreshTokenLifetime = (int)RefreshAbsoluteLifetime.TotalSeconds,
+            UpdateAccessTokenClaimsOnRefresh = true,
+        },
+
+        // RFC 10017 §6.1: the BFF is a confidential client using the authorization code grant with PKCE; the tokens stay on it.
+        new Client
+        {
+            ClientId = WebBffSettings.ClientId,
+            ClientName = "Harmony web (BFF)",
+
+            // private_key_jwt (RFC 7523): the BFF signs, Identity checks with the public key. No shared secret exists.
+            ClientSecrets = [.. bffPublicKeys.Select(jwk => new Secret { Type = IdentityServerConstants.SecretTypes.JsonWebKey, Value = jwk })],
+            RequireClientSecret = true,
+
+            AllowedGrantTypes = GrantTypes.Code,
+            RequirePkce = true,
+            AllowPlainTextPkce = false,
+
+            // PAR (RFC 9126): the sign-in details are pushed server to server; the browser carries only a one-time reference.
+            RequirePushedAuthorization = true,
+            PushedAuthorizationLifetime = (int)PushedAuthorizationLifetime.TotalSeconds,
+
+            RedirectUris = [.. bffOrigins.Select(origin => origin + WebBffSettings.RedirectPath)],
+            PostLogoutRedirectUris = [.. bffOrigins.Select(origin => origin + WebBffSettings.PostLogoutRedirectPath)],
+
+            // A server-side client: no browser calls Identity's endpoints for it, so no CORS origin.
+            AllowedCorsOrigins = [],
+
+            AllowedScopes =
+            {
+                IdentityServerConstants.StandardScopes.OpenId,
+                IdentityServerConstants.StandardScopes.Profile,
+                PlatformScope,
+                IdentityServerConstants.StandardScopes.OfflineAccess,
+            },
+            AllowOfflineAccess = true,
+            RequireConsent = false,
+            AlwaysIncludeUserClaimsInIdToken = false,
+
             AccessTokenLifetime = (int)AccessTokenLifetime.TotalSeconds,
             RefreshTokenUsage = TokenUsage.OneTimeOnly,
             RefreshTokenExpiration = TokenExpiration.Sliding,

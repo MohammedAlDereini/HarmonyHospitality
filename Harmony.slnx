@@ -21,6 +21,8 @@
     <File Path="secrets/identity-signing-key.pem" />
     <File Path="secrets/identity-dataprotection.pem" />
     <File Path="secrets/redis-identity.txt" />
+    <File Path="secrets/web-bff-client-key.pem" />
+    <File Path="secrets/web-bff-client-key.public.pem" />
   </Folder>
   <Folder Name="/Backend/" />
   <Folder Name="/Backend/Services/" />

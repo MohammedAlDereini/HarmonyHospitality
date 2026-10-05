@@ -24,6 +24,7 @@ using Harmony.Identity.Infrastructure.Caching;
 using Harmony.Identity.Infrastructure.Services;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
+using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
 using System.Reflection;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -190,9 +191,19 @@ public static class DependenciesConfigurator
         services.TryAddScoped<ICacheSeeder, CacheSeeder>();
         services.TryAddScoped<ISessionRevoker, DuendeSessionRevoker>();
         services.TryAddScoped<MfaChallengeStore>();
+
         // The sign-in rules, shared by the sign-in pages and the password grant they replace.
         services.TryAddScoped<PasswordCheck>();
         services.TryAddScoped<SecondFactorCheck>();
+
+        // The BFF client's settings, checked at startup: a non-https origin, or a missing / wrong / private key, stops the service.
+        services.AddOptions<WebBffSettings>()
+            .Bind(configuration.GetSection(WebBffSettings.Section))
+            .Validate(settings => settings.Origins.Length > 0 && settings.Origins.All(WebLinkSettings.IsValidOrigin), $"{WebBffSettings.Section}:Origins must list at least one https origin without a path.")
+            .Validate(settings => WebBffSettings.ReadPublicJwk(settings.ClientPublicKeyPath) is not null, $"{WebBffSettings.Section}:ClientPublicKeyPath must name a PEM file holding an EC P-256 public key, and no private key.")
+            .Validate(settings => settings.PreviousClientPublicKeyPaths.All(path => WebBffSettings.ReadPublicJwk(path) is not null), $"{WebBffSettings.Section}:PreviousClientPublicKeyPaths must each name a PEM file holding an EC P-256 public key, and no private key.")
+            .ValidateOnStart();
+
         services.TryAddScoped<IAccountMailer, AccountMailer>();
         services.AddOptions<WebLinkSettings>()
             .Bind(configuration.GetSection(WebLinkSettings.Section))
@@ -288,15 +299,27 @@ public static class DependenciesConfigurator
     /// </summary>
     private static void AddIdentityServerHost(this IServiceCollection services, IConfiguration configuration)
     {
+        var bff = configuration.GetSection(WebBffSettings.Section).Get<WebBffSettings>() ?? new WebBffSettings();
+        var bffPublicKeys = new[] { bff.ClientPublicKeyPath }.Concat(bff.PreviousClientPublicKeyPaths)
+            .Select(WebBffSettings.ReadPublicJwk)
+            .OfType<string>()
+            .ToArray();
+
         services.AddIdentityServer(options =>
         {
             options.IssuerUri = configuration[$"{TokenIssuerSettings.Section}:{nameof(TokenIssuerSettings.Issuer)}"];
             options.KeyManagement.Enabled = false;
             options.EmitStaticAudienceClaim = false;
+
+            // private_key_jwt: a client's signed proof must name exactly this server, so a proof made for another cannot be replayed here.
+            options.StrictClientAssertionAudienceValidation = true;
         })
+        .AddInMemoryIdentityResources(IdentityServerResources.IdentityResources)
         .AddInMemoryApiScopes(IdentityServerResources.ApiScopes)
         .AddInMemoryApiResources(IdentityServerResources.ApiResources)
-        .AddInMemoryClients(IdentityServerResources.Clients(WebOrigins(configuration)))
+        .AddInMemoryClients(IdentityServerResources.Clients(WebOrigins(configuration), bff.Origins, bffPublicKeys))
+        // private_key_jwt client authentication (RFC 7523), used by the BFF.
+        .AddJwtBearerClientAuthentication()
         // S5: PropX sign-in rules and token claims, run by Duende on /connect/token.
         .AddResourceOwnerValidator<HarmonyPasswordValidator>()
         .AddProfileService<HarmonyProfileService>()

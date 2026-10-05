@@ -33,6 +33,11 @@
     "PreviousCertificatePaths": []
   },
   "IdentitySettings": {
+    "WebBff": {
+      "Origins": [ "https://localhost:5173" ],
+      "ClientPublicKeyPath": "D:/PMS System/Harmony/secrets/web-bff-client-key.public.pem",
+      "PreviousClientPublicKeyPaths": []
+    },
     "Web": {
       "AllowedOrigins": [ "https://localhost:5173" ],
       "ResetPasswordUrl": "https://localhost:5173/account/reset-password?email={email}&token={token}",
