@@ -4,6 +4,7 @@ using Duende.IdentityServer;
 using Harmony.Core.Identity.Implementations.Platform;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Infrastructure.IdentityServer;
+using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Microsoft.AspNetCore.Authentication;
 
 namespace Harmony.Identity.Api.Pages.Account;
@@ -42,11 +43,35 @@ internal static class SignInSession
     public static void ReleaseSecondStep(HttpResponse response)
         => response.Cookies.Delete(SecondStepCookie, SecondStepOptions(null));
 
+    /// <summary>
+    /// Ties a two-step setup to this browser (15 minutes): the e-mailed link works only where this cookie is.
+    /// Lax, not Strict: the link is clicked in a mail program or webmail, another site, and Strict would not be sent.
+    /// </summary>
+    public const string SetupCookie = "__Host-harmony-two-step-setup";
+
+    public static void HoldSetup(HttpResponse response, string browser)
+        => response.Cookies.Append(SetupCookie, browser, SetupOptions(TwoStepSetup.Lifetime));
+
+    public static string? Setup(HttpRequest request) => request.Cookies[SetupCookie];
+
+    public static void ReleaseSetup(HttpResponse response)
+        => response.Cookies.Delete(SetupCookie, SetupOptions(null));
+
     private static CookieOptions SecondStepOptions(TimeSpan? maxAge) => new()
     {
         HttpOnly = true,
         Secure = true,
         SameSite = SameSiteMode.Strict,
+        Path = "/",
+        IsEssential = true,
+        MaxAge = maxAge,
+    };
+
+    private static CookieOptions SetupOptions(TimeSpan? maxAge) => new()
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Lax,
         Path = "/",
         IsEssential = true,
         MaxAge = maxAge,

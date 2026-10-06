@@ -1,5 +1,6 @@
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
+using Harmony.Identity.Domain.Services;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +12,7 @@ namespace Harmony.Identity.Api.Pages.Account;
 /// The sign-in page: e-mail and password, checked by the same rules as before (PasswordCheck, change 1.1).
 /// It opens only for a real sign-in request from a known client (the returnUrl Duende gives); anything else goes to the
 /// error page. With two-step sign-in on, the password earns a 5-minute challenge and the code page finishes the sign-in.
+/// Two-step sign-in is required for everyone: without it, the password earns a setup link by e-mail, never a session.
 /// </summary>
 [AllowAnonymous]
 [SignInPageHeaders]
@@ -21,12 +23,24 @@ public sealed class LoginModel : PageModel
     private readonly IIdentityServerInteractionService interaction;
     private readonly PasswordCheck passwordCheck;
     private readonly MfaChallengeStore challenges;
+    private readonly TwoStepSetup setup;
+    private readonly IAccountMailer mailer;
+    private readonly IIssuerNameService issuer;
 
-    public LoginModel(IIdentityServerInteractionService interaction, PasswordCheck passwordCheck, MfaChallengeStore challenges)
+    public LoginModel(
+        IIdentityServerInteractionService interaction,
+        PasswordCheck passwordCheck,
+        MfaChallengeStore challenges,
+        TwoStepSetup setup,
+        IAccountMailer mailer,
+        IIssuerNameService issuer)
     {
         this.interaction = interaction;
         this.passwordCheck = passwordCheck;
         this.challenges = challenges;
+        this.setup = setup;
+        this.mailer = mailer;
+        this.issuer = issuer;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -67,8 +81,14 @@ public sealed class LoginModel : PageModel
 
         if (result.Status == PasswordCheckStatus.Accepted)
         {
-            await SignInSession.SignInAsync(this.HttpContext, result.User!, "pwd");
-            return this.Redirect(this.ReturnUrl!);
+            // Right password, two-step not set up yet: nobody is signed in. A setup link goes to the account's e-mail and
+            // works only in this browser. The link is built on Identity's configured address, never on the request's Host.
+            var (browser, link) = await this.setup.StartAsync(result.User!, this.HttpContext.RequestAborted);
+            SignInSession.HoldSetup(this.Response, browser);
+            var path = this.Url.Page("TwoStepSetup", pageHandler: null, values: new { token = link, this.ReturnUrl })!;
+            var address = await this.issuer.GetCurrentAsync(this.HttpContext.RequestAborted);
+            await this.mailer.SendTwoStepSetupAsync(result.User!, address.TrimEnd('/') + path, this.HttpContext.RequestAborted);
+            return this.RedirectToPage("TwoStepSetup", new { this.ReturnUrl });
         }
 
         if (result.Status == PasswordCheckStatus.SecondFactorRequired)

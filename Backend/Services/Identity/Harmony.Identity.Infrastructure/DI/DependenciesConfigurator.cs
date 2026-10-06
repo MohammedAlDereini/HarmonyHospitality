@@ -199,6 +199,7 @@ public static class DependenciesConfigurator
         // The sign-in rules, shared by the sign-in pages and the password grant they replace.
         services.TryAddScoped<PasswordCheck>();
         services.TryAddScoped<SecondFactorCheck>();
+        services.TryAddScoped<TwoStepSetup>();
 
         // The BFF client's settings, checked at startup: a non-https origin, or a missing / wrong / private key, stops the service.
         services.AddOptions<WebBffSettings>()

@@ -48,3 +48,9 @@ button.secondary:hover { background: var(--sunk); }
 .links { margin-top: 16px; font-size: 0.9rem; }
 a { color: var(--info); }
 .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.92em; }
+
+.qr { margin: 6px 0 4px; }
+.qr svg { width: 200px; height: 200px; display: block; }
+.codes { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+a.button { display: block; text-align: center; text-decoration: none; margin-top: 18px; padding: 10px 14px; border-radius: 6px; background: var(--shell); color: var(--shell-ink); font-weight: 500; }
+a.button:hover { background: var(--shell-2); }

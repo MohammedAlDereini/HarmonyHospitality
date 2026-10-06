@@ -1,0 +1,60 @@
+@page
+@model TwoStepSetupModel
+@{
+    ViewData["Title"] = "Two-step sign-in";
+}
+
+@switch (Model.Step)
+{
+    case TwoStepSetupModel.Steps.CheckEmail:
+        <h1>Check your e-mail</h1>
+        <p class="lead">Every Harmony account needs two-step sign-in. We sent you an e-mail with a link to set it up.</p>
+        <p class="note">Open the link on this computer, within 15 minutes.</p>
+        break;
+
+    case TwoStepSetupModel.Steps.Scan:
+        <h1>Set up two-step sign-in</h1>
+        <p class="lead">Scan this code with Microsoft Authenticator or Google Authenticator, then type the 6-digit code it shows.</p>
+        <div class="qr">@Html.Raw(Model.QrSvg)</div>
+        <p class="note">Can't scan? Type this key in the app: <span class="mono">@Model.Key</span></p>
+        <form method="post">
+            <input type="hidden" asp-for="ReturnUrl" />
+            <label asp-for="Code">Code from the app</label>
+            <input asp-for="Code" autocomplete="one-time-code" inputmode="numeric" autofocus required />
+            @if (Model.Error is not null)
+            {
+                <p class="error" role="alert">@Model.Error</p>
+            }
+            <button type="submit">Turn on two-step sign-in</button>
+        </form>
+        break;
+
+    case TwoStepSetupModel.Steps.Done:
+        <h1>Two-step sign-in is on</h1>
+        <p class="lead">Save these backup codes somewhere safe. Each one works once, if you lose your phone.</p>
+        <ul class="codes">
+            @foreach (var code in Model.RecoveryCodes)
+            {
+                <li class="mono">@code</li>
+            }
+        </ul>
+        @if (Model.ContinueUrl is not null)
+        {
+            <a class="button" href="@Model.ContinueUrl">Continue to Harmony</a>
+        }
+        else
+        {
+            <p class="note">Go back to Harmony and sign in.</p>
+        }
+        break;
+
+    case TwoStepSetupModel.Steps.WrongBrowser:
+        <h1>Open the link on the same computer</h1>
+        <p class="lead">This link only works in the browser where you signed in. Open the e-mail there.</p>
+        break;
+
+    default:
+        <h1>This link no longer works</h1>
+        <p class="lead">It was already used, or it is older than 15 minutes. Go back to Harmony and sign in again to get a new one.</p>
+        break;
+}

@@ -51,6 +51,18 @@ public sealed class AccountMailer : IAccountMailer
         return this.SendAsync(user, "Welcome to Harmony: set your password", body, cancellationToken);
     }
 
+    public Task SendTwoStepSetupAsync(User user, string link, CancellationToken cancellationToken)
+    {
+        var body =
+            $"Hello {user.DisplayName},\n\n" +
+            "You just signed in to Harmony. Every account needs two-step sign-in, so set it up now.\n" +
+            "Open this link on the same computer, within 15 minutes:\n" +
+            $"{link}\n\n" +
+            "If you did not just sign in, someone knows your password. Do not open the link: change your password and tell your administrator.\n";
+
+        return this.SendAsync(user, "Set up two-step sign-in for Harmony", body, cancellationToken);
+    }
+
     private async Task SendAsync(User user, string subject, string body, CancellationToken cancellationToken)
     {
         var message = new NotificationEmailMessage
