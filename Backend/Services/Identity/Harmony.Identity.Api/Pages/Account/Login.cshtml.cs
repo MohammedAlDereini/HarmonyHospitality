@@ -14,6 +14,7 @@ namespace Harmony.Identity.Api.Pages.Account;
 /// It opens only for a real sign-in request from a known client (the returnUrl Duende gives); anything else goes to the
 /// error page. With two-step sign-in on, the password earns a 5-minute challenge and the code page finishes the sign-in.
 /// Two-step sign-in is required for everyone: without it, the password earns a setup link by e-mail, never a session.
+/// The one exception is the two-step exception list (like Mews): there the password alone signs the person in.
 /// </summary>
 [AllowAnonymous]
 [SignInPageHeaders]
@@ -82,6 +83,13 @@ public sealed class LoginModel : PageModel
         }
 
         var result = await this.passwordCheck.CheckAsync(this.Email, this.Password, tenant: null, this.HttpContext.RequestAborted);
+
+        if (result.Status == PasswordCheckStatus.Exempt)
+        {
+            // On the exception list: signed in with the password alone, and the session says so ("pwd").
+            await SignInSession.SignInAsync(this.HttpContext, result.User!, "pwd");
+            return this.Redirect(this.ReturnUrl!);
+        }
 
         if (result.Status == PasswordCheckStatus.Accepted)
         {

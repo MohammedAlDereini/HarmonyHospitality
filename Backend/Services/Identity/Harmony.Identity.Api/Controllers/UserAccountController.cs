@@ -5,6 +5,7 @@ using Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Sessions;
 using Harmony.Identity.Handler.Commands.UserAccountModule.TwoFactor;
+using Harmony.Identity.Handler.Commands.UserAccountModule.TwoStepExemption;
 using Microsoft.AspNetCore.Authorization;
 using Harmony.Identity.Handler.Commands.UserAccountModule.State;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Detail;
@@ -124,6 +125,26 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [RequirePermission(PermissionEnum.ManageUsers)]
     public async Task<IActionResult> ResetTwoFactor([FromBody] ResetTwoFactorCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>An admin puts an account on the two-step exception list, with a reason: the password alone signs it in. Never a Manager or higher role, never the admin's own account.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageUsers)]
+    public async Task<IActionResult> ExemptFromTwoStep([FromBody] ExemptFromTwoStepCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>An admin takes an account off the two-step exception list; every session of that account ends.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageUsers)]
+    public async Task<IActionResult> EndTwoStepExemption([FromBody] EndTwoStepExemptionCommand command)
     {
         var response = await this.Mediator.Send(command);
         return await this.CallResponseManager.AsActionResultAsync(response);

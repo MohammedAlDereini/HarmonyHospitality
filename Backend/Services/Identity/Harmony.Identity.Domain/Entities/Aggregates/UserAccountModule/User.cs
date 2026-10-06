@@ -29,9 +29,17 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
     /// <summary>How the second step is proved at sign-in, once two-step sign-in is on (TwoFactorEnabled, Identity's).</summary>
     public TwoStepMethod TwoStepMethod { get; private set; } = TwoStepMethod.AuthenticatorApp;
 
+    /// <summary>
+    /// Why an admin put this person on the two-step exception list (like Mews), or null when they are not on it. On the list,
+    /// a person without two-step signs in with the password alone; it never applies to a Manager or higher role.
+    /// </summary>
+    public string? TwoStepExemptReason { get; private set; }
+
     public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
 
     public bool CanSignIn => State == AdministrativeState.Active;
+
+    public bool IsTwoStepExempt => TwoStepExemptReason is not null;
 
     public Guid TenantId { get; private set; }
     public DateTime CreatedDate { get; private set; }
@@ -61,6 +69,31 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
     public void UseTwoStepMethod(TwoStepMethod method)
     {
         TwoStepMethod = Enum.IsDefined(method) ? method : throw new ArgumentOutOfRangeException(nameof(method));
+    }
+
+    /// <summary>
+    /// On the two-step exception list, for a person who cannot use an app or a mailbox at work. Lowers nothing that is on:
+    /// with two-step already turned on, the person still proves it. Exempting again only replaces the reason.
+    /// </summary>
+    public void ExemptFromTwoStep(string reason)
+    {
+        AssertNotTerminated();
+
+        TwoStepExemptReason = IdentityText.Reason(reason) ?? throw new ArgumentException("A reason is required.", nameof(reason));
+    }
+
+    /// <summary>Off the exception list. The version bumps, so every password-only session ends and the next sign-in needs two-step.</summary>
+    public void EndTwoStepExemption()
+    {
+        AssertNotTerminated();
+
+        if (TwoStepExemptReason is null)
+        {
+            return;
+        }
+
+        TwoStepExemptReason = null;
+        BumpSecurityVersion();
     }
 
     /// <summary>The password was chosen by someone else; the person must replace it before doing anything else. For new accounts, so nothing to kill.</summary>

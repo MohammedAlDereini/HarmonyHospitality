@@ -13,6 +13,9 @@ public enum PasswordCheckStatus
     /// <summary>Password right, but the account has an authenticator: the sign-in waits for the code.</summary>
     SecondFactorRequired,
 
+    /// <summary>Password right, no second factor, and on the two-step exception list without a Manager or higher role: the password is enough.</summary>
+    Exempt,
+
     /// <summary>Unknown name or wrong password: one answer for both, so nobody learns which names exist.</summary>
     InvalidCredentials,
 
@@ -98,6 +101,14 @@ public sealed class PasswordCheck
         {
             this.logger.LogInformation("Sign-in needs a second factor for account {UserId}.", user.Id);
             return new(PasswordCheckStatus.SecondFactorRequired, user);
+        }
+
+        // The exception list counts only for people without a Manager or higher role, checked now: a role given after the
+        // exemption wins over it.
+        if (user.IsTwoStepExempt && !await this.userAccounts.HoldsPrivilegedRoleAsync(user.Id, cancellationToken))
+        {
+            this.logger.LogInformation("Sign-in with the password only for account {UserId}: on the two-step exception list.", user.Id);
+            return new(PasswordCheckStatus.Exempt, user);
         }
 
         this.logger.LogInformation("Sign-in accepted for account {UserId} in tenant {Tenant}.", user.Id, user.TenantId);

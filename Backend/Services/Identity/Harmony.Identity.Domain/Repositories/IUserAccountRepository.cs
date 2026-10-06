@@ -22,4 +22,10 @@ public interface IUserAccountRepository : IRepository<User>
     /// two-factor challenge is known and no tenant is chosen yet.
     /// </summary>
     public Task<User?> FindByIdAcrossTenantsAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// True when the account holds a Manager or higher role. Searches every tenant (the id is unique), because sign-in asks
+    /// before any tenant is chosen; such a person always needs two-step, exception list or not.
+    /// </summary>
+    public Task<bool> HoldsPrivilegedRoleAsync(Guid userId, CancellationToken cancellationToken);
 }

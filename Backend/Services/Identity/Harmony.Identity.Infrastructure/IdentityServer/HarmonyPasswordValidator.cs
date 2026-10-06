@@ -49,7 +49,7 @@ public sealed class HarmonyPasswordValidator : IResourceOwnerPasswordValidator
 
             // The token claims come from HarmonyProfileService. The subject keeps one thing of its own: the SecurityVersion
             // it signed in with, stored inside the refresh token, so a later bump ends that session at the next refresh.
-            PasswordCheckStatus.Accepted => new GrantValidationResult(
+            PasswordCheckStatus.Accepted or PasswordCheckStatus.Exempt => new GrantValidationResult(
                 result.User!.Id.ToString("D"),
                 "pwd",
                 [new Claim(PlatformClaimTypes.SecurityVersion, result.User.SecurityVersion.ToString(CultureInfo.InvariantCulture))]),

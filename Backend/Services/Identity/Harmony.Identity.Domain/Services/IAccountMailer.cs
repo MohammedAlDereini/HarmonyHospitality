@@ -21,7 +21,8 @@ public interface IAccountMailer
     Task SendSignInLinkAsync(User user, string link, CancellationToken cancellationToken);
 
     /// <summary>
-    /// "Something changed on your account": two-step on, off or reset, a password changed or set, a backup code used.
+    /// "Something changed on your account": two-step on, off or reset, a password changed or set, a backup code used,
+    /// put on or taken off the two-step exception list.
     /// Never throws: the change it reports already happened and stands, so a failed send is logged for the operators.
     /// </summary>
     Task SendSecurityAlertAsync(User user, SecurityAlert alert, CancellationToken cancellationToken);

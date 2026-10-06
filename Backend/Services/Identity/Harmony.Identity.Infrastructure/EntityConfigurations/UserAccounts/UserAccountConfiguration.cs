@@ -52,7 +52,12 @@ public class UserAccountConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(16)
             .HasDefaultValue(TwoStepMethod.AuthenticatorApp);
 
+        // The two-step exception list: the admin's reason, or null when the person is not on it. Same length as StateReason.
+        builder.Property(e => e.TwoStepExemptReason)
+            .HasMaxLength(500);
+
         builder.Ignore(e => e.CanSignIn);
+        builder.Ignore(e => e.IsTwoStepExempt);
 
         builder.HasIndex(e => new { e.TenantId, e.NormalizedUserName })
             .IsUnique()

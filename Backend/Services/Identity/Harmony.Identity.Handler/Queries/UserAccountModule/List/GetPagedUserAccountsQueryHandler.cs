@@ -15,6 +15,7 @@ namespace Harmony.Identity.Handler.Queries.UserAccountModule.List
             Email = a.Email,
             DisplayName = a.DisplayName,
             TwoFactorEnabled = a.TwoFactorEnabled,
+            TwoStepExemptReason = a.TwoStepExemptReason,
             State = a.State,
             StateReason = a.StateReason,
             SecurityVersion = a.SecurityVersion,

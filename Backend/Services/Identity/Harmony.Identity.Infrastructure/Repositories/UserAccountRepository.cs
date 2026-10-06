@@ -1,5 +1,6 @@
 using Harmony.Core.BuildingBlocks.Infrastructure;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Infrastructure.Persistence;
@@ -48,5 +49,15 @@ public class UserAccountRepository : BaseRepository<User>, IUserAccountRepositor
         return await this.context.UserAccounts
             .IgnoreQueryFilters([QueryFilterNames.Tenant])
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+    }
+
+    public async Task<bool> HoldsPrivilegedRoleAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        // The level is stored as text, where "Standard" >= "Manager": ask for the privileged names, never ">=" in SQL.
+        var privileged = Enum.GetValues<PrivilegeLevel>().Where(level => level >= PrivilegeLevel.Manager).ToList();
+
+        return await this.context.UserRoles
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .AnyAsync(ur => ur.UserId == userId && privileged.Contains(ur.Role.PrivilegeLevel), cancellationToken);
     }
 }

@@ -34,6 +34,8 @@ const messages: Record<string, string> = {
   '00052': 'Scan the key first, then enter the code it gives.',
   '00053': 'This link is no longer valid. Ask for a new one.',
   '00054': 'The invitation e-mail could not be sent.',
+  '00066': 'You cannot put your own account on the two-step exception list.',
+  '00067': 'A person with a Manager or higher role always needs two-step sign-in.',
 
   // reference data (one set for the ten tables)
   '00055': 'This row no longer exists.',

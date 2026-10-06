@@ -10,6 +10,8 @@ public class UserAccountModel
     public string? Email { get; set; }
     public string DisplayName { get; set; } = null!;
     public bool TwoFactorEnabled { get; set; }
+    /// <summary>Why the person is on the two-step exception list; null when they are not.</summary>
+    public string? TwoStepExemptReason { get; set; }
     public AdministrativeState State { get; set; }
     public string? StateReason { get; set; }
     public int SecurityVersion { get; set; }

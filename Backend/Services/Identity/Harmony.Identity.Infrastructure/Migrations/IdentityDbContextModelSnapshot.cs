@@ -455,6 +455,10 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<string>("TwoStepExemptReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("TwoStepMethod")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
