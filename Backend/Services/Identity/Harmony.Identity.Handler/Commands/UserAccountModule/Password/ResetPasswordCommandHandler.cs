@@ -15,12 +15,14 @@ using Microsoft.Extensions.Logging;
 public class ResetPasswordCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<ResetPasswordCommand, CallResponse>
 {
     private readonly IUserAccountRepository userAccounts;
+    private readonly IAccountMailer mailer;
     private readonly ILogger<ResetPasswordCommandHandler> logger;
 
-    public ResetPasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, IUserAccountRepository userAccounts, ILogger<ResetPasswordCommandHandler> logger)
+    public ResetPasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, IUserAccountRepository userAccounts, IAccountMailer mailer, ILogger<ResetPasswordCommandHandler> logger)
         : base(userManager, cacheService, sessionRevoker)
     {
         this.userAccounts = userAccounts;
+        this.mailer = mailer;
         this.logger = logger;
     }
 
@@ -64,6 +66,7 @@ public class ResetPasswordCommandHandler : UserAccountCommandHandlerBase, IReque
         await this.UserManager.ResetAccessFailedCountAsync(user);
         await this.PublishSecurityVersionAsync(user, cancellationToken);
         this.logger.LogInformation("Password set through a link for account {UserId}; SecurityVersion is now {Version}.", user.Id, user.SecurityVersion);
+        await this.mailer.SendSecurityAlertAsync(user, SecurityAlert.PasswordSetByLink, cancellationToken);
 
         return Ok();
     }

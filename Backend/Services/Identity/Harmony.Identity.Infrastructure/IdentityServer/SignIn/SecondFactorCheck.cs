@@ -2,6 +2,7 @@
 using Harmony.Core.Cache.Enums;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
+using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -40,6 +41,7 @@ public sealed class SecondFactorCheck
     private readonly UserManager<User> userManager;
     private readonly MfaChallengeStore challenges;
     private readonly ICache<Harmony.Core.Cache.Providers.Redis> cache;
+    private readonly IAccountMailer mailer;
     private readonly ILogger<SecondFactorCheck> logger;
 
     public SecondFactorCheck(
@@ -47,12 +49,14 @@ public sealed class SecondFactorCheck
         UserManager<User> userManager,
         MfaChallengeStore challenges,
         ICache<Harmony.Core.Cache.Providers.Redis> cache,
+        IAccountMailer mailer,
         ILogger<SecondFactorCheck> logger)
     {
         this.userAccounts = userAccounts;
         this.userManager = userManager;
         this.challenges = challenges;
         this.cache = cache;
+        this.mailer = mailer;
         this.logger = logger;
     }
 
@@ -103,6 +107,13 @@ public sealed class SecondFactorCheck
         await this.userManager.ResetAccessFailedCountAsync(user);
         await this.challenges.ConsumeAsync(challenge!, cancellationToken);
         this.logger.LogInformation("Second factor accepted for account {UserId} in tenant {Tenant}.", user.Id, user.TenantId);
+
+        // A backup code is an account recovery: the person is told, so a stolen code that gets used is noticed.
+        if (string.IsNullOrEmpty(otp))
+        {
+            await this.mailer.SendSecurityAlertAsync(user, SecurityAlert.BackupCodeUsed, cancellationToken);
+        }
+
         return new(SecondFactorStatus.Accepted, user);
     }
 

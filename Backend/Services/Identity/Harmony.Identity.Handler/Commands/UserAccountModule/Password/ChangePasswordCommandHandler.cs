@@ -16,12 +16,14 @@ using Microsoft.Extensions.Logging;
 public class ChangePasswordCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<ChangePasswordCommand, CallResponse>
 {
     private readonly ICallContext callContext;
+    private readonly IAccountMailer mailer;
     private readonly ILogger<ChangePasswordCommandHandler> logger;
 
-    public ChangePasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, ILogger<ChangePasswordCommandHandler> logger)
+    public ChangePasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, IAccountMailer mailer, ILogger<ChangePasswordCommandHandler> logger)
         : base(userManager, cacheService, sessionRevoker)
     {
         this.callContext = callContext;
+        this.mailer = mailer;
         this.logger = logger;
     }
 
@@ -72,6 +74,7 @@ public class ChangePasswordCommandHandler : UserAccountCommandHandlerBase, IRequ
         await this.UserManager.ResetAccessFailedCountAsync(user);
         await this.PublishSecurityVersionAsync(user, cancellationToken);
         this.logger.LogInformation("Password changed for account {UserId}; SecurityVersion is now {Version}.", user.Id, user.SecurityVersion);
+        await this.mailer.SendSecurityAlertAsync(user, SecurityAlert.PasswordChanged, cancellationToken);
 
         return Ok();
     }

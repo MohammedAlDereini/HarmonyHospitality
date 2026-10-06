@@ -5,6 +5,7 @@ using Harmony.Core.Cache.Abstractions;
 using Harmony.Core.Cache.Enums;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
+using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -46,13 +47,15 @@ public sealed class TwoStepSetup
     private readonly ICache<Harmony.Core.Cache.Providers.Redis> cache;
     private readonly IUserAccountRepository userAccounts;
     private readonly UserManager<User> userManager;
+    private readonly IAccountMailer mailer;
     private readonly ILogger<TwoStepSetup> logger;
 
-    public TwoStepSetup(ICache<Harmony.Core.Cache.Providers.Redis> cache, IUserAccountRepository userAccounts, UserManager<User> userManager, ILogger<TwoStepSetup> logger)
+    public TwoStepSetup(ICache<Harmony.Core.Cache.Providers.Redis> cache, IUserAccountRepository userAccounts, UserManager<User> userManager, IAccountMailer mailer, ILogger<TwoStepSetup> logger)
     {
         this.cache = cache;
         this.userAccounts = userAccounts;
         this.userManager = userManager;
+        this.mailer = mailer;
         this.logger = logger;
     }
 
@@ -173,6 +176,7 @@ public sealed class TwoStepSetup
         var codes = await this.userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, RecoveryCodeCount);
         await this.cache.DeleteAsync(KeyPrefix + browser, eCacheAccessLevel.Public, cancellationToken);
         this.logger.LogInformation("Two-step sign-in turned on for account {UserId} at sign-in, with {Method}.", user.Id, method);
+        await this.mailer.SendSecurityAlertAsync(user, SecurityAlert.TwoStepTurnedOn, cancellationToken);
         return new(TwoStepSetupStatus.Enabled, user, codes?.ToList() ?? []);
     }
 

@@ -12,11 +12,13 @@ using Microsoft.Extensions.Logging;
 /// </summary>
 public class ResetTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<ResetTwoFactorCommand, CallResponse>
 {
+    private readonly IAccountMailer mailer;
     private readonly ILogger<ResetTwoFactorCommandHandler> logger;
 
-    public ResetTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ILogger<ResetTwoFactorCommandHandler> logger)
+    public ResetTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, IAccountMailer mailer, ILogger<ResetTwoFactorCommandHandler> logger)
         : base(userManager, cacheService, sessionRevoker)
     {
+        this.mailer = mailer;
         this.logger = logger;
     }
 
@@ -40,6 +42,7 @@ public class ResetTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRequ
 
         await this.PublishSecurityVersionAsync(user, cancellationToken);
         this.logger.LogInformation("Two-factor reset by an admin for account {UserId}; SecurityVersion is now {Version}.", user.Id, user.SecurityVersion);
+        await this.mailer.SendSecurityAlertAsync(user, SecurityAlert.TwoStepResetByAdmin, cancellationToken);
 
         return Ok();
     }

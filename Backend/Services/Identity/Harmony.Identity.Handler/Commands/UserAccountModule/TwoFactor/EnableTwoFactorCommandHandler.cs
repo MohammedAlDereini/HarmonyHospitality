@@ -17,12 +17,14 @@ public class EnableTwoFactorCommandHandler : UserAccountCommandHandlerBase, IReq
     public const int RecoveryCodeCount = 10;
 
     private readonly ICallContext callContext;
+    private readonly IAccountMailer mailer;
     private readonly ILogger<EnableTwoFactorCommandHandler> logger;
 
-    public EnableTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, ILogger<EnableTwoFactorCommandHandler> logger)
+    public EnableTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, IAccountMailer mailer, ILogger<EnableTwoFactorCommandHandler> logger)
         : base(userManager, cacheService, sessionRevoker)
     {
         this.callContext = callContext;
+        this.mailer = mailer;
         this.logger = logger;
     }
 
@@ -60,6 +62,7 @@ public class EnableTwoFactorCommandHandler : UserAccountCommandHandlerBase, IReq
         EnsureSucceeded(await this.UserManager.SetTwoFactorEnabledAsync(user, true));
         var recoveryCodes = await this.UserManager.GenerateNewTwoFactorRecoveryCodesAsync(user, RecoveryCodeCount);
         this.logger.LogInformation("Two-factor enabled for account {UserId}.", user.Id);
+        await this.mailer.SendSecurityAlertAsync(user, SecurityAlert.TwoStepTurnedOn, cancellationToken);
 
         return CallResponseBuilder.CreateResponse<TwoFactorRecoveryCodesModel>(eCallResponseStatus.Success)
             .HasData(new TwoFactorRecoveryCodesModel { RecoveryCodes = recoveryCodes?.ToList() ?? [] });

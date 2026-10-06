@@ -74,6 +74,36 @@ public sealed class AccountMailer : IAccountMailer
         return this.SendAsync(user, "Your Harmony sign-in link", body, cancellationToken);
     }
 
+    public async Task SendSecurityAlertAsync(User user, SecurityAlert alert, CancellationToken cancellationToken)
+    {
+        var (subject, what) = alert switch
+        {
+            SecurityAlert.TwoStepTurnedOn => ("Two-step sign-in was turned on", "Two-step sign-in was just turned on for your account."),
+            SecurityAlert.TwoStepTurnedOff => ("Two-step sign-in was turned off", "Two-step sign-in was just turned off for your account."),
+            SecurityAlert.TwoStepResetByAdmin => ("Two-step sign-in was reset", "An administrator just reset two-step sign-in for your account. You will set it up again at your next sign-in."),
+            SecurityAlert.PasswordChanged => ("Your password was changed", "The password of your account was just changed."),
+            SecurityAlert.PasswordSetByLink => ("Your password was set", "The password of your account was just set with a link from an e-mail."),
+            SecurityAlert.BackupCodeUsed => ("A backup code was used", "One of your backup codes was just used to sign in. Each code works once."),
+            _ => throw new ArgumentOutOfRangeException(nameof(alert)),
+        };
+
+        var body =
+            $"Hello {user.DisplayName},\n\n" +
+            $"{what}\n\n" +
+            "If it was you, there is nothing to do.\n" +
+            "If it was not you, change your password now and tell your administrator.\n";
+
+        try
+        {
+            await this.SendAsync(user, "Harmony security: " + subject.ToLowerInvariant(), body, cancellationToken);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            // The change already happened and stands; a lost alert is an operator problem, not an error for the person.
+            this.logger.LogError(exception, "Security alert {Alert} for account {UserId} could not be sent.", alert, user.Id);
+        }
+    }
+
     private async Task SendAsync(User user, string subject, string body, CancellationToken cancellationToken)
     {
         var message = new NotificationEmailMessage

@@ -13,12 +13,14 @@ using Microsoft.Extensions.Logging;
 public class DisableTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<DisableTwoFactorCommand, CallResponse>
 {
     private readonly ICallContext callContext;
+    private readonly IAccountMailer mailer;
     private readonly ILogger<DisableTwoFactorCommandHandler> logger;
 
-    public DisableTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, ILogger<DisableTwoFactorCommandHandler> logger)
+    public DisableTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, IAccountMailer mailer, ILogger<DisableTwoFactorCommandHandler> logger)
         : base(userManager, cacheService, sessionRevoker)
     {
         this.callContext = callContext;
+        this.mailer = mailer;
         this.logger = logger;
     }
 
@@ -57,6 +59,7 @@ public class DisableTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRe
         EnsureSucceeded(await this.UserManager.ResetAuthenticatorKeyAsync(user));
         await this.UserManager.ResetAccessFailedCountAsync(user);
         this.logger.LogInformation("Two-factor disabled for account {UserId}.", user.Id);
+        await this.mailer.SendSecurityAlertAsync(user, SecurityAlert.TwoStepTurnedOff, cancellationToken);
 
         return Ok();
     }

@@ -19,4 +19,10 @@ public interface IAccountMailer
 
     /// <summary>"Your sign-in link": the second step for people who chose the e-mail link, for the computer that typed the password.</summary>
     Task SendSignInLinkAsync(User user, string link, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// "Something changed on your account": two-step on, off or reset, a password changed or set, a backup code used.
+    /// Never throws: the change it reports already happened and stands, so a failed send is logged for the operators.
+    /// </summary>
+    Task SendSecurityAlertAsync(User user, SecurityAlert alert, CancellationToken cancellationToken);
 }
