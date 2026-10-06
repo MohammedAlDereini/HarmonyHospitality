@@ -56,8 +56,11 @@ public static class IdentityServerResources
     public static readonly TimeSpan RefreshIdleLifetime = TimeSpan.FromMinutes(30);
     public static readonly TimeSpan RefreshAbsoluteLifetime = TimeSpan.FromHours(12);
 
-    /// <summary>A pushed sign-in request is used within seconds; one minute is ample (RFC 9126 §2.2).</summary>
-    public static readonly TimeSpan PushedAuthorizationLifetime = TimeSpan.FromMinutes(1);
+    /// <summary>
+    /// A pushed sign-in request must outlive the whole sign-in: typing the password, the two-step code, setting up two-step.
+    /// 10 minutes is Duende's default and the FAPI 2.0 maximum; shorter fails people who are slow to type.
+    /// </summary>
+    public static readonly TimeSpan PushedAuthorizationLifetime = TimeSpan.FromMinutes(10);
 
     /// <param name="allowedCorsOrigins">The web app origins (IdentitySettings:Web:AllowedOrigins); the token endpoint answers browsers from nowhere else.</param>
     /// <param name="bffOrigins">The BFF origins (IdentitySettings:WebBff:Origins).</param>
