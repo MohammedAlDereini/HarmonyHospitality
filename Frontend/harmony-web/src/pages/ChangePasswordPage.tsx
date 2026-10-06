@@ -52,7 +52,7 @@ export default function ChangePasswordPage() {
       <input id="next" name="next" type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} />
       <label htmlFor="confirm">Repeat it</label>
       <input id="confirm" name="confirm" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
-      <p className="lead">At least 12 characters, with an upper-case letter, a lower-case letter and a digit.</p>
+      <p className="lead">At least 12 characters with one symbol, like - or ! (a space counts). A few words make a strong password.</p>
       {error && <p className="error" role="alert">{error}</p>}
       <button type="submit" disabled={busy || !current || !next || !confirm}>Save the password</button>
       {!forced && <button type="button" className="secondary" onClick={() => navigate('/')}>Cancel</button>}

@@ -25,7 +25,7 @@ const messages: Record<string, string> = {
   '00041': 'This account is terminated.',
   '00042': 'The identity store refused the change.',
   '00044': 'The current password is wrong.',
-  '00045': 'The password must be at least 12 characters with an upper-case letter, a lower-case letter and a digit.',
+  '00045': 'The password must be at least 12 characters and include a symbol, like - or ! (a space counts).',
   '00046': 'The new password must be different from the current one.',
   '00047': 'Too many wrong attempts. The account is locked for a few minutes.',
   '00049': 'Two-step sign-in is already on.',

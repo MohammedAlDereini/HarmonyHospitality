@@ -240,14 +240,18 @@ public static class DependenciesConfigurator
     private static void AddUserAccounts(this IServiceCollection services)
     {
         // Fully qualified: Identity's package also has a type named IdentityDbContext.
-        // PropX rules: five wrong passwords in a row lock the account for five minutes; passwords are 12+ characters.
+        // PropX rules: five wrong passwords in a row lock the account for five minutes. Passwords: 12+ characters with a symbol.
         services.AddIdentityCore<User>(options =>
         {
             options.Lockout.AllowedForNewUsers = true;
             options.Lockout.MaxFailedAccessAttempts = 5;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
             options.Password.RequiredLength = PasswordRules.MinimumLength;
-            options.Password.RequireNonAlphanumeric = false;
+            // Like Mews: at least one symbol (anything but A-Z, a-z, 0-9; a space counts). No other mix of character kinds.
+            options.Password.RequireDigit = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireNonAlphanumeric = true;
             options.User.RequireUniqueEmail = false;
         })
             .AddUserStore<HarmonyUserStore>()
