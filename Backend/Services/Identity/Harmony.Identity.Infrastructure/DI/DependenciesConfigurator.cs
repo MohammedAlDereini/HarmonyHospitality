@@ -200,6 +200,7 @@ public static class DependenciesConfigurator
         services.TryAddScoped<PasswordCheck>();
         services.TryAddScoped<SecondFactorCheck>();
         services.TryAddScoped<TwoStepSetup>();
+        services.TryAddScoped<EmailSignIn>();
 
         // The BFF client's settings, checked at startup: a non-https origin, or a missing / wrong / private key, stops the service.
         services.AddOptions<WebBffSettings>()

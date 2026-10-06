@@ -16,4 +16,7 @@ public interface IAccountMailer
 
     /// <summary>"Set up two-step sign-in": the link opens the setup on the computer where the person just signed in.</summary>
     Task SendTwoStepSetupAsync(User user, string link, CancellationToken cancellationToken);
+
+    /// <summary>"Your sign-in link": the second step for people who chose the e-mail link, for the computer that typed the password.</summary>
+    Task SendSignInLinkAsync(User user, string link, CancellationToken cancellationToken);
 }

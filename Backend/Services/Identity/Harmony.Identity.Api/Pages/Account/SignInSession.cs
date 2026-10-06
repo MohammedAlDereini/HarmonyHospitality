@@ -57,6 +57,17 @@ internal static class SignInSession
     public static void ReleaseSetup(HttpResponse response)
         => response.Cookies.Delete(SetupCookie, SetupOptions(null));
 
+    /// <summary>Ties an e-mailed sign-in link to this browser (10 minutes). Lax for the same reason as the setup cookie.</summary>
+    public const string EmailLinkCookie = "__Host-harmony-email-sign-in";
+
+    public static void HoldEmailLink(HttpResponse response, string browser)
+        => response.Cookies.Append(EmailLinkCookie, browser, SetupOptions(EmailSignIn.Lifetime));
+
+    public static string? EmailLink(HttpRequest request) => request.Cookies[EmailLinkCookie];
+
+    public static void ReleaseEmailLink(HttpResponse response)
+        => response.Cookies.Delete(EmailLinkCookie, SetupOptions(null));
+
     private static CookieOptions SecondStepOptions(TimeSpan? maxAge) => new()
     {
         HttpOnly = true,

@@ -55,6 +55,8 @@ public class EnableTwoFactorCommandHandler : UserAccountCommandHandlerBase, IReq
             return Fail<TwoFactorRecoveryCodesModel>(BusinessErrorCodes.Identity.UserAccount.TwoFactorCodeInvalid);
         }
 
+        // This path is the authenticator app; saving the two-step flag saves the method with it.
+        user.UseTwoStepMethod(TwoStepMethod.AuthenticatorApp);
         EnsureSucceeded(await this.UserManager.SetTwoFactorEnabledAsync(user, true));
         var recoveryCodes = await this.UserManager.GenerateNewTwoFactorRecoveryCodesAsync(user, RecoveryCodeCount);
         this.logger.LogInformation("Two-factor enabled for account {UserId}.", user.Id);

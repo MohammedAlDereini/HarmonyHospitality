@@ -1,5 +1,6 @@
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
+using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Services;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
@@ -24,6 +25,7 @@ public sealed class LoginModel : PageModel
     private readonly PasswordCheck passwordCheck;
     private readonly MfaChallengeStore challenges;
     private readonly TwoStepSetup setup;
+    private readonly EmailSignIn emailSignIn;
     private readonly IAccountMailer mailer;
     private readonly IIssuerNameService issuer;
 
@@ -32,6 +34,7 @@ public sealed class LoginModel : PageModel
         PasswordCheck passwordCheck,
         MfaChallengeStore challenges,
         TwoStepSetup setup,
+        EmailSignIn emailSignIn,
         IAccountMailer mailer,
         IIssuerNameService issuer)
     {
@@ -39,6 +42,7 @@ public sealed class LoginModel : PageModel
         this.passwordCheck = passwordCheck;
         this.challenges = challenges;
         this.setup = setup;
+        this.emailSignIn = emailSignIn;
         this.mailer = mailer;
         this.issuer = issuer;
     }
@@ -82,18 +86,27 @@ public sealed class LoginModel : PageModel
         if (result.Status == PasswordCheckStatus.Accepted)
         {
             // Right password, two-step not set up yet: nobody is signed in. A setup link goes to the account's e-mail and
-            // works only in this browser. The link is built on Identity's configured address, never on the request's Host.
+            // works only in this browser.
             var (browser, link) = await this.setup.StartAsync(result.User!, this.HttpContext.RequestAborted);
             SignInSession.HoldSetup(this.Response, browser);
-            var path = this.Url.Page("TwoStepSetup", pageHandler: null, values: new { token = link, this.ReturnUrl })!;
-            var address = await this.issuer.GetCurrentAsync(this.HttpContext.RequestAborted);
-            await this.mailer.SendTwoStepSetupAsync(result.User!, address.TrimEnd('/') + path, this.HttpContext.RequestAborted);
+            await this.mailer.SendTwoStepSetupAsync(result.User!, await this.LinkAsync("TwoStepSetup", link), this.HttpContext.RequestAborted);
             return this.RedirectToPage("TwoStepSetup", new { this.ReturnUrl });
         }
 
         if (result.Status == PasswordCheckStatus.SecondFactorRequired)
         {
+            // The pause before the second step; with it a backup code still works, whatever the method.
             SignInSession.HoldSecondStep(this.Response, await this.challenges.IssueAsync(result.User!.Id, this.HttpContext.RequestAborted));
+
+            // E-mail people (like Mews): a one-time sign-in link to the account's e-mail, for this browser only.
+            if (result.User.TwoStepMethod == TwoStepMethod.EmailLink)
+            {
+                var (browser, link) = await this.emailSignIn.StartAsync(result.User, this.HttpContext.RequestAborted);
+                SignInSession.HoldEmailLink(this.Response, browser);
+                await this.mailer.SendSignInLinkAsync(result.User, await this.LinkAsync("EmailSignIn", link), this.HttpContext.RequestAborted);
+                return this.RedirectToPage("EmailSignIn", new { this.ReturnUrl });
+            }
+
             return this.RedirectToPage("TwoStep", new { this.ReturnUrl });
         }
 
@@ -111,4 +124,12 @@ public sealed class LoginModel : PageModel
     // The web app's own "forgot password" page, on the address the sign-in will return to.
     private static string ForgotPasswordOf(AuthorizationRequest request)
         => new Uri(request.RedirectUri).GetLeftPart(UriPartial.Authority) + "/forgot-password";
+
+    // A link for an e-mail, built on Identity's configured address, never on the request's Host header.
+    private async Task<string> LinkAsync(string page, string token)
+    {
+        var path = this.Url.Page(page, pageHandler: null, values: new { token, this.ReturnUrl })!;
+        var address = await this.issuer.GetCurrentAsync(this.HttpContext.RequestAborted);
+        return address.TrimEnd('/') + path;
+    }
 }

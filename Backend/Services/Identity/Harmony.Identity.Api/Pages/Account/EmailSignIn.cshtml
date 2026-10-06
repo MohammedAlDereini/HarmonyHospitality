@@ -1,0 +1,29 @@
+@page
+@model EmailSignInModel
+@{
+    ViewData["Title"] = "Check your e-mail";
+}
+
+@switch (Model.Step)
+{
+    case EmailSignInModel.Steps.CheckEmail:
+        <h1>Check your e-mail</h1>
+        <p class="lead">We sent you a sign-in link. Open it on this computer, within 10 minutes.</p>
+        <p class="links"><a asp-page="TwoStep" asp-route-returnUrl="@Model.ReturnUrl" asp-route-recovery="true">Use a backup code instead</a></p>
+        break;
+
+    case EmailSignInModel.Steps.SignedIn:
+        <h1>You are signed in</h1>
+        <p class="lead">Go back to Harmony.</p>
+        break;
+
+    case EmailSignInModel.Steps.WrongBrowser:
+        <h1>Open the link on the same computer</h1>
+        <p class="lead">This link only works in the browser where you typed your password. Open the e-mail there.</p>
+        break;
+
+    default:
+        <h1>This link no longer works</h1>
+        <p class="lead">It was already used, or it is older than 10 minutes. Go back to Harmony and sign in again.</p>
+        break;
+}

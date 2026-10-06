@@ -140,6 +140,30 @@ public sealed class TwoStepSetup
         }
 
         await this.userManager.ResetAccessFailedCountAsync(user);
+        return await this.TurnOnAsync(browser!, user, TwoStepMethod.AuthenticatorApp, cancellationToken);
+    }
+
+    /// <summary>The person chose the e-mail link (like Mews). Opening the setup link already proved the mailbox: two-step is on.</summary>
+    public async Task<TwoStepSetupResult> EnableEmailAsync(string? browser, CancellationToken cancellationToken)
+    {
+        var user = await this.OpenedAccountAsync(browser, cancellationToken);
+        if (user is null)
+        {
+            return new(TwoStepSetupStatus.NotOpened, null, []);
+        }
+
+        if (!user.CanSignIn)
+        {
+            return new(TwoStepSetupStatus.AccountNotActive, user, []);
+        }
+
+        return await this.TurnOnAsync(browser!, user, TwoStepMethod.EmailLink, cancellationToken);
+    }
+
+    // Saving the two-step flag saves the whole account, so the chosen method goes with it. The setup is then finished.
+    private async Task<TwoStepSetupResult> TurnOnAsync(string browser, User user, TwoStepMethod method, CancellationToken cancellationToken)
+    {
+        user.UseTwoStepMethod(method);
         var enabled = await this.userManager.SetTwoFactorEnabledAsync(user, true);
         if (!enabled.Succeeded)
         {
@@ -148,7 +172,7 @@ public sealed class TwoStepSetup
 
         var codes = await this.userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, RecoveryCodeCount);
         await this.cache.DeleteAsync(KeyPrefix + browser, eCacheAccessLevel.Public, cancellationToken);
-        this.logger.LogInformation("Two-step sign-in turned on for account {UserId} at sign-in.", user.Id);
+        this.logger.LogInformation("Two-step sign-in turned on for account {UserId} at sign-in, with {Method}.", user.Id, method);
         return new(TwoStepSetupStatus.Enabled, user, codes?.ToList() ?? []);
     }
 

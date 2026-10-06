@@ -44,6 +44,14 @@ public class UserAccountConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.MustChangePassword)
             .IsRequired();
 
+        // How the second step is proved (two-step itself is Identity's TwoFactorEnabled). Text, like State, so a row reads
+        // plainly. Existing accounts get AuthenticatorApp: the only method before this column.
+        builder.Property(e => e.TwoStepMethod)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(16)
+            .HasDefaultValue(TwoStepMethod.AuthenticatorApp);
+
         builder.Ignore(e => e.CanSignIn);
 
         builder.HasIndex(e => new { e.TenantId, e.NormalizedUserName })

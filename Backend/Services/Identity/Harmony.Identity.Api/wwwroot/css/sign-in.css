@@ -54,3 +54,4 @@ a { color: var(--info); }
 .codes { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
 a.button { display: block; text-align: center; text-decoration: none; margin-top: 18px; padding: 10px 14px; border-radius: 6px; background: var(--shell); color: var(--shell-ink); font-weight: 500; }
 a.button:hover { background: var(--shell-2); }
+form + form button { margin-top: 10px; }

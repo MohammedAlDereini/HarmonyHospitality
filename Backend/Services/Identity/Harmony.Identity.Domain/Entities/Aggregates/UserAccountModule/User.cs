@@ -25,6 +25,10 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
 
     /// <summary>True until the person replaces a password somebody else chose (the first-account seed, an admin). While true, a token can only change the password.</summary>
     public bool MustChangePassword { get; private set; }
+
+    /// <summary>How the second step is proved at sign-in, once two-step sign-in is on (TwoFactorEnabled, Identity's).</summary>
+    public TwoStepMethod TwoStepMethod { get; private set; } = TwoStepMethod.AuthenticatorApp;
+
     public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
 
     public bool CanSignIn => State == AdministrativeState.Active;
@@ -51,6 +55,12 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
             SecurityStamp = Guid.NewGuid().ToString("N"),
             LockoutEnabled = true,
         };
+    }
+
+    /// <summary>The way the person chose to prove the second step. Our code passes the value, never a request, so an unknown one is a bug.</summary>
+    public void UseTwoStepMethod(TwoStepMethod method)
+    {
+        TwoStepMethod = Enum.IsDefined(method) ? method : throw new ArgumentOutOfRangeException(nameof(method));
     }
 
     /// <summary>The password was chosen by someone else; the person must replace it before doing anything else. For new accounts, so nothing to kill.</summary>
