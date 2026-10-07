@@ -64,6 +64,24 @@ public abstract class UserAccountCommandHandlerBase
         throw new BusinessException($"The identity store refused the change: {codes}.", Error.New(BusinessErrorCodes.Identity.UserAccount.StoreRefused));
     }
 
+    /// <summary>
+    /// Why a new password was refused, as the one code the person can act on first: leaked, then the service name or
+    /// their own name, then Identity's own rules (length, a symbol).
+    /// </summary>
+    protected static string PasswordRefusal(IEnumerable<string> identityCodes)
+    {
+        var codes = identityCodes.ToList();
+
+        if (codes.Contains(PasswordRules.LeakedErrorCode))
+        {
+            return BusinessErrorCodes.Identity.UserAccount.PasswordLeaked;
+        }
+
+        return codes.Contains(PasswordRules.ContextWordErrorCode)
+            ? BusinessErrorCodes.Identity.UserAccount.PasswordHasContextWord
+            : BusinessErrorCodes.Identity.UserAccount.PasswordRejected;
+    }
+
     protected static CallResponse Ok()
         => CallResponseBuilder.CreateResponse(eCallResponseStatus.Success);
 

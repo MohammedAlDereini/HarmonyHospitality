@@ -70,7 +70,7 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
 
             if (codes.Any(code => code.StartsWith("Password", StringComparison.Ordinal)))
             {
-                return Fail<Guid>(BusinessErrorCodes.Identity.UserAccount.PasswordRejected);
+                return Fail<Guid>(PasswordRefusal(codes));
             }
 
             return Fail<Guid>(BusinessErrorCodes.Identity.UserAccount.StoreRefused);

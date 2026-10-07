@@ -8,4 +8,13 @@
 public static class PasswordRules
 {
     public const int MinimumLength = 12;
+
+    /// <summary>The words no password may contain, whoever it belongs to: the name of the service (NIST SP 800-63B-4 blocklist).</summary>
+    public static readonly IReadOnlyList<string> ServiceWords = ["harmony"];
+
+    /// <summary>Identity's error code when a password appears in a known data breach.</summary>
+    public const string LeakedErrorCode = "PasswordLeaked";
+
+    /// <summary>Identity's error code when a password contains the service name or the person's own name or e-mail name.</summary>
+    public const string ContextWordErrorCode = "PasswordContainsContextWord";
 }

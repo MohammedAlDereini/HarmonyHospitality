@@ -66,9 +66,9 @@ public class ChangePasswordCommandHandler : UserAccountCommandHandlerBase, IRequ
         var result = await this.UserManager.ChangePasswordAsync(user, command.CurrentPassword, command.NewPassword);
         if (!result.Succeeded)
         {
-            // Only Identity's password rules can still say no here (the length, the symbol).
+            // Only the password checks can still say no here: the length, the symbol, the blocklist (leaked, own name).
             this.logger.LogInformation("Password change refused for account {UserId}: {Codes}.", user.Id, string.Join(", ", result.Errors.Select(e => e.Code)));
-            return Fail(BusinessErrorCodes.Identity.UserAccount.PasswordRejected);
+            return Fail(PasswordRefusal(result.Errors.Select(e => e.Code)));
         }
 
         await this.UserManager.ResetAccessFailedCountAsync(user);

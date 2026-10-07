@@ -36,6 +36,8 @@ const messages: Record<string, string> = {
   '00054': 'The invitation e-mail could not be sent.',
   '00066': 'You cannot put your own account on the two-step exception list.',
   '00067': 'A person with a Manager or higher role always needs two-step sign-in.',
+  '00068': 'This password appeared in a data leak. Choose a different one.',
+  '00069': 'Do not use "Harmony", your name or your e-mail name in the password.',
 
   // reference data (one set for the ten tables)
   '00055': 'This row no longer exists.',

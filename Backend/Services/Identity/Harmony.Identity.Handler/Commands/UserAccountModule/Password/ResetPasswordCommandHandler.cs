@@ -54,7 +54,7 @@ public class ResetPasswordCommandHandler : UserAccountCommandHandlerBase, IReque
 
             if (codes.Any(code => code.StartsWith("Password", StringComparison.Ordinal)))
             {
-                return Fail(BusinessErrorCodes.Identity.UserAccount.PasswordRejected);
+                return Fail(PasswordRefusal(codes));
             }
 
             return Fail(BusinessErrorCodes.Identity.UserAccount.StoreRefused);

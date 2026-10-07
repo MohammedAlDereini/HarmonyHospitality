@@ -17,6 +17,7 @@ using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
 using Harmony.Identity.Infrastructure.Mail;
+using Harmony.Identity.Infrastructure.Passwords;
 using Harmony.Identity.Infrastructure.Persistence;
 using Harmony.Identity.Infrastructure.Repositories;
 using Harmony.Identity.Infrastructure.Services;
@@ -218,6 +219,13 @@ public static class DependenciesConfigurator
             .Validate(settings => settings.AllowedOrigins.Length > 0 && settings.AllowedOrigins.All(WebLinkSettings.IsValidOrigin), $"{WebLinkSettings.Section}:AllowedOrigins must list at least one https origin without a path.")
             .ValidateOnStart();
 
+        // The leaked-password check (Have I Been Pwned); the section is optional, its defaults are the public service.
+        services.AddOptions<LeakedPasswordSettings>()
+            .Bind(configuration.GetSection(LeakedPasswordSettings.Section))
+            .Validate(LeakedPasswordSettings.IsValid, $"{LeakedPasswordSettings.Section}:RangeUrl must be an absolute https URL ending in '/' (http only on localhost), and TimeoutSeconds 1 to 30.")
+            .ValidateOnStart();
+        services.AddHttpClient(LeakedPasswordValidator.ClientName, client => client.DefaultRequestHeaders.UserAgent.ParseAdd("Harmony-Identity"));
+
         // The browser side of the API: only the web app origins, with the Authorization header and the verbs we use.
         services.AddCors(cors => cors.AddDefaultPolicy(policy => policy
             .WithOrigins(WebOrigins(configuration))
@@ -255,6 +263,9 @@ public static class DependenciesConfigurator
             options.User.RequireUniqueEmail = false;
         })
             .AddUserStore<HarmonyUserStore>()
+            // NIST SP 800-63B-4 blocklist, after Identity's own rules: no service name or own name, no leaked password.
+            .AddPasswordValidator<ContextWordPasswordValidator>()
+            .AddPasswordValidator<LeakedPasswordValidator>()
             // RFC 6238 authenticator codes (Google / Microsoft Authenticator). The only token provider we need.
             .AddTokenProvider<AuthenticatorTokenProvider<User>>(TokenOptions.DefaultAuthenticatorProvider)
             // One-time links (password reset, invitation): Data Protection tokens bound to the security stamp, 24 h.
