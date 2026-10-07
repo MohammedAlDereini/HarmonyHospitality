@@ -1,6 +1,8 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.TwoFactor;
 
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -15,8 +17,8 @@ public class ResetTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRequ
     private readonly IAccountMailer mailer;
     private readonly ILogger<ResetTwoFactorCommandHandler> logger;
 
-    public ResetTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, IAccountMailer mailer, ILogger<ResetTwoFactorCommandHandler> logger)
-        : base(userManager, cacheService, sessionRevoker)
+    public ResetTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IAccountMailer mailer, ILogger<ResetTwoFactorCommandHandler> logger)
+        : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.mailer = mailer;
         this.logger = logger;
@@ -37,6 +39,7 @@ public class ResetTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRequ
 
         // Domain first, store second: SetTwoFactorEnabledAsync saves the whole entity, so the bump lands with the change.
         user.EndAllSessions();
+        await this.TrailAsync(user, SecurityAuditActions.TwoStepResetByAdmin, cancellationToken);
         EnsureSucceeded(await this.UserManager.SetTwoFactorEnabledAsync(user, false));
         EnsureSucceeded(await this.UserManager.ResetAuthenticatorKeyAsync(user));
 

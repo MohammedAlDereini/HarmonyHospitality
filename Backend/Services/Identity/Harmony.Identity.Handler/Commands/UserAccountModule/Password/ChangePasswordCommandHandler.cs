@@ -1,7 +1,9 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 
 using Harmony.Core.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -19,8 +21,8 @@ public class ChangePasswordCommandHandler : UserAccountCommandHandlerBase, IRequ
     private readonly IAccountMailer mailer;
     private readonly ILogger<ChangePasswordCommandHandler> logger;
 
-    public ChangePasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, IAccountMailer mailer, ILogger<ChangePasswordCommandHandler> logger)
-        : base(userManager, cacheService, sessionRevoker)
+    public ChangePasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, ICallContext callContext, IAccountMailer mailer, ILogger<ChangePasswordCommandHandler> logger)
+        : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.callContext = callContext;
         this.mailer = mailer;
@@ -63,6 +65,7 @@ public class ChangePasswordCommandHandler : UserAccountCommandHandlerBase, IRequ
         // Domain first, store second: ChangePasswordAsync saves the whole entity, so the cleared flag and the
         // bumped version land in the same write as the new hash, or not at all.
         user.MarkPasswordChanged();
+        await this.TrailAsync(user, SecurityAuditActions.PasswordChanged, cancellationToken);
         var result = await this.UserManager.ChangePasswordAsync(user, command.CurrentPassword, command.NewPassword);
         if (!result.Succeeded)
         {

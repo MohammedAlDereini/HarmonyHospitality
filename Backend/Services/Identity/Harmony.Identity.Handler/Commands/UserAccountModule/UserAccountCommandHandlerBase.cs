@@ -3,6 +3,7 @@ namespace Harmony.Identity.Handler.Commands.UserAccountModule;
 using Harmony.Core.Exceptions;
 using Harmony.Core.Identity.Permissions;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 
@@ -10,22 +11,37 @@ using Microsoft.AspNetCore.Identity;
 /// Writes go through Identity's UserManager: it normalises names, checks uniqueness (inside the tenant,
 /// because the store is tenant-filtered), keeps the security stamp, and saves through our DbContext.
 /// After a save that bumped the user's SecurityVersion, the new number is published so every service refuses
-/// the user's older tokens at the next request.
+/// the user's older tokens at the next request. Every security change also writes its row to the security trail.
 /// </summary>
 public abstract class UserAccountCommandHandlerBase
 {
-    protected UserAccountCommandHandlerBase(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker)
+    private readonly ISecurityEventFactory securityEvents;
+
+    protected UserAccountCommandHandlerBase(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents)
     {
         this.UserManager = userManager;
         this.CacheService = cacheService;
-        this.SessionRevoker = sessionRevoker;
+        this.SessionService = sessionService;
+        this.AuditEvents = auditEvents;
+        this.securityEvents = securityEvents;
     }
 
     protected UserManager<User> UserManager { get; }
 
     protected ICacheService CacheService { get; }
 
-    protected ISessionRevoker SessionRevoker { get; }
+    protected ISessionService SessionService { get; }
+
+    protected ISecurityAuditEventRepository AuditEvents { get; }
+
+    /// <summary>
+    /// Stages the trail row for this change. It is not saved here: the handler's next save stores the change and its row
+    /// together, or neither (the repository's add only stages, like every add in this service).
+    /// </summary>
+    protected async Task TrailAsync(User user, string action, CancellationToken cancellationToken)
+    {
+        await this.AuditEvents.AddAsync(this.securityEvents.Create(user, action), cancellationToken);
+    }
 
     protected async Task<User?> LoadAsync(Guid id)
     {
@@ -49,7 +65,7 @@ public abstract class UserAccountCommandHandlerBase
             SecurityVersionCacheKeys.UserVersionLifetime,
             cancellationToken);
 
-        await this.SessionRevoker.EndAllAsync(user.Id, cancellationToken);
+        await this.SessionService.EndAllAsync(user.Id, cancellationToken);
     }
 
     /// <summary>An Identity refusal is a bug or a race, never user input, so it surfaces as an exception with the codes.</summary>

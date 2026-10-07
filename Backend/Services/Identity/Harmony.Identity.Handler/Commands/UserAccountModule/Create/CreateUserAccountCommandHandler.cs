@@ -1,5 +1,6 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.Create;
 
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
@@ -19,8 +20,8 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
     private readonly IAccountMailer mailer;
     private readonly ILogger<CreateUserAccountCommandHandler> logger;
 
-    public CreateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, IRoleRepository roles, IAccountMailer mailer, ILogger<CreateUserAccountCommandHandler> logger)
-        : base(userManager, cacheService, sessionRevoker)
+    public CreateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IRoleRepository roles, IAccountMailer mailer, ILogger<CreateUserAccountCommandHandler> logger)
+        : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.roles = roles;
         this.mailer = mailer;
@@ -92,6 +93,11 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
                 return Fail<Guid>(BusinessErrorCodes.Identity.UserAccount.InvitationNotSent);
             }
         }
+
+        // Written once the account is kept for good: an invitation that fails removes the account again, and the trail must
+        // never point at an account that does not exist.
+        await this.TrailAsync(user, SecurityAuditActions.AccountCreated, cancellationToken);
+        await this.AuditEvents.SaveChangesAsync(cancellationToken);
 
         // PropX: the cache follows the database at once, so the first token this person gets finds its version.
         await this.PublishSecurityVersionAsync(user, cancellationToken);

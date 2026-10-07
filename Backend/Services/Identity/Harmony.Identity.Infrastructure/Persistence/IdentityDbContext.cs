@@ -3,6 +3,7 @@ using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Entities.Reference;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,9 @@ public sealed class IdentityDbContext : DbBaseContext
 
     public DbSet<User> UserAccounts { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<UserDevice> UserDevices { get; set; }
+    public DbSet<SecurityAuditEvent> SecurityAuditEvents { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);

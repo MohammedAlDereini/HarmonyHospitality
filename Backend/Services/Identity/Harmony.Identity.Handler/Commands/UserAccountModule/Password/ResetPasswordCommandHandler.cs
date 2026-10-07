@@ -1,5 +1,6 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
@@ -18,8 +19,8 @@ public class ResetPasswordCommandHandler : UserAccountCommandHandlerBase, IReque
     private readonly IAccountMailer mailer;
     private readonly ILogger<ResetPasswordCommandHandler> logger;
 
-    public ResetPasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, IUserAccountRepository userAccounts, IAccountMailer mailer, ILogger<ResetPasswordCommandHandler> logger)
-        : base(userManager, cacheService, sessionRevoker)
+    public ResetPasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserAccountRepository userAccounts, IAccountMailer mailer, ILogger<ResetPasswordCommandHandler> logger)
+        : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.userAccounts = userAccounts;
         this.mailer = mailer;
@@ -62,6 +63,7 @@ public class ResetPasswordCommandHandler : UserAccountCommandHandlerBase, IReque
 
         // The hash is stored; now the domain side of a password change, same as ChangePassword.
         user.MarkPasswordChanged();
+        await this.TrailAsync(user, SecurityAuditActions.PasswordResetByLink, cancellationToken);
         await this.SaveAsync(user);
         await this.UserManager.ResetAccessFailedCountAsync(user);
         await this.PublishSecurityVersionAsync(user, cancellationToken);

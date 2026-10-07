@@ -1,4 +1,6 @@
 using Duende.IdentityServer.Services;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
+using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -24,11 +26,13 @@ public sealed class EmailSignInModel : PageModel
 
     private readonly IIdentityServerInteractionService interaction;
     private readonly EmailSignIn emailSignIn;
+    private readonly IMediator mediator;
 
-    public EmailSignInModel(IIdentityServerInteractionService interaction, EmailSignIn emailSignIn)
+    public EmailSignInModel(IIdentityServerInteractionService interaction, EmailSignIn emailSignIn, IMediator mediator)
     {
         this.interaction = interaction;
         this.emailSignIn = emailSignIn;
+        this.mediator = mediator;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -60,7 +64,10 @@ public sealed class EmailSignInModel : PageModel
 
         SignInSession.ReleaseEmailLink(this.Response);
         SignInSession.ReleaseSecondStep(this.Response);
-        await SignInSession.SignInAsync(this.HttpContext, user, "mfa");
+        var signedIn = await SignInSession.SignInAsync(this.HttpContext, user, "mfa");
+        await this.mediator.Send(
+            new RecordSignInCommand { UserId = user.Id, TrailAction = SecurityAuditActions.SignInEmailLink, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },
+            this.HttpContext.RequestAborted);
 
         // Back to the sign-in request while Duende still knows it; otherwise the person is signed in here and goes back.
         if (await this.interaction.GetAuthorizationContextAsync(this.ReturnUrl, this.HttpContext.RequestAborted) is not null)

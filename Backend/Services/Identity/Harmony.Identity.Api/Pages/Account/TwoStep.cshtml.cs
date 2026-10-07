@@ -1,4 +1,6 @@
 using Duende.IdentityServer.Services;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
+using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,11 +18,13 @@ public sealed class TwoStepModel : PageModel
 {
     private readonly IIdentityServerInteractionService interaction;
     private readonly SecondFactorCheck secondFactorCheck;
+    private readonly IMediator mediator;
 
-    public TwoStepModel(IIdentityServerInteractionService interaction, SecondFactorCheck secondFactorCheck)
+    public TwoStepModel(IIdentityServerInteractionService interaction, SecondFactorCheck secondFactorCheck, IMediator mediator)
     {
         this.interaction = interaction;
         this.secondFactorCheck = secondFactorCheck;
+        this.mediator = mediator;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -63,10 +67,26 @@ public sealed class TwoStepModel : PageModel
             this.Recovery ? this.Code : null,
             this.HttpContext.RequestAborted);
 
+        // In the trail: a wrong code or a lock-out of a known account, and a backup code used (an account recovery).
+        var trail = result.Status switch
+        {
+            SecondFactorStatus.CodeInvalid => SecurityAuditActions.SignInWrongCode,
+            SecondFactorStatus.LockedOut => SecurityAuditActions.SignInLockedOut,
+            SecondFactorStatus.Accepted when this.Recovery => SecurityAuditActions.BackupCodeUsed,
+            _ => null,
+        };
+        if (result.User is not null && trail is not null)
+        {
+            await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = trail }, this.HttpContext.RequestAborted);
+        }
+
         if (result.Status == SecondFactorStatus.Accepted)
         {
             SignInSession.ReleaseSecondStep(this.Response);
-            await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");
+            var signedIn = await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");
+            await this.mediator.Send(
+                new RecordSignInCommand { UserId = result.User!.Id, TrailAction = SecurityAuditActions.SignInTwoStep, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },
+                this.HttpContext.RequestAborted);
             return this.Redirect(this.ReturnUrl!);
         }
 

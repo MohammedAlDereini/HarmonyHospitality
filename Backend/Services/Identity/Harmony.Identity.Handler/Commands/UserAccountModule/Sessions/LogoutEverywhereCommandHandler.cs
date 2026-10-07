@@ -1,7 +1,9 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.Sessions;
 
 using Harmony.Core.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -16,8 +18,8 @@ public class LogoutEverywhereCommandHandler : UserAccountCommandHandlerBase, IRe
     private readonly ICallContext callContext;
     private readonly ILogger<LogoutEverywhereCommandHandler> logger;
 
-    public LogoutEverywhereCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, ILogger<LogoutEverywhereCommandHandler> logger)
-        : base(userManager, cacheService, sessionRevoker)
+    public LogoutEverywhereCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, ICallContext callContext, ILogger<LogoutEverywhereCommandHandler> logger)
+        : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.callContext = callContext;
         this.logger = logger;
@@ -38,6 +40,7 @@ public class LogoutEverywhereCommandHandler : UserAccountCommandHandlerBase, IRe
         }
 
         user.EndAllSessions();
+        await this.TrailAsync(user, SecurityAuditActions.SignedOutEverywhere, cancellationToken);
         await this.SaveAsync(user);
 
         // The bump is published and the refresh tokens go: out on every device, the caller included.

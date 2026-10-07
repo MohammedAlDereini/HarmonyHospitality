@@ -1,7 +1,9 @@
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Services;
+using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Microsoft.AspNetCore.Authorization;
@@ -29,6 +31,7 @@ public sealed class LoginModel : PageModel
     private readonly EmailSignIn emailSignIn;
     private readonly IAccountMailer mailer;
     private readonly IIssuerNameService issuer;
+    private readonly IMediator mediator;
 
     public LoginModel(
         IIdentityServerInteractionService interaction,
@@ -37,7 +40,8 @@ public sealed class LoginModel : PageModel
         TwoStepSetup setup,
         EmailSignIn emailSignIn,
         IAccountMailer mailer,
-        IIssuerNameService issuer)
+        IIssuerNameService issuer,
+        IMediator mediator)
     {
         this.interaction = interaction;
         this.passwordCheck = passwordCheck;
@@ -46,6 +50,7 @@ public sealed class LoginModel : PageModel
         this.emailSignIn = emailSignIn;
         this.mailer = mailer;
         this.issuer = issuer;
+        this.mediator = mediator;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -84,10 +89,19 @@ public sealed class LoginModel : PageModel
 
         var result = await this.passwordCheck.CheckAsync(this.Email, this.Password, tenant: null, this.HttpContext.RequestAborted);
 
+        // A refused sign-in of a known account goes in its trail; an unknown name has no account to write to.
+        if (result.User is not null && RefusalOf(result.Status) is { } refusal)
+        {
+            await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = refusal }, this.HttpContext.RequestAborted);
+        }
+
         if (result.Status == PasswordCheckStatus.Exempt)
         {
             // On the exception list: signed in with the password alone, and the session says so ("pwd").
-            await SignInSession.SignInAsync(this.HttpContext, result.User!, "pwd");
+            var signedIn = await SignInSession.SignInAsync(this.HttpContext, result.User!, "pwd");
+            await this.mediator.Send(
+                new RecordSignInCommand { UserId = result.User!.Id, TrailAction = SecurityAuditActions.SignInPasswordOnly, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },
+                this.HttpContext.RequestAborted);
             return this.Redirect(this.ReturnUrl!);
         }
 
@@ -128,6 +142,15 @@ public sealed class LoginModel : PageModel
         };
         return this.Page();
     }
+
+    // The trail action for a refused password step, or null when the step was not refused.
+    private static string? RefusalOf(PasswordCheckStatus status) => status switch
+    {
+        PasswordCheckStatus.InvalidCredentials => SecurityAuditActions.SignInWrongPassword,
+        PasswordCheckStatus.LockedOut => SecurityAuditActions.SignInLockedOut,
+        PasswordCheckStatus.AccountNotActive => SecurityAuditActions.SignInNotActive,
+        _ => null,
+    };
 
     // The web app's own "forgot password" page, on the address the sign-in will return to.
     private static string ForgotPasswordOf(AuthorizationRequest request)

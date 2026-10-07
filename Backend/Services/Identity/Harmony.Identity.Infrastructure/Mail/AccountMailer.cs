@@ -106,6 +106,27 @@ public sealed class AccountMailer : IAccountMailer
         }
     }
 
+    public async Task SendNewDeviceAlertAsync(User user, string device, string? address, DateTimeOffset at, CancellationToken cancellationToken)
+    {
+        var body =
+            $"Hello {user.DisplayName},\n\n" +
+            "Your Harmony account was just used to sign in from a device it has not used before:\n" +
+            $"  {device}\n" +
+            $"  from {address ?? "an unknown address"}\n" +
+            $"  at {at.UtcDateTime:yyyy-MM-dd HH:mm} UTC\n\n" +
+            "If it was you, there is nothing to do.\n" +
+            "If it was not you, change your password now and tell your administrator.\n";
+
+        try
+        {
+            await this.SendAsync(user, "Harmony security: a new sign-in to your account", body, cancellationToken);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            this.logger.LogError(exception, "New-device alert for account {UserId} could not be sent.", user.Id);
+        }
+    }
+
     private async Task SendAsync(User user, string subject, string body, CancellationToken cancellationToken)
     {
         var message = new NotificationEmailMessage

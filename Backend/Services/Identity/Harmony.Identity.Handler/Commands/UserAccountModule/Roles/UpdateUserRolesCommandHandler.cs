@@ -1,6 +1,7 @@
 namespace Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
 
 using Harmony.Core.Identity.Permissions;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
 
@@ -9,14 +10,18 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
     private readonly IUserAccountRepository userAccounts;
     private readonly IRoleRepository roles;
     private readonly ICacheService cacheService;
-    private readonly ISessionRevoker sessionRevoker;
+    private readonly ISessionService sessionService;
+    private readonly ISecurityAuditEventRepository auditEvents;
+    private readonly ISecurityEventFactory securityEvents;
 
-    public UpdateUserRolesCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, ICacheService cacheService, ISessionRevoker sessionRevoker)
+    public UpdateUserRolesCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents)
     {
         this.userAccounts = userAccounts;
         this.roles = roles;
         this.cacheService = cacheService;
-        this.sessionRevoker = sessionRevoker;
+        this.sessionService = sessionService;
+        this.auditEvents = auditEvents;
+        this.securityEvents = securityEvents;
     }
 
     public async Task<CallResponse> Handle(UpdateUserRolesCommand command, CancellationToken cancellationToken)
@@ -35,7 +40,15 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
             return Fail(BusinessErrorCodes.Identity.Role.NotFound);
         }
 
+        // A changed set bumps the version; the same set changes nothing, and writes no trail.
+        var before = user.SecurityVersion;
         user.UpdateRoles(wanted);
+        if (user.SecurityVersion != before)
+        {
+            // Staged here, saved with the roles below.
+            await this.auditEvents.AddAsync(this.securityEvents.Create(user, SecurityAuditActions.RolesChanged), cancellationToken);
+        }
+
         await this.userAccounts.SaveChangesAsync(cancellationToken);
 
         // Roles travel inside the token. A changed set bumped the version, and the published number makes every
@@ -45,7 +58,7 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
             user.SecurityVersion,
             SecurityVersionCacheKeys.UserVersionLifetime,
             cancellationToken);
-        await this.sessionRevoker.EndAllAsync(user.Id, cancellationToken);
+        await this.sessionService.EndAllAsync(user.Id, cancellationToken);
 
         return CallResponseBuilder.CreateResponse(eCallResponseStatus.Success);
     }

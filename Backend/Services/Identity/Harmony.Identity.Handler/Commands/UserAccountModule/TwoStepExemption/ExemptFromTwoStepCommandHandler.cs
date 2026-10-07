@@ -1,6 +1,7 @@
 namespace Harmony.Identity.Handler.Commands.UserAccountModule.TwoStepExemption;
 
 using Harmony.Core.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
@@ -19,8 +20,8 @@ public class ExemptFromTwoStepCommandHandler : UserAccountCommandHandlerBase, IR
     private readonly IAccountMailer mailer;
     private readonly ILogger<ExemptFromTwoStepCommandHandler> logger;
 
-    public ExemptFromTwoStepCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, IUserAccountRepository userAccounts, ICallContext callContext, IAccountMailer mailer, ILogger<ExemptFromTwoStepCommandHandler> logger)
-        : base(userManager, cacheService, sessionRevoker)
+    public ExemptFromTwoStepCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserAccountRepository userAccounts, ICallContext callContext, IAccountMailer mailer, ILogger<ExemptFromTwoStepCommandHandler> logger)
+        : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.userAccounts = userAccounts;
         this.callContext = callContext;
@@ -47,6 +48,7 @@ public class ExemptFromTwoStepCommandHandler : UserAccountCommandHandlerBase, IR
         }
 
         user.ExemptFromTwoStep(command.Reason);
+        await this.TrailAsync(user, SecurityAuditActions.TwoStepExempted, cancellationToken);
         await this.SaveAsync(user);
 
         this.logger.LogInformation("Account {UserId} put on the two-step exception list by {AdminId}.", user.Id, this.callContext.UserId());

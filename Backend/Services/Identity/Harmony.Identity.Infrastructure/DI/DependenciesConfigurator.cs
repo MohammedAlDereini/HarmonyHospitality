@@ -194,7 +194,7 @@ public static class DependenciesConfigurator
         // Scoped like the Redis cache and the DbContext it wraps.
         services.TryAddScoped<ICacheService, CacheService>();
         services.TryAddScoped<ICacheSeeder, CacheSeeder>();
-        services.TryAddScoped<ISessionRevoker, DuendeSessionRevoker>();
+        services.TryAddScoped<ISessionService, SessionService>();
         services.TryAddScoped<MfaChallengeStore>();
 
         // The sign-in rules, shared by the sign-in pages and the password grant they replace.
@@ -202,6 +202,9 @@ public static class DependenciesConfigurator
         services.TryAddScoped<SecondFactorCheck>();
         services.TryAddScoped<TwoStepSetup>();
         services.TryAddScoped<EmailSignIn>();
+
+        // Item 4: builds security-trail rows from the request (the handlers save them through their repositories).
+        services.TryAddScoped<ISecurityEventFactory, SecurityEventFactory>();
 
         // The BFF client's settings, checked at startup: a non-https origin, or a missing / wrong / private key, stops the service.
         services.AddOptions<WebBffSettings>()
@@ -370,7 +373,10 @@ public static class DependenciesConfigurator
             store.ConfigureDbContext = db => UseIdentityDatabase(db, configuration);
             store.EnableTokenCleanup = true;
             store.RemoveConsumedTokens = true;
-        });
+        })
+        // Item 4: each sign-in session is kept in SQL (the ServerSideSessions table of the same store), so one session can be
+        // listed and ended on its own: "sign out this device" like Mews. The cookie then carries only a reference.
+        .AddServerSideSessions();
 
         // The sign-in cookie. __Host- means HTTPS only, this host only, the whole site; HttpOnly means no script can read it.
         services.PostConfigure<CookieAuthenticationOptions>(IdentityServerConstants.DefaultCookieAuthenticationScheme, cookie =>

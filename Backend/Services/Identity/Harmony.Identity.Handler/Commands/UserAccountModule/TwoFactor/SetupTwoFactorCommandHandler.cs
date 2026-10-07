@@ -3,6 +3,7 @@
 using Harmony.Core.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Models.UserAccountModule;
+using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 
@@ -17,8 +18,8 @@ public class SetupTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRequ
 
     private readonly ICallContext callContext;
 
-    public SetupTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext)
-        : base(userManager, cacheService, sessionRevoker)
+    public SetupTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, ICallContext callContext)
+        : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.callContext = callContext;
     }

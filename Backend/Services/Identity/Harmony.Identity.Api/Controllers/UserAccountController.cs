@@ -1,6 +1,7 @@
 using Harmony.Core.Models;
 using Harmony.Identity.Domain.Models.UserAccountModule;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Create;
+using Harmony.Identity.Handler.Commands.UserAccountModule.Devices;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Sessions;
@@ -9,7 +10,9 @@ using Harmony.Identity.Handler.Commands.UserAccountModule.TwoStepExemption;
 using Microsoft.AspNetCore.Authorization;
 using Harmony.Identity.Handler.Commands.UserAccountModule.State;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Detail;
+using Harmony.Identity.Handler.Queries.UserAccountModule.Devices;
 using Harmony.Identity.Handler.Queries.UserAccountModule.List;
+using Harmony.Identity.Handler.Queries.UserAccountModule.Security;
 
 namespace Harmony.Identity.Api.Controllers;
 
@@ -145,6 +148,66 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [RequirePermission(PermissionEnum.ManageUsers)]
     public async Task<IActionResult> EndTwoStepExemption([FromBody] EndTwoStepExemptionCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The caller's own security trail (sign-ins, password, two-step and session changes), newest 100 first.</summary>
+    [HttpGet("[action]")]
+    [ProducesResponseType(typeof(List<SecurityEventModel>), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> MySecurityEvents()
+    {
+        var response = await this.Mediator.Send(new GetSecurityEventsQuery());
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>An account's security trail, newest 100 first: who did what to it, from where, when.</summary>
+    [HttpGet("{id:guid}/security-events")]
+    [ProducesResponseType(typeof(List<SecurityEventModel>), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewUsers)]
+    public async Task<IActionResult> SecurityEvents(Guid id)
+    {
+        var response = await this.Mediator.Send(new GetSecurityEventsQuery { Id = id });
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The browsers the caller signed in from, and whether each is still signed in.</summary>
+    [HttpGet("[action]")]
+    [ProducesResponseType(typeof(List<UserDeviceModel>), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> MyDevices()
+    {
+        var response = await this.Mediator.Send(new GetDevicesQuery());
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The browsers an account signed in from (Mews: "Devices and activity").</summary>
+    [HttpGet("{id:guid}/devices")]
+    [ProducesResponseType(typeof(List<UserDeviceModel>), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewUsers)]
+    public async Task<IActionResult> Devices(Guid id)
+    {
+        var response = await this.Mediator.Send(new GetDevicesQuery { Id = id });
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The caller signs out of one of their devices; that device is forgotten.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> SignOutMyDevice([FromBody] SignOutMyDeviceCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>An admin signs a person out of one device; that device is forgotten.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageUsers)]
+    public async Task<IActionResult> SignOutDevice([FromBody] SignOutDeviceCommand command)
     {
         var response = await this.Mediator.Send(command);
         return await this.CallResponseManager.AsActionResultAsync(response);

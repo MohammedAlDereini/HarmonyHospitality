@@ -38,6 +38,7 @@ const messages: Record<string, string> = {
   '00067': 'A person with a Manager or higher role always needs two-step sign-in.',
   '00068': 'This password appeared in a data leak. Choose a different one.',
   '00069': 'Do not use "Harmony", your name or your e-mail name in the password.',
+  '00074': 'That device is not in the list any more.',
 
   // reference data (one set for the ten tables)
   '00055': 'This row no longer exists.',
@@ -62,6 +63,7 @@ const messages: Record<string, string> = {
   '10317': 'The code is required.',
   '10318': 'The code is 6 digits.',
   '10319': 'The link is incomplete.',
+  '10320': 'Choose a device.',
 
   // model validation: paging
   '10001': 'The page number must be 1 or more.',

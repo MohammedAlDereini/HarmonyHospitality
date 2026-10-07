@@ -1,8 +1,10 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.TwoFactor;
 
 using Harmony.Core.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Models.UserAccountModule;
+using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -20,8 +22,8 @@ public class EnableTwoFactorCommandHandler : UserAccountCommandHandlerBase, IReq
     private readonly IAccountMailer mailer;
     private readonly ILogger<EnableTwoFactorCommandHandler> logger;
 
-    public EnableTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, IAccountMailer mailer, ILogger<EnableTwoFactorCommandHandler> logger)
-        : base(userManager, cacheService, sessionRevoker)
+    public EnableTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, ICallContext callContext, IAccountMailer mailer, ILogger<EnableTwoFactorCommandHandler> logger)
+        : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.callContext = callContext;
         this.mailer = mailer;
@@ -59,6 +61,7 @@ public class EnableTwoFactorCommandHandler : UserAccountCommandHandlerBase, IReq
 
         // This path is the authenticator app; saving the two-step flag saves the method with it.
         user.UseTwoStepMethod(TwoStepMethod.AuthenticatorApp);
+        await this.TrailAsync(user, SecurityAuditActions.TwoStepTurnedOn, cancellationToken);
         EnsureSucceeded(await this.UserManager.SetTwoFactorEnabledAsync(user, true));
         var recoveryCodes = await this.UserManager.GenerateNewTwoFactorRecoveryCodesAsync(user, RecoveryCodeCount);
         this.logger.LogInformation("Two-factor enabled for account {UserId}.", user.Id);

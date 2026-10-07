@@ -409,3 +409,190 @@ to the second: `invalid_client`.
 
 - Duende IdentityServer, Distributed caching and the replay cache: https://docs.duendesoftware.com/identityserver/deployment/
 - RFC 7523 §3 (one-use `jti`): https://www.rfc-editor.org/rfc/rfc7523
+
+---
+
+## L5. EPOS: staff switch on the till with a PIN or a card
+
+**Parked:** 2026-10-06, after the two-step exception list (2.3b).
+
+**Why.** Harmony will have its own EPOS next to the PMS, like Mews (Mews POS) and Oracle (Simphony with OPERA). At a till many
+people share one device and switch many times a shift. A full password and two-step at every switch is too slow, so both
+vendors use a short unlock on a device that was trusted first.
+
+```
+ back office (web):  e-mail + password + two-step                                   (built)
+ the till:           a manager signs the terminal in once ──► staff switch with a PIN or a card
+```
+
+**What Mews and Oracle do.**
+- Mews POS: a 4-digit PIN for cashier roles. It unlocks the app only after the person signed in with the password on that
+  device; an admin can "sign in all cashiers at once".
+- Oracle Simphony: an employee ID by magnetic card, RFID card or keypad; a fingerprint alone or with the ID. Oracle recommends
+  ID + fingerprint, and at least 6 digits when IDs are typed.
+
+**Decided.** Nothing yet. The back office keeps two-step.
+
+**What it needs (first sketch).**
+1. Registered terminals: a manager signs a till in once; the terminal has its own credential and can be removed remotely.
+2. A till PIN (or card id) per person, stored only as a hash, with lockout; never accepted outside a registered terminal.
+3. Short till sessions per person, so every sale says who made it.
+
+**Waits for.** The EPOS product design.
+
+### Sources
+
+- Mews Help, Setting up user PIN in Mews POS: https://help.mews.com/s/article/setting-up-user-pin?language=en_US
+- Oracle Simphony, POS Client User Authentication:
+  https://docs.oracle.com/en/industries/food-beverage/simphony/simsg/pos_client_user_authentication.htm
+
+---
+
+## L6. EPOS payments: our own terminals, a payment processor behind them
+
+**Parked:** 2026-10-06, after looking at how Mews earns on payments.
+
+**Why.** At Mews, payments are the business. 2025, from Mews's statutory filings (Skift, 2026-10-06):
+
+| Item | Amount |
+|---|---|
+| Total revenue | €291M |
+| From payments | €219M (75%) |
+| From subscriptions | €62M |
+
+They moved €17B of payments and paid €172M to payment gateways ("including interchange and bank fees"), so roughly €47M
+(about 0.28% of the volume) stayed with Mews. Even so, the 2025 operating loss was €111M.
+
+**How Mews does it.**
+
+```
+ Mews POS / PMS ──amount──► Mews Terminal ──encrypted card──► Adyen or Stripe (process it)
+                                 │
+                                 └──► payment posted to the right bill or booking, automatically
+```
+
+- Own-branded terminals (A1 to A4, S2). Adyen or Stripe is the "Terminal Provider", and the hotel accepts that provider's terms.
+- One stored card (a token) works at the front desk, the kiosk and in F&B. Card details stay with the payment providers, never
+  in Mews.
+- Each payment pays a Mews Payments fee ("the commission paid to Mews") + interchange + scheme fees, plus a fee for stored cards.
+  No public prices; every hotel gets a quote.
+- One real contract, from a payments consultant (not Mews): Visa/Mastercard interchange + 1.0%, Amex 3.7% flat, $0.55 per
+  stored card, $15 per chargeback, $0.10 terminal fee.
+
+**How Mews gets its cut: the processor splits every payment.**
+
+```
+ guest taps the card ──► Adyen ──► guest's bank says yes
+                           │
+                           ▼  the money arrives at Adyen
+ €100 split (example numbers):
+   €0.50  → guest's bank + Visa
+   €1.00  → Mews (its commission)
+   €98.50 → paid out to the hotel
+```
+
+- Mews never bills the hotel for payments: its cut comes out before the payout. Adyen's platform product does this split
+  (sale amount, platform commission, card fees) on every payment.
+- Mews does not make terminals. It sells the provider's terminals under the Mews name, under a contract with Adyen or Stripe.
+- The cut is not only from terminals: online card payments (stored cards, payment links) go through the same Mews Payments.
+- Mews's own contract with Adyen and Stripe is private; the split mechanism is Adyen's public product, not a Mews disclosure.
+
+**Decide first (business).**
+
+| Option | We earn | We carry |
+|---|---|---|
+| Payment facilitator like Mews (Adyen for Platforms or Stripe Connect) | a fee on every payment | onboarding checks, chargebacks, compliance |
+| Connect to the hotel's own processor and terminals | nothing on payments | little |
+
+Either way, card numbers never touch Harmony: terminals encrypt to the processor and Harmony keeps only tokens.
+
+**Waits for.** The EPOS product design and the business decision above.
+
+### Sources
+
+- Skift, Inside Mews' $2.5 Billion Valuation (2026-10-06):
+  https://skift.com/2026/10/06/inside-mews-2-5-billion-valuation-can-the-economics-catch-up/
+- Mews, Payment Terminal Policy (Adyen / Stripe): https://www.mews.com/en/legal/terminal-terms
+- Mews, Hotel Payment Terminals: https://www.mews.com/en/products/terminals
+- Mews Help, Mews Payments fees: https://help.mews.com/s/article/merchant-fees?language=en_US
+- Mews Help, What is Mews Payments: https://help.mews.com/s/article/what-is-mews-payments-and-how-does-it-work?language=en_US
+- Adyen, Split transactions between balance accounts (platform commission): https://docs.adyen.com/marketplaces/split-transactions
+- Merchant Cost Consulting, Mews payment fees breakdown:
+  https://merchantcostconsulting.com/lower-credit-card-processing-fees/mews-hotel-payment-processing-fees-breakdown/
+
+---
+
+## L7. Leaked-password check: a paid supplier if a customer asks
+
+**Parked:** 2026-10-07, after the password blocklist (3b).
+
+**Why.** 3b checks every new password against Have I Been Pwned (HIBP): free, no account, named by OWASP, and the UK NCSC
+and the FBI work with it. Only 5 characters of the password's SHA-1 leave the server. Banks buy the same check from paid
+suppliers instead, for fresher data (dark web, password-stealing malware) and a contract. A large hotel group may ask for
+the same.
+
+```
+ now:    new password ──► LeakedPasswordValidator ──► HIBP (free)
+ later:  new password ──► LeakedPasswordValidator ──► a paid supplier
+         (one class and its settings change; nothing else)
+```
+
+**The suppliers (prices checked 2026-10-07).**
+
+| Supplier | What it is | Cost |
+|---|---|---|
+| Google reCAPTCHA "password defense" | checks a password against leaks | 10,000 a month free, then $8 flat to 100,000, then $1 per 1,000 |
+| Enzoic | password-check API | 2,000 calls free, then $0.04 down to $0.008 a call |
+| SpyCloud | enterprise; dark-web and malware data | not public, quote only |
+| AWS WAF Account Takeover Prevention | guards the sign-in page, not password changes | $10 a month + $1 per 1,000 sign-ins; the app must sit behind AWS WAF |
+| HIBP offline | the whole list on our own server, no outside call | free; tens of GB, refreshed by hand |
+
+Microsoft has no public service for this: its checks cover only passwords stored in Microsoft Entra (hotels that sign in
+with SSO).
+
+**Decided.** Keep HIBP. Change supplier only when a customer asks for it.
+
+**Waits for.** A customer asking.
+
+### Sources
+
+- OWASP Authentication Cheat Sheet (Pwned Passwords): https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
+- Have I Been Pwned, Pwned Passwords: https://haveibeenpwned.com/Passwords
+- Google reCAPTCHA pricing: https://cloud.google.com/security/products/recaptcha#pricing
+- Enzoic APIs: https://www.enzoic.com/apis/
+- SpyCloud, financial services: https://spycloud.com/industry/financial-services/
+- AWS WAF Fraud Control pricing: https://aws.amazon.com/about-aws/whats-new/2023/06/aws-waf-fraud-control-account-creation-prevention-pricing
+- Microsoft Entra Password Protection: https://learn.microsoft.com/en-us/entra/identity/authentication/concept-password-ban-bad
+
+---
+
+## L8. 15+ characters for people on the two-step exception list
+
+**Parked:** 2026-10-07, step 3c, skipped on purpose.
+
+**Why it came up.** People on the exception list (2.3b) sign in with a password alone. NIST SP 800-63B-4 asks 15+ characters
+for a password used alone (8 with two-step). Everyone else keeps 12 + a symbol.
+
+**Why it waits.** Mews keeps one rule for everyone (12 + a symbol) and guards exceptions with its security score instead. The
+exempt door is already small: never a Manager or higher, an alert e-mail when someone is put on the list, and leaked
+passwords are refused (3b).
+
+**What it needs (sketch).** One more password check (exempt and two-step off: 15+), a new code, and at sign-in "must change
+the password" when an exempt person's password is shorter. No migration.
+
+**Waits for.** A customer or an audit that asks for NIST's single-factor rule.
+
+---
+
+## L9. Leaked-password check at sign-in
+
+**Parked:** 2026-10-07, step 3d.
+
+**Why.** 3b checks a password when it is set. A password that was fine then can appear in a leak later. NIST SP 800-63B-4 asks
+to force a change when a password is known to be compromised.
+
+**What it needs (sketch).** At sign-in, the password is known for a moment: check it against Have I Been Pwned the same way
+(5 characters of the SHA-1), and when it is listed, sign the person in with "must change the password". If the service
+cannot answer, sign in as usual.
+
+**Waits for.** After item 4 (audit log), so the forced change is recorded.

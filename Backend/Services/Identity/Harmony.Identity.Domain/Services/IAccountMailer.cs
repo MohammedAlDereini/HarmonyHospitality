@@ -26,4 +26,7 @@ public interface IAccountMailer
     /// Never throws: the change it reports already happened and stands, so a failed send is logged for the operators.
     /// </summary>
     Task SendSecurityAlertAsync(User user, SecurityAlert alert, CancellationToken cancellationToken);
+
+    /// <summary>"A new sign-in to your account": the browser, the address and the time. Never throws, like the alerts above.</summary>
+    Task SendNewDeviceAlertAsync(User user, string device, string? address, DateTimeOffset at, CancellationToken cancellationToken);
 }

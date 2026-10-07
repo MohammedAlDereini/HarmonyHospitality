@@ -1,5 +1,7 @@
 using Duende.IdentityServer.Services;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -29,11 +31,13 @@ public sealed class TwoStepSetupModel : PageModel
 
     private readonly IIdentityServerInteractionService interaction;
     private readonly TwoStepSetup setup;
+    private readonly IMediator mediator;
 
-    public TwoStepSetupModel(IIdentityServerInteractionService interaction, TwoStepSetup setup)
+    public TwoStepSetupModel(IIdentityServerInteractionService interaction, TwoStepSetup setup, IMediator mediator)
     {
         this.interaction = interaction;
         this.setup = setup;
+        this.mediator = mediator;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -102,6 +106,18 @@ public sealed class TwoStepSetupModel : PageModel
             return await this.FinishAsync(result);
         }
 
+        // A wrong code counts towards the lock-out, so it goes in the trail like one at sign-in.
+        var refusal = result.Status switch
+        {
+            TwoStepSetupStatus.CodeInvalid => SecurityAuditActions.SignInWrongCode,
+            TwoStepSetupStatus.LockedOut => SecurityAuditActions.SignInLockedOut,
+            _ => null,
+        };
+        if (result.User is not null && refusal is not null)
+        {
+            await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = refusal }, this.HttpContext.RequestAborted);
+        }
+
         this.Error = result.Status switch
         {
             TwoStepSetupStatus.LockedOut => "Too many wrong attempts. The account is locked for a few minutes.",
@@ -120,7 +136,11 @@ public sealed class TwoStepSetupModel : PageModel
         }
 
         SignInSession.ReleaseSetup(this.Response);
-        await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");
+        await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User!.Id, TrailAction = SecurityAuditActions.TwoStepTurnedOn }, this.HttpContext.RequestAborted);
+        var signedIn = await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");
+        await this.mediator.Send(
+            new RecordSignInCommand { UserId = result.User!.Id, TrailAction = SecurityAuditActions.SignInAfterSetup, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },
+            this.HttpContext.RequestAborted);
         this.RecoveryCodes = result.RecoveryCodes;
         this.Method = result.User!.TwoStepMethod;
         this.ContinueUrl = await this.interaction.GetAuthorizationContextAsync(this.ReturnUrl, this.HttpContext.RequestAborted) is null

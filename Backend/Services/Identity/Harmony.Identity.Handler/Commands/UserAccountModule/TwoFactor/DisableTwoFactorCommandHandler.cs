@@ -1,7 +1,9 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.TwoFactor;
 
 using Harmony.Core.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -16,8 +18,8 @@ public class DisableTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRe
     private readonly IAccountMailer mailer;
     private readonly ILogger<DisableTwoFactorCommandHandler> logger;
 
-    public DisableTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionRevoker sessionRevoker, ICallContext callContext, IAccountMailer mailer, ILogger<DisableTwoFactorCommandHandler> logger)
-        : base(userManager, cacheService, sessionRevoker)
+    public DisableTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, ICallContext callContext, IAccountMailer mailer, ILogger<DisableTwoFactorCommandHandler> logger)
+        : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.callContext = callContext;
         this.mailer = mailer;
@@ -55,6 +57,7 @@ public class DisableTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRe
             return Fail(BusinessErrorCodes.Identity.UserAccount.CurrentPasswordWrong);
         }
 
+        await this.TrailAsync(user, SecurityAuditActions.TwoStepTurnedOff, cancellationToken);
         EnsureSucceeded(await this.UserManager.SetTwoFactorEnabledAsync(user, false));
         EnsureSucceeded(await this.UserManager.ResetAuthenticatorKeyAsync(user));
         await this.UserManager.ResetAccessFailedCountAsync(user);
