@@ -692,3 +692,26 @@ and shares one sign-in budget with the sign-in pages. It exists only because the
 `Program.cs` in the same change that removes the password grant. The sign-in pages keep `[EnableRateLimiting]`.
 
 **Waits for.** BFF step 5.
+
+---
+
+## L16. Trusted devices and approving new sign-ins
+
+**Parked:** 2026-10-08, after item 5.
+
+**Why.** Item 4 only tells: a sign-in from an unknown browser sends the person an e-mail, and the new browser is already in.
+The wish is to ask first: the person marks a device as trusted, and a sign-in from any other device waits until they
+approve it there (Google's "Is it you?", WhatsApp's new device). Yes lets the new browser in; No refuses it.
+
+**What was learned (sketch, not decided).**
+- Plain Yes/No is not safe any more: attackers send prompts until a tired person taps Yes (the 2022 Uber breach).
+  Microsoft made number matching mandatory in 2023: the new browser shows a number, the person types it on the
+  trusted device.
+- A fallback is needed when nobody can approve (one front-desk PC, the trusted device switched off): for example the
+  normal two-step code.
+- Storage: "trust this device" is one more column on `UserDevices` (no new table); the waiting approval lives a few
+  minutes, so a cache entry, not a table.
+- Check Mews's own trusted-device behaviour in its docs before designing, and decide who may trust a device (the person,
+  or an admin) and for how long.
+
+**Waits for.** The rank rules (C1 + C2) first; then a design pass of its own.
