@@ -40,15 +40,17 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
             return Fail(BusinessErrorCodes.Identity.Role.NotFound);
         }
 
-        // A changed set bumps the version; the same set changes nothing, and writes no trail.
+        // A changed set bumps the version. The same set is a no-op success, like PropX's UpdateRolePermissions: nothing is
+        // saved, no trail row, and nobody is signed out because an admin pressed Save without changing anything.
         var before = user.SecurityVersion;
         user.UpdateRoles(wanted);
-        if (user.SecurityVersion != before)
+        if (user.SecurityVersion == before)
         {
-            // Staged here, saved with the roles below.
-            await this.auditEvents.AddAsync(this.securityEvents.Create(user, SecurityAuditActions.RolesChanged), cancellationToken);
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.Success);
         }
 
+        // Staged here, saved with the roles below.
+        await this.auditEvents.AddAsync(this.securityEvents.Create(user, SecurityAuditActions.RolesChanged), cancellationToken);
         await this.userAccounts.SaveChangesAsync(cancellationToken);
 
         // Roles travel inside the token. A changed set bumped the version, and the published number makes every
