@@ -42,6 +42,9 @@ public partial class Program
 
         static void ConfigureMvc(WebApplicationBuilder builder)
         {
+            // No "Server: Kestrel" on any answer: nothing tells a caller which server software to aim at.
+            builder.WebHost.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
+
             builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.WriteIndented = true);
 
             // The sign-in pages (Pages/Account): server-rendered, no script.
@@ -87,6 +90,19 @@ public partial class Program
         {
             // Item 5: first, so everything after it (rate limits, the security trail) sees the caller's real address.
             app.UseForwardedHeaders();
+
+            // Outside Development the browser is told to use HTTPS only for this host (HSTS); localhost is never included.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHsts();
+            }
+
+            // Every answer, the stylesheet and script included: the browser must trust the declared type, never guess one.
+            app.Use((context, next) =>
+            {
+                context.Response.Headers.XContentTypeOptions = "nosniff";
+                return next(context);
+            });
 
             app.UseRouting();
             app.UseCors();

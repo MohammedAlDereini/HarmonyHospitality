@@ -15,7 +15,7 @@
     {
         <p class="error" role="alert">@Model.Error</p>
     }
-    <button type="submit">Continue</button>
+    <button type="submit" data-busy="Checking…">Continue</button>
 </form>
 <p class="links">
     <a asp-page="TwoStep" asp-route-returnUrl="@Model.ReturnUrl" asp-route-recovery="@(!Model.Recovery)">@(Model.Recovery ? "Use the authenticator app instead" : "Use a recovery code instead")</a>

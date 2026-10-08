@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-@* The sign-in family: one card in the middle, the same look as the web app. No script anywhere. *@
+@* The sign-in family: one card in the middle, the same look as the web app. One script of ours (one send per page),
+   allowed only by this response's nonce; no inline script anywhere. *@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] · Harmony</title>
     <link rel="stylesheet" href="~/css/sign-in.css" asp-append-version="true" />
+    <script src="~/js/sign-in.js" asp-append-version="true" nonce="@SignInPageHeadersAttribute.Nonce(Context)" defer></script>
 </head>
 <body>
     <main class="centered">
