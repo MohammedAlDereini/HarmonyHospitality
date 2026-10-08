@@ -6,7 +6,9 @@ using Harmony.Identity.Domain.Services;
 using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
+using Harmony.Identity.Infrastructure.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Harmony.Identity.Api.Pages.Account;
@@ -20,6 +22,7 @@ namespace Harmony.Identity.Api.Pages.Account;
 /// </summary>
 [AllowAnonymous]
 [SignInPageHeaders]
+[EnableRateLimiting(RateLimitPolicies.SignIn)]
 public sealed class LoginModel : PageModel
 {
     public const string TimedOut = "timed-out";

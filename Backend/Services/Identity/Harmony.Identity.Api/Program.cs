@@ -5,6 +5,7 @@ using Harmony.Identity.Handler.DI;
 using Harmony.Identity.Infrastructure.Caching;
 using Harmony.Identity.Infrastructure.DI;
 using Harmony.Identity.Infrastructure.Persistence;
+using Harmony.Identity.Infrastructure.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 /// <summary>
@@ -84,8 +85,18 @@ public partial class Program
 
         static void ConfigureApp(WebApplication app)
         {
+            // Item 5: first, so everything after it (rate limits, the security trail) sees the caller's real address.
+            app.UseForwardedHeaders();
+
             app.UseRouting();
             app.UseCors();
+
+            // Item 5: after routing, so each door's [EnableRateLimiting] is known; before any sign-in work runs.
+            app.UseRateLimiter();
+
+            // Item 5, until BFF step 5: the old password grant at Duende's token door, which no attribute reaches.
+            app.UseMiddleware<TokenDoorLimiter>();
+
             app.ConfigureAppLogging();
             app.MapControllers();
 

@@ -596,3 +596,99 @@ to force a change when a password is known to be compromised.
 cannot answer, sign in as usual.
 
 **Waits for.** After item 4 (audit log), so the forced change is recorded.
+
+---
+
+## L10. Rate limits per property network
+
+**Parked:** 2026-10-07, item 5 (rate limits).
+
+**Why.** Item 5 counts tries per caller address. A hotel's staff share one public address, often with the guest Wi-Fi, and a
+head-office VPN or a remote desktop can put hundreds of staff behind one address. One abuser on that network can use up the
+sign-in budget for everyone there for a few minutes, and a big office may need more than 60 at once + 20 a minute.
+
+**What it needs (sketch).** Each property lists its own network ranges. Callers from a listed range get that property's own,
+higher budget; everyone else keeps the global one. Floods from many addresses are for bot protection at the front door (L2).
+
+**Waits for.** The Tenant ticket (properties live there) and L2.
+
+---
+
+## L11. One count across two or more servers
+
+**Parked:** 2026-10-07, item 5.
+
+**Why.** The counts live in each server's memory. With two or more Identity servers behind a front door that spreads the
+calls, a caller gets one budget per server.
+
+**What it needs (sketch).** The counters in Redis, which we already run: one increment with an expiry per try, our own few
+lines through the framework's Redis, no new package. Or a front door that keeps a caller on one server.
+
+**Waits for.** A second Identity server, together with L4.
+
+---
+
+## L12. One sign-in e-mail a minute per account
+
+**Parked:** 2026-10-07, found during item 5.
+
+**Why.** Every right password at the sign-in page sends a new e-mail: the two-step setup link, or the e-mail sign-in link.
+Forgot password already sends at most one mail a minute per account; these two do not. Abuse needs the password, but a
+double click already sends two.
+
+**What it needs (sketch).** The same per-account rule as forgot password (a cache key for one minute); the page then says the
+link was already sent.
+
+**Waits for.** Nothing; it is small.
+
+---
+
+## L13. At most 100 wrong tries in a row on one account (NIST)
+
+**Parked:** 2026-10-07, item 5.
+
+**Why.** NIST SP 800-63B-4 §3.2.2 says a verifier SHALL allow no more than 100 failed tries in a row on one account. Our
+lockout (5 wrong → 5 minutes) starts counting again after each lock, so guessing never stops; it is about 60 tries an hour.
+That meets OWASP ASVS 2.2.1 (at most 100 an hour) but not NIST's "in a row". Mews publishes no such rule; it blocks risky
+sign-ins and its security team checks them by hand.
+
+**What it needs (sketch).** Count wrong tries across locks (one column, a migration). At 100 the account stays locked until a
+password reset or an admin unlocks it, with an alert e-mail and a trail row.
+
+**Waits for.** An audit that asks for NIST, or before go-live.
+
+**Sources**
+- NIST SP 800-63B-4, §3.2.2 Rate limiting: https://pages.nist.gov/800-63-4/sp800-63b.html
+- OWASP ASVS 4.0.3, V2.2.1: https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x11-V2-Authentication.md
+- Mews, login blocked as account takeover: https://help.mews.com/s/article/How-to-log-in-to-Mews-when-login-displays-Error-503-page
+
+---
+
+## L14. Forgot password answers in the same time
+
+**Parked:** 2026-10-07, found during item 5.
+
+**Why.** OWASP asks a forgot-password answer to take the same time whether the account exists or not. Ours sends the mail
+before it answers, so a real account answers more slowly and accounts can be found by timing. Item 5's limit slows that
+down; it does not stop it.
+
+**What it needs (sketch).** Answer first and send after (a background mail queue), the same way for every address.
+
+**Waits for.** A background mail queue (outbox).
+
+**Sources**
+- OWASP Forgot Password Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html
+
+---
+
+## L15. Remove the token door with BFF step 5
+
+**Parked:** 2026-10-07, item 5.
+
+**Why.** `TokenDoorLimiter` counts the old password grant at Duende's token endpoint, which no `[EnableRateLimiting]` reaches,
+and shares one sign-in budget with the sign-in pages. It exists only because the web app still signs in with that grant.
+
+**What it needs.** Delete `RateLimiting/TokenDoorLimiter.cs` and its `app.UseMiddleware<TokenDoorLimiter>()` line in
+`Program.cs` in the same change that removes the password grant. The sign-in pages keep `[EnableRateLimiting]`.
+
+**Waits for.** BFF step 5.

@@ -3,7 +3,9 @@ using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
+using Harmony.Identity.Infrastructure.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRCoder;
 
@@ -17,6 +19,7 @@ namespace Harmony.Identity.Api.Pages.Account;
 /// </summary>
 [AllowAnonymous]
 [SignInPageHeaders]
+[EnableRateLimiting(RateLimitPolicies.SignIn)]
 public sealed class TwoStepSetupModel : PageModel
 {
     public enum Steps

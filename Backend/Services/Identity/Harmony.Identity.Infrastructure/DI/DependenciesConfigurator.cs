@@ -19,6 +19,8 @@ using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
 using Harmony.Identity.Infrastructure.Mail;
 using Harmony.Identity.Infrastructure.Passwords;
 using Harmony.Identity.Infrastructure.Persistence;
+using Harmony.Identity.Infrastructure.Proxies;
+using Harmony.Identity.Infrastructure.RateLimiting;
 using Harmony.Identity.Infrastructure.Repositories;
 using Harmony.Identity.Infrastructure.Services;
 using Harmony.Identity.Infrastructure.Signing;
@@ -26,12 +28,15 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using System.Net;
 using System.Reflection;
 
 namespace Harmony.Identity.Infrastructure.DI;
@@ -229,11 +234,58 @@ public static class DependenciesConfigurator
             .ValidateOnStart();
         services.AddHttpClient(LeakedPasswordValidator.ClientName, client => client.DefaultRequestHeaders.UserAgent.ParseAdd("Harmony-Identity"));
 
+        // Item 5: tries per caller address at the anonymous doors; the section is optional, its defaults fit a hotel.
+        services.AddOptions<RateLimitSettings>()
+            .Bind(configuration.GetSection(RateLimitSettings.Section))
+            .Validate(RateLimitSettings.IsValid, $"{RateLimitSettings.Section}: every limit must be 1 or more, and WindowMinutes 1 to 60.")
+            .ValidateOnStart();
+
+        // Item 5: the real caller address (X-Forwarded-For), believed only from the front doors the settings list.
+        services.AddOptions<TrustedProxySettings>()
+            .Bind(configuration.GetSection(TrustedProxySettings.Section))
+            .Validate(TrustedProxySettings.IsValid, $"{TrustedProxySettings.Section}: every entry must be an IP address (Addresses) or a range like 172.17.0.0/16 (Networks).")
+            .ValidateOnStart();
+        services.AddOptions<ForwardedHeadersOptions>()
+            .Configure<IOptions<TrustedProxySettings>>((options, settings) =>
+            {
+                var proxies = settings.Value;
+
+                // Microsoft trusts this machine by default; we trust only the list. Careful: with BOTH lists empty Microsoft
+                // trusts EVERY sender, so no proxy listed means the header is not read at all.
+                options.KnownProxies.Clear();
+                options.KnownIPNetworks.Clear();
+                if (proxies.Addresses.Length == 0 && proxies.Networks.Length == 0)
+                {
+                    options.ForwardedHeaders = ForwardedHeaders.None;
+                    return;
+                }
+
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+
+                // Walk back through every listed proxy to the first address not listed: that is the caller. Microsoft's default
+                // stops after one hop, so behind the front door AND the BFF everyone would count as the front door. Safe only
+                // because the lists are never empty here (Microsoft: no limit only with known proxies or networks).
+                options.ForwardLimit = null;
+                foreach (var address in proxies.Addresses)
+                {
+                    options.KnownProxies.Add(IPAddress.Parse(address));
+                }
+
+                foreach (var network in proxies.Networks)
+                {
+                    options.KnownIPNetworks.Add(System.Net.IPNetwork.Parse(network));
+                }
+            });
+
+        // Item 5: the limits per caller at the sign-in, forgot and reset doors (switched on per door with [EnableRateLimiting]).
+        services.AddSignInRateLimits();
+
         // The browser side of the API: only the web app origins, with the Authorization header and the verbs we use.
         services.AddCors(cors => cors.AddDefaultPolicy(policy => policy
             .WithOrigins(WebOrigins(configuration))
             .AllowAnyHeader()
-            .WithMethods("GET", "POST", "PUT", "DELETE")));
+            .WithMethods("GET", "POST", "PUT", "DELETE")
+            .WithExposedHeaders("Retry-After")));
 
         // PropX: Identity answers a cache miss from its own database and rewrites the key. The framework readers in the
         // other services cannot, so Identity also republishes everything the first time it finds Redis wiped.

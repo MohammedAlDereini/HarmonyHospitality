@@ -7,7 +7,9 @@ using Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Sessions;
 using Harmony.Identity.Handler.Commands.UserAccountModule.TwoFactor;
 using Harmony.Identity.Handler.Commands.UserAccountModule.TwoStepExemption;
+using Harmony.Identity.Infrastructure.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Harmony.Identity.Handler.Commands.UserAccountModule.State;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Detail;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Devices;
@@ -217,6 +219,7 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     [HttpPost("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.ForgotPassword)]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
     {
         var response = await this.Mediator.Send(command);
@@ -227,6 +230,7 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     [HttpPost("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.ResetPassword)]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
     {
         var response = await this.Mediator.Send(command);

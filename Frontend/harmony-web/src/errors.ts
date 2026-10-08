@@ -39,6 +39,7 @@ const messages: Record<string, string> = {
   '00068': 'This password appeared in a data leak. Choose a different one.',
   '00069': 'Do not use "Harmony", your name or your e-mail name in the password.',
   '00074': 'That device is not in the list any more.',
+  '00075': 'Too many tries from your network. Wait a minute, then try again. If this keeps happening, tell your administrator.',
 
   // reference data (one set for the ten tables)
   '00055': 'This row no longer exists.',
