@@ -47,12 +47,24 @@ public class ExemptFromTwoStepCommandHandler : UserAccountCommandHandlerBase, IR
             return Fail(BusinessErrorCodes.Identity.UserAccount.PrivilegedCannotBeExempt);
         }
 
+        // The same thing again changes nothing. A new reason is recorded, but the person is told only when
+        // their sign-in actually changes (going on the list), not when an admin rewords the reason.
+        var wasExempt = user.IsTwoStepExempt;
+        var reasonBefore = user.TwoStepExemptReason;
         user.ExemptFromTwoStep(command.Reason);
+        if (user.TwoStepExemptReason == reasonBefore)
+        {
+            return Ok();
+        }
+
         await this.TrailAsync(user, SecurityAuditActions.TwoStepExempted, cancellationToken);
         await this.SaveAsync(user);
 
         this.logger.LogInformation("Account {UserId} put on the two-step exception list by {AdminId}.", user.Id, this.callContext.UserId());
-        await this.mailer.SendSecurityAlertAsync(user, SecurityAlert.TwoStepExempted, cancellationToken);
+        if (!wasExempt)
+        {
+            await this.mailer.SendSecurityAlertAsync(user, SecurityAlert.TwoStepExempted, cancellationToken);
+        }
 
         return Ok();
     }
