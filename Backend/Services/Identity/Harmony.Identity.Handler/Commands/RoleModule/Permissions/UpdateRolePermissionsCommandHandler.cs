@@ -42,7 +42,7 @@ public class UpdateRolePermissionsCommandHandler : IRequestHandler<UpdateRolePer
         role.UpdatePermissions(desired);
         await this.roles.SaveChangesAsync(cancellationToken);
 
-        // 4. PropX: the cache follows the database at once.
+        // 4. The cache follows the database at once.
         await this.cacheService.AddAsync(
             PermissionCacheKeys.RolePermissionKey(role.TenantId, role.Id),
             known.Select(p => (int)p.PermissionValue).Distinct().Order().ToList(),

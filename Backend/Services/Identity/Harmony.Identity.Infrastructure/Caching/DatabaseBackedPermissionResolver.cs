@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace Harmony.Identity.Infrastructure.Caching;
 
 /// <summary>
-/// PropX PermissionAuthorizationService, Identity's side: a role's permissions come from the cache, and a miss is
+/// Identity's side of the permission check: a role's permissions come from the cache, and a miss is
 /// answered from the database and written back, so the next request is a hit. Only Identity can do this; the other
 /// services read the same key through the framework and fail closed on a miss. When the miss turns out to be a wiped
 /// Redis, everything is republished first, which heals the other services too.
@@ -73,7 +73,7 @@ public sealed class DatabaseBackedPermissionResolver : IPlatformPermissionResolv
             }
         }
 
-        // PropX: the miss is answered from the database and the key is rewritten.
+        // The miss is answered from the database and the key is rewritten.
         var role = await services.GetRequiredService<IdentityDbContext>().Roles
             .IgnoreQueryFilters([QueryFilterNames.Tenant])
             .AsNoTracking()

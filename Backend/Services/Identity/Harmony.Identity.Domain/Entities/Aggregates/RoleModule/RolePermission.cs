@@ -3,7 +3,7 @@ using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 
 namespace Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 
-/// <summary>One row = this role holds this permission. Owned by the Role aggregate (PropX RolePermission).</summary>
+/// <summary>One row = this role holds this permission. Owned by the Role aggregate.</summary>
 public sealed class RolePermission : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntity, IConcurrentEntity
 {
     private RolePermission()

@@ -46,7 +46,7 @@ public static class IdentityServerResources
         new IdentityResources.Profile(),
     ];
 
-    /// <summary>The web client people sign in with today: PropX email + password, issued by Duende as the password grant.</summary>
+    /// <summary>The web client people sign in with today: e-mail + password, issued by Duende as the password grant.</summary>
     public const string WebClientId = "harmony-web";
 
     /// <summary>15 minutes: a token is short-lived; a demoted or terminated user is stopped sooner by security_version anyway.</summary>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Harmony.Identity.Api.Checks;
 
 /// <summary>
-/// Startup check (PropX PermissionEnumIntegrityCheck): every configured tenant holds a row for every
+/// Startup check: every configured tenant holds a row for every
 /// <see cref="PermissionEnum"/> value. A tenant with a hole would let a role reference a permission that does not exist
 /// for it, so the service refuses to start and names the gap.
 /// </summary>
@@ -25,7 +25,7 @@ public static class PermissionEnumIntegrityCheck
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
 
-        // One pass over every tenant's rows: the tenant filter is dropped by name (PropX IgnoreQueryFilters()).
+        // One pass over every tenant's rows: the tenant filter is dropped by name.
         var rows = await dbContext.Permissions
             .IgnoreQueryFilters([QueryFilterNames.Tenant])
             .AsNoTracking()

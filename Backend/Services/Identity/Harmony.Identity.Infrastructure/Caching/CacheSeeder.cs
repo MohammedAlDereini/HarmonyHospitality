@@ -10,11 +10,11 @@ using Microsoft.Extensions.Logging;
 namespace Harmony.Identity.Infrastructure.Caching;
 
 /// <summary>
-/// PropX's CacheSeeder: at every start every role's permissions and every user's security version are published
+/// At every start every role's permissions and every user's security version are published
 /// again, overwriting what is there, so a fresh Redis, a lost key or a publish that failed while Identity was down are
 /// all healed before the first request. A sentinel key is written last; when a later request finds it gone, Redis was
 /// wiped and <see cref="HealIfLostAsync"/> republishes everything, so the other services heal through Identity.
-/// Unlike PropX there is no ClearAllAsync first: Redis is shared and Identity's user may only write Global:identity:*.
+/// There is no ClearAllAsync first: Redis is shared and Identity's user may only write Global:identity:*.
 /// </summary>
 public sealed class CacheSeeder : ICacheSeeder
 {
@@ -67,7 +67,7 @@ public sealed class CacheSeeder : ICacheSeeder
 
     private async Task SeedRolesPermissions(CancellationToken cancellationToken)
     {
-        // The tenant filter is dropped by name so every tenant's roles load in one pass at startup (PropX IgnoreQueryFilters()).
+        // The tenant filter is dropped by name so every tenant's roles load in one pass at startup.
         var roles = await this.dbContext.Roles
             .IgnoreQueryFilters([QueryFilterNames.Tenant])
             .AsNoTracking()

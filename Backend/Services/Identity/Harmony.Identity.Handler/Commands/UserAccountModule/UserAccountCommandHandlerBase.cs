@@ -54,7 +54,7 @@ public abstract class UserAccountCommandHandlerBase
     }
 
     /// <summary>
-    /// PropX: the cache follows the database at once. Called after the save, never before. A bumped version ends every
+    /// The cache follows the database at once. Called after the save, never before. A bumped version ends every
     /// session, so the refresh tokens the person holds go with it: nothing can be refreshed into a new token.
     /// </summary>
     protected async Task PublishSecurityVersionAsync(User user, CancellationToken cancellationToken)

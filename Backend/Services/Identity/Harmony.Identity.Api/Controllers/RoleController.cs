@@ -39,7 +39,7 @@ public class RoleController(IMediator mediator, ICallResponseManager callRespons
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 
-    /// <summary>Sets the role's permissions to exactly this list of ids (PropX AssignPermissions).</summary>
+    /// <summary>Sets the role's permissions to exactly this list of ids.</summary>
     [HttpPost("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [RequirePermission(PermissionEnum.ManageRolePermissions)]

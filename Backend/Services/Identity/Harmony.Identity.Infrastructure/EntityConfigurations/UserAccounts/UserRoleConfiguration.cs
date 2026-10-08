@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Harmony.Identity.Infrastructure.EntityConfigurations.UserAccounts;
 
-/// <summary>PropX's UserRoles mapping. Audit, tenant and rowversion columns come from the framework conventions, like Roles.</summary>
+/// <summary>The UserRoles mapping. Audit, tenant and rowversion columns come from the framework conventions, like Roles.</summary>
 public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 {
     public void Configure(EntityTypeBuilder<UserRole> builder)

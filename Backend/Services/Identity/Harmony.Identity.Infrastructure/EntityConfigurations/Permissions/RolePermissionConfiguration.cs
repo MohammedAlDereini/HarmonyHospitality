@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Harmony.Identity.Infrastructure.EntityConfigurations.Permissions;
 
 /// <summary>
-/// PropX's RolePermissions mapping. One difference: deleting a role deletes its rows (Cascade); a permission in use
+/// The RolePermissions mapping: deleting a role deletes its rows (Cascade); a permission in use
 /// cannot be deleted (Restrict). Audit, tenant and rowversion columns come from the framework conventions.
 /// </summary>
 public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermission>

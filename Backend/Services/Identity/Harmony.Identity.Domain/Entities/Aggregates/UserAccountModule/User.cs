@@ -162,7 +162,7 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
         BumpSecurityVersion();
     }
 
-    /// <summary>The account holds exactly these roles afterwards: missing ones are added, others removed. Same as PropX User.Update.</summary>
+    /// <summary>The account holds exactly these roles afterwards: missing ones are added, others removed.</summary>
     public void UpdateRoles(IEnumerable<Guid>? roleIds)
     {
         AssertNotTerminated();

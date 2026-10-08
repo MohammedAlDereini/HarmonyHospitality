@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Harmony.Identity.Infrastructure.IdentityServer;
 
 /// <summary>
-/// PropX AuthClaimsBuilder, as Duende's profile service: what a Harmony token says about its subject. The claims are
+/// Duende's profile service: what a Harmony token says about its subject. The claims are
 /// exactly the ones every service reads: tenant_id, role (one claim per role id), security_version, name, and
 /// must_change_password while the person still has to replace a password somebody else chose.
 /// Duende asks again on every refresh, and <see cref="IsActiveAsync"/> is where a session ends: a suspended or

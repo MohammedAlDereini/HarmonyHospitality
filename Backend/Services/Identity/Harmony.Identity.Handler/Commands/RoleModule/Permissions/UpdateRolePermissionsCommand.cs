@@ -1,6 +1,6 @@
 namespace Harmony.Identity.Handler.Commands.RoleModule.Permissions;
 
-/// <summary>The role holds exactly these permissions afterwards (PropX UpdateRolePermissions).</summary>
+/// <summary>The role holds exactly these permissions afterwards.</summary>
 public class UpdateRolePermissionsCommand : BaseCommandRequest<CallResponse>
 {
     public Guid RoleId { get; set; }

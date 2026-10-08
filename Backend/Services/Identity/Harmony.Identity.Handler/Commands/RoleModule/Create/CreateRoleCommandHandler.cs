@@ -48,7 +48,7 @@ public class CreateRoleCommandHandler : RoleCommandHandlerBase, IRequestHandler<
         await this.RoleRepository.AddAsync(role, cancellationToken);
         await this.RoleRepository.SaveChangesAsync(cancellationToken);
 
-        // PropX: the cache follows the database at once.
+        // The cache follows the database at once.
         await this.cacheService.AddAsync(
             PermissionCacheKeys.RolePermissionKey(role.TenantId, role.Id),
             values,

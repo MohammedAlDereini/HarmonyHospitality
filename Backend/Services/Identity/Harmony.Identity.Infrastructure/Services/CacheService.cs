@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Harmony.Identity.Infrastructure.Services;
 
 /// <summary>
-/// PropX CacheService over the framework's Redis cache, Public level, so keys land under "Global:" where every service
-/// may read them. Two deliberate differences from PropX: writes use SaveAsync (overwrite), because this framework's
+/// The cache service over the framework's Redis cache, Public level, so keys land under "Global:" where every service
+/// may read them. Two deliberate choices: writes use SaveAsync (overwrite), because this framework's
 /// AddAsync is add-if-absent and a republished role must replace the old set; and a failed write throws, because the
 /// database already holds the change and a silent failure would keep a revoked permission alive for the whole TTL.
 /// </summary>

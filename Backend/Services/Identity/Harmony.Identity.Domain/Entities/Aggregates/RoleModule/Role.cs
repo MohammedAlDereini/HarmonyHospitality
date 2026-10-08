@@ -28,7 +28,7 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
 
     public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
 
-    /// <summary>The permissions this role holds, as rows (PropX RolePermissions). The super role holds none: it passes every check.</summary>
+    /// <summary>The permissions this role holds, as rows. The super role holds none: it passes every check.</summary>
     public ICollection<RolePermission> Permissions { get; private set; } = new List<RolePermission>();
 
     public bool IsPrivileged => PrivilegeLevel >= PrivilegeLevel.Manager;

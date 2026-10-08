@@ -23,7 +23,7 @@ public sealed class Permission : BaseEntity<Guid>, IAuditableEntity, IMultiTenan
 
     public bool IsActive { get; private set; }
 
-    /// <summary>The roles that hold this permission (PropX Permission.Permissions).</summary>
+    /// <summary>The roles that hold this permission.</summary>
     public ICollection<RolePermission> RolePermissions { get; private set; } = new List<RolePermission>();
 
     public Guid TenantId { get; private set; }

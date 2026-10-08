@@ -13,7 +13,7 @@ namespace Harmony.Identity.Infrastructure.Caching;
 
 /// <summary>
 /// Identity's side of the stale-token check: a user's security version comes from the cache, and a miss is answered
-/// from the database and written back (PropX: heal a miss with a query). The framework readers in the other services
+/// from the database and written back. The framework readers in the other services
 /// fail closed on a miss; when the miss turns out to be a wiped Redis, everything is republished first, so they heal too.
 /// Runs inside token validation, before the call context exists: the database work runs in its own scope so the
 /// request's DbContext, which captures the tenant when constructed, is never built too early.
@@ -71,7 +71,7 @@ public sealed class DatabaseBackedSecurityVersionResolver : ISecurityVersionReso
             }
         }
 
-        // PropX: the miss is answered from the database and the key is rewritten.
+        // The miss is answered from the database and the key is rewritten.
         var version = await services.GetRequiredService<IdentityDbContext>().UserAccounts
             .IgnoreQueryFilters([QueryFilterNames.Tenant])
             .AsNoTracking()

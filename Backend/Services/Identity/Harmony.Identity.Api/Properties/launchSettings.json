@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "PropX.Identity.Backend": {
+    "Harmony.Identity.Api": {
       "commandName": "Project",
       "launchUrl": "api/identity/swagger",
       "environmentVariables": {

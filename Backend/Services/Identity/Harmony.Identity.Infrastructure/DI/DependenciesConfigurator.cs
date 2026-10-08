@@ -287,7 +287,7 @@ public static class DependenciesConfigurator
             .WithMethods("GET", "POST", "PUT", "DELETE")
             .WithExposedHeaders("Retry-After")));
 
-        // PropX: Identity answers a cache miss from its own database and rewrites the key. The framework readers in the
+        // Identity answers a cache miss from its own database and rewrites the key. The framework readers in the
         // other services cannot, so Identity also republishes everything the first time it finds Redis wiped.
         services.Replace(ServiceDescriptor.Scoped<IPlatformPermissionResolver, DatabaseBackedPermissionResolver>());
         services.Replace(ServiceDescriptor.Scoped<ISecurityVersionResolver, DatabaseBackedSecurityVersionResolver>());
@@ -303,7 +303,7 @@ public static class DependenciesConfigurator
     private static void AddUserAccounts(this IServiceCollection services)
     {
         // Fully qualified: Identity's package also has a type named IdentityDbContext.
-        // PropX rules: five wrong passwords in a row lock the account for five minutes. Passwords: 12+ characters with a symbol.
+        // Five wrong passwords in a row lock the account for five minutes. Passwords: 12+ characters with a symbol.
         services.AddIdentityCore<User>(options =>
         {
             options.Lockout.AllowedForNewUsers = true;
@@ -413,7 +413,7 @@ public static class DependenciesConfigurator
         .AddInMemoryClients(IdentityServerResources.Clients(WebOrigins(configuration), bff.Origins, bffPublicKeys))
         // private_key_jwt client authentication (RFC 7523), used by the BFF.
         .AddJwtBearerClientAuthentication()
-        // S5: PropX sign-in rules and token claims, run by Duende on /connect/token.
+        // S5: the sign-in rules and token claims, run by Duende on /connect/token.
         .AddResourceOwnerValidator<HarmonyPasswordValidator>()
         .AddProfileService<HarmonyProfileService>()
         // S5 two-factor: the second half of a sign-in when the account has an authenticator.

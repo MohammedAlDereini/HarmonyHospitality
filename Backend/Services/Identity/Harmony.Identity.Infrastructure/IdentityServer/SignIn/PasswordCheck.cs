@@ -29,7 +29,7 @@ public enum PasswordCheckStatus
 public sealed record PasswordCheckResult(PasswordCheckStatus Status, User? User);
 
 /// <summary>
-/// PropX LoginCommandHandler rules, in one place for every way a person signs in (the sign-in page and, until it is
+/// The sign-in rules, in one place for every way a person signs in (the sign-in page and, until it is
 /// removed, the password grant): the account exists, is Active, is not locked out, and the password matches.
 /// Identity's lockout counts the failures (5 in a row lock the account for 5 minutes). Sign-in runs before any tenant is
 /// known, so the lookup searches every tenant; a tenant id picks the account when the same name exists in several.

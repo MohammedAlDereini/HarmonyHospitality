@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
-/// An admin creates an account the PropX way (User.New + roles). Two ways to give it a password: by default an invitation
+/// An admin creates an account (User.New + roles). Two ways to give it a password: by default an invitation
 /// mail carries a one-time link and the person chooses the password, so nobody else ever knows it; or the admin types an
 /// initial password, and the account is born with MustChangePassword so that password works exactly once. If the invitation
 /// cannot be sent the account is not kept: no half-created person. The email is the user name and is unique inside the
@@ -99,7 +99,7 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
         await this.TrailAsync(user, SecurityAuditActions.AccountCreated, cancellationToken);
         await this.AuditEvents.SaveChangesAsync(cancellationToken);
 
-        // PropX: the cache follows the database at once, so the first token this person gets finds its version.
+        // The cache follows the database at once, so the first token this person gets finds its version.
         await this.PublishSecurityVersionAsync(user, cancellationToken);
         this.logger.LogInformation(
             "Account {UserId} created in tenant {Tenant} with {Roles} role(s); {How}.",
