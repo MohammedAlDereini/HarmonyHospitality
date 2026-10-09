@@ -20,4 +20,10 @@ public interface IUserDeviceRepository : IRepository<UserDevice>
 
     /// <summary>Lets go of a staged, never-saved device (its insert was refused as a duplicate), so the next save ignores it.</summary>
     public void Forget(UserDevice device);
+
+    /// <summary>
+    /// Deletes up to one batch of devices not seen since the cutoff, across every tenant, and returns how many went.
+    /// The next sign-in from a forgotten device warns the person again, which is the point.
+    /// </summary>
+    public Task<int> DeleteUnseenSinceAsync(DateTimeOffset cutoffUtc, int batchSize, CancellationToken cancellationToken);
 }

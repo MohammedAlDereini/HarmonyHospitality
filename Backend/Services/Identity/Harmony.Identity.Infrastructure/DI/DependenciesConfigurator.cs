@@ -13,6 +13,7 @@ using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Services;
 using Harmony.Identity.Infrastructure.Caching;
+using Harmony.Identity.Infrastructure.BackgroundServices.DataRetention;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
@@ -241,6 +242,15 @@ public static class DependenciesConfigurator
             .Bind(configuration.GetSection(RateLimitSettings.Section))
             .Validate(RateLimitSettings.IsValid, $"{RateLimitSettings.Section}: every limit must be 1 or more, and WindowMinutes 1 to 60.")
             .ValidateOnStart();
+
+        // G1: the data retention periods and the nightly background cleanup that enforces them - the same
+        // hosted-job shape as Duende's token cleanup below. The section is optional: the defaults are the legal floor.
+        services.AddOptions<DataRetentionSettings>()
+            .Bind(configuration.GetSection(DataRetentionSettings.Section))
+            .Validate(DataRetentionSettings.IsValid, $"{DataRetentionSettings.Section}: SecurityTrailMonths 12 to 120, UnseenDeviceDays 30 to 400, CleanupHourUtc 0 to 23, StartDelaySeconds 5 to 3600, DeleteBatchSize 100 to 50000.")
+            .ValidateOnStart();
+        services.TryAddScoped<IDataRetentionCleanupService, DataRetentionCleanupService>();
+        services.AddHostedService<DataRetentionBackgroundService>();
 
         // Item 5: the real caller address (X-Forwarded-For), believed only from the front doors the settings list.
         services.AddOptions<TrustedProxySettings>()

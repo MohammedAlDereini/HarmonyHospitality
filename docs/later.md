@@ -788,3 +788,21 @@ Collected for the tenant ticket (00070–00073); evidence in the session notes.
   middle floor, Opera is the model; Mews proves it can wait.
 - Nice-to-have seen at Mews: a security score (Low→Very high) driven by the SHARE of admins (6+ in a small property or
   >30% = Low), exceptions count, passkeys and SSO — a cheap, honest admin-dashboard idea for much later.
+
+---
+
+## L21. The trail's storage ladder (when the table grows heavy)
+
+**Parked:** 2026-10-09, with G1. The trail stays ONE table with the Action column (the Entra/Windows/Opera layout:
+same shape = same table, the event type is a value; a new table only for a new SHAPE, as UserDevices already is).
+G1's sweep caps it at 12 months of rows. When that is still too heavy, climb one rung at a time:
+
+1. **Month drawers** — SQL Server table partitioning by OccurredAtUtc (every edition since 2016 SP1). One code-first
+   migration carrying the raw SQL (partition function + scheme + clustered index on (OccurredAtUtc, Id)); the sweep
+   swaps batched DELETE for SPLIT + TRUNCATE of whole partitions. The app never notices. Trap: every index must carry
+   the date column.
+2. **Tenant shards** — a database per tenant (or group), the whole service's scaling rung, decided in the tenant era;
+   the tenant filter already hides tenancy from the handlers, which is what makes this possible without rewriting them.
+3. **Export** — the Microsoft way at Microsoft scale: Entra keeps sign-in logs 30 days and exports the rest (Log
+   Analytics + storage with lifecycle rules). Ours: a short hot window in the DB, old months shipped to cheap files.
+   The card rules bless it: 3 months immediately available, 12 retained anywhere.

@@ -40,4 +40,14 @@ public class UserDeviceRepository : BaseRepository<UserDevice>, IUserDeviceRepos
     {
         this.context.Entry(device).State = EntityState.Detached;
     }
+
+    public async Task<int> DeleteUnseenSinceAsync(DateTimeOffset cutoffUtc, int batchSize, CancellationToken cancellationToken)
+    {
+        // The cleanup serves every tenant, so the tenant filter is lifted - or the job would happily delete nothing.
+        return await this.context.UserDevices
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .Where(d => d.LastSeenUtc < cutoffUtc)
+            .Take(batchSize)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
 }
