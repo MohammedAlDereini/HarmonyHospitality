@@ -69,7 +69,7 @@ export async function revoke(refreshToken: string): Promise<void> {
   }).catch(() => undefined)
 }
 
-async function apiCall<T>(method: Method, path: string, body?: unknown, accessToken?: string): Promise<ApiResult<T>> {
+async function apiCall<T>(method: Method, path: string, body?: unknown, accessToken?: string, receipt?: string): Promise<ApiResult<T>> {
   let response: Response
   try {
     response = await fetch(`${base}${path}`, {
@@ -77,6 +77,7 @@ async function apiCall<T>(method: Method, path: string, body?: unknown, accessTo
       headers: {
         ...(method === 'GET' ? {} : { 'Content-Type': 'application/json' }),
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        ...(receipt ? { 'Idempotency-Key': receipt } : {}),
       },
       ...(method === 'GET' ? {} : { body: JSON.stringify(body ?? {}) }),
     })
@@ -96,7 +97,10 @@ async function apiCall<T>(method: Method, path: string, body?: unknown, accessTo
 export async function authCall<T>(method: Method, path: string, body?: unknown): Promise<ApiResult<T>> {
   const tokens = getTokens()
   if (!tokens) return { ok: false, status: 401, codes: [sessionExpired] }
-  let result = await apiCall<T>(method, path, body, tokens.access_token)
+  // One receipt per user action, reused if this call is retried after a token refresh: the server runs the
+  // action once and replays the same answer to the retry.
+  const receipt = method === 'GET' ? undefined : crypto.randomUUID()
+  let result = await apiCall<T>(method, path, body, tokens.access_token, receipt)
   if (result.status !== 401) return result
   const renewed = await refresh(tokens.refresh_token)
   if (renewed.kind !== 'ok') {
@@ -104,7 +108,7 @@ export async function authCall<T>(method: Method, path: string, body?: unknown):
     return { ok: false, status: 401, codes: [sessionExpired] }
   }
   setTokens(renewed.tokens)
-  result = await apiCall<T>(method, path, body, renewed.tokens.access_token)
+  result = await apiCall<T>(method, path, body, renewed.tokens.access_token, receipt)
   if (result.status === 401) {
     clearSession()
     return { ok: false, status: 401, codes: [sessionExpired] }

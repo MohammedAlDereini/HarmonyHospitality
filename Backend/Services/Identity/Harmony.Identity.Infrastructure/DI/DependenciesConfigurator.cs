@@ -173,6 +173,8 @@ public static class DependenciesConfigurator
             config.AddRedisCache();
             config.AddRedisDistributedLock();
             config.AddMemoryWithRedisInvalidatorCache();
+            // The receipt gate's store. A write that carries a receipt runs once; its repeats replay the answer.
+            config.AddReceiptStore();
         });
     }
 

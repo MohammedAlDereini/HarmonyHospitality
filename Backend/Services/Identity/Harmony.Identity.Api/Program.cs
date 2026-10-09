@@ -1,5 +1,6 @@
 using Duende.IdentityServer.EntityFramework.DbContexts;
 using Harmony.Core.BuildingBlocks;
+using Harmony.Core.Middlewares.Receipts;
 using Harmony.Identity.Api.Checks;
 using Harmony.Identity.Handler.DI;
 using Harmony.Identity.Infrastructure.Caching;
@@ -114,6 +115,10 @@ public partial class Program
             app.UseMiddleware<TokenDoorLimiter>();
 
             app.ConfigureAppLogging();
+
+            // The receipt gate: after authentication (receipts are per signed-in user), before the API endpoints.
+            // A write carrying an Idempotency-Key runs once; a resent copy gets the same answer back.
+            app.UseReceiptGate();
             app.MapControllers();
 
             // wwwroot (the sign-in pages' stylesheet), fingerprinted and compressed at build time. Open to anyone: it holds nothing secret.

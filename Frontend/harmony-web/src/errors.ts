@@ -8,6 +8,8 @@ const messages: Record<string, string> = {
   session_expired: 'Your session has ended. Sign in again.',
   forbidden: 'Your role does not allow this.',
   '000.4': 'Your role does not allow this.',
+  '000.06': 'Your last try is still being processed. Give it a second, then try again.',
+  '000.07': 'This was already sent as a different action. Reload the page and try again.',
 
   // Duende token endpoint
   invalid_credentials: 'Wrong e-mail or password.',
