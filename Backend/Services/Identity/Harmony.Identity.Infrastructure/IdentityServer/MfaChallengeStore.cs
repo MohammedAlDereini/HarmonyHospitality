@@ -14,7 +14,11 @@ public sealed class MfaChallengeStore
 {
     public static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
 
+    /// <summary>How long a completed challenge still answers its own doubled send; longer than any straggler copy.</summary>
+    public static readonly TimeSpan DoneLifetime = TimeSpan.FromSeconds(60);
+
     private const string KeyPrefix = "identity:mfa:";
+    private const string DoneKeyPrefix = "identity:mfa-done:";
     private const int ChallengeLength = 43; // 32 bytes, base64url, no padding
 
     private readonly ICache<Harmony.Core.Cache.Providers.Redis> cache;
@@ -51,5 +55,26 @@ public sealed class MfaChallengeStore
     public async Task ConsumeAsync(string challenge, CancellationToken cancellationToken)
     {
         await this.cache.DeleteAsync(KeyPrefix + challenge, eCacheAccessLevel.Public, cancellationToken);
+    }
+
+    /// <summary>
+    /// Remembers, briefly, that this challenge completed its sign-in and for whom. A failed write only costs smoothness:
+    /// the doubled send would start the sign-in again instead of walking through.
+    /// </summary>
+    public async Task MarkDoneAsync(string challenge, Guid userId, CancellationToken cancellationToken)
+    {
+        _ = await this.cache.SaveAsync(DoneKeyPrefix + challenge, userId.ToString("D"), DoneLifetime, eCacheAccessLevel.Public, cancellationToken);
+    }
+
+    /// <summary>The account whose sign-in this challenge already completed a moment ago, or null.</summary>
+    public async Task<Guid?> DoneUserAsync(string? challenge, CancellationToken cancellationToken)
+    {
+        if (challenge is null || challenge.Length != ChallengeLength)
+        {
+            return null;
+        }
+
+        var response = await this.cache.GetAsync<string>(DoneKeyPrefix + challenge, eCacheAccessLevel.Public, cancellationToken);
+        return Guid.TryParse(response?.Value, out var userId) ? userId : null;
     }
 }

@@ -77,6 +77,9 @@ public sealed class LoginModel : PageModel
             return this.RedirectToPage("Error");
         }
 
+        // The device key is named with the page, before any send: both copies of a doubled send then carry the same key.
+        SignInSession.EnsureDeviceKey(this.HttpContext);
+
         this.ForgotPasswordUrl = ForgotPasswordOf(request);
         this.Error = notice == TimedOut ? "The sign-in step timed out. Start again." : null;
         return this.Page();

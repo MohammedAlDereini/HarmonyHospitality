@@ -17,4 +17,7 @@ public interface IUserDeviceRepository : IRepository<UserDevice>
 
     /// <summary>The devices of the caller's tenant, read-only, to be joined with the account in one query.</summary>
     public IQueryable<UserDevice> Query();
+
+    /// <summary>Lets go of a staged, never-saved device (its insert was refused as a duplicate), so the next save ignores it.</summary>
+    public void Forget(UserDevice device);
 }

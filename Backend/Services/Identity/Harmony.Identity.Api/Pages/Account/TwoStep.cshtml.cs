@@ -93,6 +93,14 @@ public sealed class TwoStepModel : PageModel
             return this.Redirect(this.ReturnUrl!);
         }
 
+        if (result.Status == SecondFactorStatus.AlreadyAccepted)
+        {
+            // The doubled send of a sign-in this browser just finished: walk it through, and record nothing twice.
+            SignInSession.ReleaseSecondStep(this.Response);
+            await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");
+            return this.Redirect(this.ReturnUrl!);
+        }
+
         if (result.Status == SecondFactorStatus.ChallengeInvalid)
         {
             return this.StartAgain();

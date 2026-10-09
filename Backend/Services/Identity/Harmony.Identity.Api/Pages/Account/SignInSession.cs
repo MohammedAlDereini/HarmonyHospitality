@@ -43,11 +43,14 @@ internal static class SignInSession
         await http.SignInAsync(person, new AuthenticationProperties { IsPersistent = false });
 
         var session = await http.RequestServices.GetRequiredService<IUserSession>().GetSessionIdAsync(http.RequestAborted);
-        return new SignedIn(session, DeviceKey(http));
+        return new SignedIn(session, EnsureDeviceKey(http));
     }
 
-    /// <summary>This browser's device key: the one in its cookie, or a new random one, set in the cookie now.</summary>
-    private static string DeviceKey(HttpContext http)
+    /// <summary>
+    /// This browser's device key: the one in its cookie, or a new random one, set in the cookie now. The login page calls
+    /// this when it OPENS, so a send that reaches the server twice carries one key, and the device is remembered once.
+    /// </summary>
+    internal static string EnsureDeviceKey(HttpContext http)
     {
         var key = http.Request.Cookies[DeviceCookie];
         if (key is { Length: RecordSignInCommandHandler.DeviceKeyLength })

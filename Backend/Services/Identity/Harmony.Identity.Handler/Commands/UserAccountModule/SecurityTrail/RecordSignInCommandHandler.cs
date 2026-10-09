@@ -1,5 +1,6 @@
 namespace Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 
+using Harmony.Core.Exceptions;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
@@ -51,18 +52,33 @@ public class RecordSignInCommandHandler : IRequestHandler<RecordSignInCommand, C
         var label = row.Device ?? UnknownDevice;
         var hash = UserDevice.HashOf(command.DeviceKey);
         var device = await this.devices.FindByKeyAsync(user.Id, hash, cancellationToken);
-        if (device is null)
+        var fresh = device is null ? UserDevice.First(user.TenantId, user.Id, hash, label, row.SourceAddress, command.SessionId, row.OccurredAtUtc) : null;
+        if (fresh is not null)
         {
-            await this.devices.AddAsync(UserDevice.First(user.TenantId, user.Id, hash, label, row.SourceAddress, command.SessionId, row.OccurredAtUtc), cancellationToken);
+            await this.devices.AddAsync(fresh, cancellationToken);
         }
         else
         {
-            device.SeenAgain(label, row.SourceAddress, command.SessionId, row.OccurredAtUtc);
+            device!.SeenAgain(label, row.SourceAddress, command.SessionId, row.OccurredAtUtc);
         }
 
-        await this.devices.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await this.devices.SaveChangesAsync(cancellationToken);
+        }
+        catch (BusinessException exception) when (fresh is not null && exception.Errors.Any(e => e.Code == "Conflict"))
+        {
+            // The same sign-in reached us twice and the other copy saved this device first (the unique index said no).
+            // The device exists now, which is all this copy wanted: let go of our unsaved row, mark the saved one seen
+            // again, and keep this copy's trail row. One device, one e-mail, no error for the person.
+            this.devices.Forget(fresh);
+            device = await this.devices.FindByKeyAsync(user.Id, hash, cancellationToken)
+                ?? throw new InvalidOperationException("The device vanished right after its duplicate was refused.");
+            device.SeenAgain(label, row.SourceAddress, command.SessionId, row.OccurredAtUtc);
+            await this.devices.SaveChangesAsync(cancellationToken);
+        }
 
-        if (device is null)
+        if (fresh is not null && device is null)
         {
             this.logger.LogInformation("Account {UserId} signed in from a new device ({Device}); the person is told.", user.Id, label);
             await this.mailer.SendNewDeviceAlertAsync(user, label, row.SourceAddress, row.OccurredAtUtc, cancellationToken);

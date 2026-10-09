@@ -35,4 +35,9 @@ public class UserDeviceRepository : BaseRepository<UserDevice>, IUserDeviceRepos
     {
         return this.context.UserDevices.AsNoTracking();
     }
+
+    public void Forget(UserDevice device)
+    {
+        this.context.Entry(device).State = EntityState.Detached;
+    }
 }

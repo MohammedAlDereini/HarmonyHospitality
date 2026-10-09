@@ -39,6 +39,8 @@ public sealed class MfaOtpGrantValidator : IExtensionGrantValidator
         context.Result = result.Status switch
         {
             SecondFactorStatus.OneProofRequired => new GrantValidationResult(TokenRequestErrors.InvalidRequest, OneCodeRequired),
+            // The old grant stays strict: a completed challenge never earns a second token answer.
+            SecondFactorStatus.AlreadyAccepted => new GrantValidationResult(TokenRequestErrors.InvalidGrant, MfaTokenInvalid),
             SecondFactorStatus.ChallengeInvalid => new GrantValidationResult(TokenRequestErrors.InvalidGrant, MfaTokenInvalid),
             SecondFactorStatus.AccountNotActive => new GrantValidationResult(TokenRequestErrors.InvalidGrant, HarmonyPasswordValidator.AccountNotActive),
             SecondFactorStatus.LockedOut => new GrantValidationResult(TokenRequestErrors.InvalidGrant, HarmonyPasswordValidator.LockedOut),

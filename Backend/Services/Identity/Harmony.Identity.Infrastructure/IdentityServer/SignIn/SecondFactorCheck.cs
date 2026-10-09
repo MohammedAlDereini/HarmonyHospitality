@@ -12,6 +12,9 @@ public enum SecondFactorStatus
 {
     Accepted,
 
+    /// <summary>This challenge already completed its sign-in a moment ago: the same browser's doubled send walks through.</summary>
+    AlreadyAccepted,
+
     /// <summary>Neither or both of a code and a recovery code were given: exactly one proof is expected.</summary>
     OneProofRequired,
 
@@ -71,6 +74,17 @@ public sealed class SecondFactorCheck
             return new(SecondFactorStatus.OneProofRequired, null);
         }
 
+        // A doubled send: the first copy finished this exact challenge a moment ago. The same browser (it holds the
+        // challenge) repeating the same sign-in walks through, with no code spent, no wrong try and no false row.
+        if (await this.challenges.DoneUserAsync(challenge, cancellationToken) is Guid doneUserId)
+        {
+            var doneUser = await this.userAccounts.FindByIdAcrossTenantsAsync(doneUserId, cancellationToken);
+            if (doneUser is not null && doneUser.CanSignIn)
+            {
+                return new(SecondFactorStatus.AlreadyAccepted, doneUser);
+            }
+        }
+
         var userId = await this.challenges.PeekAsync(challenge, cancellationToken);
         if (userId is null)
         {
@@ -92,9 +106,35 @@ public sealed class SecondFactorCheck
             return new(SecondFactorStatus.LockedOut, user);
         }
 
-        var accepted = !string.IsNullOrEmpty(otp)
-            ? await this.VerifyOtpAsync(user, otp, cancellationToken)
-            : (await this.userManager.RedeemTwoFactorRecoveryCodeAsync(user, recoveryCode!.Trim())).Succeeded;
+        var accepted = false;
+        if (!string.IsNullOrEmpty(otp))
+        {
+            switch (await this.VerifyOtpAsync(user, otp, cancellationToken))
+            {
+                case OtpOutcome.Accepted:
+                    accepted = true;
+                    break;
+
+                case OtpOutcome.Replayed:
+                    // The other copy of a doubled send claimed this code a moment ago and is still finishing. Wait for
+                    // its done-mark: when it lands, this is the same browser's same sign-in and it walks through. When
+                    // nothing lands, the code really was replayed (another browser, an attacker): refused and counted.
+                    for (var wait = 0; wait < 10; wait++)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
+                        if (await this.challenges.DoneUserAsync(challenge, cancellationToken) == user.Id)
+                        {
+                            return new(SecondFactorStatus.AlreadyAccepted, user);
+                        }
+                    }
+
+                    break;
+            }
+        }
+        else
+        {
+            accepted = (await this.userManager.RedeemTwoFactorRecoveryCodeAsync(user, recoveryCode!.Trim())).Succeeded;
+        }
 
         if (!accepted)
         {
@@ -106,6 +146,7 @@ public sealed class SecondFactorCheck
 
         await this.userManager.ResetAccessFailedCountAsync(user);
         await this.challenges.ConsumeAsync(challenge!, cancellationToken);
+        await this.challenges.MarkDoneAsync(challenge!, user.Id, cancellationToken);
         this.logger.LogInformation("Second factor accepted for account {UserId} in tenant {Tenant}.", user.Id, user.TenantId);
 
         // A backup code is an account recovery: the person is told, so a stolen code that gets used is noticed.
@@ -117,27 +158,40 @@ public sealed class SecondFactorCheck
         return new(SecondFactorStatus.Accepted, user);
     }
 
-    private async Task<bool> VerifyOtpAsync(User user, string otp, CancellationToken cancellationToken)
+    private async Task<OtpOutcome> VerifyOtpAsync(User user, string otp, CancellationToken cancellationToken)
     {
         otp = otp.Trim();
         if (otp.Length != 6 || !otp.All(char.IsAsciiDigit))
         {
-            return false;
+            return OtpOutcome.Wrong;
         }
 
+        // Claiming the code and asking "was it used?" are ONE atomic step (add-if-absent), so two sends can never both
+        // spend one code. The claim comes first; a claim on a guess that then proves wrong only burns that wrong guess.
         var usedKey = UsedCodeKeyPrefix + user.Id.ToString("D") + ":" + otp;
-        if (await this.cache.ExistsAsync(usedKey, eCacheAccessLevel.Public, cancellationToken) == eCacheOperationResult.Success)
+        var claim = await this.cache.AddAsync(usedKey, "1", UsedCodeLifetime, eCacheAccessLevel.Public, cancellationToken);
+        if (claim == eCacheOperationResult.KeyAlreadyExists)
         {
             this.logger.LogWarning("Second factor refused: replayed code for account {UserId}.", user.Id);
-            return false;
+            return OtpOutcome.Replayed;
         }
 
-        if (!await this.userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultAuthenticatorProvider, otp))
+        if (claim != eCacheOperationResult.Success)
         {
-            return false;
+            // The store could not answer: the code is checked without replay protection rather than locking everyone out.
+            this.logger.LogWarning("The used-code store did not answer ({Result}); replay protection is off for this one check.", claim);
         }
 
-        await this.cache.SaveAsync(usedKey, "1", UsedCodeLifetime, eCacheAccessLevel.Public, cancellationToken);
-        return true;
+        return await this.userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultAuthenticatorProvider, otp)
+            ? OtpOutcome.Accepted
+            : OtpOutcome.Wrong;
+    }
+
+    private enum OtpOutcome
+    {
+        Accepted,
+        Wrong,
+        /// <summary>This exact code was already claimed within its window.</summary>
+        Replayed,
     }
 }
