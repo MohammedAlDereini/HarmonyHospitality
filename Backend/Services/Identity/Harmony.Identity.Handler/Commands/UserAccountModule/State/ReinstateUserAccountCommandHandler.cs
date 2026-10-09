@@ -1,5 +1,6 @@
 namespace Harmony.Identity.Handler.Commands.UserAccountModule.State;
 
+using Harmony.Core.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
@@ -8,9 +9,14 @@ using Microsoft.AspNetCore.Identity;
 
 public class ReinstateUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<ReinstateUserAccountCommand, CallResponse>
 {
-    public ReinstateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents)
+    private readonly IUserAccountRepository userAccounts;
+    private readonly ICallContext callContext;
+
+    public ReinstateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserAccountRepository userAccounts, ICallContext callContext)
         : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
+        this.userAccounts = userAccounts;
+        this.callContext = callContext;
     }
 
     public async Task<CallResponse> Handle(ReinstateUserAccountCommand command, CancellationToken cancellationToken)
@@ -19,6 +25,14 @@ public class ReinstateUserAccountCommandHandler : UserAccountCommandHandlerBase,
         if (user is null)
         {
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
+        }
+
+
+        // The rank rule: a target standing above the caller is not theirs to reinstate. (A suspended or terminated
+        // account has no live session, so the caller's-own-account case cannot arise here.)
+        if (await RankRules.OutrankRefusalAsync(this.userAccounts, RankRules.CallerId(this.callContext), user, cancellationToken) is { } refusal)
+        {
+            return Fail(refusal);
         }
 
         // Reinstate kills nothing, so the version stays and nothing is published: the user signs in again.

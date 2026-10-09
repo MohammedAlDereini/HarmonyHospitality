@@ -1,5 +1,7 @@
 namespace Harmony.Identity.Handler.Commands.RoleModule.Permissions;
 
+using Harmony.Core.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
 using Harmony.Core.Identity.Permissions;
@@ -8,12 +10,16 @@ public class UpdateRolePermissionsCommandHandler : IRequestHandler<UpdateRolePer
 {
     private readonly IRoleRepository roles;
     private readonly IPermissionRepository permissions;
+    private readonly IUserAccountRepository userAccounts;
+    private readonly ICallContext callContext;
     private readonly ICacheService cacheService;
 
-    public UpdateRolePermissionsCommandHandler(IRoleRepository roles, IPermissionRepository permissions, ICacheService cacheService)
+    public UpdateRolePermissionsCommandHandler(IRoleRepository roles, IPermissionRepository permissions, IUserAccountRepository userAccounts, ICallContext callContext, ICacheService cacheService)
     {
         this.roles = roles;
         this.permissions = permissions;
+        this.userAccounts = userAccounts;
+        this.callContext = callContext;
         this.cacheService = cacheService;
     }
 
@@ -24,6 +30,13 @@ public class UpdateRolePermissionsCommandHandler : IRequestHandler<UpdateRolePer
         if (role is null)
         {
             return Fail(BusinessErrorCodes.Identity.Role.NotFound);
+        }
+
+        // The rank rule: what a role standing above the caller may do is not the caller's to change.
+        var callerRank = await this.userAccounts.RankOfAsync(RankRules.CallerId(this.callContext), cancellationToken);
+        if (RoleRank.Of(role.PrivilegeLevel, role.IsSuperRole) > callerRank)
+        {
+            return Fail(BusinessErrorCodes.Identity.Rank.HigherRank);
         }
 
         // 2. Every requested permission must exist in this tenant and be active.

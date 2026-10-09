@@ -14,13 +14,15 @@ using Microsoft.Extensions.Logging;
 /// </summary>
 public class EndTwoStepExemptionCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<EndTwoStepExemptionCommand, CallResponse>
 {
+    private readonly IUserAccountRepository userAccounts;
     private readonly ICallContext callContext;
     private readonly IAccountMailer mailer;
     private readonly ILogger<EndTwoStepExemptionCommandHandler> logger;
 
-    public EndTwoStepExemptionCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, ICallContext callContext, IAccountMailer mailer, ILogger<EndTwoStepExemptionCommandHandler> logger)
+    public EndTwoStepExemptionCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserAccountRepository userAccounts, ICallContext callContext, IAccountMailer mailer, ILogger<EndTwoStepExemptionCommandHandler> logger)
         : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
+        this.userAccounts = userAccounts;
         this.callContext = callContext;
         this.mailer = mailer;
         this.logger = logger;
@@ -32,6 +34,13 @@ public class EndTwoStepExemptionCommandHandler : UserAccountCommandHandlerBase, 
         if (user is null)
         {
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
+        }
+
+        // The rank rule: a target standing above the caller is not theirs to touch. The caller's own account is
+        // fine here: ending one's own exemption only raises security.
+        if (await RankRules.OutrankRefusalAsync(this.userAccounts, RankRules.CallerId(this.callContext), user, cancellationToken) is { } refusal)
+        {
+            return Fail(refusal);
         }
 
         if (!user.IsTwoStepExempt)

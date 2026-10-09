@@ -43,6 +43,12 @@ const messages: Record<string, string> = {
   '00074': 'That device is not in the list any more.',
   '00075': 'Too many tries from your network. Wait a minute, then try again. If this keeps happening, tell your administrator.',
 
+  // the rank rules
+  '00076': 'This stands above your rank, so it is not yours to change.',
+  '00077': 'You cannot give a rank above your own.',
+  '00078': 'Not on your own account. Another admin must do this.',
+  '00079': 'This would leave no administrator. Hand the Administrator rank to someone else first.',
+
   // reference data (one set for the ten tables)
   '00055': 'This row no longer exists.',
   '00056': 'A row with this code already exists.',

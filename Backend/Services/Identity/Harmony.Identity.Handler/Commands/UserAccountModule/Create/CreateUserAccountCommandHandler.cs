@@ -1,5 +1,7 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.Create;
 
+using Harmony.Core.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
@@ -17,13 +19,17 @@ using Microsoft.Extensions.Logging;
 public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<CreateUserAccountCommand, CallResponse<Guid>>
 {
     private readonly IRoleRepository roles;
+    private readonly IUserAccountRepository userAccounts;
+    private readonly ICallContext callContext;
     private readonly IAccountMailer mailer;
     private readonly ILogger<CreateUserAccountCommandHandler> logger;
 
-    public CreateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IRoleRepository roles, IAccountMailer mailer, ILogger<CreateUserAccountCommandHandler> logger)
+    public CreateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IRoleRepository roles, IUserAccountRepository userAccounts, ICallContext callContext, IAccountMailer mailer, ILogger<CreateUserAccountCommandHandler> logger)
         : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.roles = roles;
+        this.userAccounts = userAccounts;
+        this.callContext = callContext;
         this.mailer = mailer;
         this.logger = logger;
     }
@@ -41,10 +47,17 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
 
         // Every id must be a role of this tenant; the tenant filter on the query is the wall.
         var wanted = command.RoleIds.Distinct().ToList();
-        var known = await this.roles.Query().CountAsync(r => wanted.Contains(r.Id), cancellationToken);
-        if (known != wanted.Count)
+        var known = await this.roles.Query().Where(r => wanted.Contains(r.Id)).Select(r => new { r.PrivilegeLevel, r.IsSuperRole }).ToListAsync(cancellationToken);
+        if (known.Count != wanted.Count)
         {
             return Fail<Guid>(BusinessErrorCodes.Identity.Role.NotFound);
+        }
+
+        // The rank rule: a new account is born at or below its maker's own rank, never above.
+        var callerRank = await this.userAccounts.RankOfAsync(RankRules.CallerId(this.callContext), cancellationToken);
+        if (known.Any(r => RoleRank.Of(r.PrivilegeLevel, r.IsSuperRole) > callerRank))
+        {
+            return Fail<Guid>(BusinessErrorCodes.Identity.Rank.AboveSelf);
         }
 
         var user = User.Create(command.DisplayName, email, email);

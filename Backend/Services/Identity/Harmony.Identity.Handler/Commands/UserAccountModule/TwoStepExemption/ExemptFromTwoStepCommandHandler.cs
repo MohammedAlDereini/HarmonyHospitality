@@ -42,6 +42,12 @@ public class ExemptFromTwoStepCommandHandler : UserAccountCommandHandlerBase, IR
             return Fail(BusinessErrorCodes.Identity.UserAccount.CannotExemptSelf);
         }
 
+        // The rank rule: a target standing above the caller is not theirs to exempt.
+        if (await RankRules.OutrankRefusalAsync(this.userAccounts, callerId, user, cancellationToken) is { } refusal)
+        {
+            return Fail(refusal);
+        }
+
         if (await this.userAccounts.HoldsPrivilegedRoleAsync(user.Id, cancellationToken))
         {
             return Fail(BusinessErrorCodes.Identity.UserAccount.PrivilegedCannotBeExempt);

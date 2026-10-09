@@ -28,4 +28,16 @@ public interface IUserAccountRepository : IRepository<User>
     /// before any tenant is chosen; such a person always needs two-step, exception list or not.
     /// </summary>
     public Task<bool> HoldsPrivilegedRoleAsync(Guid userId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// The account's rank: the highest privilege level among its roles in the caller's tenant, as a number
+    /// (RoleRank: the super role above every level, no roles at all = 0). An unknown id is simply rank 0.
+    /// </summary>
+    public Task<int> RankOfAsync(Guid userId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// True when every ACTIVE administrator of the tenant stands on this one role: demoting or deleting it
+    /// would leave the tenant with nobody in charge.
+    /// </summary>
+    public Task<bool> SoleAdministratorRoleAsync(Guid roleId, CancellationToken cancellationToken);
 }

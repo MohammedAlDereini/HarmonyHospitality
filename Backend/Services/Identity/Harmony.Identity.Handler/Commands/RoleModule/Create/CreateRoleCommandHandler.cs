@@ -1,5 +1,6 @@
 namespace Harmony.Identity.Handler.Commands.RoleModule.Create;
 
+using Harmony.Core.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
@@ -8,18 +9,29 @@ using Harmony.Core.Identity.Permissions;
 public class CreateRoleCommandHandler : RoleCommandHandlerBase, IRequestHandler<CreateRoleCommand, CallResponse<Guid>>
 {
     private readonly IPermissionRepository permissions;
+    private readonly IUserAccountRepository userAccounts;
+    private readonly ICallContext callContext;
     private readonly ICacheService cacheService;
 
-    public CreateRoleCommandHandler(IRoleRepository roleRepository, IPermissionRepository permissions, ICacheService cacheService)
+    public CreateRoleCommandHandler(IRoleRepository roleRepository, IPermissionRepository permissions, IUserAccountRepository userAccounts, ICallContext callContext, ICacheService cacheService)
         : base(roleRepository)
     {
         this.permissions = permissions;
+        this.userAccounts = userAccounts;
+        this.callContext = callContext;
         this.cacheService = cacheService;
     }
 
     public async Task<CallResponse<Guid>> Handle(CreateRoleCommand command, CancellationToken cancellationToken)
     {
         var role = Role.Create(command.Code, command.NameEn, command.NameAr, command.PrivilegeLevel);
+
+        // The rank rule: nobody builds a role above their own standing.
+        var callerRank = await this.userAccounts.RankOfAsync(RankRules.CallerId(this.callContext), cancellationToken);
+        if (RoleRank.Of(role.PrivilegeLevel, isSuperRole: false) > callerRank)
+        {
+            return CallResponseBuilder.CreateResponse<Guid>(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Rank.AboveSelf));
+        }
 
         if (await this.IsCodeInUseAsync(role.Code, excludeId: null, cancellationToken))
         {

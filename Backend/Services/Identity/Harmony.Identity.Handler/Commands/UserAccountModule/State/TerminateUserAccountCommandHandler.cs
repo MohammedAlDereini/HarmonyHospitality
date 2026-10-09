@@ -1,5 +1,6 @@
 namespace Harmony.Identity.Handler.Commands.UserAccountModule.State;
 
+using Harmony.Core.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
@@ -8,9 +9,14 @@ using Microsoft.AspNetCore.Identity;
 
 public class TerminateUserAccountCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<TerminateUserAccountCommand, CallResponse>
 {
-    public TerminateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents)
+    private readonly IUserAccountRepository userAccounts;
+    private readonly ICallContext callContext;
+
+    public TerminateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserAccountRepository userAccounts, ICallContext callContext)
         : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
+        this.userAccounts = userAccounts;
+        this.callContext = callContext;
     }
 
     public async Task<CallResponse> Handle(TerminateUserAccountCommand command, CancellationToken cancellationToken)
@@ -19,6 +25,13 @@ public class TerminateUserAccountCommandHandler : UserAccountCommandHandlerBase,
         if (user is null)
         {
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
+        }
+
+
+        // The rank rules: an admin door never serves the caller's own account, and never a target standing above the caller.
+        if (await RankRules.RefusalAsync(this.userAccounts, this.callContext, user, cancellationToken) is { } refusal)
+        {
+            return Fail(refusal);
         }
 
         // Terminating twice is a no-op, and so is its trail.

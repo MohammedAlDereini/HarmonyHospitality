@@ -1,5 +1,6 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.TwoFactor;
 
+using Harmony.Core.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
@@ -14,12 +15,16 @@ using Microsoft.Extensions.Logging;
 /// </summary>
 public class ResetTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<ResetTwoFactorCommand, CallResponse>
 {
+    private readonly IUserAccountRepository userAccounts;
+    private readonly ICallContext callContext;
     private readonly IAccountMailer mailer;
     private readonly ILogger<ResetTwoFactorCommandHandler> logger;
 
-    public ResetTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IAccountMailer mailer, ILogger<ResetTwoFactorCommandHandler> logger)
+    public ResetTwoFactorCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserAccountRepository userAccounts, ICallContext callContext, IAccountMailer mailer, ILogger<ResetTwoFactorCommandHandler> logger)
         : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
+        this.userAccounts = userAccounts;
+        this.callContext = callContext;
         this.mailer = mailer;
         this.logger = logger;
     }
@@ -30,6 +35,12 @@ public class ResetTwoFactorCommandHandler : UserAccountCommandHandlerBase, IRequ
         if (user is null)
         {
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
+        }
+
+        // The rank rules first, the state second: an unauthorized caller learns nothing about the account's two-step.
+        if (await RankRules.RefusalAsync(this.userAccounts, this.callContext, user, cancellationToken) is { } refusal)
+        {
+            return Fail(refusal);
         }
 
         if (!user.TwoFactorEnabled)

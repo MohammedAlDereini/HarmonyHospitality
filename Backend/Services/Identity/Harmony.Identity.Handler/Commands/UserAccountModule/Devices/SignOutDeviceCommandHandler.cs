@@ -1,5 +1,6 @@
 namespace Harmony.Identity.Handler.Commands.UserAccountModule.Devices;
 
+using Harmony.Core.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
@@ -14,11 +15,15 @@ using Microsoft.AspNetCore.Identity;
 public class SignOutDeviceCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<SignOutDeviceCommand, CallResponse>
 {
     private readonly IUserDeviceRepository devices;
+    private readonly IUserAccountRepository userAccounts;
+    private readonly ICallContext callContext;
 
-    public SignOutDeviceCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserDeviceRepository devices)
+    public SignOutDeviceCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserDeviceRepository devices, IUserAccountRepository userAccounts, ICallContext callContext)
         : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.devices = devices;
+        this.userAccounts = userAccounts;
+        this.callContext = callContext;
     }
 
     public async Task<CallResponse> Handle(SignOutDeviceCommand command, CancellationToken cancellationToken)
@@ -28,6 +33,12 @@ public class SignOutDeviceCommandHandler : UserAccountCommandHandlerBase, IReque
         if (user is null)
         {
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
+        }
+
+        // The rank rules first, the device second: an unauthorized caller learns nothing about the account's devices.
+        if (await RankRules.RefusalAsync(this.userAccounts, this.callContext, user, cancellationToken) is { } refusal)
+        {
+            return Fail(refusal);
         }
 
         var device = await this.devices.FindAsync(user.Id, command.DeviceId, cancellationToken);

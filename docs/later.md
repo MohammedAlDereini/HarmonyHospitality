@@ -713,5 +713,78 @@ approve it there (Google's "Is it you?", WhatsApp's new device). Yes lets the ne
   minutes, so a cache entry, not a table.
 - Check Mews's own trusted-device behaviour in its docs before designing, and decide who may trust a device (the person,
   or an admin) and for how long.
+- CONFIRMED 2026-10-09 from Mews's own docs ("Securing your Mews Operations user accounts"): a first sign-in from a new
+  device or location is approved through an e-mailed link; the device list lives in account settings and removing one
+  signs it out remotely; the whole feature is off when SSO is enforced. Our design matches.
 
 **Waits for.** The rank rules (C1 + C2) first; then a design pass of its own.
+
+---
+
+## L17. R4 (last administrator, 00079) on the account doors when cross-tenant support arrives
+
+**Parked:** 2026-10-09, with the rank rules.
+
+**Why.** Today R4 lives only on the role doors (Role/Update, Role/Delete), because through the account doors the case
+cannot arise: whoever may suspend, terminate or demote an administrator (R2: equal or higher rank) is an active
+administrator themselves, so one always remains. The one reachable hole was the sole admin lowering or deleting the
+role they stand on — closed with `SoleAdministratorRoleAsync`.
+
+**What changes it.** The day a platform (super) admin can reach INTO a hotel tenant (cross-tenant support tooling),
+that caller is not counted in the tenant's own administrators, so suspending or demoting the tenant's last admin
+becomes reachable. Add the 00079 check to Suspend, Terminate and UpdateRoles in the same ticket that opens
+cross-tenant access.
+
+**Waits for.** The tenant ticket (00070–00073) / platform support access.
+
+---
+
+## L18. Step-up re-authorization for the dangerous moments
+
+**Parked:** 2026-10-09, from the Mews deep-dive.
+
+**Why.** Mews forces a person to verify their identity AGAIN — a live session is not enough — when they add a user,
+download a report with sensitive data, or open areas holding sensitive data ("Securing your Mews Operations user
+accounts"). It is why their all-powerful Admin is survivable: a stolen admin session still cannot quietly add an
+account or pull the guest list.
+
+**Sketch.** A short-lived "recently proved" marker (cache, like the MFA done-mark): the guarded endpoints refuse with
+their own error code unless the caller re-entered their password or code in the last N minutes; the web app catches
+that code and shows the prove-yourself dialog. Guard first: Create user, UpdateRoles, role doors, sensitive exports.
+
+**Waits for.** BFF steps 2–5 (the dialog belongs in the cookie world, not the token door).
+
+---
+
+## L19. Graded enforcement: mask sensitive data instead of refusing
+
+**Parked:** 2026-10-09, from the Mews deep-dive.
+
+**Why.** Since 2024-08-07 Mews lets accounts without two-step still sign in, but masks every customer e-mail and phone
+for them — in screens AND exports — including two-step-exempt accounts. The kiosk can check guests in but can never
+leak the guest list. This composes perfectly with our exception list (L-free today: exempt accounts have full sight).
+
+**Sketch.** One flag on the caller's identity ("reduced sight": no two-step proved on this session), honoured by the
+queries that return personal data. Decide the masked fields per module when the PMS modules exist.
+
+**Waits for.** The first module that serves guest personal data.
+
+---
+
+## L20. Tenant ticket design input (the Mews/Opera multi-property truth, 2026-10-09)
+
+Collected for the tenant ticket (00070–00073); evidence in the session notes.
+
+- Both vendors: the VENDOR builds the top container (Oracle provisions chains/properties; Mews builds the portfolio at
+  onboarding). Ours: the platform super admin creates tenants — already our model.
+- Both vendors: every property/tenant is BORN with its admin (Opera seeds `<CODE>-ADMIN` groups; Mews's first
+  onboarded user is the Admin). Ours: on tenant creation, seed one system role "Administrator" (level Administrator,
+  all permissions, Mews-style) and invite the first admin with it. One seed + one invitation — no hand-made admins.
+- The in-between cases (see a few properties, GM of some, finance across many) are NEVER solved with half-admins at
+  the top: both vendors compose them from below with per-property MEMBERSHIP + a role per membership (Opera's hubs =
+  key 2). Properties inside a tenant should follow the same two-keys shape when they arrive.
+- Group-of-properties admin (chain of groups) exists only in Opera (enterprise → chain → property, an admin group per
+  node, each scoped). Mews has two floors only, and its portfolio admins are all-or-nothing. If Harmony ever needs a
+  middle floor, Opera is the model; Mews proves it can wait.
+- Nice-to-have seen at Mews: a security score (Low→Very high) driven by the SHARE of admins (6+ in a small property or
+  >30% = Low), exceptions count, passkeys and SSO — a cheap, honest admin-dashboard idea for much later.
