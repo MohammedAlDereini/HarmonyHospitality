@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Harmony.Core.BuildingBlocks" Version="*" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Update="applicationSettings.json" CopyToOutputDirectory="PreserveNewest" />
+		<Content Update="applicationSettings.Development.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+</Project>

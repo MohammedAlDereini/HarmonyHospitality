@@ -25,6 +25,9 @@
     <File Path="secrets/web-bff-client-key.public.pem" />
   </Folder>
   <Folder Name="/Backend/" />
+  <Folder Name="/Backend/ApiGateways/">
+    <Project Path="Backend/ApiGateways/Harmony.Web.Bff/Harmony.Web.Bff.csproj" />
+  </Folder>
   <Folder Name="/Backend/Services/" />
   <Folder Name="/Backend/Services/Identity/">
     <Project Path="Backend/Services/Identity/Harmony.Identity.Api/Harmony.Identity.Api.csproj" Id="50e49367-88d3-47d7-ae34-cbe5335b6293" />

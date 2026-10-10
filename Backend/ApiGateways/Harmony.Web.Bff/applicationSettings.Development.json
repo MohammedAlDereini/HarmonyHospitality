@@ -1,0 +1,7 @@
+{
+  "BffSettings": {
+    "Authority": "https://localhost:5000",
+    "ClientPrivateKeyPath": "D:/PMS System/Harmony/secrets/web-bff-client-key.pem",
+    "ApiDestination": "https://localhost:5000"
+  }
+}
