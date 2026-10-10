@@ -1,5 +1,12 @@
+using System.Security.Claims;
 using Harmony.Core.DI;
+using Harmony.Web.Bff.Authentication;
 using Harmony.Web.Bff.Settings;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,8 +21,161 @@ builder.Services.AddOptions<BffSettings>()
     .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24.")
     .ValidateOnStart();
 
+builder.Services.AddSingleton<ClientAssertionFactory>();
+ConfigureAuthentication(builder);
+
+// Deny by default: an endpoint added tomorrow without a thought is BORN protected; the public doors below
+// say AllowAnonymous out loud.
+builder.Services.AddAuthorization(options =>
+    options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+
 var app = builder.Build();
 
-app.MapGet("/healthz", () => Results.Ok(new { status = "alive" }));
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapGet("/healthz", () => Results.Ok(new { status = "alive" })).AllowAnonymous();
+
+// The browser never signs in itself: this door starts the dance and the BFF does the rest (RFC 10017 §6.1).
+// Only a LOCAL path may ride along, or a crafted link could land a fresh sign-in on someone else's site.
+app.MapGet("/bff/login", (string? returnUrl) =>
+    Results.Challenge(
+        new AuthenticationProperties { RedirectUri = LocalPathOnly(returnUrl) },
+        [OpenIdConnectDefaults.AuthenticationScheme])).AllowAnonymous();
+
+// Who am I: the few claims the web app needs to draw itself. Never cached, never a token. The endpoint answers
+// anonymity ITSELF with 401 — a generic challenge here would start an OIDC redirect no fetch() can follow.
+app.MapGet("/bff/user", (ClaimsPrincipal user, HttpContext http) =>
+{
+    http.Response.Headers.CacheControl = "no-store";
+    if (user.Identity?.IsAuthenticated != true)
+    {
+        return Results.Unauthorized();
+    }
+
+    return Results.Json(new
+    {
+        sub = user.FindFirstValue("sub"),
+        name = user.FindFirstValue("name"),
+        roles = user.FindAll("role").Select(claim => claim.Value).ToArray(),
+    });
+}).AllowAnonymous();
 
 await app.RunAsync();
+
+// A path like "/reservations" is welcome; "//evil.example", "https://evil.example" and friends fall back to home.
+static string LocalPathOnly(string? returnUrl)
+    => !string.IsNullOrEmpty(returnUrl) && returnUrl.StartsWith('/') && !returnUrl.StartsWith("//", StringComparison.Ordinal) && !returnUrl.Contains(':')
+        ? returnUrl
+        : "/";
+
+static void ConfigureAuthentication(WebApplicationBuilder builder)
+{
+    builder.Services
+        .AddAuthentication(options =>
+        {
+            // The cookie IS the session; Identity is only ever consulted through the OIDC dance.
+            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+        })
+        .AddCookie(options =>
+        {
+            var settings = builder.Configuration.GetSection(BffSettings.Section).Get<BffSettings>() ?? new BffSettings();
+
+            // RFC 10017 §6.1.3.2: HttpOnly and Secure are MUSTs, SameSite=Strict, Path=/ and the __Host- prefix
+            // are its SHOULDs — all of them taken. The browser itself enforces the prefix's promises.
+            options.Cookie.Name = settings.CookieName;
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.Strict;
+            options.Cookie.Path = "/";
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(settings.SessionIdleMinutes);
+            options.SlidingExpiration = true;
+
+            // The callers are fetch() calls, not page loads: an expired session must answer 401/403,
+            // never a redirect the script cannot follow.
+            options.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
+            };
+            options.Events.OnRedirectToAccessDenied = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return Task.CompletedTask;
+            };
+        })
+        .AddOpenIdConnect(options =>
+        {
+            var settings = builder.Configuration.GetSection(BffSettings.Section).Get<BffSettings>() ?? new BffSettings();
+
+            options.Authority = settings.Authority;
+            options.ClientId = settings.ClientId;
+            options.ResponseType = OpenIdConnectResponseType.Code;
+
+            options.Scope.Clear();
+            foreach (var scope in settings.Scopes)
+            {
+                options.Scope.Add(scope);
+            }
+
+            // Our server advertises PAR, so anything less refuses to run (fail closed); PKCE is on by default.
+            options.PushedAuthorizationBehavior = PushedAuthorizationBehavior.Require;
+            options.RequireHttpsMetadata = true;
+
+            // Tokens ride inside the session ticket; step 2.3 moves the ticket into Redis.
+            options.SaveTokens = true;
+            options.GetClaimsFromUserInfoEndpoint = false;
+
+            // Raw claim names (sub, name, role, sid) — no legacy SOAP renaming; sid is the back-channel logout key.
+            options.MapInboundClaims = false;
+            options.TokenValidationParameters.NameClaimType = "name";
+            options.TokenValidationParameters.RoleClaimType = "role";
+
+            // The handshake's own short-lived cookies, pinned explicitly: always Secure, and SameSite=None on
+            // purpose — the form_post answer arrives as a cross-site POST and must still see them.
+            options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.CorrelationCookie.HttpOnly = true;
+            options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.NonceCookie.HttpOnly = true;
+
+            // A failed or cancelled sign-in (wrong state, lost correlation, Cancel at Identity) is an everyday
+            // event, never a stack trace: log the reason, send the person home.
+            options.Events.OnRemoteFailure = context =>
+            {
+                context.HttpContext.RequestServices
+                    .GetRequiredService<ILogger<Program>>()
+                    .LogWarning("Sign-in could not finish: {Reason}", context.Failure?.Message);
+                context.Response.Redirect("/");
+                context.HandleResponse();
+                return Task.CompletedTask;
+            };
+
+            // private_key_jwt at BOTH moments client authentication happens: pushing the authorization
+            // request (PAR) and redeeming the code. No client secret exists to configure.
+            options.Events.OnPushAuthorization = context =>
+            {
+                var assertions = context.HttpContext.RequestServices.GetRequiredService<ClientAssertionFactory>();
+                context.ProtocolMessage.ClientAssertionType = ClientAssertionFactory.AssertionType;
+                context.ProtocolMessage.ClientAssertion = assertions.Create(settings.Authority);
+                return Task.CompletedTask;
+            };
+            options.Events.OnAuthorizationCodeReceived = context =>
+            {
+                var assertions = context.HttpContext.RequestServices.GetRequiredService<ClientAssertionFactory>();
+                context.TokenEndpointRequest!.ClientAssertionType = ClientAssertionFactory.AssertionType;
+                context.TokenEndpointRequest.ClientAssertion = assertions.Create(settings.Authority);
+                return Task.CompletedTask;
+            };
+
+            if (builder.Environment.IsDevelopment())
+            {
+                // Development only: the local dev certificate is not in every store this host validates against.
+                // Production keeps full certificate validation — this branch cannot be reached outside Development.
+                options.BackchannelHttpHandler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+                };
+            }
+        });
+}
