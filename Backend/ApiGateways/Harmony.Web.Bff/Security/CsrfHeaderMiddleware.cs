@@ -13,13 +13,17 @@ internal sealed class CsrfHeaderMiddleware
     internal const string HeaderName = "x-csrf";
     internal const string HeaderValue = "1";
 
-    /// <summary>Top-level navigations of the sign-in/sign-out walk: no fetch(), so no custom header possible.</summary>
-    private static readonly string[] NavigationPaths =
+    /// <summary>
+    /// Top-level navigations of the sign-in/sign-out walk (no fetch(), so no custom header possible), plus the
+    /// back-channel receiver: Identity's own server POST, guarded by its signed logout_token instead.
+    /// </summary>
+    private static readonly string[] ExemptPaths =
     [
         "/bff/login",
         "/signin-oidc",
         "/signout-callback-oidc",
         "/signout-oidc",
+        "/bff/backchannel-logout",
     ];
 
     private readonly RequestDelegate next;
@@ -30,7 +34,7 @@ internal sealed class CsrfHeaderMiddleware
     {
         var path = context.Request.Path;
         var guarded = (path.StartsWithSegments("/bff") || path.StartsWithSegments("/api"))
-            && !NavigationPaths.Any(navigation => path.StartsWithSegments(navigation));
+            && !ExemptPaths.Any(exempt => path.StartsWithSegments(exempt));
 
         if (guarded)
         {

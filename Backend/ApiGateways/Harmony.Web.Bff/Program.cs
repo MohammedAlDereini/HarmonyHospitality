@@ -169,6 +169,9 @@ app.MapPost("/bff/logout", async (HttpContext http, IHttpClientFactory clients, 
     return Results.Empty;
 }).AllowAnonymous();
 
+// Identity's server-to-server kill switch: no cookie, no browser — the signed logout_token is the whole proof.
+app.MapPost(BackChannelLogout.Path, BackChannelLogout.HandleAsync).AllowAnonymous();
+
 await app.RunAsync();
 
 // The raw Redis connection Data Protection persists its key ring over, from the same settings the cache uses.

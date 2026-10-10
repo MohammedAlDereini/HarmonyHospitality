@@ -26,6 +26,9 @@ public class WebBffSettings
     /// <summary>Front-channel logout: ending a session at Identity also tells the BFF, on its handler's built-in path.</summary>
     public const string FrontChannelLogoutPath = "/signout-oidc";
 
+    /// <summary>Back-channel logout: the reliable kill, server to server — suspend and sign-out-everywhere land here.</summary>
+    public const string BackChannelLogoutPath = "/bff/backchannel-logout";
+
     /// <summary>The BFF's origins, scheme + host + port and nothing after: "https://app.example.com".</summary>
     public string[] Origins { get; set; } = [];
 
