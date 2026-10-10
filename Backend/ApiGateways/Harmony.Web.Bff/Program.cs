@@ -81,6 +81,16 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+// Outside Development the browser is told: HTTPS only for this host, from the first answer on.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+}
+
+// Armor first (no path can forget its headers), then the CSRF wall, then who-you-are.
+app.UseMiddleware<Harmony.Web.Bff.Security.SecurityHeadersMiddleware>();
+app.UseMiddleware<Harmony.Web.Bff.Security.CsrfHeaderMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -112,19 +122,14 @@ app.MapGet("/bff/user", (ClaimsPrincipal user, HttpContext http) =>
     });
 }).AllowAnonymous();
 
-// Signing out is state-changing, so it is a POST and carries the CSRF header (2.5 makes that header a wall for
-// everything; this door refuses without it from birth). The refresh token is revoked FIRST — after this call,
-// nothing the BFF ever held can mint another token — then the local session dies, then Identity's.
+// Signing out is state-changing, so it is a POST behind the CSRF wall like every /bff call. The refresh token is
+// revoked FIRST — after this call, nothing the BFF ever held can mint another token — then the local session
+// dies, then Identity's.
 app.MapPost("/bff/logout", async (HttpContext http, IHttpClientFactory clients, ClientAssertionFactory assertions, IOptions<BffSettings> bff, IOptionsMonitor<OpenIdConnectOptions> oidc, ILogger<Program> logger) =>
 {
     if (http.User.Identity?.IsAuthenticated != true)
     {
         return Results.Unauthorized();
-    }
-
-    if (http.Request.Headers["x-csrf"] != "1")
-    {
-        return Results.BadRequest();
     }
 
     var refreshToken = await http.GetTokenAsync("refresh_token");
@@ -253,6 +258,11 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
             options.MapInboundClaims = false;
             options.TokenValidationParameters.NameClaimType = "name";
             options.TokenValidationParameters.RoleClaimType = "role";
+
+            // Front-channel logout (the handler's built-in /signout-oidc receiver, sid+iss checked against THIS
+            // session) is BEST-EFFORT ONLY: it runs in an iframe on Identity's logout page, and browsers that
+            // block third-party cookies may never send our session cookie there. The reliable kill is the
+            // back-channel receiver (2.6) and the refresh refusal — never lean on front-channel alone.
 
             // The session's birth moment, for the absolute cap: however lively, no cookie outlives its shift.
             options.Events.OnTokenValidated = context =>

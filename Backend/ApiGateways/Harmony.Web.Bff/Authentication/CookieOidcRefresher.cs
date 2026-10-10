@@ -148,6 +148,16 @@ internal sealed class CookieOidcRefresher
                 return;
             }
 
+            // OpenID Connect Core §12.2: a refreshed id_token MUST speak of the SAME person. A different sub is
+            // not a quirk, it is an account-swap — the session ends before any token or claim is touched.
+            var refreshedSub = result.ClaimsIdentity.FindFirst("sub")?.Value;
+            if (!string.Equals(refreshedSub, context.Principal?.FindFirstValue("sub"), StringComparison.Ordinal))
+            {
+                this.logger.LogWarning("A refresh answered with an id_token for a DIFFERENT subject; the session ends.");
+                context.RejectPrincipal();
+                return;
+            }
+
             context.ReplacePrincipal(new ClaimsPrincipal(result.ClaimsIdentity));
             _ = context.Properties.UpdateTokenValue("id_token", payload.IdToken);
         }

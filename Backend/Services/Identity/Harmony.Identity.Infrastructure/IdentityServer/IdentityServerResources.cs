@@ -113,8 +113,9 @@ public static class IdentityServerResources
             RedirectUris = [.. bffOrigins.Select(origin => origin + WebBffSettings.RedirectPath)],
             PostLogoutRedirectUris = [.. bffOrigins.Select(origin => origin + WebBffSettings.PostLogoutRedirectPath)],
 
-            // Ending a session here tells the BFF too (the sid rides along); its handler listens on this path by default.
-            FrontChannelLogoutUri = bffOrigins.First() + WebBffSettings.FrontChannelLogoutPath,
+            // Ending a session here tells the BFF too (the sid rides along); its handler listens on this path by
+            // default. Never throw here on an empty list: startup validation refuses it with the NAMED message.
+            FrontChannelLogoutUri = bffOrigins.Count > 0 ? bffOrigins.First() + WebBffSettings.FrontChannelLogoutPath : null,
 
             // A server-side client: no browser calls Identity's endpoints for it, so no CORS origin.
             AllowedCorsOrigins = [],
