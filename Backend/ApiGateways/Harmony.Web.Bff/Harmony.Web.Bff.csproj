@@ -8,7 +8,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Harmony.Core.BuildingBlocks" Version="*" />
+		<PackageReference Include="Harmony.Core.Cache" Version="*" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.12" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="10.0.12" />
 	</ItemGroup>
 
 	<ItemGroup>

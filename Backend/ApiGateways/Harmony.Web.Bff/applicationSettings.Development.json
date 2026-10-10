@@ -3,5 +3,36 @@
     "Authority": "https://localhost:5000",
     "ClientPrivateKeyPath": "D:/PMS System/Harmony/secrets/web-bff-client-key.pem",
     "ApiDestination": "https://localhost:5000"
+  },
+  "DataProtectionSettings": {
+    "CertificatePath": "D:/PMS System/Harmony/secrets/identity-dataprotection.pem"
+  },
+  "CacheSettings": {
+    "CacheProviders": {
+      "Redis": {
+        "Connection": "localhost",
+        "Port": 6379,
+        "User": "webbff",
+        "Password": "kXp2WrB8NfTqL5zYhJ3cVdMG9jRuAE6D",
+        "AllowAdmin": false,
+        "Ssl": false,
+        "DistributedLockMode": "RedLock"
+      }
+    },
+    "InterceptionSettings": {
+      "CachingEnabled": false,
+      "DefaultCacheProvider": "Redis",
+      "DefaultCacheAccessLevel": "Private",
+      "CachingMethods": [
+        {
+          "TypeName": "",
+          "CacheProvider": "Memory",
+          "Name": "",
+          "ExpiryInMinutes": 0,
+          "Enabled": false,
+          "CacheAccessLevel": null
+        }
+      ]
+    }
   }
 }

@@ -1,12 +1,17 @@
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using Harmony.Core.DI;
 using Harmony.Web.Bff.Authentication;
+using Harmony.Web.Bff.Sessions;
 using Harmony.Web.Bff.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +26,53 @@ builder.Services.AddOptions<BffSettings>()
     .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24.")
     .ValidateOnStart();
 
+// The shared fabric this host stands on: the framework core (AppInfo names every Redis key "webbff", the call
+// context the lock manager leans on), the Redis cache that holds the sessions, and the distributed lock that
+// makes token refresh single-flight.
+Harmony.Core.DI.DependenciesConfigurator.AddCore(builder.Services, builder.Configuration, core =>
+    core.AddAppInfo(app =>
+    {
+        app.Name = "WebBff";
+        app.Title = "Harmony.Web.Bff";
+        app.Description = "Harmony web BFF";
+    }));
+Harmony.Core.Cache.DI.DependenciesConfigurator.AddCache(builder.Services, builder.Configuration, cache =>
+{
+    cache.AddRedisCache();
+    cache.AddRedisDistributedLock();
+});
+
+// The key ring lives in Redis (restarts and sibling instances share it) and only this certificate opens it;
+// the application name keeps this host's keys apart from every other service for good.
+var dataProtectionSettings = builder.Configuration.GetSection(DataProtectionSettings.Section).Get<DataProtectionSettings>() ?? new DataProtectionSettings();
+if (!DataProtectionSettings.IsValid(dataProtectionSettings))
+{
+    throw new InvalidOperationException($"{DataProtectionSettings.Section}: CertificatePath must name an existing PEM file holding the certificate and its key.");
+}
+
+builder.Services.AddDataProtection()
+    .SetApplicationName("Harmony.Web.Bff")
+    .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(RedisConnection(builder.Configuration)), "Global:webbff:dataprotection-keys")
+    .ProtectKeysWithCertificate(X509Certificate2.CreateFromPemFile(dataProtectionSettings.CertificatePath));
+
 builder.Services.AddSingleton<ClientAssertionFactory>();
+builder.Services.AddSingleton<RedisTicketStore>();
+builder.Services.AddSingleton<CookieOidcRefresher>();
 ConfigureAuthentication(builder);
+
+// The session body lives in Redis and the cookie carries only its key; every request passes the refresher:
+// the absolute cap first, then a silent token refresh when the access token nears its end.
+builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
+    .Configure<RedisTicketStore, CookieOidcRefresher>((options, store, refresher) =>
+    {
+        options.SessionStore = store;
+        options.Events.OnValidatePrincipal = refresher.ValidateAsync;
+    });
+
+builder.Services.AddHttpClient(CookieOidcRefresher.BackchannelClientName).ConfigurePrimaryHttpMessageHandler(() =>
+    builder.Environment.IsDevelopment()
+        ? new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
+        : new HttpClientHandler());
 
 // Deny by default: an endpoint added tomorrow without a thought is BORN protected; the public doors below
 // say AllowAnonymous out loud.
@@ -62,6 +112,20 @@ app.MapGet("/bff/user", (ClaimsPrincipal user, HttpContext http) =>
 }).AllowAnonymous();
 
 await app.RunAsync();
+
+// The raw Redis connection Data Protection persists its key ring over, from the same settings the cache uses.
+static ConfigurationOptions RedisConnection(IConfiguration configuration)
+{
+    var redis = configuration.GetSection("CacheSettings:CacheProviders:Redis");
+    var options = new ConfigurationOptions
+    {
+        User = redis["User"],
+        Password = redis["Password"],
+        Ssl = bool.TryParse(redis["Ssl"], out var ssl) && ssl,
+    };
+    options.EndPoints.Add($"{redis["Connection"]}:{redis["Port"]}");
+    return options;
+}
 
 // A path like "/reservations" is welcome; "//evil.example", "https://evil.example" and friends fall back to home.
 static string LocalPathOnly(string? returnUrl)
@@ -131,6 +195,13 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
             options.MapInboundClaims = false;
             options.TokenValidationParameters.NameClaimType = "name";
             options.TokenValidationParameters.RoleClaimType = "role";
+
+            // The session's birth moment, for the absolute cap: however lively, no cookie outlives its shift.
+            options.Events.OnTokenValidated = context =>
+            {
+                context.Properties!.SetString(CookieOidcRefresher.SessionStartedKey, DateTimeOffset.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture));
+                return Task.CompletedTask;
+            };
 
             // The handshake's own short-lived cookies, pinned explicitly: always Secure, and SameSite=None on
             // purpose — the form_post answer arrives as a cross-site POST and must still see them.
