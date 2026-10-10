@@ -33,6 +33,9 @@
     "PreviousCertificatePaths": []
   },
   "IdentitySettings": {
+    "TrustedProxies": {
+      "Addresses": [ "127.0.0.1", "::1" ]
+    },
     "WebBff": {
       "Origins": [ "https://localhost:5173" ],
       "ClientPublicKeyPath": "D:/PMS System/Harmony/secrets/web-bff-client-key.public.pem",

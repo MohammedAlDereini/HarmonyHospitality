@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using Harmony.Core.DI;
@@ -12,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using StackExchange.Redis;
+using Yarp.ReverseProxy.Configuration;
+using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,6 +81,58 @@ builder.Services.AddHttpClient(CookieOidcRefresher.BackchannelClientName).Config
 // say AllowAnonymous out loud.
 builder.Services.AddAuthorization(options =>
     options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+
+// The ONE proxied door: /api/{**} to the platform API, nothing else. The route says "anonymous" OUT LOUD
+// because proxy routes fall under the fallback policy like every endpoint — without it, deny-by-default
+// would 401 the API's anonymous doors before the API could answer. The API stays the authority:
+// protected doors demand the Bearer token this BFF attaches only when a session exists.
+var bffSettings = builder.Configuration.GetSection(BffSettings.Section).Get<BffSettings>() ?? new BffSettings();
+builder.Services.AddReverseProxy()
+    .LoadFromMemory(
+        [
+            new RouteConfig
+            {
+                RouteId = "api",
+                ClusterId = "api",
+                Match = new RouteMatch { Path = "/api/{**rest}" },
+                AuthorizationPolicy = "anonymous",
+            },
+        ],
+        [
+            new ClusterConfig
+            {
+                ClusterId = "api",
+                Destinations = new Dictionary<string, DestinationConfig>
+                {
+                    ["api"] = new() { Address = bffSettings.ApiDestination },
+                },
+                HttpClient = builder.Environment.IsDevelopment()
+                    // Development only: the local dev certificate; production keeps full validation.
+                    ? new HttpClientConfig { DangerousAcceptAnyServerCertificate = true }
+                    : null,
+            },
+        ])
+    .AddTransforms(transforms =>
+    {
+        // X-Forwarded-For REPLACED, never appended: a caller writing its own header lies to nobody,
+        // and the trail's SourceAddress downstream records the truth.
+        transforms.AddXForwarded(ForwardedTransformActions.Set);
+
+        // The session cookie and the CSRF header are OUR protocol with the browser; the API never sees them.
+        transforms.AddRequestHeaderRemove("Cookie");
+        transforms.AddRequestHeaderRemove(Harmony.Web.Bff.Security.CsrfHeaderMiddleware.HeaderName);
+
+        // The whole point of the BFF: the browser holds a cookie, the API receives a Bearer token — attached
+        // only when a session exists, already refreshed by the cookie refresher on this very request.
+        transforms.AddRequestTransform(async context =>
+        {
+            var accessToken = await context.HttpContext.GetTokenAsync("access_token");
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                context.ProxyRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            }
+        });
+    });
 
 var app = builder.Build();
 
@@ -171,6 +226,14 @@ app.MapPost("/bff/logout", async (HttpContext http, IHttpClientFactory clients, 
 
 // Identity's server-to-server kill switch: no cookie, no browser — the signed logout_token is the whole proof.
 app.MapPost(BackChannelLogout.Path, BackChannelLogout.HandleAsync).AllowAnonymous();
+
+// Mapped last: every named /bff door above answers first; everything /api flows through the allow-list.
+app.MapReverseProxy();
+
+// Any OTHER path is nobody's: a plain 404, said out loud. Without this, the deny-by-default fallback policy
+// CHALLENGES the stranger — a full PAR push and a sign-in redirect for /favicon.ico. Step 4 swaps this door
+// for the web app's static files + SPA fallback in production.
+app.MapFallback(() => Results.NotFound()).AllowAnonymous();
 
 await app.RunAsync();
 

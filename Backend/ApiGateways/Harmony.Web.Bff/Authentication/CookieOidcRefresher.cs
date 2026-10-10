@@ -3,6 +3,7 @@ namespace Harmony.Web.Bff.Authentication;
 using System.Globalization;
 using System.Security.Claims;
 using Harmony.Core.Abstractions;
+using Harmony.Web.Bff.Sessions;
 using Harmony.Web.Bff.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -30,15 +31,17 @@ internal sealed class CookieOidcRefresher
     private readonly IHttpClientFactory httpClients;
     private readonly IOptionsMonitor<OpenIdConnectOptions> oidcOptions;
     private readonly ClientAssertionFactory assertions;
+    private readonly RedisTicketStore store;
     private readonly BffSettings settings;
     private readonly ILogger<CookieOidcRefresher> logger;
 
-    public CookieOidcRefresher(IServiceScopeFactory scopes, IHttpClientFactory httpClients, IOptionsMonitor<OpenIdConnectOptions> oidcOptions, ClientAssertionFactory assertions, IOptions<BffSettings> options, ILogger<CookieOidcRefresher> logger)
+    public CookieOidcRefresher(IServiceScopeFactory scopes, IHttpClientFactory httpClients, IOptionsMonitor<OpenIdConnectOptions> oidcOptions, ClientAssertionFactory assertions, RedisTicketStore store, IOptions<BffSettings> options, ILogger<CookieOidcRefresher> logger)
     {
         this.scopes = scopes;
         this.httpClients = httpClients;
         this.oidcOptions = oidcOptions;
         this.assertions = assertions;
+        this.store = store;
         this.settings = options.Value;
         this.logger = logger;
     }
@@ -50,7 +53,7 @@ internal sealed class CookieOidcRefresher
             && DateTimeOffset.UtcNow - started > TimeSpan.FromHours(this.settings.SessionAbsoluteHours))
         {
             this.logger.LogInformation("A session reached its absolute cap of {Hours} hours and ended.", this.settings.SessionAbsoluteHours);
-            context.RejectPrincipal();
+            await EndSessionAsync(context);
             return;
         }
 
@@ -70,9 +73,11 @@ internal sealed class CookieOidcRefresher
 
         // One refresh per session at a time, across every instance: refresh tokens are one-time-use, and the
         // loser of a doubled request must WAIT and walk on, never spend the same token again.
+        // The framework registers the lock PROVIDER-TYPED (IDistributedLockManager&lt;Redis&gt;, the same way its own
+        // tests resolve it); the bare interface is never in the container — s41's live fire caught exactly that.
         var lockKey = $"refresh:{context.Principal?.FindFirstValue("sub")}:{context.Principal?.FindFirstValue("sid")}";
         using var scope = this.scopes.CreateScope();
-        var locks = scope.ServiceProvider.GetRequiredService<IDistributedLockManager>();
+        var locks = scope.ServiceProvider.GetRequiredService<IDistributedLockManager<Harmony.Core.Cache.Providers.Redis>>();
 
         var first = await locks.AcquireLockAsync(lockKey, TimeSpan.FromSeconds(30), privateCache: false);
         if (!first)
@@ -82,18 +87,75 @@ internal sealed class CookieOidcRefresher
                 await Task.Delay(TimeSpan.FromMilliseconds(250));
             }
 
-            // The winner refreshed while we waited; this request rides on and the next one reads the renewed session.
+            // The winner refreshed while we waited: this request rides on with what the WINNER stored, never
+            // its own stale copy.
+            _ = await this.AdoptStoredAsync(context);
             _ = await locks.UnlockAsync(lockKey, privateCache: false);
             return;
         }
 
         try
         {
+            // Check AFTER taking the lock: a request that loaded its session a moment before another one
+            // rotated the token, and only then won the lock, holds a spent copy — spending it would end the
+            // session for everyone. If the store already moved on, adopt its tokens and refresh nothing.
+            if (await this.AdoptStoredAsync(context))
+            {
+                return;
+            }
+
             await this.RefreshAsync(context, refreshToken);
         }
         finally
         {
             _ = await locks.UnlockAsync(lockKey, privateCache: false);
+        }
+    }
+
+    /// <summary>The store's key for this session, through the sid index the store keeps for back-channel logout.</summary>
+    private async Task<string?> SessionKeyAsync(CookieValidatePrincipalContext context)
+    {
+        var sid = context.Principal?.FindFirstValue("sid");
+        return sid is null ? null : await this.store.SessionKeyBySidAsync(sid, context.HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// When the stored session already carries a NEWER refresh token than this request loaded, take the stored
+    /// principal and tokens and report true; false means this request's copy is the current one.
+    /// </summary>
+    private async Task<bool> AdoptStoredAsync(CookieValidatePrincipalContext context)
+    {
+        var key = await this.SessionKeyAsync(context);
+        var stored = key is null ? null : await this.store.RetrieveAsync(key);
+        var storedRefreshToken = stored?.Properties.GetTokenValue("refresh_token");
+        if (stored is null || string.IsNullOrEmpty(storedRefreshToken) || storedRefreshToken == context.Properties.GetTokenValue("refresh_token"))
+        {
+            return false;
+        }
+
+        context.ReplacePrincipal(stored.Principal);
+        foreach (var name in new[] { "access_token", "refresh_token", "id_token", "expires_at" })
+        {
+            if (stored.Properties.GetTokenValue(name) is string value)
+            {
+                _ = context.Properties.UpdateTokenValue(name, value);
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// The renewed session goes to the store NOW, while the lock is still held. The cookie handler writes it
+    /// again at response time (ShouldRenew), but that moment comes after the lock is released — too late for
+    /// the next request in line, which must already see the rotated token when it takes the lock.
+    /// </summary>
+    private async Task PersistAsync(CookieValidatePrincipalContext context)
+    {
+        var key = await this.SessionKeyAsync(context);
+        if (key is not null)
+        {
+            await this.store.RenewAsync(key, new AuthenticationTicket(context.Principal!, context.Properties, context.Scheme.Name));
         }
     }
 
@@ -118,7 +180,7 @@ internal sealed class CookieOidcRefresher
         {
             // The refresh token is dead: suspended, signed out everywhere, or spent by someone else. So is the session.
             this.logger.LogInformation("A session's refresh was refused ({Status}); the session ends.", (int)response.StatusCode);
-            context.RejectPrincipal();
+            await EndSessionAsync(context);
             return;
         }
 
@@ -144,7 +206,7 @@ internal sealed class CookieOidcRefresher
             if (!result.IsValid)
             {
                 this.logger.LogWarning("A refresh answered with an id_token that did not validate; the session ends.");
-                context.RejectPrincipal();
+                await EndSessionAsync(context);
                 return;
             }
 
@@ -154,7 +216,7 @@ internal sealed class CookieOidcRefresher
             if (!string.Equals(refreshedSub, context.Principal?.FindFirstValue("sub"), StringComparison.Ordinal))
             {
                 this.logger.LogWarning("A refresh answered with an id_token for a DIFFERENT subject; the session ends.");
-                context.RejectPrincipal();
+                await EndSessionAsync(context);
                 return;
             }
 
@@ -169,7 +231,19 @@ internal sealed class CookieOidcRefresher
         }
 
         _ = context.Properties.UpdateTokenValue("expires_at", DateTimeOffset.UtcNow.AddSeconds(payload.ExpiresIn).ToString("o", CultureInfo.InvariantCulture));
+        await this.PersistAsync(context);
         context.ShouldRenew = true;
+    }
+
+    /// <summary>
+    /// Ending a session here means BOTH: reject the principal for this request, and sign the cookie scheme out —
+    /// which is what removes the stored session row (Microsoft's refresher pairs them the same way). Reject alone
+    /// leaves a dead row behind until its own timer; s41 measured exactly that.
+    /// </summary>
+    private static async Task EndSessionAsync(CookieValidatePrincipalContext context)
+    {
+        context.RejectPrincipal();
+        await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
 
     private sealed record RefreshAnswer

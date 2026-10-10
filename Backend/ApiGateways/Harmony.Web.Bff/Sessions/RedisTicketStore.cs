@@ -104,10 +104,19 @@ internal sealed class RedisTicketStore : ITicketStore
     private async Task WriteAsync(string key, AuthenticationTicket ticket)
     {
         var sealedTicket = Convert.ToBase64String(this.protector.Protect(TicketSerializer.Default.Serialize(ticket)));
+        var life = this.LifetimeOf(ticket);
 
         using var scope = this.scopes.CreateScope();
         var cache = scope.ServiceProvider.GetRequiredService<ICache<Providers.Redis>>();
-        _ = await cache.SaveAsync(this.prefix + key, sealedTicket, this.LifetimeOf(ticket), eCacheAccessLevel.Public, CancellationToken.None);
+        _ = await cache.SaveAsync(this.prefix + key, sealedTicket, life, eCacheAccessLevel.Public, CancellationToken.None);
+
+        // Identity's session id points at ours, so a back-channel logout can end exactly this session. Written
+        // on EVERY renewal, not only at sign-in: an index left at its sign-in lifetime would expire before a
+        // long shift's session does, and the logout would then find nothing to end.
+        if (ticket.Principal.FindFirst("sid")?.Value is string sid)
+        {
+            _ = await cache.SaveAsync(this.sidPrefix + sid, key, life, eCacheAccessLevel.Public, CancellationToken.None);
+        }
     }
 
     /// <summary>Redis expires what the cookie outlives: the ticket's own end plus a little grace, never forever.</summary>
