@@ -17,7 +17,7 @@ public sealed class BffSettings
     /// <summary>PEM file holding the EC P-256 PRIVATE key this host signs client assertions with.</summary>
     public string ClientPrivateKeyPath { get; set; } = null!;
 
-    public string[] Scopes { get; set; } = ["openid", "profile", "harmony", "offline_access"];
+    public string[] Scopes { get; set; } = ["openid", "profile", "harmony.profile", "harmony", "offline_access"];
 
     /// <summary>The session cookie. __Host- is load-bearing: the browser itself enforces Secure + Path=/ + no Domain.</summary>
     public string CookieName { get; set; } = "__Host-harmony-session";

@@ -39,11 +39,18 @@ public static class IdentityServerResources
         },
     ];
 
+    /// <summary>The identity scope the BFF asks for so ITS OWN session knows who the person is to Harmony.</summary>
+    public const string UserProfileScope = "harmony.profile";
+
     /// <summary>OpenID Connect sign-in (sub) and the display name (profile → name), for the BFF's own session.</summary>
     public static IEnumerable<IdentityResource> IdentityResources =>
     [
         new IdentityResources.OpenId(),
         new IdentityResources.Profile(),
+
+        // The profile service filters to REQUESTED claim types (AddRequestedClaims): without this scope, userinfo
+        // would answer the BFF with a name and nothing else — no roles to draw menus with, no tenant.
+        new IdentityResource(UserProfileScope, "Who you are to Harmony", [PlatformClaimTypes.Role, PlatformClaimTypes.Tenant]),
     ];
 
     /// <summary>The web client people sign in with today: e-mail + password, issued by Duende as the password grant.</summary>
@@ -106,6 +113,9 @@ public static class IdentityServerResources
             RedirectUris = [.. bffOrigins.Select(origin => origin + WebBffSettings.RedirectPath)],
             PostLogoutRedirectUris = [.. bffOrigins.Select(origin => origin + WebBffSettings.PostLogoutRedirectPath)],
 
+            // Ending a session here tells the BFF too (the sid rides along); its handler listens on this path by default.
+            FrontChannelLogoutUri = bffOrigins.First() + WebBffSettings.FrontChannelLogoutPath,
+
             // A server-side client: no browser calls Identity's endpoints for it, so no CORS origin.
             AllowedCorsOrigins = [],
 
@@ -113,6 +123,7 @@ public static class IdentityServerResources
             {
                 IdentityServerConstants.StandardScopes.OpenId,
                 IdentityServerConstants.StandardScopes.Profile,
+                UserProfileScope,
                 PlatformScope,
                 IdentityServerConstants.StandardScopes.OfflineAccess,
             },

@@ -23,6 +23,9 @@ public class WebBffSettings
     /// <summary>Where the browser lands after signing out (ASP.NET Core's default SignedOutCallbackPath).</summary>
     public const string PostLogoutRedirectPath = "/signout-callback-oidc";
 
+    /// <summary>Front-channel logout: ending a session at Identity also tells the BFF, on its handler's built-in path.</summary>
+    public const string FrontChannelLogoutPath = "/signout-oidc";
+
     /// <summary>The BFF's origins, scheme + host + port and nothing after: "https://app.example.com".</summary>
     public string[] Origins { get; set; } = [];
 

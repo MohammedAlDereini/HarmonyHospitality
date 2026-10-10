@@ -107,8 +107,61 @@ app.MapGet("/bff/user", (ClaimsPrincipal user, HttpContext http) =>
     {
         sub = user.FindFirstValue("sub"),
         name = user.FindFirstValue("name"),
+        tenant = user.FindFirstValue("tenant_id"),
         roles = user.FindAll("role").Select(claim => claim.Value).ToArray(),
     });
+}).AllowAnonymous();
+
+// Signing out is state-changing, so it is a POST and carries the CSRF header (2.5 makes that header a wall for
+// everything; this door refuses without it from birth). The refresh token is revoked FIRST — after this call,
+// nothing the BFF ever held can mint another token — then the local session dies, then Identity's.
+app.MapPost("/bff/logout", async (HttpContext http, IHttpClientFactory clients, ClientAssertionFactory assertions, IOptions<BffSettings> bff, IOptionsMonitor<OpenIdConnectOptions> oidc, ILogger<Program> logger) =>
+{
+    if (http.User.Identity?.IsAuthenticated != true)
+    {
+        return Results.Unauthorized();
+    }
+
+    if (http.Request.Headers["x-csrf"] != "1")
+    {
+        return Results.BadRequest();
+    }
+
+    var refreshToken = await http.GetTokenAsync("refresh_token");
+    if (!string.IsNullOrEmpty(refreshToken))
+    {
+        try
+        {
+            var configuration = await oidc.Get(OpenIdConnectDefaults.AuthenticationScheme).ConfigurationManager!.GetConfigurationAsync(http.RequestAborted);
+            var revocationEndpoint = configuration.AdditionalData.TryGetValue("revocation_endpoint", out var found) && found is string endpoint
+                ? endpoint
+                : bff.Value.Authority.TrimEnd('/') + "/connect/revocation";
+            using var answer = await clients.CreateClient(CookieOidcRefresher.BackchannelClientName).PostAsync(
+                revocationEndpoint,
+                new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    ["token"] = refreshToken,
+                    ["token_type_hint"] = "refresh_token",
+                    ["client_id"] = bff.Value.ClientId,
+                    ["client_assertion_type"] = ClientAssertionFactory.AssertionType,
+                    ["client_assertion"] = assertions.Create(bff.Value.Authority),
+                }),
+                http.RequestAborted);
+            if (!answer.IsSuccessStatusCode)
+            {
+                logger.LogWarning("Revoking the refresh token answered {Status}; the sign-out continues.", (int)answer.StatusCode);
+            }
+        }
+        catch (Exception exception)
+        {
+            // A revocation hiccup never traps a person in a session they asked to leave.
+            logger.LogWarning(exception, "Revoking the refresh token failed; the sign-out continues.");
+        }
+    }
+
+    await http.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    await http.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/" });
+    return Results.Empty;
 }).AllowAnonymous();
 
 await app.RunAsync();
@@ -187,9 +240,14 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
             options.PushedAuthorizationBehavior = PushedAuthorizationBehavior.Require;
             options.RequireHttpsMetadata = true;
 
-            // Tokens ride inside the session ticket; step 2.3 moves the ticket into Redis.
+            // Tokens ride inside the session ticket, and the ticket lives in Redis.
             options.SaveTokens = true;
-            options.GetClaimsFromUserInfoEndpoint = false;
+
+            // Who the person is comes from userinfo (the id_token stays lean): the name arrives by default,
+            // role ids and the tenant through the harmony.profile scope — each array element its own claim.
+            options.GetClaimsFromUserInfoEndpoint = true;
+            options.ClaimActions.MapJsonKey("role", "role");
+            options.ClaimActions.MapJsonKey("tenant_id", "tenant_id");
 
             // Raw claim names (sub, name, role, sid) — no legacy SOAP renaming; sid is the back-channel logout key.
             options.MapInboundClaims = false;
