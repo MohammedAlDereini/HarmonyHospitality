@@ -806,3 +806,15 @@ G1's sweep caps it at 12 months of rows. When that is still too heavy, climb one
 3. **Export** — the Microsoft way at Microsoft scale: Entra keeps sign-in logs 30 days and exports the rest (Log
    Analytics + storage with lifecycle rules). Ours: a short hot window in the DB, old months shipped to cheap files.
    The card rules bless it: 3 months immediately available, 12 retained anywhere.
+
+## L22. Session LOCK with a PIN for card-scope deployments (the PCI 8.2.8 answer)
+
+**Parked:** 2026-10-10, with the BFF session clocks (decided 60 minutes idle / 12 hours absolute, NIST 800-63B
+rev 4 AAL2). When payments land (the EPOS era, L6), front-desk machines enter card scope and PCI DSS 8.2.8
+expects re-authentication after 15 idle minutes — the rule Opera answers with a hard 15-minute logout its users
+hate, and the gap Mews users beg about on the feedback forum (no inactivity protection at all; a community
+Chrome extension was the official workaround). The kind answer is the one Mews customers keep requesting:
+a 15-minute session LOCK over the still-alive session, unlocked with a short PIN — PCI accepts a lock screen
+as re-authentication, and the desk keeps its open folios. Build it with the till sign-in work (L5/L6): the lock
+is a front-end overlay + a BFF check, the PIN is per-user, and the idle/absolute cookie clocks underneath stay
+as they are (a card-strict deployment may also just set SessionIdleMinutes to 15 — the knob already exists).

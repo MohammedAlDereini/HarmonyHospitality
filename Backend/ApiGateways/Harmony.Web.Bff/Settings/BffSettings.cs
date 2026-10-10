@@ -22,11 +22,16 @@ public sealed class BffSettings
     /// <summary>The session cookie. __Host- is load-bearing: the browser itself enforces Secure + Path=/ + no Domain.</summary>
     public string CookieName { get; set; } = "__Host-harmony-session";
 
-    /// <summary>Idle minutes before the session ends, 5 to 720.</summary>
+    /// <summary>
+    /// Idle minutes before the session ends, 5 to 720. The default mirrors Identity's session rule (60 minutes
+    /// idle — NIST 800-63B rev 4 AAL2's ceiling, enforced there by the refresh token): a cookie that pretended
+    /// to live longer would die at the refresh anyway — the clocks agree on purpose. A card-strict deployment
+    /// (PCI DSS 8.2.8 reads 15 minutes) dials this down here, no code change.
+    /// </summary>
     public int SessionIdleMinutes { get; set; } = 60;
 
-    /// <summary>The hard cap in hours regardless of activity, 1 to 24: no layer outlives Identity's own session.</summary>
-    public int SessionAbsoluteHours { get; set; } = 8;
+    /// <summary>The hard cap in hours regardless of activity, 1 to 24: Identity's absolute session rule (12 hours, half of AAL2's 24-hour ceiling).</summary>
+    public int SessionAbsoluteHours { get; set; } = 12;
 
     /// <summary>Where /api/{**} is forwarded (step 3). Absolute https, origin only.</summary>
     public string ApiDestination { get; set; } = null!;

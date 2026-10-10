@@ -59,8 +59,13 @@ public static class IdentityServerResources
     /// <summary>15 minutes: a token is short-lived; a demoted or terminated user is stopped sooner by security_version anyway.</summary>
     public static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromMinutes(15);
 
-    /// <summary>The design docs session rule: 30 minutes idle, 12 hours absolute, enforced by the refresh token.</summary>
-    public static readonly TimeSpan RefreshIdleLifetime = TimeSpan.FromMinutes(30);
+    /// <summary>
+    /// The session rule: 60 minutes idle, 12 hours absolute, enforced by the refresh token. 60 is NIST 800-63B
+    /// rev 4 AAL2's idle ceiling exactly; 12 is half its 24-hour absolute ceiling. Opera hard-codes 15 (the PCI
+    /// DSS 8.2.8 letter), Mews never signs anyone out, Microsoft defaults to 24-hour idle with no absolute cap —
+    /// we sit between, and a card-strict deployment tightens the BFF's own knob without touching this.
+    /// </summary>
+    public static readonly TimeSpan RefreshIdleLifetime = TimeSpan.FromMinutes(60);
     public static readonly TimeSpan RefreshAbsoluteLifetime = TimeSpan.FromHours(12);
 
     /// <summary>

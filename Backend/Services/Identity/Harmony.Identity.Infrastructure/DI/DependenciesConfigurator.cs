@@ -410,7 +410,7 @@ public static class DependenciesConfigurator
             // The APIs here use the platform token (Bearer, the default scheme). The sign-in session is Duende's own cookie, named, never guessed.
             options.Authentication.CookieAuthenticationScheme = IdentityServerConstants.DefaultCookieAuthenticationScheme;
 
-            // The design rule: 30 minutes without activity ends the session (the same as the refresh token).
+            // The session rule: 60 minutes without activity ends the session (the same as the refresh token).
             options.Authentication.CookieLifetime = IdentityServerResources.RefreshIdleLifetime;
             options.Authentication.CookieSlidingExpiration = true;
 
