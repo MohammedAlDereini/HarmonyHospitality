@@ -146,6 +146,25 @@ if (!app.Environment.IsDevelopment())
 app.UseMiddleware<Harmony.Web.Bff.Security.SecurityHeadersMiddleware>();
 app.UseMiddleware<Harmony.Web.Bff.Security.CsrfHeaderMiddleware>();
 
+// Production: the built web app lives in wwwroot. Its files are served BEFORE authentication runs — a stylesheet
+// needs no session and must not spend a token refresh. The hashed assets may be cached forever; index.html never,
+// or a deployment would show the old app until the browser felt like asking.
+var staticFiles = new StaticFileOptions
+{
+    OnPrepareResponse = context =>
+    {
+        if (context.File.Name.Equals("index.html", StringComparison.OrdinalIgnoreCase))
+        {
+            context.Context.Response.Headers.CacheControl = "no-cache";
+        }
+    },
+};
+if (bffSettings.ServeStaticFiles)
+{
+    app.UseDefaultFiles();
+    app.UseStaticFiles(staticFiles);
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -174,17 +193,30 @@ app.MapGet("/bff/user", (ClaimsPrincipal user, HttpContext http) =>
         name = user.FindFirstValue("name"),
         tenant = user.FindFirstValue("tenant_id"),
         roles = user.FindAll("role").Select(claim => claim.Value).ToArray(),
+        // How the person signed in (pwd, and mfa when the authenticator was used), from the id_token.
+        amr = user.FindAll("amr").Select(claim => claim.Value).ToArray(),
+        // The sign-out link carries this session's own sid: the proof a cross-site page cannot know.
+        logoutUrl = "/bff/logout?sid=" + Uri.EscapeDataString(user.FindFirstValue("sid") ?? string.Empty),
     });
 }).AllowAnonymous();
 
-// Signing out is state-changing, so it is a POST behind the CSRF wall like every /bff call. The refresh token is
-// revoked FIRST — after this call, nothing the BFF ever held can mint another token — then the local session
-// dies, then Identity's.
-app.MapPost("/bff/logout", async (HttpContext http, IHttpClientFactory clients, ClientAssertionFactory assertions, IOptions<BffSettings> bff, IOptionsMonitor<OpenIdConnectOptions> oidc, ILogger<Program> logger) =>
+// Signing out is a top-level NAVIGATION, never a fetch(): Identity ends its own session only when the browser
+// itself walks to its end-session door carrying Identity's cookie, which a redirect inside a fetch() never does.
+// A navigation cannot carry the CSRF header, so the proof here is the session's own sid in the link — a value no
+// cross-site page knows (Duende BFF's own scheme) — on top of the Strict cookie no cross-site request carries.
+// The refresh token is revoked FIRST — after this call, nothing the BFF ever held can mint another token — then
+// the local session dies, then Identity's.
+app.MapGet("/bff/logout", async (string? sid, HttpContext http, IHttpClientFactory clients, ClientAssertionFactory assertions, IOptions<BffSettings> bff, IOptionsMonitor<OpenIdConnectOptions> oidc, ILogger<Program> logger) =>
 {
     if (http.User.Identity?.IsAuthenticated != true)
     {
-        return Results.Unauthorized();
+        // Nothing to end: home, where the app asks who you are and sends you to sign in.
+        return Results.Redirect("/");
+    }
+
+    if (string.IsNullOrEmpty(sid) || !string.Equals(sid, http.User.FindFirstValue("sid"), StringComparison.Ordinal))
+    {
+        return Results.StatusCode(StatusCodes.Status403Forbidden);
     }
 
     var refreshToken = await http.GetTokenAsync("refresh_token");
@@ -230,10 +262,18 @@ app.MapPost(BackChannelLogout.Path, BackChannelLogout.HandleAsync).AllowAnonymou
 // Mapped last: every named /bff door above answers first; everything /api flows through the allow-list.
 app.MapReverseProxy();
 
-// Any OTHER path is nobody's: a plain 404, said out loud. Without this, the deny-by-default fallback policy
-// CHALLENGES the stranger — a full PAR push and a sign-in redirect for /favicon.ico. Step 4 swaps this door
-// for the web app's static files + SPA fallback in production.
-app.MapFallback(() => Results.NotFound()).AllowAnonymous();
+if (bffSettings.ServeStaticFiles)
+{
+    // Every path that is no door above is the web app's own (its router reads the address): index.html.
+    app.MapFallbackToFile("index.html", staticFiles).AllowAnonymous();
+}
+else
+{
+    // Development, where the dev server serves the app: any other path is nobody's — a plain 404, said out
+    // loud. Without it the deny-by-default fallback policy CHALLENGES the stranger: a full PAR push and a
+    // sign-in redirect for /favicon.ico.
+    app.MapFallback(() => Results.NotFound()).AllowAnonymous();
+}
 
 await app.RunAsync();
 

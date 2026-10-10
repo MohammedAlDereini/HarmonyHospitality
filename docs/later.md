@@ -818,3 +818,14 @@ a 15-minute session LOCK over the still-alive session, unlocked with a short PIN
 as re-authentication, and the desk keeps its open folios. Build it with the till sign-in work (L5/L6): the lock
 is a front-end overlay + a BFF check, the PIN is per-user, and the idle/absolute cookie clocks underneath stay
 as they are (a card-strict deployment may also just set SessionIdleMinutes to 15 — the knob already exists).
+
+## L23. After sign-out: a "signed out" page, and the sign-in method after a refresh
+
+**Parked:** 2026-10-10, with BFF step 4. Two small things seen in the real-browser proof, neither wrong today:
+
+1. Signing out lands on "/", the app finds no session and walks straight back to Identity's sign-in page — correct,
+   but a person who meant to leave sees a sign-in form. The kind answer is a public "You are signed out" page
+   (PostLogoutRedirectPath pointing at it, the app's router serving it without a session).
+2. The app says "password + authenticator" from the id_token's amr claim. The refreshed id_token Identity hands the
+   BFF on a silent refresh may not carry amr; then the wording falls back to "password" after the first refresh.
+   Either keep the first id_token's amr in the session at sign-in, or ask Identity to repeat it on refresh.

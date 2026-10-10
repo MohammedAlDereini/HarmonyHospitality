@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import QRCode from 'qrcode'
-import { claimsOf, disableTwoFactor, enableTwoFactor, logoutEverywhere, myAccount, sessionExpired, setupTwoFactor, type AccountModel, type TwoFactorSetup } from '../api'
+import { disableTwoFactor, enableTwoFactor, logoutEverywhere, myAccount, sessionExpired, setupTwoFactor, type AccountModel, type TwoFactorSetup } from '../api'
 import { messagesFor } from '../errors'
-import { clearSession, getTokens } from '../session'
+import { useSession } from '../session'
 import { toast } from '../components/Toast'
 
 /**
@@ -12,9 +12,8 @@ import { toast } from '../components/Toast'
  */
 export default function SecurityPage() {
   const navigate = useNavigate()
-  const tokens = getTokens()
-  const claims = tokens ? claimsOf(tokens.access_token) : {}
-  const sub = String(claims.sub ?? '')
+  const { user } = useSession()
+  const sub = user?.sub ?? ''
   const [account, setAccount] = useState<AccountModel | null>(null)
   const [canRead, setCanRead] = useState(true)
   const [setup, setSetup] = useState<TwoFactorSetup | null>(null)
@@ -79,10 +78,10 @@ export default function SecurityPage() {
     void loadAccount()
   }
 
+  /** Identity ends every session on every device, this one included (the BFF hears it server to server); then sign in again. */
   async function onSignOutEverywhere() {
-    if (tokens) await logoutEverywhere(tokens.access_token)
-    clearSession()
-    navigate('/login', { replace: true })
+    await logoutEverywhere()
+    window.location.assign('/login')
   }
 
   const enabled = account?.twoFactorEnabled ?? null
@@ -158,9 +157,9 @@ export default function SecurityPage() {
           <h2>Sessions</h2>
           <p className="lead">Signing out everywhere ends every session on every device, this one included, and invalidates every refresh token.</p>
           <ul className="facts">
-            <li><span>Signed in as</span><span>{String(claims.name ?? '')}</span></li>
-            <li><span>Signed in with</span><span>{String(claims.amr ?? '').includes('mfa') ? 'password + authenticator' : 'password'}</span></li>
-            <li><span>Security version</span><span>{String(account?.securityVersion ?? claims.security_version ?? '')}</span></li>
+            <li><span>Signed in as</span><span>{user?.name ?? ''}</span></li>
+            <li><span>Signed in with</span><span>{(user?.amr ?? []).includes('mfa') ? 'password + authenticator' : 'password'}</span></li>
+            <li><span>Security version</span><span>{String(account?.securityVersion ?? '')}</span></li>
           </ul>
           <div style={{ display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
             <button type="button" className="auto secondary" onClick={() => navigate('/account/change-password')}>Change password</button>

@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { claimsOf, listRows, sessionExpired } from '../api'
-import { getTokens } from '../session'
+import { listRows, sessionExpired } from '../api'
+import { useSession } from '../session'
 import { tables, type Row } from '../reference/tables'
 
 /** Home: the reference tables with how many rows each holds, and who is signed in. */
 export default function HomePage() {
   const navigate = useNavigate()
-  const tokens = getTokens()
-  const claims = tokens ? claimsOf(tokens.access_token) : {}
+  const { user } = useSession()
   const [counts, setCounts] = useState<Record<string, number | 'denied' | null>>({})
 
   useEffect(() => {
@@ -65,9 +64,9 @@ export default function HomePage() {
       <section className="surface pad" style={{ marginTop: 18, maxWidth: 520 }}>
         <h2>You</h2>
         <ul className="facts">
-          <li><span>Signed in as</span><span>{String(claims.name ?? '')}</span></li>
-          <li><span>Signed in with</span><span>{String(claims.amr ?? '').includes('mfa') ? 'password + authenticator' : 'password'}</span></li>
-          <li><span>Roles</span><span>{Array.isArray(claims.role) ? claims.role.length : claims.role ? 1 : 0}</span></li>
+          <li><span>Signed in as</span><span>{user?.name ?? ''}</span></li>
+          <li><span>Signed in with</span><span>{(user?.amr ?? []).includes('mfa') ? 'password + authenticator' : 'password'}</span></li>
+          <li><span>Roles</span><span>{user?.roles.length ?? 0}</span></li>
         </ul>
         <p className="links"><Link to="/account/security">Security and two-step sign-in</Link></p>
       </section>

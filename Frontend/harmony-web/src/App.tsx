@@ -1,5 +1,5 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
-import { hasSession } from './session'
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
+import { useSession } from './session'
 import Shell from './components/Shell'
 import LoginPage from './pages/LoginPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
@@ -9,9 +9,13 @@ import HomePage from './pages/HomePage'
 import SecurityPage from './pages/SecurityPage'
 import ReferenceTablePage from './pages/reference/ReferenceTablePage'
 
-/** A page that needs a signed-in person: without a session, go to the login page. */
+/** A page that needs a signed-in person: until /bff/user has answered, nothing; without a session, go sign in and come back here. */
 function Private({ children }: { children: React.ReactNode }) {
-  return hasSession() ? <>{children}</> : <Navigate to="/login" replace />
+  const { user, loading } = useSession()
+  const location = useLocation()
+  if (loading) return null
+  if (!user) return <Navigate to={`/login?returnUrl=${encodeURIComponent(location.pathname + location.search)}`} replace />
+  return <>{children}</>
 }
 
 /** The sign-in family renders one card in the middle of the screen, outside the shell. */

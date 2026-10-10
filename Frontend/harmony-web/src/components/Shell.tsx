@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { claimsOf, logoutEverywhere, revoke } from '../api'
-import { clearSession, getTokens } from '../session'
+import { logoutEverywhere } from '../api'
+import { useSession } from '../session'
 import { tables } from '../reference/tables'
 import { Lockup } from './Logo'
 import { ToastHost } from './Toast'
@@ -9,9 +9,9 @@ import { ToastHost } from './Toast'
 /** The signed-in frame: global bar (brand, who), the rail (Home, the reference tables, the account) and the work surface. */
 export default function Shell() {
   const navigate = useNavigate()
-  const tokens = getTokens()
-  const claims = tokens ? claimsOf(tokens.access_token) : {}
-  const name = String(claims.name ?? 'Signed in')
+  const { user } = useSession()
+  const name = user?.name || 'Signed in'
+  const withAuthenticator = (user?.amr ?? []).includes('mfa')
   const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || 'H'
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -32,16 +32,15 @@ export default function Shell() {
     }
   }, [open])
 
-  async function signOut() {
-    if (tokens) await revoke(tokens.refresh_token)
-    clearSession()
-    navigate('/login', { replace: true })
+  /** A top-level navigation on purpose: Identity ends its own session only when the browser itself walks there. */
+  function signOut() {
+    window.location.assign(user?.logoutUrl ?? '/login')
   }
 
+  /** Identity ends every session on every device, this one included (the BFF hears it server to server); then sign in again. */
   async function signOutEverywhere() {
-    if (tokens) await logoutEverywhere(tokens.access_token)
-    clearSession()
-    navigate('/login', { replace: true })
+    await logoutEverywhere()
+    window.location.assign('/login')
   }
 
   return (
@@ -61,7 +60,7 @@ export default function Shell() {
             <div className="menu" role="menu">
               <div className="head">
                 <b>{name}</b>
-                <span>{String(claims.amr ?? '').includes('mfa') ? 'Signed in with password and authenticator' : 'Signed in with password'}</span>
+                <span>{withAuthenticator ? 'Signed in with password and authenticator' : 'Signed in with password'}</span>
               </div>
               <button type="button" role="menuitem" onClick={() => { setOpen(false); navigate('/account/security') }}>Security and two-step sign-in</button>
               <button type="button" role="menuitem" onClick={() => { setOpen(false); navigate('/account/change-password') }}>Change password</button>

@@ -1,82 +1,28 @@
 /**
- * The web app's only door to Identity. Two kinds of calls:
- *  - Duende's token endpoint (form posts): login, second factor, refresh, revocation
- *  - the API envelope (json): { data, errors: [{ code }] }; 200/201 ok, 202 business refusal, 400 validation, 403 no permission
- * Signed-in calls go through authCall, which refreshes an expired access token once and ends the session when that fails.
+ * The web app's only door: the BFF, on this same origin. The browser holds one HttpOnly cookie; the BFF turns it
+ * into the Bearer token the platform API wants, so no token ever exists on this page. Every call carries
+ * "x-csrf: 1" — a header a cross-site page cannot add — and the API envelope stays { data, errors: [{ code }] }:
+ * 200/201 ok, 202 business refusal, 400 validation, 403 no permission, 401 no session (sign in again).
  */
-import { clearSession, getTokens, setTokens } from './session'
-
-const base = (import.meta.env.VITE_IDENTITY_URL as string | undefined)?.replace(/\/$/, '') ?? 'https://localhost:5000'
-const clientId = 'harmony-web'
-
-export type Tokens = { access_token: string; refresh_token: string; expires_in: number }
-
-export type LoginResult =
-  | { kind: 'ok'; tokens: Tokens }
-  | { kind: 'mfa'; mfaToken: string }
-  | { kind: 'error'; error: string }
-
 export type ApiResult<T = unknown> = { ok: boolean; status: number; codes: string[]; data?: T }
 
 type Method = 'GET' | 'POST' | 'PUT'
 
-/** Identity not reachable, or the browser refused the call (origin not allowed): one code for both. */
+/** The BFF not reachable: one code for every network failure. */
 export const unreachable = 'identity_unreachable'
-/** The access token expired and could not be refreshed: the person has to sign in again. */
+/** No session behind the cookie any more (it ended, or was ended for the person): sign in again. */
 export const sessionExpired = 'session_expired'
 
-async function tokenCall(form: Record<string, string>): Promise<LoginResult> {
+const csrf = { 'x-csrf': '1' }
+
+async function apiCall<T>(method: Method, path: string, body?: unknown, receipt?: string): Promise<ApiResult<T>> {
   let response: Response
   try {
-    response = await fetch(`${base}/connect/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ client_id: clientId, scope: 'harmony offline_access', ...form }),
-    })
-  } catch {
-    return { kind: 'error', error: unreachable }
-  }
-  const body = (await response.json().catch(() => ({}))) as Record<string, unknown>
-  if (response.ok && typeof body.access_token === 'string') {
-    return { kind: 'ok', tokens: body as Tokens }
-  }
-  if (body.error_description === 'mfa_required' && typeof body.mfa_token === 'string') {
-    return { kind: 'mfa', mfaToken: body.mfa_token }
-  }
-  return { kind: 'error', error: String(body.error_description ?? body.error ?? `http_${response.status}`) }
-}
-
-export const login = (username: string, password: string) =>
-  tokenCall({ grant_type: 'password', username, password })
-
-export const completeMfa = (mfaToken: string, proof: { otp?: string; recoveryCode?: string }) =>
-  tokenCall({
-    grant_type: 'mfa_otp',
-    mfa_token: mfaToken,
-    ...(proof.otp ? { otp: proof.otp } : {}),
-    ...(proof.recoveryCode ? { recovery_code: proof.recoveryCode } : {}),
-  })
-
-export const refresh = (refreshToken: string) =>
-  tokenCall({ grant_type: 'refresh_token', refresh_token: refreshToken })
-
-/** Logout of this device: the refresh token dies on the server. */
-export async function revoke(refreshToken: string): Promise<void> {
-  await fetch(`${base}/connect/revocation`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ client_id: clientId, token: refreshToken, token_type_hint: 'refresh_token' }),
-  }).catch(() => undefined)
-}
-
-async function apiCall<T>(method: Method, path: string, body?: unknown, accessToken?: string, receipt?: string): Promise<ApiResult<T>> {
-  let response: Response
-  try {
-    response = await fetch(`${base}${path}`, {
+    response = await fetch(path, {
       method,
       headers: {
+        ...csrf,
         ...(method === 'GET' ? {} : { 'Content-Type': 'application/json' }),
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         ...(receipt ? { 'Idempotency-Key': receipt } : {}),
       },
       ...(method === 'GET' ? {} : { body: JSON.stringify(body ?? {}) }),
@@ -86,37 +32,42 @@ async function apiCall<T>(method: Method, path: string, body?: unknown, accessTo
   }
   const envelope = (await response.json().catch(() => ({}))) as { data?: T; errors?: { code: string }[] }
   const codes = (envelope.errors ?? []).map((e) => e.code)
+  if (response.status === 401) codes.push(sessionExpired)
   if (response.status === 403 && codes.length === 0) codes.push('forbidden')
   return { ok: response.status < 300 && codes.length === 0, status: response.status, codes, data: envelope.data }
 }
 
 /**
- * A call on behalf of the signed-in person. A 401 means the 15-minute access token has expired: refresh once and retry;
- * if the refresh is refused too (revoked, logged out everywhere, password changed) the session is over.
+ * A call on behalf of the signed-in person: the cookie goes along by itself and the BFF keeps the token fresh,
+ * so there is nothing to refresh or retry here. One receipt per user action: the server runs it once.
  */
-export async function authCall<T>(method: Method, path: string, body?: unknown): Promise<ApiResult<T>> {
-  const tokens = getTokens()
-  if (!tokens) return { ok: false, status: 401, codes: [sessionExpired] }
-  // One receipt per user action, reused if this call is retried after a token refresh: the server runs the
-  // action once and replays the same answer to the retry.
-  const receipt = method === 'GET' ? undefined : crypto.randomUUID()
-  let result = await apiCall<T>(method, path, body, tokens.access_token, receipt)
-  if (result.status !== 401) return result
-  const renewed = await refresh(tokens.refresh_token)
-  if (renewed.kind !== 'ok') {
-    clearSession()
-    return { ok: false, status: 401, codes: [sessionExpired] }
-  }
-  setTokens(renewed.tokens)
-  result = await apiCall<T>(method, path, body, renewed.tokens.access_token, receipt)
-  if (result.status === 401) {
-    clearSession()
-    return { ok: false, status: 401, codes: [sessionExpired] }
-  }
-  return result
+export const authCall = <T>(method: Method, path: string, body?: unknown) =>
+  apiCall<T>(method, path, body, method === 'GET' ? undefined : crypto.randomUUID())
+
+// ---- who is signed in ----
+
+export type User = {
+  sub: string
+  name: string
+  tenant: string | null
+  roles: string[]
+  /** How the person signed in: "pwd", and "mfa" when the authenticator was used too. */
+  amr: string[]
+  /** The sign-out link, carrying this session's own proof; always a top-level navigation. */
+  logoutUrl: string
 }
 
-// ---- account (anonymous flows keep an explicit token argument: they run before or outside a session) ----
+/** The signed-in person, or null when there is no session (the BFF answers 401). */
+export async function whoAmI(): Promise<User | null> {
+  try {
+    const response = await fetch('/bff/user', { headers: csrf })
+    return response.ok ? ((await response.json()) as User) : null
+  } catch {
+    return null
+  }
+}
+
+// ---- account (the anonymous flows run before a session exists) ----
 
 export const forgotPassword = (email: string) =>
   apiCall('POST', '/api/UserAccount/ForgotPassword', { email })
@@ -124,11 +75,11 @@ export const forgotPassword = (email: string) =>
 export const resetPassword = (email: string, token: string, newPassword: string) =>
   apiCall('POST', '/api/UserAccount/ResetPassword', { email, token, newPassword })
 
-export const changePassword = (accessToken: string, currentPassword: string, newPassword: string) =>
-  apiCall('PUT', '/api/UserAccount/ChangePassword', { currentPassword, newPassword }, accessToken)
+export const changePassword = (currentPassword: string, newPassword: string) =>
+  authCall('PUT', '/api/UserAccount/ChangePassword', { currentPassword, newPassword })
 
-export const logoutEverywhere = (accessToken: string) =>
-  apiCall('PUT', '/api/UserAccount/LogoutEverywhere', undefined, accessToken)
+export const logoutEverywhere = () =>
+  authCall('PUT', '/api/UserAccount/LogoutEverywhere')
 
 export type AccountModel = {
   id: string
@@ -175,13 +126,3 @@ export const createRow = (api: string, body: Record<string, unknown>) =>
 
 export const updateRow = (api: string, body: Record<string, unknown>) =>
   authCall('PUT', `/api/${api}/Update`, body)
-
-/** The claims inside an access token (no signature check here: the server checks, the app only reads). */
-export function claimsOf(accessToken: string): Record<string, unknown> {
-  try {
-    const payload = accessToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
-    return JSON.parse(atob(payload.padEnd(payload.length + ((4 - (payload.length % 4)) % 4), '=')))
-  } catch {
-    return {}
-  }
-}

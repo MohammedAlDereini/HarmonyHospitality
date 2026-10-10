@@ -14,12 +14,14 @@ internal sealed class CsrfHeaderMiddleware
     internal const string HeaderValue = "1";
 
     /// <summary>
-    /// Top-level navigations of the sign-in/sign-out walk (no fetch(), so no custom header possible), plus the
-    /// back-channel receiver: Identity's own server POST, guarded by its signed logout_token instead.
+    /// Top-level navigations of the sign-in/sign-out walk (no fetch(), so no custom header possible): sign-in,
+    /// the callback, sign-out (guarded by the session's own sid in the link instead) and its callbacks; plus
+    /// the back-channel receiver: Identity's own server POST, guarded by its signed logout_token instead.
     /// </summary>
     private static readonly string[] ExemptPaths =
     [
         "/bff/login",
+        "/bff/logout",
         "/signin-oidc",
         "/signout-callback-oidc",
         "/signout-oidc",
