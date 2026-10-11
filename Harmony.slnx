@@ -36,4 +36,5 @@
     <Project Path="Backend/Services/Identity/Harmony.Identity.Infrastructure/Harmony.Identity.Infrastructure.csproj" Id="80b4ba10-5b6b-4eea-94bb-9d4b9da728e0" />
   </Folder>
   <Folder Name="/Frontend/" />
+  <Folder Name="/UI design/" />
 </Solution>
