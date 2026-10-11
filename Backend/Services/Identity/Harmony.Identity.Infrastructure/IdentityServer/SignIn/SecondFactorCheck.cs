@@ -29,8 +29,8 @@ public enum SecondFactorStatus
 public sealed record SecondFactorResult(SecondFactorStatus Status, User? User);
 
 /// <summary>
-/// The second half of a two-factor sign-in, in one place for the sign-in page and (until it is removed) the mfa_otp grant:
-/// the challenge the password step issued, then either the 6-digit code from the authenticator app or one recovery code.
+/// The second half of a two-factor sign-in on the sign-in pages (the only caller since BFF step 5 removed the mfa_otp
+/// grant): the challenge the password step issued, then either the 6-digit code from the authenticator app or one recovery code.
 /// Wrong codes count towards the same lockout as wrong passwords (5 → 5 minutes). A code accepted once is refused for
 /// the rest of its window (RFC 6238 §5.2: a verifier must not accept a replay). On success the challenge is consumed.
 /// </summary>

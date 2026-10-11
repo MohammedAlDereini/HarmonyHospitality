@@ -10,6 +10,8 @@ using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Harmony.Identity.Api.Pages.Account;
 
@@ -103,6 +105,28 @@ internal static class SignInSession
 
     public static void ReleaseEmailLink(HttpResponse response)
         => response.Cookies.Delete(EmailLinkCookie, SetupOptions(null));
+
+    /// <summary>Holds a proved sign-in while the person replaces a password somebody else chose (10 minutes, like the hold).</summary>
+    public const string PasswordChangeCookie = "__Host-harmony-password-change";
+
+    public static void HoldPasswordChange(HttpResponse response, string secret)
+        => response.Cookies.Append(PasswordChangeCookie, secret, SecondStepOptions(ForcedPasswordChange.Lifetime));
+
+    public static string? PasswordChange(HttpRequest request) => request.Cookies[PasswordChangeCookie];
+
+    public static void ReleasePasswordChange(HttpResponse response)
+        => response.Cookies.Delete(PasswordChangeCookie, SecondStepOptions(null));
+
+    /// <summary>
+    /// The same pause from every way a person proves who they are: the sign-in goes on hold with how it was proved and
+    /// the trail line it will write, and the change page finishes it. Nobody is signed in until the password is theirs.
+    /// </summary>
+    public static async Task<IActionResult> HoldForPasswordChangeAsync(PageModel page, ForcedPasswordChange forced, User user, string method, string trailAction, string? returnUrl)
+    {
+        var secret = await forced.HoldAsync(user, method, trailAction, page.HttpContext.RequestAborted);
+        HoldPasswordChange(page.Response, secret);
+        return page.RedirectToPage("ChangePassword", new { returnUrl });
+    }
 
     private static CookieOptions SecondStepOptions(TimeSpan? maxAge) => new()
     {

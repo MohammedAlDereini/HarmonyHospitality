@@ -53,9 +53,6 @@ public static class IdentityServerResources
         new IdentityResource(UserProfileScope, "Who you are to Harmony", [PlatformClaimTypes.Role, PlatformClaimTypes.Tenant]),
     ];
 
-    /// <summary>The web client people sign in with today: e-mail + password, issued by Duende as the password grant.</summary>
-    public const string WebClientId = "harmony-web";
-
     /// <summary>15 minutes: a token is short-lived; a demoted or terminated user is stopped sooner by security_version anyway.</summary>
     public static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromMinutes(15);
 
@@ -64,6 +61,7 @@ public static class IdentityServerResources
     /// rev 4 AAL2's idle ceiling exactly; 12 is half its 24-hour absolute ceiling. Opera hard-codes 15 (the PCI
     /// DSS 8.2.8 letter), Mews never signs anyone out, Microsoft defaults to 24-hour idle with no absolute cap —
     /// we sit between, and a card-strict deployment tightens the BFF's own knob without touching this.
+    /// One constant drives the BFF client's refresh window AND Duende's own sign-in cookie.
     /// </summary>
     public static readonly TimeSpan RefreshIdleLifetime = TimeSpan.FromMinutes(60);
     public static readonly TimeSpan RefreshAbsoluteLifetime = TimeSpan.FromHours(12);
@@ -74,30 +72,13 @@ public static class IdentityServerResources
     /// </summary>
     public static readonly TimeSpan PushedAuthorizationLifetime = TimeSpan.FromMinutes(10);
 
-    /// <param name="allowedCorsOrigins">The web app origins (IdentitySettings:Web:AllowedOrigins); the token endpoint answers browsers from nowhere else.</param>
     /// <param name="bffOrigins">The BFF origins (IdentitySettings:WebBff:Origins).</param>
     /// <param name="bffPublicKeys">The BFF's public keys as JSON Web Keys (current first, then those kept during a rotation).</param>
-    public static IEnumerable<Client> Clients(IEnumerable<string> allowedCorsOrigins, IReadOnlyCollection<string> bffOrigins, IEnumerable<string> bffPublicKeys) =>
+    public static IEnumerable<Client> Clients(IReadOnlyCollection<string> bffOrigins, IEnumerable<string> bffPublicKeys) =>
     [
-        new Client
-        {
-            AllowedCorsOrigins = [.. allowedCorsOrigins],
-            ClientId = WebClientId,
-            ClientName = "Harmony web",
-            // Password first; when the account has two-factor on, the second call is the mfa_otp grant with the challenge and the code.
-            AllowedGrantTypes = { GrantType.ResourceOwnerPassword, MfaOtpGrantValidator.GrantTypeName },
-            RequireClientSecret = false,
-            AllowedScopes = { PlatformScope, IdentityServerConstants.StandardScopes.OfflineAccess },
-            AllowOfflineAccess = true,
-            AccessTokenLifetime = (int)AccessTokenLifetime.TotalSeconds,
-            RefreshTokenUsage = TokenUsage.OneTimeOnly,
-            RefreshTokenExpiration = TokenExpiration.Sliding,
-            SlidingRefreshTokenLifetime = (int)RefreshIdleLifetime.TotalSeconds,
-            AbsoluteRefreshTokenLifetime = (int)RefreshAbsoluteLifetime.TotalSeconds,
-            UpdateAccessTokenClaimsOnRefresh = true,
-        },
-
-        // RFC 10017 §6.1: the BFF is a confidential client using the authorization code grant with PKCE; the tokens stay on it.
+        // The ONE way a person signs in (BFF step 5 removed the web app's password grant): RFC 10017 §6.1, the BFF as a
+        // confidential client using the authorization code grant with PKCE; the tokens stay on it, no browser ever
+        // calls the token endpoint.
         new Client
         {
             ClientId = WebBffSettings.ClientId,

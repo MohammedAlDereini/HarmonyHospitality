@@ -9,7 +9,7 @@ public sealed class RateLimitSettings
 {
     public const string Section = "IdentitySettings:RateLimits";
 
-    /// <summary>Sign-in tries (password, two-step code, two-step setup, the old password grant) one address may make at once.</summary>
+    /// <summary>Sign-in tries (password, two-step code, two-step setup, the forced password change) one address may make at once.</summary>
     public int SignInBurst { get; set; } = 60;
 
     /// <summary>Sign-in tries given back to the address every minute, up to the burst.</summary>

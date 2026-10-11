@@ -35,9 +35,8 @@ public static class SecurityAuditActions
     public const string SignInEmailLink = "sign-in.email-link";
     public const string SignInAfterSetup = "sign-in.after-two-step-setup";
 
-    // Sign-ins through the old password grant (until the web app signs in through the BFF)
-    public const string SignInPasswordGrant = "sign-in.password-grant";
-    public const string SignInPasswordGrantTwoStep = "sign-in.password-grant-two-step";
+    // Rows written before BFF step 5 may still carry "sign-in.password-grant" and "sign-in.password-grant-two-step":
+    // the old web app's grant, gone with step 5. The trail keeps them as history; nothing writes them any more.
 
     // Refused sign-ins
     public const string SignInWrongPassword = "sign-in.wrong-password";

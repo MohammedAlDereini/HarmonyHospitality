@@ -26,12 +26,14 @@ public sealed class EmailSignInModel : PageModel
 
     private readonly IIdentityServerInteractionService interaction;
     private readonly EmailSignIn emailSignIn;
+    private readonly ForcedPasswordChange forced;
     private readonly IMediator mediator;
 
-    public EmailSignInModel(IIdentityServerInteractionService interaction, EmailSignIn emailSignIn, IMediator mediator)
+    public EmailSignInModel(IIdentityServerInteractionService interaction, EmailSignIn emailSignIn, ForcedPasswordChange forced, IMediator mediator)
     {
         this.interaction = interaction;
         this.emailSignIn = emailSignIn;
+        this.forced = forced;
         this.mediator = mediator;
     }
 
@@ -64,6 +66,13 @@ public sealed class EmailSignInModel : PageModel
 
         SignInSession.ReleaseEmailLink(this.Response);
         SignInSession.ReleaseSecondStep(this.Response);
+
+        // A password somebody else chose: proved, not signed in — the change page finishes this sign-in.
+        if (user.MustChangePassword)
+        {
+            return await SignInSession.HoldForPasswordChangeAsync(this, this.forced, user, "mfa", SecurityAuditActions.SignInEmailLink, this.ReturnUrl);
+        }
+
         var signedIn = await SignInSession.SignInAsync(this.HttpContext, user, "mfa");
         await this.mediator.Send(
             new RecordSignInCommand { UserId = user.Id, TrailAction = SecurityAuditActions.SignInEmailLink, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },

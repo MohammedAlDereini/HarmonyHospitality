@@ -106,13 +106,10 @@ public partial class Program
             });
 
             app.UseRouting();
-            app.UseCors();
 
-            // Item 5: after routing, so each door's [EnableRateLimiting] is known; before any sign-in work runs.
+            // Item 5: after routing, so each door's [EnableRateLimiting] is known; before any sign-in work runs. Duende's
+            // token door needs no limiter of its own since BFF step 5: only the BFF (code + refresh) calls it.
             app.UseRateLimiter();
-
-            // Item 5, until BFF step 5: the old password grant at Duende's token door, which no attribute reaches.
-            app.UseMiddleware<TokenDoorLimiter>();
 
             app.ConfigureAppLogging();
 

@@ -683,15 +683,8 @@ down; it does not stop it.
 
 ## L15. Remove the token door with BFF step 5
 
-**Parked:** 2026-10-07, item 5.
-
-**Why.** `TokenDoorLimiter` counts the old password grant at Duende's token endpoint, which no `[EnableRateLimiting]` reaches,
-and shares one sign-in budget with the sign-in pages. It exists only because the web app still signs in with that grant.
-
-**What it needs.** Delete `RateLimiting/TokenDoorLimiter.cs` and its `app.UseMiddleware<TokenDoorLimiter>()` line in
-`Program.cs` in the same change that removes the password grant. The sign-in pages keep `[EnableRateLimiting]`.
-
-**Waits for.** BFF step 5.
+**Done:** 2026-10-11, BFF step 5. `TokenDoorLimiter` went with the password and `mfa_otp` grants, the `harmony-web`
+client and CORS; the sign-in pages keep `[EnableRateLimiting]`, and only the BFF (code + refresh) calls the token door.
 
 ---
 

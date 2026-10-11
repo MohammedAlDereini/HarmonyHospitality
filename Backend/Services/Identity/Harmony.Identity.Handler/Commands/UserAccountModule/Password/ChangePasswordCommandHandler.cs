@@ -1,7 +1,6 @@
-﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.Password;
+namespace Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 
 using Harmony.Core.Abstractions;
-using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
@@ -9,24 +8,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
-/// The caller changes their own password. The account is the token's subject, never a body field, so nobody can
-/// change another person's password here. The current password must match (a wrong one counts towards the login
-/// lockout, same rule as sign-in), the new one must differ and pass Identity's password rules. A success clears
-/// MustChangePassword and bumps SecurityVersion: every token the person holds, the caller's own included, dies at
-/// its next request and no refresh token survives, so the person signs in again with the new password.
+/// The caller changes their own password through the API. The account is the token's subject, never a body field, so
+/// nobody can change another person's password here; the rules and what follows are <see cref="PasswordChangeHandlerBase"/>'s.
 /// </summary>
-public class ChangePasswordCommandHandler : UserAccountCommandHandlerBase, IRequestHandler<ChangePasswordCommand, CallResponse>
+public class ChangePasswordCommandHandler : PasswordChangeHandlerBase, IRequestHandler<ChangePasswordCommand, CallResponse>
 {
     private readonly ICallContext callContext;
-    private readonly IAccountMailer mailer;
-    private readonly ILogger<ChangePasswordCommandHandler> logger;
 
     public ChangePasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, ICallContext callContext, IAccountMailer mailer, ILogger<ChangePasswordCommandHandler> logger)
-        : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
+        : base(userManager, cacheService, sessionService, auditEvents, securityEvents, mailer, logger)
     {
         this.callContext = callContext;
-        this.mailer = mailer;
-        this.logger = logger;
     }
 
     public async Task<CallResponse> Handle(ChangePasswordCommand command, CancellationToken cancellationToken)
@@ -43,42 +35,6 @@ public class ChangePasswordCommandHandler : UserAccountCommandHandlerBase, IRequ
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
         }
 
-        // Same door as sign-in: a locked-out account gets no password check at all, so the lockout cannot be bypassed here.
-        if (await this.UserManager.IsLockedOutAsync(user))
-        {
-            this.logger.LogWarning("Password change refused: account {UserId} is locked out.", user.Id);
-            return Fail(BusinessErrorCodes.Identity.UserAccount.LockedOut);
-        }
-
-        if (!await this.UserManager.CheckPasswordAsync(user, command.CurrentPassword))
-        {
-            await this.UserManager.AccessFailedAsync(user);
-            this.logger.LogWarning("Password change refused: wrong current password for account {UserId}.", user.Id);
-            return Fail(BusinessErrorCodes.Identity.UserAccount.CurrentPasswordWrong);
-        }
-
-        if (await this.UserManager.CheckPasswordAsync(user, command.NewPassword))
-        {
-            return Fail(BusinessErrorCodes.Identity.UserAccount.NewPasswordSameAsCurrent);
-        }
-
-        // Domain first, store second: ChangePasswordAsync saves the whole entity, so the cleared flag and the
-        // bumped version land in the same write as the new hash, or not at all.
-        user.MarkPasswordChanged();
-        await this.TrailAsync(user, SecurityAuditActions.PasswordChanged, cancellationToken);
-        var result = await this.UserManager.ChangePasswordAsync(user, command.CurrentPassword, command.NewPassword);
-        if (!result.Succeeded)
-        {
-            // Only the password checks can still say no here: the length, the symbol, the blocklist (leaked, own name).
-            this.logger.LogInformation("Password change refused for account {UserId}: {Codes}.", user.Id, string.Join(", ", result.Errors.Select(e => e.Code)));
-            return Fail(PasswordRefusal(result.Errors.Select(e => e.Code)));
-        }
-
-        await this.UserManager.ResetAccessFailedCountAsync(user);
-        await this.PublishSecurityVersionAsync(user, cancellationToken);
-        this.logger.LogInformation("Password changed for account {UserId}; SecurityVersion is now {Version}.", user.Id, user.SecurityVersion);
-        await this.mailer.SendSecurityAlertAsync(user, SecurityAlert.PasswordChanged, cancellationToken);
-
-        return Ok();
+        return await this.ChangeAsync(user, command.CurrentPassword, command.NewPassword, cancellationToken);
     }
 }

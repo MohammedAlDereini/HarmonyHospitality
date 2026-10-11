@@ -205,11 +205,12 @@ public static class DependenciesConfigurator
         services.TryAddScoped<ISessionService, SessionService>();
         services.TryAddScoped<MfaChallengeStore>();
 
-        // The sign-in rules, shared by the sign-in pages and the password grant they replace.
+        // The sign-in rules behind the sign-in pages (the only way in since BFF step 5), in one place each.
         services.TryAddScoped<PasswordCheck>();
         services.TryAddScoped<SecondFactorCheck>();
         services.TryAddScoped<TwoStepSetup>();
         services.TryAddScoped<EmailSignIn>();
+        services.TryAddScoped<ForcedPasswordChange>();
 
         // Item 4: builds security-trail rows from the request (the handlers save them through their repositories).
         services.TryAddScoped<ISecurityEventFactory, SecurityEventFactory>();
@@ -227,7 +228,6 @@ public static class DependenciesConfigurator
             .Bind(configuration.GetSection(WebLinkSettings.Section))
             .Validate(settings => WebLinkSettings.IsValidTemplate(settings.ResetPasswordUrl), $"{WebLinkSettings.Section}:ResetPasswordUrl must be an absolute https URL containing {{email}} and {{token}}.")
             .Validate(settings => WebLinkSettings.IsValidTemplate(settings.InvitationUrl), $"{WebLinkSettings.Section}:InvitationUrl must be an absolute https URL containing {{email}} and {{token}}.")
-            .Validate(settings => settings.AllowedOrigins.Length > 0 && settings.AllowedOrigins.All(WebLinkSettings.IsValidOrigin), $"{WebLinkSettings.Section}:AllowedOrigins must list at least one https origin without a path.")
             .ValidateOnStart();
 
         // The leaked-password check (Have I Been Pwned); the section is optional, its defaults are the public service.
@@ -292,12 +292,8 @@ public static class DependenciesConfigurator
         // Item 5: the limits per caller at the sign-in, forgot and reset doors (switched on per door with [EnableRateLimiting]).
         services.AddSignInRateLimits();
 
-        // The browser side of the API: only the web app origins, with the Authorization header and the verbs we use.
-        services.AddCors(cors => cors.AddDefaultPolicy(policy => policy
-            .WithOrigins(WebOrigins(configuration))
-            .AllowAnyHeader()
-            .WithMethods("GET", "POST", "PUT", "DELETE")
-            .WithExposedHeaders("Retry-After")));
+        // No CORS on purpose (BFF step 5): no browser calls this service's API or token endpoint directly any more. The
+        // web app talks to its BFF on its own origin, and the BFF talks to this service server to server.
 
         // Identity answers a cache miss from its own database and rewrites the key. The framework readers in the
         // other services cannot, so Identity also republishes everything the first time it finds Redis wiped.
@@ -422,14 +418,11 @@ public static class DependenciesConfigurator
         .AddInMemoryIdentityResources(IdentityServerResources.IdentityResources)
         .AddInMemoryApiScopes(IdentityServerResources.ApiScopes)
         .AddInMemoryApiResources(IdentityServerResources.ApiResources)
-        .AddInMemoryClients(IdentityServerResources.Clients(WebOrigins(configuration), bff.Origins, bffPublicKeys))
+        .AddInMemoryClients(IdentityServerResources.Clients(bff.Origins, bffPublicKeys))
         // private_key_jwt client authentication (RFC 7523), used by the BFF.
         .AddJwtBearerClientAuthentication()
-        // S5: the sign-in rules and token claims, run by Duende on /connect/token.
-        .AddResourceOwnerValidator<HarmonyPasswordValidator>()
+        // The token claims (tenant, roles, security version), run by Duende for every token it issues.
         .AddProfileService<HarmonyProfileService>()
-        // S5 two-factor: the second half of a sign-in when the account has an authenticator.
-        .AddExtensionGrantValidator<MfaOtpGrantValidator>()
         // S5 step 4: refresh tokens live in SQL (Duende operational store, same database as ours), so they survive a restart and
         // a second instance sees them. Duende cleans expired and consumed rows itself (TokenCleanupHost, hourly).
         .AddOperationalStore(store =>
@@ -476,10 +469,6 @@ public static class DependenciesConfigurator
             .ProtectKeysWithCertificate(current)
             .UnprotectKeysWithAnyCertificate([current, .. previous]);
     }
-
-    /// <summary>The web app origins, read once at registration; the options validation above refuses a bad list at startup.</summary>
-    private static string[] WebOrigins(IConfiguration configuration)
-        => configuration.GetSection($"{WebLinkSettings.Section}:{nameof(WebLinkSettings.AllowedOrigins)}").Get<string[]>() ?? [];
 
     /// <summary>The supporting stores (Duende grants, Data Protection keys) live in the Identity database: same engine, same connection.</summary>
     private static void UseIdentityDatabase(DbContextOptionsBuilder db, IConfiguration configuration)

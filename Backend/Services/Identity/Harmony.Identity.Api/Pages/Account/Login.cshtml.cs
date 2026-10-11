@@ -32,6 +32,7 @@ public sealed class LoginModel : PageModel
     private readonly MfaChallengeStore challenges;
     private readonly TwoStepSetup setup;
     private readonly EmailSignIn emailSignIn;
+    private readonly ForcedPasswordChange forced;
     private readonly IAccountMailer mailer;
     private readonly IIssuerNameService issuer;
     private readonly IMediator mediator;
@@ -42,6 +43,7 @@ public sealed class LoginModel : PageModel
         MfaChallengeStore challenges,
         TwoStepSetup setup,
         EmailSignIn emailSignIn,
+        ForcedPasswordChange forced,
         IAccountMailer mailer,
         IIssuerNameService issuer,
         IMediator mediator)
@@ -51,6 +53,7 @@ public sealed class LoginModel : PageModel
         this.challenges = challenges;
         this.setup = setup;
         this.emailSignIn = emailSignIn;
+        this.forced = forced;
         this.mailer = mailer;
         this.issuer = issuer;
         this.mediator = mediator;
@@ -103,6 +106,12 @@ public sealed class LoginModel : PageModel
 
         if (result.Status == PasswordCheckStatus.Exempt)
         {
+            // A password somebody else chose: proved, not signed in — the change page finishes this sign-in.
+            if (result.User!.MustChangePassword)
+            {
+                return await SignInSession.HoldForPasswordChangeAsync(this, this.forced, result.User, "pwd", SecurityAuditActions.SignInPasswordOnly, this.ReturnUrl);
+            }
+
             // On the exception list: signed in with the password alone, and the session says so ("pwd").
             var signedIn = await SignInSession.SignInAsync(this.HttpContext, result.User!, "pwd");
             await this.mediator.Send(

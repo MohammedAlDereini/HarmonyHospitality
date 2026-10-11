@@ -21,12 +21,14 @@ public sealed class TwoStepModel : PageModel
 {
     private readonly IIdentityServerInteractionService interaction;
     private readonly SecondFactorCheck secondFactorCheck;
+    private readonly ForcedPasswordChange forced;
     private readonly IMediator mediator;
 
-    public TwoStepModel(IIdentityServerInteractionService interaction, SecondFactorCheck secondFactorCheck, IMediator mediator)
+    public TwoStepModel(IIdentityServerInteractionService interaction, SecondFactorCheck secondFactorCheck, ForcedPasswordChange forced, IMediator mediator)
     {
         this.interaction = interaction;
         this.secondFactorCheck = secondFactorCheck;
+        this.forced = forced;
         this.mediator = mediator;
     }
 
@@ -86,6 +88,13 @@ public sealed class TwoStepModel : PageModel
         if (result.Status == SecondFactorStatus.Accepted)
         {
             SignInSession.ReleaseSecondStep(this.Response);
+
+            // A password somebody else chose: proved, not signed in — the change page finishes this sign-in.
+            if (result.User!.MustChangePassword)
+            {
+                return await SignInSession.HoldForPasswordChangeAsync(this, this.forced, result.User, "mfa", SecurityAuditActions.SignInTwoStep, this.ReturnUrl);
+            }
+
             var signedIn = await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");
             await this.mediator.Send(
                 new RecordSignInCommand { UserId = result.User!.Id, TrailAction = SecurityAuditActions.SignInTwoStep, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },
@@ -97,6 +106,12 @@ public sealed class TwoStepModel : PageModel
         {
             // The doubled send of a sign-in this browser just finished: walk it through, and record nothing twice.
             SignInSession.ReleaseSecondStep(this.Response);
+            if (result.User!.MustChangePassword)
+            {
+                // The first send already put the sign-in on hold in this browser; this copy just follows it.
+                return this.RedirectToPage("ChangePassword", new { this.ReturnUrl });
+            }
+
             await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");
             return this.Redirect(this.ReturnUrl!);
         }

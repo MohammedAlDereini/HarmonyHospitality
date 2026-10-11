@@ -61,7 +61,7 @@
         </ul>
         @if (Model.ContinueUrl is not null)
         {
-            <a class="button" href="@Model.ContinueUrl">Continue to Harmony</a>
+            <a class="button" href="@Model.ContinueUrl">@(Model.PasswordChangeNext ? "Continue: choose your password" : "Continue to Harmony")</a>
         }
         else
         {

@@ -9,8 +9,8 @@ namespace Harmony.Identity.Infrastructure.IdentityServer;
 /// <summary>
 /// The sign-in sessions and refresh tokens, kept and ended by Duende; Harmony stores none of them. End all: every sign-in
 /// session of the person (server-side sessions, so the sign-in cookies stop working at once) and every persisted grant
-/// (refresh tokens, including the old password grant's, which belong to no session); with the SecurityVersion bump that
-/// always comes with it, the person is out everywhere. End one: the session of one browser and its refresh tokens.
+/// (the refresh tokens the BFF holds for them); with the SecurityVersion bump that always comes with it, the person is
+/// out everywhere. End one: the session of one browser and its refresh tokens.
 /// List open: which sessions are still alive, for the device list, read from Duende's session store by the exact subject
 /// (an index lookup); the management service's QuerySessionsAsync is a text search that reads the whole table.
 /// </summary>

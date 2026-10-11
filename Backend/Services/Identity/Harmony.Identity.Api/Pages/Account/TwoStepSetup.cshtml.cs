@@ -34,12 +34,14 @@ public sealed class TwoStepSetupModel : PageModel
 
     private readonly IIdentityServerInteractionService interaction;
     private readonly TwoStepSetup setup;
+    private readonly ForcedPasswordChange forced;
     private readonly IMediator mediator;
 
-    public TwoStepSetupModel(IIdentityServerInteractionService interaction, TwoStepSetup setup, IMediator mediator)
+    public TwoStepSetupModel(IIdentityServerInteractionService interaction, TwoStepSetup setup, ForcedPasswordChange forced, IMediator mediator)
     {
         this.interaction = interaction;
         this.setup = setup;
+        this.forced = forced;
         this.mediator = mediator;
     }
 
@@ -63,8 +65,11 @@ public sealed class TwoStepSetupModel : PageModel
     /// <summary>The method that was turned on, for the last page's wording.</summary>
     public TwoStepMethod Method { get; private set; }
 
-    /// <summary>Back to the sign-in request, only while Duende still knows it.</summary>
+    /// <summary>Back to the sign-in request, only while Duende still knows it — or on to the password change when one is due.</summary>
     public string? ContinueUrl { get; private set; }
+
+    /// <summary>True when the walk continues with the password change (a password somebody else chose).</summary>
+    public bool PasswordChangeNext { get; private set; }
 
     public async Task<IActionResult> OnGetAsync(string? token)
     {
@@ -140,12 +145,23 @@ public sealed class TwoStepSetupModel : PageModel
 
         SignInSession.ReleaseSetup(this.Response);
         await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User!.Id, TrailAction = SecurityAuditActions.TwoStepTurnedOn }, this.HttpContext.RequestAborted);
+        this.RecoveryCodes = result.RecoveryCodes;
+        this.Method = result.User!.TwoStepMethod;
+
+        if (result.User.MustChangePassword)
+        {
+            // Proved and set up, not signed in yet: the backup codes first, then the password change finishes the sign-in.
+            SignInSession.HoldPasswordChange(this.Response, await this.forced.HoldAsync(result.User, "mfa", SecurityAuditActions.SignInAfterSetup, this.HttpContext.RequestAborted));
+            this.PasswordChangeNext = true;
+            this.ContinueUrl = this.Url.Page("ChangePassword", new { this.ReturnUrl });
+            this.Step = Steps.Done;
+            return this.Page();
+        }
+
         var signedIn = await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");
         await this.mediator.Send(
             new RecordSignInCommand { UserId = result.User!.Id, TrailAction = SecurityAuditActions.SignInAfterSetup, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },
             this.HttpContext.RequestAborted);
-        this.RecoveryCodes = result.RecoveryCodes;
-        this.Method = result.User!.TwoStepMethod;
         this.ContinueUrl = await this.interaction.GetAuthorizationContextAsync(this.ReturnUrl, this.HttpContext.RequestAborted) is null
             ? null
             : this.ReturnUrl;
