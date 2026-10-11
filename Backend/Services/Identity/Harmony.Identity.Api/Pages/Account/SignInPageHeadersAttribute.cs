@@ -8,10 +8,11 @@ namespace Harmony.Identity.Api.Pages.Account;
 
 /// <summary>
 /// The rules every sign-in page is sent with. Script: only the one tag the layout writes, carrying this response's
-/// nonce (a fresh random value each time), and Trusted Types on, so injected markup can never run code. Styles only from
-/// this host; the forms post only here and their redirects end only at the web app (the BFF); no other site may frame the
-/// page, open it as a window it controls, or load it as a resource; no camera, microphone or location; the browser keeps
-/// no copy, and the address never leaks to another site in a Referer header.
+/// nonce (a fresh random value each time), and Trusted Types on, so injected markup can never run code; that script may
+/// call this host only (the passkey challenge). Styles only from this host; the forms post only here and their redirects
+/// end only at the web app (the BFF); no other site may frame the page, open it as a window it controls, or load it as a
+/// resource; no camera, microphone or location; the browser keeps no copy, and the address never leaks to another site
+/// in a Referer header.
 /// </summary>
 public sealed class SignInPageHeadersAttribute : ResultFilterAttribute
 {
@@ -33,7 +34,7 @@ public sealed class SignInPageHeadersAttribute : ResultFilterAttribute
             context.HttpContext.Items[NonceKey] = nonce;
 
             headers.ContentSecurityPolicy =
-                $"default-src 'none'; script-src 'nonce-{nonce}'; style-src 'self'; img-src 'self'; " +
+                $"default-src 'none'; script-src 'nonce-{nonce}'; style-src 'self'; img-src 'self'; connect-src 'self'; " +
                 $"form-action 'self' {string.Join(' ', bff.Origins)}; frame-ancestors 'none'; base-uri 'none'; " +
                 "require-trusted-types-for 'script'";
             headers.XFrameOptions = "DENY";

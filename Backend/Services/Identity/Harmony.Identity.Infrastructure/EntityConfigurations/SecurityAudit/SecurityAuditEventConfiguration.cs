@@ -1,4 +1,4 @@
-using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
+﻿using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -22,6 +22,7 @@ public class SecurityAuditEventConfiguration : IEntityTypeConfiguration<Security
         builder.Property(e => e.ActorSubject).IsRequired().HasMaxLength(SecurityAuditEvent.ActorMaxLength);
         builder.Property(e => e.SourceAddress).HasMaxLength(SecurityAuditEvent.AddressMaxLength);
         builder.Property(e => e.Device).HasMaxLength(SecurityAuditEvent.DeviceMaxLength);
+        builder.Property(e => e.Detail).HasMaxLength(SecurityAuditEvent.DetailMaxLength);
         builder.Property(e => e.OccurredAtUtc).IsRequired();
 
         // An account is never deleted (terminated only), so its trail can point at it; Restrict keeps it that way.

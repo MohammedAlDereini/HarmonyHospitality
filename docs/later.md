@@ -822,3 +822,48 @@ as they are (a card-strict deployment may also just set SessionIdleMinutes to 15
 2. The app says "password + authenticator" from the id_token's amr claim. The refreshed id_token Identity hands the
    BFF on a silent refresh may not carry amr; then the wording falls back to "password" after the first refresh.
    Either keep the first id_token's amr in the session at sign-in, or ask Identity to repeat it on refresh.
+   (Item 6 added "passkey" to that wording: amr "swk" + "mfa".)
+
+## L24. Passkeys: what item 6 left for later
+
+**Parked:** 2026-10-11, with item 6 (passkeys built on .NET 10's own WebAuthn handler, like Mews: made in the app,
+sign in on their own, no password, no code). Decided and shipped: user verification required, discoverable keys,
+one relying-party domain for the app and the sign-in page (IdentitySettings:Passkeys:ServerDomain), ten per
+account, rename, the person told by e-mail on add and remove, a refused answer written to the key holder's trail,
+challenges spent in one atomic step, attestation NOT verified (format "none" accepted, so a synced passkey from any
+phone or password manager works — the Mews stance), and NO request on page load: the browser's "autofill" offer
+("conditional" mediation) opened a modal system dialog in embedded Chromium that claims the feature without its UI,
+so only the button asks. Left:
+
+1. **"Passkeys required" policy** — Mews lets a property enforce passkeys for all its users and makes them mandatory
+   for every admin from 23 April 2026 (help.mews.com, "How to enforce passkeys"). Ours would be a tenant setting:
+   at a password sign-in of a person without a passkey, a setup page on Identity's own origin (the rpId covers it),
+   with a grace period and the same exception list shape as two-step. A product decision first: who may be exempt.
+2. **Attestation and key policy** — the Entra model: an admin profile that demands device-bound keys with verified
+   attestation (a FIDO Metadata Service lookup, an AAGUID allow-list) for the roles that handle money. The handler
+   already has the hook (IdentityPasskeyOptions.VerifyAttestationStatement; the attestation object and client data
+   are stored per key, so a later audit can re-check them). Opera's one-click passkeys need the same resident keys
+   we already demand.
+3. **"Passkeys only" for an account** — turning the password off once a person holds a passkey (Microsoft accounts
+   do this). Needs the recovery story first: an admin reset path and the two-step exception list interplay.
+4. **amr for a hardware key** — the token says "swk" (software-secured key, RFC 8176) for every passkey because
+   attestation is not verified; with 2. in place a verified security key can honestly say "hwk".
+5. **The browser's autofill offer** — worth turning back on for real Chrome/Edge/Safari once a browser check can
+   tell an embedded Chromium apart (or when those stop claiming conditional mediation they cannot show).
+
+**Closed the same day, after the industry audit (Microsoft .NET 10 passkeys docs and template source, WebAuthn L3,
+NIST 800-63B-4, OWASP passkey cheat sheet, FIDO UX patterns, Mews/Entra behaviour), eleven items:** a fresh proof of
+identity before a passkey is added or removed (the password, or one of the person's own passkeys; 5 minutes; 00084
+without; `ConfirmIdentityOptions`/`ConfirmIdentity`, trail `identity.confirmed` with "password"/"passkey"); a removal
+ends every session, by the person and by an admin (the version bumps in the same save; the app shows "Passkey removed",
+tells the person to delete it from the device too, then sends them to sign in again); a new passkey without a name is
+named after its maker from the AAGUID in its attestation (`PasskeyMakers`, a table of every registered maker in our own
+code, 402 names; unknown → "Passkey" and the rename opens at once); the trail says WHICH passkey signed in (`Detail`,
+migration `AddSecurityEventDetail`); the browser's Signal API (the sign-in page signals a key nobody holds any more,
+the app signals the full list and the owner's name after every load and removal); the answer JSON is built by hand
+always, never `toJSON()` (node proof in s45); the W3C `/.well-known/passkey-endpoints` document served by the BFF
+(`BffSettings:PasskeyEnrollUrl/PasskeyManageUrl`, both absolute https or both empty; **deployment: the front door must
+route that path of the relying-party apex, https://harmony.local/.well-known/passkey-endpoints, to the BFF**); the
+passkey doors rate-limited per person (`RateLimits:PasskeyBurst/PasskeyPerMinute`); the origin check compares scheme,
+host and port field by field; the FIDO remove dialog (named key, last-key warning) and the shared-desk warning; the
+creation options exclude every key the account holds. s45 = 74 checks.

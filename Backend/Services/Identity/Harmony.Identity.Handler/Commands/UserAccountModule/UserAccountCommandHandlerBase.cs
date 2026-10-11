@@ -1,4 +1,4 @@
-namespace Harmony.Identity.Handler.Commands.UserAccountModule;
+﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule;
 
 using Harmony.Core.Exceptions;
 using Harmony.Core.Identity.Permissions;
@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Identity;
 /// </summary>
 public abstract class UserAccountCommandHandlerBase
 {
-    private readonly ISecurityEventFactory securityEvents;
 
     protected UserAccountCommandHandlerBase(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents)
     {
@@ -23,7 +22,7 @@ public abstract class UserAccountCommandHandlerBase
         this.CacheService = cacheService;
         this.SessionService = sessionService;
         this.AuditEvents = auditEvents;
-        this.securityEvents = securityEvents;
+        this.SecurityEvents = securityEvents;
     }
 
     protected UserManager<User> UserManager { get; }
@@ -34,13 +33,15 @@ public abstract class UserAccountCommandHandlerBase
 
     protected ISecurityAuditEventRepository AuditEvents { get; }
 
+    protected ISecurityEventFactory SecurityEvents { get; }
+
     /// <summary>
     /// Stages the trail row for this change. It is not saved here: the handler's next save stores the change and its row
     /// together, or neither (the repository's add only stages, like every add in this service).
     /// </summary>
     protected async Task TrailAsync(User user, string action, CancellationToken cancellationToken)
     {
-        await this.AuditEvents.AddAsync(this.securityEvents.Create(user, action), cancellationToken);
+        await this.AuditEvents.AddAsync(this.SecurityEvents.Create(user, action), cancellationToken);
     }
 
     protected async Task<User?> LoadAsync(Guid id)

@@ -1,4 +1,4 @@
-using Harmony.Core.Abstractions;
+﻿using Harmony.Core.Abstractions;
 using Harmony.Identity.Domain.Models.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
 
@@ -41,6 +41,7 @@ public class GetSecurityEventsQueryHandler : IRequestHandler<GetSecurityEventsQu
                 ActorSubject = e.ActorSubject,
                 SourceAddress = e.SourceAddress,
                 Device = e.Device,
+                Detail = e.Detail,
             })
             .ToListAsync(cancellationToken);
 

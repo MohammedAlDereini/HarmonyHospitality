@@ -1,7 +1,8 @@
-using Harmony.Core.Models;
+﻿using Harmony.Core.Models;
 using Harmony.Identity.Domain.Models.UserAccountModule;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Create;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Devices;
+using Harmony.Identity.Handler.Commands.UserAccountModule.Passkeys;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Sessions;
@@ -14,6 +15,7 @@ using Harmony.Identity.Handler.Commands.UserAccountModule.State;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Detail;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Devices;
 using Harmony.Identity.Handler.Queries.UserAccountModule.List;
+using Harmony.Identity.Handler.Queries.UserAccountModule.Passkeys;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Security;
 
 namespace Harmony.Identity.Api.Controllers;
@@ -210,6 +212,100 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [RequirePermission(PermissionEnum.ManageUsers)]
     public async Task<IActionResult> SignOutDevice([FromBody] SignOutDeviceCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>Step 1 of adding a passkey for the caller: the WebAuthn creation options (the challenge), good for 5 minutes, once.</summary>
+    /// <summary>Before a passkey is added or removed: the WebAuthn request options for one of the caller's own passkeys, to prove it is them.</summary>
+    [HttpPost("[action]")]
+    [ProducesResponseType(typeof(PasskeyRequestOptionsModel), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    [EnableRateLimiting(RateLimitPolicies.Passkeys)]
+    public async Task<IActionResult> ConfirmIdentityOptions()
+    {
+        var response = await this.Mediator.Send(new ConfirmIdentityOptionsCommand());
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The caller proves it is them with the password or a passkey answer; good for 5 minutes of passkey changes.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    [EnableRateLimiting(RateLimitPolicies.Passkeys)]
+    public async Task<IActionResult> ConfirmIdentity([FromBody] ConfirmIdentityCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    [HttpPost("[action]")]
+    [ProducesResponseType(typeof(PasskeyCreationOptionsModel), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    [EnableRateLimiting(RateLimitPolicies.Passkeys)]
+    public async Task<IActionResult> PasskeyOptions()
+    {
+        var response = await this.Mediator.Send(new StartPasskeyRegistrationCommand());
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>Step 2: the browser's answer and a name (or none: its maker's name); the passkey is stored and signs the caller in from now on.</summary>
+    [HttpPost("[action]")]
+    [ProducesResponseType(typeof(UserPasskeyModel), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    [EnableRateLimiting(RateLimitPolicies.Passkeys)]
+    public async Task<IActionResult> AddPasskey([FromBody] AddPasskeyCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The caller's passkeys, newest first.</summary>
+    [HttpGet("[action]")]
+    [ProducesResponseType(typeof(List<UserPasskeyModel>), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> MyPasskeys()
+    {
+        var response = await this.Mediator.Send(new GetPasskeysQuery());
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>An account's passkeys (names and dates; never the keys).</summary>
+    [HttpGet("{id:guid}/passkeys")]
+    [ProducesResponseType(typeof(List<UserPasskeyModel>), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewUsers)]
+    public async Task<IActionResult> Passkeys(Guid id)
+    {
+        var response = await this.Mediator.Send(new GetPasskeysQuery { Id = id });
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The caller renames one of their own passkeys; only the label changes.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> RenameMyPasskey([FromBody] RenameMyPasskeyCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The caller removes one of their own passkeys; every session of the account ends.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> RemoveMyPasskey([FromBody] RemoveMyPasskeyCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>An admin removes a passkey from an account (the rank rules apply); every session of the account ends and the person is told.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageUsers)]
+    public async Task<IActionResult> RemovePasskey([FromBody] RemovePasskeyCommand command)
     {
         var response = await this.Mediator.Send(command);
         return await this.CallResponseManager.AsActionResultAsync(response);

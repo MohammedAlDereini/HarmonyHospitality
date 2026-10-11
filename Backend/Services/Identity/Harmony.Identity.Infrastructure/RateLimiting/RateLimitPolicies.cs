@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.RateLimiting;
@@ -23,6 +23,9 @@ public static class RateLimitPolicies
     public const string SignIn = "sign-in";
     public const string ForgotPassword = "forgot-password";
     public const string ResetPassword = "reset-password";
+
+    /// <summary>The passkey doors behind a session (a challenge, an answer, a proof of identity): counted per PERSON, not per address.</summary>
+    public const string Passkeys = "passkeys";
 
     /// <summary>The sign-in family's refusal page (Pages/Account/TooManyTries), where a refused sign-in send is redirected.</summary>
     public const string RefusalPage = "/account/toomanytries";
@@ -52,6 +55,12 @@ public static class RateLimitPolicies
 
                 // Also the invitation door: a burst an onboarding day fits in.
                 options.AddPolicy(ResetPassword, context => SendsOnly(context, caller => Bucket(caller, limits.ResetPasswordBurst, limits.ResetPasswordPerMinute)));
+
+                // Item 6 (OWASP: rate-limit registration): a signed-in person asks for a passkey challenge a few times, a script a
+                // thousand times. Counted by the token's subject; a call without one falls back to the address.
+                options.AddPolicy(Passkeys, context => IsSend(context.Request.Method)
+                    ? Bucket(PersonOf(context), limits.PasskeyBurst, limits.PasskeyPerMinute)
+                    : RateLimitPartition.GetNoLimiter("read"));
             });
 
         return services;
@@ -82,6 +91,10 @@ public static class RateLimitPolicies
         Array.Clear(bytes, 8, 8);
         return new IPAddress(bytes) + "/64";
     }
+
+    /// <summary>The signed-in person behind a call (the token's subject), else the caller's address.</summary>
+    internal static string PersonOf(HttpContext context)
+        => context.User.FindFirst("sub")?.Value is { Length: > 0 } subject ? "sub:" + subject : CallerOf(context.Connection.RemoteIpAddress);
 
     /// <summary>A send counts; opening a page (GET), HEAD and the browser's CORS check (OPTIONS) never do.</summary>
     internal static bool IsSend(string method)

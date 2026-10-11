@@ -33,6 +33,9 @@
     "PreviousCertificatePaths": []
   },
   "IdentitySettings": {
+    "Passkeys": {
+      "ServerDomain": "harmony.local"
+    },
     "WebBff": {
       "Origins": [ "https://app.harmony.local" ],
       "ClientPublicKeyPath": "/run/secrets/web-bff-client-key.public.pem",

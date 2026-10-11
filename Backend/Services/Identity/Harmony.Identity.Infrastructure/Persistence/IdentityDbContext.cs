@@ -35,6 +35,7 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<User> UserAccounts { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<UserDevice> UserDevices { get; set; }
+    public DbSet<UserPasskey> UserPasskeys { get; set; }
     public DbSet<SecurityAuditEvent> SecurityAuditEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

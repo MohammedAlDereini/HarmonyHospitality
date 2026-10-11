@@ -1,4 +1,4 @@
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using Harmony.Core.DI;
@@ -26,7 +26,7 @@ builder.WebHost.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
 
 builder.Services.AddOptions<BffSettings>()
     .Bind(builder.Configuration.GetSection(BffSettings.Section))
-    .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24.")
+    .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24, PasskeyEnrollUrl and PasskeyManageUrl both absolute https or both empty.")
     .ValidateOnStart();
 
 // The shared fabric this host stands on: the framework core (AppInfo names every Redis key "webbff", the call
@@ -169,6 +169,18 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/healthz", () => Results.Ok(new { status = "alive" })).AllowAnonymous();
+
+// The W3C "Passkey Endpoints Well-Known URL": a password manager asks the relying-party domain where a person adds or
+// manages passkeys and sends them there. Public, a plain JSON document with the two links, cacheable for a day, never a
+// redirect (the spec forbids one); HEAD answers like GET. The front door routes the apex path here.
+if (bffSettings.ServesPasskeyEndpoints)
+{
+    app.MapMethods("/.well-known/passkey-endpoints", [HttpMethods.Get, HttpMethods.Head], (HttpContext http) =>
+    {
+        http.Response.Headers.CacheControl = "public, max-age=86400";
+        return Results.Json(new { enroll = bffSettings.PasskeyEnrollUrl, manage = bffSettings.PasskeyManageUrl });
+    }).AllowAnonymous();
+}
 
 // The browser never signs in itself: this door starts the dance and the BFF does the rest (RFC 10017 §6.1).
 // Only a LOCAL path may ride along, or a crafted link could land a fresh sign-in on someone else's site.

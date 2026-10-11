@@ -86,6 +86,8 @@ public sealed class AccountMailer : IAccountMailer
             SecurityAlert.BackupCodeUsed => ("A backup code was used", "One of your backup codes was just used to sign in. Each code works once."),
             SecurityAlert.TwoStepExempted => ("Password-only sign-in allowed", "An administrator just allowed your account to sign in with the password only, without two-step sign-in."),
             SecurityAlert.TwoStepExemptionEnded => ("Two-step sign-in is required again", "An administrator just ended password-only sign-in for your account. You will set up two-step sign-in at your next sign-in."),
+            SecurityAlert.PasskeyAdded => ("A passkey was added", "A passkey was just added to your account. It signs you in without your password."),
+            SecurityAlert.PasskeyRemoved => ("A passkey was removed", "A passkey was just removed from your account. It cannot sign you in any more."),
             _ => throw new ArgumentOutOfRangeException(nameof(alert)),
         };
 

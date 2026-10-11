@@ -51,7 +51,7 @@ export type User = {
   name: string
   tenant: string | null
   roles: string[]
-  /** How the person signed in: "pwd", and "mfa" when the authenticator was used too. */
+  /** How the person signed in: "pwd", and "mfa" when the authenticator was used too; "swk" + "mfa" for a passkey. */
   amr: string[]
   /** The sign-out link, carrying this session's own proof; always a top-level navigation. */
   logoutUrl: string
@@ -108,6 +108,48 @@ export const enableTwoFactor = (code: string) =>
 
 export const disableTwoFactor = (currentPassword: string) =>
   authCall('PUT', '/api/UserAccount/DisableTwoFactor', { currentPassword })
+
+// ---- passkeys (always about the signed-in person)
+
+export type PasskeyModel = {
+  id: string
+  /** The key's id as the browser knows it (base64url): for the browser's signals only, never shown. */
+  credentialId: string
+  /** The relying-party domain the key was made for (the signals name it). */
+  rpId: string
+  name: string
+  createdUtc: string
+  lastUsedUtc: string | null
+  /** Synced to the person's other devices (a password manager, Apple or Google account). */
+  isBackedUp: boolean
+  isBackupEligible: boolean
+  transports: string[]
+}
+
+export const myPasskeys = () => authCall<PasskeyModel[]>('GET', '/api/UserAccount/MyPasskeys')
+
+/** Adding or removing a passkey needs a fresh proof it is you (00084 without one): the password, or one of your passkeys. */
+export const identityConfirmationRequired = '00084'
+
+/** The request options for proving it is you with one of your own passkeys; good for 5 minutes, once. */
+export const confirmIdentityOptions = () => authCall<{ optionsJson: string }>('POST', '/api/UserAccount/ConfirmIdentityOptions')
+
+/** The proof: exactly one of the two. Good for 5 minutes of passkey changes. */
+export const confirmIdentity = (proof: { password: string } | { credentialJson: string }) =>
+  authCall('PUT', '/api/UserAccount/ConfirmIdentity', proof)
+
+/** Step 1: the creation options (the challenge) for the browser; good for 5 minutes, once. */
+export const passkeyOptions = () => authCall<{ optionsJson: string }>('POST', '/api/UserAccount/PasskeyOptions')
+
+/** Step 2: the browser's answer and a name; without one the passkey is named after its maker ("Windows Hello"). */
+export const addPasskey = (name: string, credentialJson: string) =>
+  authCall<PasskeyModel>('POST', '/api/UserAccount/AddPasskey', { name: name || null, credentialJson })
+
+export const removePasskey = (passkeyId: string) =>
+  authCall('PUT', '/api/UserAccount/RemoveMyPasskey', { passkeyId })
+
+export const renamePasskey = (passkeyId: string, name: string) =>
+  authCall('PUT', '/api/UserAccount/RenameMyPasskey', { passkeyId, name })
 
 // ---- reference data: the same four doors on every table ----
 

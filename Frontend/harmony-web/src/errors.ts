@@ -43,6 +43,13 @@ const messages: Record<string, string> = {
   '00074': 'That device is not in the list any more.',
   '00075': 'Too many tries from your network. Wait a minute, then try again. If this keeps happening, tell your administrator.',
 
+  // passkeys
+  '00080': 'That passkey is not in the list any more.',
+  '00081': 'The passkey was not accepted. Try again.',
+  '00082': 'That took too long: the passkey request expired. Start again.',
+  '00083': 'You already have the most passkeys an account can hold (10). Remove one first.',
+  '00084': 'Confirm it is you first: your password, or one of your passkeys.',
+
   // the rank rules
   '00076': 'This stands above your rank, so it is not yours to change.',
   '00077': 'You cannot give a rank above your own.',
@@ -73,6 +80,12 @@ const messages: Record<string, string> = {
   '10318': 'The code is 6 digits.',
   '10319': 'The link is incomplete.',
   '10320': 'Choose a device.',
+  '10321': 'Give the passkey a name.',
+  '10322': 'The passkey name is at most 64 characters.',
+  '10323': 'The browser did not return a passkey.',
+  '10324': 'Choose a passkey.',
+  '10325': 'The browser returned something that is not a passkey.',
+  '10326': 'Confirm with your password or with a passkey, one of the two.',
 
   // model validation: paging
   '10001': 'The page number must be 1 or more.',

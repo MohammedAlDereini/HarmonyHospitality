@@ -1,4 +1,4 @@
-using Duende.IdentityServer.Models;
+﻿using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
@@ -8,8 +8,10 @@ using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Harmony.Identity.Infrastructure.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 
 namespace Harmony.Identity.Api.Pages.Account;
 
@@ -19,6 +21,8 @@ namespace Harmony.Identity.Api.Pages.Account;
 /// error page. With two-step sign-in on, the password earns a 5-minute challenge and the code page finishes the sign-in.
 /// Two-step sign-in is required for everyone: without it, the password earns a setup link by e-mail, never a session.
 /// The one exception is the two-step exception list (like Mews): there the password alone signs the person in.
+/// A passkey (item 6, like Mews) is the other way in: no password, no code; the key the person's device holds and the
+/// face, fingerprint or PIN that unlocks it are the two factors, so it is a complete sign-in on its own.
 /// </summary>
 [AllowAnonymous]
 [SignInPageHeaders]
@@ -29,6 +33,7 @@ public sealed class LoginModel : PageModel
 
     private readonly IIdentityServerInteractionService interaction;
     private readonly PasswordCheck passwordCheck;
+    private readonly PasskeySignIn passkeySignIn;
     private readonly MfaChallengeStore challenges;
     private readonly TwoStepSetup setup;
     private readonly EmailSignIn emailSignIn;
@@ -36,20 +41,25 @@ public sealed class LoginModel : PageModel
     private readonly IAccountMailer mailer;
     private readonly IIssuerNameService issuer;
     private readonly IMediator mediator;
+    private readonly IOptions<IdentityPasskeyOptions> passkeyOptions;
 
     public LoginModel(
         IIdentityServerInteractionService interaction,
         PasswordCheck passwordCheck,
+        PasskeySignIn passkeySignIn,
         MfaChallengeStore challenges,
         TwoStepSetup setup,
         EmailSignIn emailSignIn,
         ForcedPasswordChange forced,
         IAccountMailer mailer,
         IIssuerNameService issuer,
-        IMediator mediator)
+        IMediator mediator,
+        IOptions<IdentityPasskeyOptions> passkeyOptions)
     {
+        this.passkeyOptions = passkeyOptions;
         this.interaction = interaction;
         this.passwordCheck = passwordCheck;
+        this.passkeySignIn = passkeySignIn;
         this.challenges = challenges;
         this.setup = setup;
         this.emailSignIn = emailSignIn;
@@ -68,9 +78,22 @@ public sealed class LoginModel : PageModel
     [BindProperty]
     public string? Password { get; set; }
 
+    /// <summary>The browser's signed passkey answer (PublicKeyCredential.toJSON()), sent by the page's script.</summary>
+    [BindProperty]
+    public string? CredentialJson { get; set; }
+
     public string? Error { get; private set; }
 
     public string? ForgotPasswordUrl { get; private set; }
+
+    /// <summary>
+    /// Set when a refused answer named a passkey nobody holds any more (removed here, still on the device): the page's
+    /// script hands it to the browser's signal method, so the device stops offering a dead key (WebAuthn Signal API).
+    /// </summary>
+    public string? UnknownCredentialId { get; private set; }
+
+    /// <summary>The relying-party domain the signal names, the one every passkey here was made for.</summary>
+    public string RpId => this.passkeyOptions.Value.ServerDomain!;
 
     public async Task<IActionResult> OnGetAsync(string? notice)
     {
@@ -154,6 +177,79 @@ public sealed class LoginModel : PageModel
             PasswordCheckStatus.LockedOut => "Too many wrong attempts. The account is locked for a few minutes.",
             PasswordCheckStatus.TenantRequired => "This e-mail exists in more than one company. Contact an administrator.",
             _ => "Wrong e-mail or password.",
+        };
+        return this.Page();
+    }
+
+    /// <summary>
+    /// The passkey challenge for the page's script (WebAuthn request options as JSON), held 5 minutes behind a cookie.
+    /// A POST like the forms, so the anti-forgery token guards it; nothing of value is in the answer, but a challenge
+    /// should never be handed to another site's page.
+    /// </summary>
+    public async Task<IActionResult> OnPostPasskeyOptionsAsync()
+    {
+        if (await this.interaction.GetAuthorizationContextAsync(this.ReturnUrl, this.HttpContext.RequestAborted) is null)
+        {
+            return this.BadRequest();
+        }
+
+        var (options, secret) = await this.passkeySignIn.StartAsync(this.HttpContext, this.HttpContext.RequestAborted);
+        SignInSession.HoldPasskey(this.Response, secret);
+        this.Response.Headers.CacheControl = "no-store";
+        return this.Content(options, "application/json");
+    }
+
+    /// <summary>The browser's signed answer. Accepted, a passkey is a complete sign-in: "swk" and "mfa", like Mews.</summary>
+    public async Task<IActionResult> OnPostPasskeyAsync()
+    {
+        var request = await this.interaction.GetAuthorizationContextAsync(this.ReturnUrl, this.HttpContext.RequestAborted);
+        if (request is null)
+        {
+            return this.RedirectToPage("Error");
+        }
+
+        var result = await this.passkeySignIn.FinishAsync(SignInSession.Passkey(this.Request), this.CredentialJson, this.HttpContext, this.HttpContext.RequestAborted);
+        SignInSession.ReleasePasskey(this.Response);
+
+        var refusal = result.Status switch
+        {
+            PasskeySignInStatus.AccountNotActive => SecurityAuditActions.SignInNotActive,
+            PasskeySignInStatus.LockedOut => SecurityAuditActions.SignInLockedOut,
+            PasskeySignInStatus.Refused => SecurityAuditActions.SignInPasskeyRefused,
+            _ => null,
+        };
+        if (result.User is not null && refusal is not null)
+        {
+            await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = refusal }, this.HttpContext.RequestAborted);
+        }
+
+        if (result.Status == PasskeySignInStatus.Accepted)
+        {
+            SignInSession.EnsureDeviceKey(this.HttpContext);
+
+            // A password somebody else chose is still waiting to be replaced: proved, not signed in.
+            if (result.User!.MustChangePassword)
+            {
+                return await SignInSession.HoldForPasswordChangeAsync(this, this.forced, result.User, string.Join(',', SignInSession.PasskeyMethods), SecurityAuditActions.SignInPasskey, this.ReturnUrl, result.PasskeyName);
+            }
+
+            // The trail line names the key that signed in (OWASP: record which credential was used), never the key itself.
+            var signedIn = await SignInSession.SignInAsync(this.HttpContext, result.User!, SignInSession.PasskeyMethods);
+            await this.mediator.Send(
+                new RecordSignInCommand { UserId = result.User!.Id, TrailAction = SecurityAuditActions.SignInPasskey, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId, Detail = result.PasskeyName },
+                this.HttpContext.RequestAborted);
+            return this.Redirect(this.ReturnUrl!);
+        }
+
+        SignInSession.EnsureDeviceKey(this.HttpContext);
+        this.UnknownCredentialId = result.UnknownCredentialId;
+        this.ForgotPasswordUrl = ForgotPasswordOf(request);
+        this.Error = result.Status switch
+        {
+            PasskeySignInStatus.AccountNotActive => "This account cannot sign in. Contact an administrator.",
+            PasskeySignInStatus.LockedOut => "Too many wrong attempts. The account is locked for a few minutes.",
+            PasskeySignInStatus.ChallengeInvalid => "The sign-in step timed out. Start again.",
+            _ => "The passkey was not accepted. Try again, or sign in with your password.",
         };
         return this.Page();
     }

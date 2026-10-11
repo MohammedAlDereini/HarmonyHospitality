@@ -1,4 +1,4 @@
-using Duende.IdentityServer;
+﻿using Duende.IdentityServer;
 using Harmony.Core.DI;
 using Harmony.Core.Enums;
 using Harmony.Core.EventBus.Abstractions;
@@ -18,6 +18,7 @@ using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
 using Harmony.Identity.Infrastructure.Mail;
+using Harmony.Identity.Infrastructure.Passkeys;
 using Harmony.Identity.Infrastructure.Passwords;
 using Harmony.Identity.Infrastructure.Persistence;
 using Harmony.Identity.Infrastructure.Proxies;
@@ -212,6 +213,18 @@ public static class DependenciesConfigurator
         services.TryAddScoped<EmailSignIn>();
         services.TryAddScoped<ForcedPasswordChange>();
 
+        // Item 6: passkeys. The sign-in half on the pages, the registration half behind the API (the challenge held server-side).
+        services.TryAddScoped<PasskeySignIn>();
+        services.TryAddScoped<PasskeyRegistrationHold>();
+        services.TryAddScoped<IdentityConfirmation>();
+        services.AddOptions<PasskeySettings>()
+            .Bind(configuration.GetSection(PasskeySettings.Section))
+            .Validate<IOptions<WebBffSettings>, IOptions<TokenIssuerSettings>>(
+                (settings, bff, issuer) => PasskeySettings.IsValid(settings, bff.Value.Origins, issuer.Value.Issuer),
+                $"{PasskeySettings.Section}:ServerDomain must be a domain the issuer's host and every WebBff origin's host equal or sit under (empty = the issuer's host, right only when they are all that host).")
+            .ValidateOnStart();
+        services.ConfigureOptions<PasskeyOptionsSetup>();
+
         // Item 4: builds security-trail rows from the request (the handlers save them through their repositories).
         services.TryAddScoped<ISecurityEventFactory, SecurityEventFactory>();
 
@@ -333,6 +346,9 @@ public static class DependenciesConfigurator
             .AddTokenProvider<AuthenticatorTokenProvider<User>>(TokenOptions.DefaultAuthenticatorProvider)
             // One-time links (password reset, invitation): Data Protection tokens bound to the security stamp, 24 h.
             .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
+
+        // Identity's WebAuthn handler (AddIdentityCore registers the store side only; AddIdentity would register this too).
+        services.TryAddScoped<IPasskeyHandler<User>, PasskeyHandler<User>>();
     }
 
     /// <summary>

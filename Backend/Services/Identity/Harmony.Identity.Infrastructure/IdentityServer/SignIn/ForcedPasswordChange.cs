@@ -1,4 +1,4 @@
-using System.Buffers.Text;
+﻿using System.Buffers.Text;
 using System.Security.Cryptography;
 using Harmony.Core.Cache.Abstractions;
 using Harmony.Core.Cache.Enums;
@@ -8,8 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 
-/// <summary>A sign-in on hold: who proved themselves, how ("pwd" or "mfa"), and the trail line the finished sign-in writes.</summary>
-public sealed record HeldPasswordChange(User User, string Method, string TrailAction);
+/// <summary>
+/// A sign-in on hold: who proved themselves, how ("pwd", "mfa", or "swk,mfa" for a passkey: the amr values, comma-joined),
+/// the trail line the finished sign-in writes, and its detail (the passkey's name; null for the other methods).
+/// </summary>
+public sealed record HeldPasswordChange(User User, string Method, string TrailAction, string? Detail = null);
 
 /// <summary>
 /// The pause in the sign-in walk for a password somebody else chose (a new account's initial password): the person has
@@ -36,10 +39,10 @@ public sealed class ForcedPasswordChange
     }
 
     /// <summary>Puts a proved sign-in on hold; returns the secret for the browser's cookie.</summary>
-    public async Task<string> HoldAsync(User user, string method, string trailAction, CancellationToken cancellationToken)
+    public async Task<string> HoldAsync(User user, string method, string trailAction, CancellationToken cancellationToken, string? detail = null)
     {
         var secret = Base64Url.EncodeToString(RandomNumberGenerator.GetBytes(32));
-        var result = await this.cache.SaveAsync(KeyPrefix + secret, $"{user.Id:D}|{method}|{trailAction}", Lifetime, eCacheAccessLevel.Public, cancellationToken);
+        var result = await this.cache.SaveAsync(KeyPrefix + secret, $"{user.Id:D}|{method}|{trailAction}|{detail}", Lifetime, eCacheAccessLevel.Public, cancellationToken);
         if (result != eCacheOperationResult.Success)
         {
             throw new InvalidOperationException($"Storing the password-change hold failed ({result}).");
@@ -58,14 +61,14 @@ public sealed class ForcedPasswordChange
         }
 
         var response = await this.cache.GetAsync<string>(KeyPrefix + secret, eCacheAccessLevel.Public, cancellationToken);
-        var parts = response?.Value?.Split('|', 3);
-        if (parts is not { Length: 3 } || !Guid.TryParse(parts[0], out var userId))
+        var parts = response?.Value?.Split('|', 4);
+        if (parts is not { Length: 4 } || !Guid.TryParse(parts[0], out var userId))
         {
             return null;
         }
 
         var user = await this.userAccounts.FindByIdAcrossTenantsAsync(userId, cancellationToken);
-        return user is { MustChangePassword: true } ? new HeldPasswordChange(user, parts[1], parts[2]) : null;
+        return user is { MustChangePassword: true } ? new HeldPasswordChange(user, parts[1], parts[2], parts[3].Length > 0 ? parts[3] : null) : null;
     }
 
     public async Task ReleaseAsync(string secret, CancellationToken cancellationToken)

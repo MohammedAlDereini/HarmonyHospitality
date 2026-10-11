@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { logoutEverywhere } from '../api'
 import { useSession } from '../session'
+import { signInMethod } from '../signInMethod'
 import { tables } from '../reference/tables'
 import { Lockup } from './Logo'
 import { ToastHost } from './Toast'
@@ -11,7 +12,7 @@ export default function Shell() {
   const navigate = useNavigate()
   const { user } = useSession()
   const name = user?.name || 'Signed in'
-  const withAuthenticator = (user?.amr ?? []).includes('mfa')
+  const method = signInMethod(user?.amr)
   const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || 'H'
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -60,9 +61,9 @@ export default function Shell() {
             <div className="menu" role="menu">
               <div className="head">
                 <b>{name}</b>
-                <span>{withAuthenticator ? 'Signed in with password and authenticator' : 'Signed in with password'}</span>
+                <span>Signed in with {method}</span>
               </div>
-              <button type="button" role="menuitem" onClick={() => { setOpen(false); navigate('/account/security') }}>Security and two-step sign-in</button>
+              <button type="button" role="menuitem" onClick={() => { setOpen(false); navigate('/account/security') }}>Security, passkeys and two-step sign-in</button>
               <button type="button" role="menuitem" onClick={() => { setOpen(false); navigate('/account/change-password') }}>Change password</button>
               <button type="button" role="menuitem" onClick={signOut}>Sign out of this device</button>
               <button type="button" role="menuitem" className="danger" onClick={signOutEverywhere}>Sign out everywhere</button>

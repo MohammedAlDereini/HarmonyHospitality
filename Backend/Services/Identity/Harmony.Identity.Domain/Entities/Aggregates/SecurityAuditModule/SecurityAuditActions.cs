@@ -1,4 +1,4 @@
-namespace Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
+﻿namespace Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 
 /// <summary>
 /// The actions this version writes to the security trail. The column itself is free text: these are names, not a list the
@@ -25,6 +25,15 @@ public static class SecurityAuditActions
     public const string TwoStepExemptionEnded = "two-step.exemption-ended";
     public const string BackupCodeUsed = "two-step.backup-code-used";
 
+    /// <summary>The person proved it was them again before changing their passkeys (the detail says how: password or passkey).</summary>
+    public const string IdentityConfirmed = "identity.confirmed";
+
+    // Passkeys
+    public const string PasskeyAdded = "passkey.added";
+    public const string PasskeyRenamed = "passkey.renamed";
+    public const string PasskeyRemoved = "passkey.removed";
+    public const string PasskeyRemovedByAdmin = "passkey.removed-by-admin";
+
     // Sessions
     public const string SignedOutEverywhere = "session.signed-out-everywhere";
     public const string SignedOutDevice = "session.signed-out-device";
@@ -34,6 +43,7 @@ public static class SecurityAuditActions
     public const string SignInTwoStep = "sign-in.two-step";
     public const string SignInEmailLink = "sign-in.email-link";
     public const string SignInAfterSetup = "sign-in.after-two-step-setup";
+    public const string SignInPasskey = "sign-in.passkey";
 
     // Rows written before BFF step 5 may still carry "sign-in.password-grant" and "sign-in.password-grant-two-step":
     // the old web app's grant, gone with step 5. The trail keeps them as history; nothing writes them any more.
@@ -43,4 +53,7 @@ public static class SecurityAuditActions
     public const string SignInWrongCode = "sign-in.wrong-code";
     public const string SignInLockedOut = "sign-in.locked-out";
     public const string SignInNotActive = "sign-in.account-not-active";
+
+    /// <summary>A passkey answer of a known account that did not verify, or a passkey removed meanwhile.</summary>
+    public const string SignInPasskeyRefused = "sign-in.passkey-refused";
 }

@@ -1,4 +1,4 @@
-namespace Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
+﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 
 using Harmony.Core.Exceptions;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
@@ -46,7 +46,7 @@ public class RecordSignInCommandHandler : IRequestHandler<RecordSignInCommand, C
         var user = await this.userAccounts.FindByIdAcrossTenantsAsync(command.UserId, cancellationToken)
             ?? throw new InvalidOperationException($"Account {command.UserId} signed in but cannot be found.");
 
-        var row = this.securityEvents.Create(user, command.TrailAction);
+        var row = this.securityEvents.Create(user, command.TrailAction, command.Detail);
         await this.auditEvents.AddAsync(row, cancellationToken);
 
         var label = row.Device ?? UnknownDevice;

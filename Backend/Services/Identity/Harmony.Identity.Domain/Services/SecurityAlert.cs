@@ -15,4 +15,6 @@ public enum SecurityAlert
     BackupCodeUsed,
     TwoStepExempted,
     TwoStepExemptionEnded,
+    PasskeyAdded,
+    PasskeyRemoved,
 }

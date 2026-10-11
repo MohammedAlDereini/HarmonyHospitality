@@ -1,4 +1,4 @@
-namespace Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
+﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 
 /// <summary>
 /// Sent by the sign-in pages once a person is signed in: which account, how (the trail action), which browser (its device
@@ -13,4 +13,7 @@ public class RecordSignInCommand : BaseCommandRequest<CallResponse>
     public string DeviceKey { get; init; } = null!;
 
     public string? SessionId { get; init; }
+
+    /// <summary>One short fact for the trail line: which passkey signed in. Null for the other methods.</summary>
+    public string? Detail { get; init; }
 }

@@ -24,7 +24,7 @@ public sealed class SecurityEventFactory : ISecurityEventFactory
         this.http = http;
     }
 
-    public SecurityAuditEvent Create(User user, string action)
+    public SecurityAuditEvent Create(User user, string action, string? detail = null)
     {
         var request = this.http.HttpContext;
         var actor = Guid.TryParse(this.callContext.UserId(), out var caller) ? caller.ToString("D")
@@ -38,7 +38,8 @@ public sealed class SecurityEventFactory : ISecurityEventFactory
             actor,
             AddressOf(request),
             request is null ? null : DeviceLabel.From(request.Request.Headers.UserAgent),
-            DateTimeOffset.UtcNow);
+            DateTimeOffset.UtcNow,
+            detail);
     }
 
     /// <summary>The caller's address as the server saw it (behind a proxy this is the proxy until forwarded headers are on).</summary>

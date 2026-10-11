@@ -1,4 +1,4 @@
-using Duende.IdentityServer.Services;
+﻿using Duende.IdentityServer.Services;
 using Harmony.Core.Errors;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Password;
 using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
@@ -106,9 +106,9 @@ public sealed class ChangePasswordModel : PageModel
             return this.StartAgain();
         }
 
-        var signedIn = await SignInSession.SignInAsync(this.HttpContext, user, held.Method);
+        var signedIn = await SignInSession.SignInAsync(this.HttpContext, user, held.Method.Split(','));
         await this.mediator.Send(
-            new RecordSignInCommand { UserId = user.Id, TrailAction = held.TrailAction, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },
+            new RecordSignInCommand { UserId = user.Id, TrailAction = held.TrailAction, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId, Detail = held.Detail },
             this.HttpContext.RequestAborted);
         return this.Redirect(this.ReturnUrl!);
     }

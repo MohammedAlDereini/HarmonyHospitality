@@ -1,8 +1,8 @@
-namespace Harmony.Web.Bff.Security;
+﻿namespace Harmony.Web.Bff.Security;
 
 /// <summary>
 /// Every answer leaves armored: content is never sniffed, never framed, never leaks a referrer. Two CSPs: the
-/// JSON doors (/bff, /api) allow NOTHING, and the web app's own page allows only itself — its scripts and styles
+/// JSON doors (/bff, /api, /.well-known) allow NOTHING, and the web app's own page allows only itself — its scripts and styles
 /// from this origin, no inline script, no foreign origin at all. Headers are set up front, before any endpoint
 /// runs, so no path can forget them.
 /// </summary>
@@ -22,7 +22,7 @@ internal sealed class SecurityHeadersMiddleware
         headers.XContentTypeOptions = "nosniff";
         headers.XFrameOptions = "DENY";
         headers["Referrer-Policy"] = "no-referrer";
-        headers.ContentSecurityPolicy = path.StartsWithSegments("/bff") || path.StartsWithSegments("/api") ? ApiPolicy : PagePolicy;
+        headers.ContentSecurityPolicy = path.StartsWithSegments("/bff") || path.StartsWithSegments("/api") || path.StartsWithSegments("/.well-known") ? ApiPolicy : PagePolicy;
         headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
         headers["Cross-Origin-Opener-Policy"] = "same-origin";
         headers["Cross-Origin-Resource-Policy"] = "same-origin";

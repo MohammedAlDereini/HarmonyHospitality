@@ -1,8 +1,10 @@
-{
+﻿{
   "BffSettings": {
     "Authority": "https://localhost:5000",
     "ClientPrivateKeyPath": "D:/PMS System/Harmony/secrets/web-bff-client-key.pem",
-    "ApiDestination": "https://localhost:5000"
+    "ApiDestination": "https://localhost:5000",
+    "PasskeyEnrollUrl": "https://localhost:5210/account/security",
+    "PasskeyManageUrl": "https://localhost:5210/account/security"
   },
   "DataProtectionSettings": {
     "CertificatePath": "D:/PMS System/Harmony/secrets/identity-dataprotection.pem"

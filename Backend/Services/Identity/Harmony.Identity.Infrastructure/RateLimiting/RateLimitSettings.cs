@@ -1,4 +1,4 @@
-namespace Harmony.Identity.Infrastructure.RateLimiting;
+﻿namespace Harmony.Identity.Infrastructure.RateLimiting;
 
 /// <summary>
 /// IdentitySettings:RateLimits, optional: how many tries one caller address gets at the anonymous doors. The defaults fit
@@ -33,6 +33,12 @@ public sealed class RateLimitSettings
     /// <summary>New-password sends given back to the address every minute, up to the burst.</summary>
     public int ResetPasswordPerMinute { get; set; } = 10;
 
+    /// <summary>Passkey calls (a challenge, an answer, a proof of identity) one signed-in person may make at once: a few registrations in a row.</summary>
+    public int PasskeyBurst { get; set; } = 30;
+
+    /// <summary>Passkey calls given back to the person every minute, up to the burst.</summary>
+    public int PasskeyPerMinute { get; set; } = 10;
+
     /// <summary>Every number 1 or more (.NET's limiters refuse 0 too, but only at the first request); the window at most an hour.</summary>
     public static bool IsValid(RateLimitSettings settings)
         => settings.SignInBurst >= 1
@@ -40,5 +46,7 @@ public sealed class RateLimitSettings
             && settings.ForgotPasswordPerWindow >= 1
             && settings.WindowMinutes is >= 1 and <= 60
             && settings.ResetPasswordBurst >= 1
-            && settings.ResetPasswordPerMinute >= 1;
+            && settings.ResetPasswordPerMinute >= 1
+            && settings.PasskeyBurst >= 1
+            && settings.PasskeyPerMinute >= 1;
 }

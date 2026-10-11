@@ -1,4 +1,4 @@
-using Harmony.Core.BuildingBlocks.Domain.Abstractions;
+﻿using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 
 namespace Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 
@@ -13,6 +13,7 @@ public sealed class SecurityAuditEvent : BaseEntity<Guid>, IMultiTenantEntity
     public const int ActorMaxLength = 64;
     public const int AddressMaxLength = 45;
     public const int DeviceMaxLength = 64;
+    public const int DetailMaxLength = 64;
 
     private SecurityAuditEvent()
     {
@@ -41,7 +42,10 @@ public sealed class SecurityAuditEvent : BaseEntity<Guid>, IMultiTenantEntity
 
     public DateTimeOffset OccurredAtUtc { get; private set; }
 
-    public static SecurityAuditEvent Record(Guid tenantId, Guid userAccountId, string action, string actorSubject, string? sourceAddress, string? device, DateTimeOffset occurredAtUtc)
+    /// <summary>One short fact the action needs: which passkey signed in ("Work PC"), how the person proved themselves. Never a secret.</summary>
+    public string? Detail { get; private set; }
+
+    public static SecurityAuditEvent Record(Guid tenantId, Guid userAccountId, string action, string actorSubject, string? sourceAddress, string? device, DateTimeOffset occurredAtUtc, string? detail = null)
     {
         if (userAccountId == Guid.Empty)
         {
@@ -57,6 +61,7 @@ public sealed class SecurityAuditEvent : BaseEntity<Guid>, IMultiTenantEntity
             SourceAddress = Cut(sourceAddress, AddressMaxLength),
             Device = Cut(device, DeviceMaxLength),
             OccurredAtUtc = occurredAtUtc,
+            Detail = Cut(detail, DetailMaxLength),
         };
     }
 

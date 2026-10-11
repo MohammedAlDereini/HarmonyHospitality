@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model LoginModel
 @{
     ViewData["Title"] = "Sign in";
@@ -17,5 +17,19 @@
         <p class="error" role="alert">@Model.Error</p>
     }
     <button type="submit" data-busy="Signing in…">Sign in</button>
+</form>
+@* Passkeys: shown by sign-in.js only in a browser that can use them. The script asks this page for the challenge
+   (the PasskeyOptions handler), the browser's authenticator signs it, and the answer is sent as this form. *@
+<form method="post" asp-page-handler="Passkey" id="passkey-form" data-options="@Url.Page("Login", "PasskeyOptions", new { Model.ReturnUrl })" hidden>
+    <input type="hidden" asp-for="ReturnUrl" />
+    <input type="hidden" name="CredentialJson" id="passkey-credential" />
+    <p class="or">or</p>
+    <button type="button" class="secondary" id="passkey-button">Sign in with a passkey</button>
+    <p class="error" role="alert" id="passkey-error" hidden></p>
+    @if (Model.UnknownCredentialId is not null)
+    {
+        @* A key this server no longer knows: the script hands it to the browser, so the device stops offering it. *@
+        <span id="passkey-unknown" data-rp-id="@Model.RpId" data-credential-id="@Model.UnknownCredentialId" hidden></span>
+    }
 </form>
 <p class="links"><a href="@Model.ForgotPasswordUrl">Forgot your password?</a></p>

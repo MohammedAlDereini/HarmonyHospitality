@@ -1,4 +1,4 @@
-using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
+﻿using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 
 namespace Harmony.Identity.Domain.Services;
@@ -10,5 +10,6 @@ namespace Harmony.Identity.Domain.Services;
 /// </summary>
 public interface ISecurityEventFactory
 {
-    SecurityAuditEvent Create(User user, string action);
+    /// <param name="detail">One short fact the action needs (which passkey, which proof); null for most actions.</param>
+    SecurityAuditEvent Create(User user, string action, string? detail = null);
 }

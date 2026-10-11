@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { listRows, sessionExpired } from '../api'
 import { useSession } from '../session'
+import { signInMethod } from '../signInMethod'
 import { tables, type Row } from '../reference/tables'
 
 /** Home: the reference tables with how many rows each holds, and who is signed in. */
@@ -65,10 +66,10 @@ export default function HomePage() {
         <h2>You</h2>
         <ul className="facts">
           <li><span>Signed in as</span><span>{user?.name ?? ''}</span></li>
-          <li><span>Signed in with</span><span>{(user?.amr ?? []).includes('mfa') ? 'password + authenticator' : 'password'}</span></li>
+          <li><span>Signed in with</span><span>{signInMethod(user?.amr)}</span></li>
           <li><span>Roles</span><span>{user?.roles.length ?? 0}</span></li>
         </ul>
-        <p className="links"><Link to="/account/security">Security and two-step sign-in</Link></p>
+        <p className="links"><Link to="/account/security">Security: passkeys and two-step sign-in</Link></p>
       </section>
     </>
   )

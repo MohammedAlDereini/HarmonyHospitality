@@ -1,4 +1,4 @@
-namespace Harmony.Web.Bff.Settings;
+﻿namespace Harmony.Web.Bff.Settings;
 
 /// <summary>
 /// BffSettings: everything this host needs, checked at startup — a wrong value refuses to start, never at 03:00.
@@ -42,6 +42,17 @@ public sealed class BffSettings
     /// <summary>Front doors whose X-Forwarded-For is believed. EMPTY MEANS TRUST NOBODY — the safe default.</summary>
     public string[] TrustedProxyAddresses { get; set; } = [];
 
+    /// <summary>
+    /// Where a password manager sends a person to add a passkey, and to manage them (the W3C "Passkey Endpoints Well-Known
+    /// URL", served here at /.well-known/passkey-endpoints). Both absolute https, or both empty: the document is then not
+    /// served. The front door routes that path of the relying-party domain's apex (https://harmony.local/...) to this host.
+    /// </summary>
+    public string? PasskeyEnrollUrl { get; set; }
+
+    public string? PasskeyManageUrl { get; set; }
+
+    public bool ServesPasskeyEndpoints => !string.IsNullOrWhiteSpace(this.PasskeyEnrollUrl) && !string.IsNullOrWhiteSpace(this.PasskeyManageUrl);
+
     public static bool IsValid(BffSettings settings)
         => Uri.TryCreate(settings.Authority, UriKind.Absolute, out var authority)
             && authority.Scheme == Uri.UriSchemeHttps
@@ -53,5 +64,17 @@ public sealed class BffSettings
             && settings.SessionIdleMinutes is >= 5 and <= 720
             && settings.SessionAbsoluteHours is >= 1 and <= 24
             && Uri.TryCreate(settings.ApiDestination, UriKind.Absolute, out var api)
-            && api.Scheme == Uri.UriSchemeHttps;
+            && api.Scheme == Uri.UriSchemeHttps
+            && PasskeyEndpointsValid(settings);
+
+    private static bool PasskeyEndpointsValid(BffSettings settings)
+    {
+        if (string.IsNullOrWhiteSpace(settings.PasskeyEnrollUrl) && string.IsNullOrWhiteSpace(settings.PasskeyManageUrl))
+        {
+            return true;
+        }
+
+        return Uri.TryCreate(settings.PasskeyEnrollUrl, UriKind.Absolute, out var enroll) && enroll.Scheme == Uri.UriSchemeHttps
+            && Uri.TryCreate(settings.PasskeyManageUrl, UriKind.Absolute, out var manage) && manage.Scheme == Uri.UriSchemeHttps;
+    }
 }

@@ -1,4 +1,4 @@
-using System.Buffers.Text;
+﻿using System.Buffers.Text;
 using System.Globalization;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -28,18 +28,29 @@ internal static class SignInSession
     public const string DeviceCookie = "__Host-harmony-device";
 
     /// <summary>
-    /// Signs the person in at Identity (Duende's cookie, set up in 1.3). The cookie carries the SecurityVersion the person
-    /// signed in with, so a later change (password, roles, suspension) can end this session. "pwd" or "mfa" says how.
-    /// Returns the sign-in session Duende opened and this browser's device key, for the page's RecordSignInCommand.
+    /// How a passkey sign-in is named in the token's amr (RFC 8176): "swk", proof of possession of a key (the attestation
+    /// is not verified, so a hardware key is never claimed), and "mfa", because the person also verified themselves on the
+    /// device (NIST SP 800-63B-4: a multi-factor cryptographic authenticator). Joined with a comma where one string is kept.
     /// </summary>
-    public static async Task<SignedIn> SignInAsync(HttpContext http, User user, string method)
+    public static readonly string[] PasskeyMethods = ["swk", "mfa"];
+
+    /// <summary>
+    /// Signs the person in at Identity (Duende's cookie, set up in 1.3). The cookie carries the SecurityVersion the person
+    /// signed in with, so a later change (password, roles, suspension) can end this session. The methods say how: "pwd",
+    /// "mfa", or the passkey pair. Returns the sign-in session Duende opened and this browser's device key, for the page's
+    /// RecordSignInCommand.
+    /// </summary>
+    public static async Task<SignedIn> SignInAsync(HttpContext http, User user, params string[] methods)
     {
         var person = new IdentityServerUser(user.Id.ToString("D"))
         {
             DisplayName = user.DisplayName,
-            AuthenticationMethods = { method },
             AdditionalClaims = { new Claim(PlatformClaimTypes.SecurityVersion, user.SecurityVersion.ToString(CultureInfo.InvariantCulture)) },
         };
+        foreach (var method in methods)
+        {
+            person.AuthenticationMethods.Add(method);
+        }
 
         // Not persistent: the cookie ends with the browser, and after 30 idle minutes in any case.
         await http.SignInAsync(person, new AuthenticationProperties { IsPersistent = false });
@@ -106,6 +117,17 @@ internal static class SignInSession
     public static void ReleaseEmailLink(HttpResponse response)
         => response.Cookies.Delete(EmailLinkCookie, SetupOptions(null));
 
+    /// <summary>Holds the passkey challenge between the request for it and the browser's signed answer (5 minutes, like the challenge).</summary>
+    public const string PasskeyCookie = "__Host-harmony-passkey";
+
+    public static void HoldPasskey(HttpResponse response, string secret)
+        => response.Cookies.Append(PasskeyCookie, secret, SecondStepOptions(PasskeySignIn.Lifetime));
+
+    public static string? Passkey(HttpRequest request) => request.Cookies[PasskeyCookie];
+
+    public static void ReleasePasskey(HttpResponse response)
+        => response.Cookies.Delete(PasskeyCookie, SecondStepOptions(null));
+
     /// <summary>Holds a proved sign-in while the person replaces a password somebody else chose (10 minutes, like the hold).</summary>
     public const string PasswordChangeCookie = "__Host-harmony-password-change";
 
@@ -121,9 +143,9 @@ internal static class SignInSession
     /// The same pause from every way a person proves who they are: the sign-in goes on hold with how it was proved and
     /// the trail line it will write, and the change page finishes it. Nobody is signed in until the password is theirs.
     /// </summary>
-    public static async Task<IActionResult> HoldForPasswordChangeAsync(PageModel page, ForcedPasswordChange forced, User user, string method, string trailAction, string? returnUrl)
+    public static async Task<IActionResult> HoldForPasswordChangeAsync(PageModel page, ForcedPasswordChange forced, User user, string method, string trailAction, string? returnUrl, string? detail = null)
     {
-        var secret = await forced.HoldAsync(user, method, trailAction, page.HttpContext.RequestAborted);
+        var secret = await forced.HoldAsync(user, method, trailAction, page.HttpContext.RequestAborted, detail);
         HoldPasswordChange(page.Response, secret);
         return page.RedirectToPage("ChangePassword", new { returnUrl });
     }
