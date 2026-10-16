@@ -23,6 +23,9 @@ public interface IUserAccountRepository : IRepository<User>
     /// </summary>
     public Task<User?> FindByIdAcrossTenantsAsync(Guid id, CancellationToken cancellationToken);
 
+    /// <summary>The first account holding a role inside a named tenant, whatever tenant the caller is in (a tenant's administrator).</summary>
+    public Task<User?> FindWithRoleInTenantAsync(Guid tenantId, Guid roleId, CancellationToken cancellationToken);
+
     /// <summary>
     /// True when the account holds a Manager or higher role. Searches every tenant (the id is unique), because sign-in asks
     /// before any tenant is chosen; such a person always needs two-step, exception list or not.

@@ -613,15 +613,15 @@ namespace Harmony.Identity.Infrastructure.Migrations
 
                     b.HasIndex("CreatedDate");
 
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UX_UserAccounts_UserName")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
                     b.HasIndex("TenantId");
 
                     b.HasIndex("TenantId", "NormalizedEmail")
                         .HasDatabaseName("IX_UserAccounts_Tenant_Email");
-
-                    b.HasIndex("TenantId", "NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UX_UserAccounts_Tenant_UserName")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("UserAccounts", (string)null);
                 });

@@ -32,6 +32,12 @@ public class UpdateRolePermissionsCommandHandler : IRequestHandler<UpdateRolePer
             return Fail(BusinessErrorCodes.Identity.Role.NotFound);
         }
 
+        // A system role (SUPERADMIN, a tenant's ADMINISTRATOR) is born with the tenant and is nobody's to re-permission.
+        if (role.IsSystemRole)
+        {
+            return Fail(BusinessErrorCodes.Identity.Role.SystemRoleImmutable);
+        }
+
         // The rank rule: what a role standing above the caller may do is not the caller's to change.
         var callerRank = await this.userAccounts.RankOfAsync(RankRules.CallerId(this.callContext), cancellationToken);
         if (RoleRank.Of(role.PrivilegeLevel, role.IsSuperRole) > callerRank)

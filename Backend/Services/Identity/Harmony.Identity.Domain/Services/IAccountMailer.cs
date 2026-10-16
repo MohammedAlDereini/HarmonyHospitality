@@ -14,6 +14,9 @@ public interface IAccountMailer
     /// <summary>"Welcome, set your password": the same kind of link, for an account created without a password.</summary>
     Task SendInvitationAsync(User user, string token, CancellationToken cancellationToken);
 
+    /// <summary>The first person of a new tenant: you are the administrator of {tenant}, choose your password within 24 hours.</summary>
+    Task SendTenantAdministratorInvitationAsync(User user, string tenantName, string token, CancellationToken cancellationToken);
+
     /// <summary>"Set up two-step sign-in": the link opens the setup on the computer where the person just signed in.</summary>
     Task SendTwoStepSetupAsync(User user, string link, CancellationToken cancellationToken);
 

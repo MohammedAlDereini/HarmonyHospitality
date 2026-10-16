@@ -797,6 +797,13 @@ queries that return personal data. Decide the masked fields per module when the 
 
 Collected for the tenant ticket (00070–00073); evidence in the session notes.
 
+**Step 2 built 2026-10-16 (born with its administrator).** Decided: one e-mail is one person on the whole platform
+(`UX_UserAccounts_UserName`, migration TenantAdministrator; a person in two tenants is a later "memberships" ticket, never a
+second account); a mail that cannot be sent does not undo the tenant (trail `tenant.administrator-invitation-failed`,
+`POST api/Tenant/InviteAdministrator` repairs and re-sends while no password is chosen, 00086 after). The catalogue lives in
+the domain (`PermissionCatalogue`); the role is the system role ADMINISTRATOR (00012 guards edit/delete/re-permission);
+codes 00085–00087, 10516–10520. Suite s48 (17 checks).
+
 - Both vendors: the VENDOR builds the top container (Oracle provisions chains/properties; Mews builds the portfolio at
   onboarding). Ours: the platform super admin creates tenants — already our model.
 - Both vendors: every property/tenant is BORN with its admin (Opera seeds `<CODE>-ADMIN` groups; Mews's first

@@ -1,4 +1,5 @@
-﻿using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
+﻿using Harmony.Core.BuildingBlocks.Infrastructure;
+using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Infrastructure.Persistence;
@@ -40,6 +41,14 @@ public class RoleRepository : BaseRepository<Role>, IRoleRepository
         return await this.context.Roles
             .Include(r => r.Permissions)
             .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+    }
+
+    public async Task<Role?> FindInTenantByCodeAsync(Guid tenantId, string code, CancellationToken cancellationToken)
+    {
+        return await this.context.Roles
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .Include(r => r.Permissions)
+            .FirstOrDefaultAsync(r => r.TenantId == tenantId && r.Code == code, cancellationToken);
     }
 
     public IQueryable<Role> Query()

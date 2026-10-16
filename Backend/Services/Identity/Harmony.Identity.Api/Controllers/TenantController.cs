@@ -1,5 +1,6 @@
 using Harmony.Core.Models;
 using Harmony.Identity.Domain.Models.TenantModule;
+using Harmony.Identity.Handler.Commands.TenantModule.Administrator;
 using Harmony.Identity.Handler.Commands.TenantModule.Create;
 using Harmony.Identity.Handler.Commands.TenantModule.Edit;
 using Harmony.Identity.Handler.Commands.TenantModule.State;
@@ -20,6 +21,19 @@ public class TenantController(IMediator mediator, ICallResponseManager callRespo
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
     [RequirePermission(PermissionEnum.ManageTenants)]
     public async Task<IActionResult> Create([FromBody] CreateTenantCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>
+    /// Send the tenant's administrator a fresh invitation while no password was chosen yet, making whatever of the birth is
+    /// missing (catalogue, role, account). Refused once the administrator is active: from then on the tenant runs itself.
+    /// </summary>
+    [HttpPost("[action]")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageTenants)]
+    public async Task<IActionResult> InviteAdministrator([FromBody] InviteTenantAdministratorCommand command)
     {
         var response = await this.Mediator.Send(command);
         return await this.CallResponseManager.AsActionResultAsync(response);

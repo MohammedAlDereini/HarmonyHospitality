@@ -26,6 +26,12 @@ public class EditRoleCommandHandler : RoleCommandHandlerBase, IRequestHandler<Ed
             return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Role.NotFound));
         }
 
+        // A system role (SUPERADMIN, a tenant's ADMINISTRATOR) is born with the tenant and is nobody's to reshape.
+        if (role.IsSystemRole)
+        {
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Role.SystemRoleImmutable));
+        }
+
         // The rank rules: a role standing above the caller is not theirs to shape; its level may never rise above
         // the caller; and the one role every active administrator stands on may not sink below Administrator.
         var callerRank = await this.userAccounts.RankOfAsync(RankRules.CallerId(this.callContext), cancellationToken);

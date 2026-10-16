@@ -61,7 +61,7 @@ public sealed class Role : BaseEntity<Guid>, IAuditableEntity, IMultiTenantEntit
 
         var role = new Role
         {
-            Code = AssignableCode(code),
+            Code = IdentityText.RoleCode(code), // the system may name its own roles; only people are kept off the reserved codes
             NameEn = RequireName(nameEn),
             NameAr = IdentityText.Blank(nameAr),
             PrivilegeLevel = RequireLevel(privilegeLevel),

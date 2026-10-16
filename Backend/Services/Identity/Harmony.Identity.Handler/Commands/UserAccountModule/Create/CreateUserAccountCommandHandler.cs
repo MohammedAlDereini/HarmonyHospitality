@@ -39,8 +39,9 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
         // The validator already refused anything that is not one clean address (no spaces around it).
         var email = command.Email;
 
-        // Normalised lookup inside the caller's tenant: a different case of the same address is the same account.
-        if (await this.UserManager.FindByNameAsync(email) is not null)
+        // One e-mail is one person on the whole platform (decided 2026-10-16): a different case of the same address, in
+        // this tenant or any other, is the same person and cannot be a second account.
+        if ((await this.userAccounts.FindByUserNameAcrossTenantsAsync(this.UserManager.NormalizeName(email), cancellationToken)).Count > 0)
         {
             return Fail<Guid>(BusinessErrorCodes.Identity.UserAccount.EmailTaken);
         }

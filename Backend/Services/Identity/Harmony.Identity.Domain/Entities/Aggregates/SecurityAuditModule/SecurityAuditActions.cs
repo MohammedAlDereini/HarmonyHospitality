@@ -63,6 +63,12 @@ public static class SecurityAuditActions
     public const string TenantSuspended = "tenant.suspended";
     public const string TenantReinstated = "tenant.reinstated";
 
+    /// <summary>The platform invited (or re-invited) a tenant's administrator; the detail is the tenant code.</summary>
+    public const string TenantAdministratorInvited = "tenant.administrator-invited";
+
+    /// <summary>The administrator account exists but the invitation mail could not be sent; InviteAdministrator repairs it.</summary>
+    public const string TenantAdministratorInvitationFailed = "tenant.administrator-invitation-failed";
+
     /// <summary>A passkey answer of a known account that did not verify, or a passkey removed meanwhile.</summary>
     public const string SignInPasskeyRefused = "sign-in.passkey-refused";
 }

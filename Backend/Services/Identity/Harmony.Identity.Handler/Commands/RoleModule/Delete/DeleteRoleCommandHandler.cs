@@ -29,6 +29,12 @@ public class DeleteRoleCommandHandler : RoleCommandHandlerBase, IRequestHandler<
             return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Role.NotFound));
         }
 
+        // A system role (SUPERADMIN, a tenant's ADMINISTRATOR) is born with the tenant and is nobody's to delete.
+        if (role.IsSystemRole)
+        {
+            return CallResponseBuilder.CreateResponse(eCallResponseStatus.BusinessValidation).HasErrors(Error.New(BusinessErrorCodes.Identity.Role.SystemRoleImmutable));
+        }
+
         // The rank rules: a role standing above the caller is not theirs to delete, and the one role every active
         // administrator stands on may not go at all.
         var callerRank = await this.userAccounts.RankOfAsync(RankRules.CallerId(this.callContext), cancellationToken);

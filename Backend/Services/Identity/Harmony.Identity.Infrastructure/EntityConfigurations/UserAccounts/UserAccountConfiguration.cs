@@ -59,9 +59,12 @@ public class UserAccountConfiguration : IEntityTypeConfiguration<User>
         builder.Ignore(e => e.CanSignIn);
         builder.Ignore(e => e.IsTwoStepExempt);
 
-        builder.HasIndex(e => new { e.TenantId, e.NormalizedUserName })
+        // One e-mail is one person on the whole platform (decided 2026-10-16): the sign-in page has no tenant field, so an
+        // address must name exactly one account wherever it lives. A person who works for two tenants is a later ticket
+        // (memberships), never a second account.
+        builder.HasIndex(e => e.NormalizedUserName)
             .IsUnique()
-            .HasDatabaseName("UX_UserAccounts_Tenant_UserName");
+            .HasDatabaseName("UX_UserAccounts_UserName");
 
         builder.HasIndex(e => new { e.TenantId, e.NormalizedEmail })
             .HasDatabaseName("IX_UserAccounts_Tenant_Email");

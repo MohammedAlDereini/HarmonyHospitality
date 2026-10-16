@@ -1,3 +1,4 @@
+using Harmony.Core.BuildingBlocks.Infrastructure;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
@@ -26,5 +27,22 @@ public class PermissionRepository : BaseRepository<Permission>, IPermissionRepos
     public IQueryable<Permission> Query()
     {
         return this.context.Permissions.AsNoTracking();
+    }
+
+    public async Task<IReadOnlyList<Permission>> OfTenantAsync(Guid tenantId, CancellationToken cancellationToken)
+    {
+        return await this.context.Permissions
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .AsNoTracking()
+            .Where(p => p.TenantId == tenantId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Permission>> AddCatalogueAsync(IEnumerable<PermissionCatalogueEntry> entries, CancellationToken cancellationToken)
+    {
+        // Ids are given on Add (a client-side Guid), so the role can point at them before anything is saved.
+        var rows = entries.Select(entry => entry.ToPermission()).ToList();
+        await this.context.Permissions.AddRangeAsync(rows, cancellationToken);
+        return rows;
     }
 }

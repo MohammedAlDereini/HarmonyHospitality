@@ -44,6 +44,15 @@ public class UserAccountRepository : BaseRepository<User>, IUserAccountRepositor
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 
+    public async Task<User?> FindWithRoleInTenantAsync(Guid tenantId, Guid roleId, CancellationToken cancellationToken)
+    {
+        return await this.context.UserAccounts
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .Where(u => u.TenantId == tenantId && u.UserRoles.Any(r => r.RoleId == roleId))
+            .OrderBy(u => u.CreatedDate)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<User?> FindByIdAcrossTenantsAsync(Guid id, CancellationToken cancellationToken)
     {
         return await this.context.UserAccounts

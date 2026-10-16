@@ -11,4 +11,7 @@ public interface IRoleRepository : IRepository<Role>
     public Task<Role?> GetWithPermissionsAsync(Guid id, CancellationToken cancellationToken);
 
     public IQueryable<Role> Query();
+
+    /// <summary>A role by code inside a named tenant, with its permissions, whatever tenant the caller is in.</summary>
+    public Task<Role?> FindInTenantByCodeAsync(Guid tenantId, string code, CancellationToken cancellationToken);
 }

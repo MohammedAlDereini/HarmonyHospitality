@@ -24,10 +24,24 @@ public class CreateTenantCommand : BaseCommandRequest<CallResponse<Guid>>
     /// <summary>The contract or billing reference; optional, at most 64 characters.</summary>
     public string? ExternalIdentifier { get; set; }
 
+    /// <summary>The first person of the tenant: invited by e-mail, born with the ADMINISTRATOR role.</summary>
+    public string AdministratorEmail { get; set; } = null!;
+
+    public string AdministratorDisplayName { get; set; } = null!;
+
     public class CreateTenantCommandValidation : AbstractValidator<CreateTenantCommand>
     {
         public CreateTenantCommandValidation()
         {
+            this.RuleFor(e => e.AdministratorEmail)
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Tenant.AdministratorEmailRequired)
+                .MaximumLength(256).WithErrorCode(ModelValidationErrorCodes.Identity.Tenant.AdministratorEmailTooLong)
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").WithErrorCode(ModelValidationErrorCodes.Identity.Tenant.AdministratorEmailInvalid);
+
+            this.RuleFor(e => e.AdministratorDisplayName)
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Tenant.AdministratorNameRequired)
+                .MaximumLength(128).WithErrorCode(ModelValidationErrorCodes.Identity.Tenant.AdministratorNameTooLong);
+
             this.RuleFor(e => e.Code)
                 .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Tenant.CodeRequired)
                 .Matches(TenantRules.CodePattern).WithErrorCode(ModelValidationErrorCodes.Identity.Tenant.CodeInvalidFormat);

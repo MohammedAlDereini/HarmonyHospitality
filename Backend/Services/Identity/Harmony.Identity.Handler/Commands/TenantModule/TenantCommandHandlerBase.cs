@@ -13,21 +13,23 @@ using Microsoft.Extensions.Options;
 /// </summary>
 public abstract class TenantCommandHandlerBase
 {
-    private readonly IUserAccountRepository userAccounts;
-    private readonly ISecurityAuditEventRepository auditEvents;
-    private readonly ISecurityEventFactory securityEvents;
-
     protected TenantCommandHandlerBase(ITenantRepository tenants, IUserAccountRepository userAccounts, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, ICallContext callContext, IOptions<PlatformTenantSettings> platform)
     {
         this.Tenants = tenants;
-        this.userAccounts = userAccounts;
-        this.auditEvents = auditEvents;
-        this.securityEvents = securityEvents;
+        this.UserAccounts = userAccounts;
+        this.AuditEvents = auditEvents;
+        this.SecurityEvents = securityEvents;
         this.CallContext = callContext;
         this.PlatformTenantId = platform.Value.TenantId;
     }
 
     protected ITenantRepository Tenants { get; }
+
+    protected IUserAccountRepository UserAccounts { get; }
+
+    protected ISecurityAuditEventRepository AuditEvents { get; }
+
+    protected ISecurityEventFactory SecurityEvents { get; }
 
     protected ICallContext CallContext { get; }
 
@@ -42,10 +44,10 @@ public abstract class TenantCommandHandlerBase
     /// <summary>Stages the trail row on the caller's own account; the handler's save stores it with the change.</summary>
     protected async Task TrailAsync(string action, Domain.Entities.Aggregates.TenantModule.Tenant tenant, CancellationToken cancellationToken)
     {
-        var caller = await this.userAccounts.FindByIdAcrossTenantsAsync(RankRules.CallerId(this.CallContext), cancellationToken)
+        var caller = await this.UserAccounts.FindByIdAcrossTenantsAsync(RankRules.CallerId(this.CallContext), cancellationToken)
             ?? throw new InvalidOperationException("The caller's account cannot be found for the trail.");
 
-        await this.auditEvents.AddAsync(this.securityEvents.Create(caller, action, tenant.Code), cancellationToken);
+        await this.AuditEvents.AddAsync(this.SecurityEvents.Create(caller, action, tenant.Code), cancellationToken);
     }
 
     protected static CallResponse Ok()
