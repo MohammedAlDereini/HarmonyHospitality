@@ -19,6 +19,7 @@ using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
 using Harmony.Identity.Infrastructure.Mail;
 using Harmony.Identity.Infrastructure.Passkeys;
+using Harmony.Identity.Infrastructure.Tenants;
 using Harmony.Identity.Infrastructure.Passwords;
 using Harmony.Identity.Infrastructure.Persistence;
 using Harmony.Identity.Infrastructure.Proxies;
@@ -147,6 +148,10 @@ public static class DependenciesConfigurator
                 var dbEngine = Enum.Parse<eDbEngine>(configuration["ApplicationSettings:ApplicationKeys:DefaultDbEngine"]!);
                 var connectionString = configuration["ApplicationSettings:ConnectionStrings:Default"]!;
 
+                // One database for every tenant (the design's one-database model): the platform tenant is the one
+                // listed, and every customer tenant, born in the Tenants table, runs with its settings under its own id.
+                multiTenancyConfig.SharedDatabase = true;
+
                 multiTenancyConfig.AddOrUpdateTenant(
                     tenantId,
                     "Harmony",
@@ -217,6 +222,13 @@ public static class DependenciesConfigurator
         services.TryAddScoped<PasskeySignIn>();
         services.TryAddScoped<PasskeyRegistrationHold>();
         services.TryAddScoped<IdentityConfirmation>();
+        // The platform's own tenant: the id every service knows, and the names its seeded row carries.
+        services.AddOptions<PlatformTenantSettings>()
+            .Bind(configuration.GetSection(PlatformTenantSettings.Section))
+            .PostConfigure(settings => settings.TenantId = Guid.TryParse(configuration["ApplicationSettings:ApplicationKeys:PlatformTenantId"], out var id) ? id : Guid.Empty)
+            .Validate(PlatformTenantSettings.IsValid, $"{PlatformTenantSettings.Section}: Code (2-32), LegalNameEn and LegalNameAr (1-128) are required, and ApplicationSettings:ApplicationKeys:PlatformTenantId must be a GUID.")
+            .ValidateOnStart();
+
         services.AddOptions<PasskeySettings>()
             .Bind(configuration.GetSection(PasskeySettings.Section))
             .Validate<IOptions<WebBffSettings>, IOptions<TokenIssuerSettings>>(

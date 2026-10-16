@@ -1,4 +1,4 @@
-using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
+﻿using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -28,6 +28,13 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 
         builder.Property(p => p.IsActive)
             .IsRequired();
+
+        // Tenant work or platform-only; platform rows live in the platform tenant alone (the seed decides).
+        builder.Property(p => p.Scope)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(16)
+            .HasDefaultValue(PermissionScope.Tenant);
 
         // One row per enum value per tenant.
         builder.HasIndex(p => new { p.PermissionValue, p.TenantId })

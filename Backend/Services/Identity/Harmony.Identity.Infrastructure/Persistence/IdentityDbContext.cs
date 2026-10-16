@@ -5,6 +5,7 @@ using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Entities.Aggregates.TenantModule;
 using Harmony.Identity.Domain.Entities.Reference;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,6 +33,7 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<RegulatoryEnvironment> RegulatoryEnvironments { get; set; }
     public DbSet<Capability> Capabilities { get; set; }
 
+    public DbSet<Tenant> Tenants { get; set; }
     public DbSet<User> UserAccounts { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<UserDevice> UserDevices { get; set; }

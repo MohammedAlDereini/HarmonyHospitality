@@ -1,4 +1,5 @@
 ﻿using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Entities.Aggregates.TenantModule;
 using Harmony.Identity.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,8 @@ public enum PasswordCheckStatus
     InvalidCredentials,
 
     AccountNotActive,
+    /// <summary>The account is fine, its company is not: the tenant is suspended or terminated.</summary>
+    TenantNotActive,
     LockedOut,
 
     /// <summary>The same name exists in several tenants and the request did not say which.</summary>
@@ -37,12 +40,14 @@ public sealed record PasswordCheckResult(PasswordCheckStatus Status, User? User)
 public sealed class PasswordCheck
 {
     private readonly IUserAccountRepository userAccounts;
+    private readonly ITenantRepository tenants;
     private readonly UserManager<User> userManager;
     private readonly ILogger<PasswordCheck> logger;
 
-    public PasswordCheck(IUserAccountRepository userAccounts, UserManager<User> userManager, ILogger<PasswordCheck> logger)
+    public PasswordCheck(IUserAccountRepository userAccounts, ITenantRepository tenants, UserManager<User> userManager, ILogger<PasswordCheck> logger)
     {
         this.userAccounts = userAccounts;
+        this.tenants = tenants;
         this.userManager = userManager;
         this.logger = logger;
     }
@@ -78,6 +83,13 @@ public sealed class PasswordCheck
         {
             this.logger.LogInformation("Sign-in refused: account {UserId} is {State}.", user.Id, user.State);
             return new(PasswordCheckStatus.AccountNotActive, user);
+        }
+
+        // The company's standing comes before the password: a suspended or terminated tenant signs nobody in.
+        if (await this.tenants.StatusOfAsync(user.TenantId, cancellationToken) != TenantStatus.Active)
+        {
+            this.logger.LogInformation("Sign-in refused: the tenant of account {UserId} is not active.", user.Id);
+            return new(PasswordCheckStatus.TenantNotActive, user);
         }
 
         if (await this.userManager.IsLockedOutAsync(user))

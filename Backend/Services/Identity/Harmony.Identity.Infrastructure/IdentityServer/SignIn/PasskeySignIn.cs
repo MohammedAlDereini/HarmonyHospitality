@@ -4,6 +4,7 @@ using System.Text.Json;
 using Harmony.Core.Cache.Abstractions;
 using Harmony.Core.Cache.Enums;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Entities.Aggregates.TenantModule;
 using Harmony.Identity.Domain.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -23,6 +24,8 @@ public enum PasskeySignInStatus
     Refused,
 
     AccountNotActive,
+    /// <summary>The account is fine, its company is not: the tenant is suspended or terminated.</summary>
+    TenantNotActive,
     LockedOut,
 }
 
@@ -58,6 +61,7 @@ public sealed class PasskeySignIn
     private readonly UserManager<User> userManager;
     private readonly IUserPasskeyRepository passkeys;
     private readonly IUserAccountRepository userAccounts;
+    private readonly ITenantRepository tenants;
     private readonly ICache<Harmony.Core.Cache.Providers.Redis> cache;
     private readonly ILogger<PasskeySignIn> logger;
 
@@ -66,6 +70,7 @@ public sealed class PasskeySignIn
         UserManager<User> userManager,
         IUserPasskeyRepository passkeys,
         IUserAccountRepository userAccounts,
+        ITenantRepository tenants,
         ICache<Harmony.Core.Cache.Providers.Redis> cache,
         ILogger<PasskeySignIn> logger)
     {
@@ -73,6 +78,7 @@ public sealed class PasskeySignIn
         this.userManager = userManager;
         this.passkeys = passkeys;
         this.userAccounts = userAccounts;
+        this.tenants = tenants;
         this.cache = cache;
         this.logger = logger;
     }
@@ -151,6 +157,12 @@ public sealed class PasskeySignIn
         {
             this.logger.LogInformation("Passkey sign-in refused: account {UserId} is {State}.", user.Id, user.State);
             return new(PasskeySignInStatus.AccountNotActive, user);
+        }
+
+        if (await this.tenants.StatusOfAsync(user.TenantId, cancellationToken) != TenantStatus.Active)
+        {
+            this.logger.LogInformation("Passkey sign-in refused: the tenant of account {UserId} is not active.", user.Id);
+            return new(PasskeySignInStatus.TenantNotActive, user);
         }
 
         if (await this.userManager.IsLockedOutAsync(user))

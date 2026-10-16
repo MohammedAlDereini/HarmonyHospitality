@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Security.Claims;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
@@ -6,6 +6,7 @@ using Duende.IdentityServer.Services;
 using Harmony.Core.BuildingBlocks.Infrastructure;
 using Harmony.Core.Identity.Implementations.Platform;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Entities.Aggregates.TenantModule;
 using Harmony.Identity.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,7 +57,11 @@ public sealed class HarmonyProfileService : IProfileService
     public async Task IsActiveAsync(IsActiveContext context, CancellationToken cancellationToken)
     {
         var user = await this.LoadAsync(context.Subject, cancellationToken);
-        var active = user is not null && user.CanSignIn;
+
+        // The account, then its company: a suspended or terminated tenant gets no token and no refresh, so every session
+        // in it ends within the access token's life.
+        var active = user is not null && user.CanSignIn
+            && await this.dbContext.Tenants.AnyAsync(t => t.Id == user.TenantId && t.Status == TenantStatus.Active, cancellationToken);
 
         // Every session remembers the version it started with: the refresh token (the grants put it on the subject), the
         // sign-in cookie and the one-time code (the sign-in pages put it there). A bump since then (password changed,

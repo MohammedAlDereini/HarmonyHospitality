@@ -1,4 +1,4 @@
-using Harmony.Core.BuildingBlocks.Domain.Abstractions;
+﻿using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Core.Identity.Permissions;
 
@@ -23,6 +23,9 @@ public sealed class Permission : BaseEntity<Guid>, IAuditableEntity, IMultiTenan
 
     public bool IsActive { get; private set; }
 
+    /// <summary>Tenant work, or platform-only. Platform rows exist in the platform tenant alone.</summary>
+    public PermissionScope Scope { get; private set; }
+
     /// <summary>The roles that hold this permission.</summary>
     public ICollection<RolePermission> RolePermissions { get; private set; } = new List<RolePermission>();
 
@@ -36,7 +39,7 @@ public sealed class Permission : BaseEntity<Guid>, IAuditableEntity, IMultiTenan
 
     public string ModifiedBy { get; private set; } = null!;
 
-    public static Permission New(PermissionEnum permissionValue, string name, string? description = null, string? endPoint = null, bool isActive = true)
+    public static Permission New(PermissionEnum permissionValue, string name, string? description = null, string? endPoint = null, bool isActive = true, PermissionScope scope = PermissionScope.Tenant)
     {
         if (!Enum.IsDefined(permissionValue))
         {
@@ -55,8 +58,12 @@ public sealed class Permission : BaseEntity<Guid>, IAuditableEntity, IMultiTenan
             Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim(),
             EndPoint = string.IsNullOrWhiteSpace(endPoint) ? null : endPoint.Trim(),
             IsActive = isActive,
+            Scope = scope,
         };
     }
+
+    /// <summary>The seed keeps the scope of a row in step with the catalogue.</summary>
+    public void SetScope(PermissionScope scope) => Scope = scope;
 
     public void Update(string name, string? description, string? endPoint)
     {

@@ -1,4 +1,4 @@
-using Harmony.Core.Abstractions;
+﻿using Harmony.Core.Abstractions;
 using Harmony.Core.BuildingBlocks.Infrastructure;
 using Harmony.Core.Cache.Abstractions;
 using Harmony.Core.Cache.Enums;
@@ -22,18 +22,15 @@ public sealed class DatabaseBackedSecurityVersionResolver : ISecurityVersionReso
 {
     private readonly ICache<Harmony.Core.Cache.Providers.Redis> redis;
     private readonly IServiceScopeFactory scopes;
-    private readonly IMultiTenancyService tenants;
     private readonly ILogger<DatabaseBackedSecurityVersionResolver> logger;
 
     public DatabaseBackedSecurityVersionResolver(
         ICache<Harmony.Core.Cache.Providers.Redis> redis,
         IServiceScopeFactory scopes,
-        IMultiTenancyService tenants,
         ILogger<DatabaseBackedSecurityVersionResolver> logger)
     {
         this.redis = redis;
         this.scopes = scopes;
-        this.tenants = tenants;
         this.logger = logger;
     }
 
@@ -52,15 +49,16 @@ public sealed class DatabaseBackedSecurityVersionResolver : ISecurityVersionReso
             return cached;
         }
 
-        // A tenant this service does not host has no database to ask; its token is refused, never a 500.
-        if (!this.tenants.GetTenants().Any(tenant => string.Equals(tenant.Id, tenantId.ToString("D"), StringComparison.OrdinalIgnoreCase)))
-        {
-            this.logger.LogWarning("Token check: tenant {Tenant} is not configured on this service.", tenantId);
-            return null;
-        }
-
         using var scope = this.scopes.CreateScope();
         var services = scope.ServiceProvider;
+
+        // Every tenant lives in the one database; the Tenants table says which ids exist. A token naming no tenant row
+        // is refused, never a 500 (the row is platform data: no tenant filter applies).
+        if (!await services.GetRequiredService<IdentityDbContext>().Tenants.AsNoTracking().AnyAsync(t => t.Id == tenantId, cancellationToken))
+        {
+            this.logger.LogWarning("Token check: tenant {Tenant} does not exist.", tenantId);
+            return null;
+        }
 
         if (await services.GetRequiredService<ICacheSeeder>().HealIfLostAsync(cancellationToken))
         {

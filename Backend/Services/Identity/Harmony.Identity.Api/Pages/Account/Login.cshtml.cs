@@ -31,6 +31,9 @@ public sealed class LoginModel : PageModel
 {
     public const string TimedOut = "timed-out";
 
+    /// <summary>The company is suspended or terminated: the account is fine, so the words say the company, not the person.</summary>
+    private const string TenantNotActiveMessage = "Your company's access to Harmony is suspended, so this account cannot sign in. Contact Harmony.";
+
     private readonly IIdentityServerInteractionService interaction;
     private readonly PasswordCheck passwordCheck;
     private readonly PasskeySignIn passkeySignIn;
@@ -174,6 +177,7 @@ public sealed class LoginModel : PageModel
         this.Error = result.Status switch
         {
             PasswordCheckStatus.AccountNotActive => "This account cannot sign in. Contact an administrator.",
+            PasswordCheckStatus.TenantNotActive => TenantNotActiveMessage,
             PasswordCheckStatus.LockedOut => "Too many wrong attempts. The account is locked for a few minutes.",
             PasswordCheckStatus.TenantRequired => "This e-mail exists in more than one company. Contact an administrator.",
             _ => "Wrong e-mail or password.",
@@ -214,6 +218,7 @@ public sealed class LoginModel : PageModel
         var refusal = result.Status switch
         {
             PasskeySignInStatus.AccountNotActive => SecurityAuditActions.SignInNotActive,
+            PasskeySignInStatus.TenantNotActive => SecurityAuditActions.SignInTenantNotActive,
             PasskeySignInStatus.LockedOut => SecurityAuditActions.SignInLockedOut,
             PasskeySignInStatus.Refused => SecurityAuditActions.SignInPasskeyRefused,
             _ => null,
@@ -247,6 +252,7 @@ public sealed class LoginModel : PageModel
         this.Error = result.Status switch
         {
             PasskeySignInStatus.AccountNotActive => "This account cannot sign in. Contact an administrator.",
+            PasskeySignInStatus.TenantNotActive => TenantNotActiveMessage,
             PasskeySignInStatus.LockedOut => "Too many wrong attempts. The account is locked for a few minutes.",
             PasskeySignInStatus.ChallengeInvalid => "The sign-in step timed out. Start again.",
             _ => "The passkey was not accepted. Try again, or sign in with your password.",
@@ -260,6 +266,7 @@ public sealed class LoginModel : PageModel
         PasswordCheckStatus.InvalidCredentials => SecurityAuditActions.SignInWrongPassword,
         PasswordCheckStatus.LockedOut => SecurityAuditActions.SignInLockedOut,
         PasswordCheckStatus.AccountNotActive => SecurityAuditActions.SignInNotActive,
+        PasswordCheckStatus.TenantNotActive => SecurityAuditActions.SignInTenantNotActive,
         _ => null,
     };
 

@@ -54,6 +54,15 @@ public static class SecurityAuditActions
     public const string SignInLockedOut = "sign-in.locked-out";
     public const string SignInNotActive = "sign-in.account-not-active";
 
+    /// <summary>The account is fine, its company is not: the tenant is suspended or terminated.</summary>
+    public const string SignInTenantNotActive = "sign-in.tenant-not-active";
+
+    // The platform console's work on customers, written to the ACTING platform person's trail; Detail = the tenant code.
+    public const string TenantCreated = "tenant.created";
+    public const string TenantUpdated = "tenant.updated";
+    public const string TenantSuspended = "tenant.suspended";
+    public const string TenantReinstated = "tenant.reinstated";
+
     /// <summary>A passkey answer of a known account that did not verify, or a passkey removed meanwhile.</summary>
     public const string SignInPasskeyRefused = "sign-in.passkey-refused";
 }

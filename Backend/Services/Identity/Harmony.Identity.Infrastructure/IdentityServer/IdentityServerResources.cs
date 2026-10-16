@@ -1,4 +1,4 @@
-using Duende.IdentityServer;
+﻿using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
 using Harmony.Core.Identity.Implementations.Platform;
 using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
@@ -18,7 +18,6 @@ public static class IdentityServerResources
     private static readonly string[] UserClaims =
     [
         PlatformClaimTypes.Tenant,
-        PlatformClaimTypes.Org,
         PlatformClaimTypes.Role,
         "name",
         PlatformClaimTypes.SecurityVersion,
