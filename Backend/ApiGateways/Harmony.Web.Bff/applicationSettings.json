@@ -1,23 +1,36 @@
 ﻿{
+  "AllowedHosts": "app.harmony.local",
+  "ApplicationSettings": {
+    "ApplicationKeys": {
+      "PlatformTenantId": "01a0e265-0cad-77e1-b31c-98fed11919e1"
+    }
+  },
   "BffSettings": {
-    "Authority": "https://localhost:5000",
-    "ClientPrivateKeyPath": "D:/PMS System/Harmony/secrets/web-bff-client-key.pem",
-    "ApiDestination": "https://localhost:5000",
-    "PasskeyEnrollUrl": "https://localhost:5210/account/security",
-    "PasskeyManageUrl": "https://localhost:5210/account/security"
+    "Authority": "https://identity.harmony.local",
+    "ClientPrivateKeyPath": "/run/secrets/web-bff-client-key.pem",
+    "ApiDestination": "https://identity.harmony.local",
+    "PasskeyEnrollUrl": "https://app.harmony.local/account/security",
+    "PasskeyManageUrl": "https://app.harmony.local/account/security"
+  },
+  "ApiDocs": {
+    "UserName": "harmony-docs",
+    "PasswordPath": "/run/secrets/identity-apidocs-password",
+    "Services": [
+      { "Name": "Identity", "Url": "https://identity.harmony.local/api/identity/swagger/v1/swagger.json" }
+    ]
   },
   "DataProtectionSettings": {
-    "CertificatePath": "D:/PMS System/Harmony/secrets/identity-dataprotection.pem"
+    "CertificatePath": "/run/secrets/identity-dataprotection.pem"
   },
   "CacheSettings": {
     "CacheProviders": {
       "Redis": {
         "Connection": "localhost",
-        "Port": 6379,
+        "Port": 6380,
         "User": "webbff",
-        "Password": "kXp2WrB8NfTqL5zYhJ3cVdMG9jRuAE6D",
+        "Password": "",
         "AllowAdmin": false,
-        "Ssl": false,
+        "Ssl": true,
         "DistributedLockMode": "RedLock"
       }
     },

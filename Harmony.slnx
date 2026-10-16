@@ -19,6 +19,7 @@
   </Folder>
   <Folder Name="/SolutionItems/secrets/">
     <File Path="secrets/identity-signing-key.pem" />
+    <File Path="secrets/identity-apidocs-password.txt" />
     <File Path="secrets/identity-dataprotection.pem" />
     <File Path="secrets/redis-identity.txt" />
     <File Path="secrets/web-bff-client-key.pem" />

@@ -9,6 +9,8 @@
 internal sealed class SecurityHeadersMiddleware
 {
     private const string ApiPolicy = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'";
+    // Swagger UI (the /docs page) writes style attributes from script; everything else stays as tight as the pages.
+    private const string DocsPolicy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'";
     private const string PagePolicy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'";
 
     private readonly RequestDelegate next;
@@ -22,7 +24,7 @@ internal sealed class SecurityHeadersMiddleware
         headers.XContentTypeOptions = "nosniff";
         headers.XFrameOptions = "DENY";
         headers["Referrer-Policy"] = "no-referrer";
-        headers.ContentSecurityPolicy = path.StartsWithSegments("/bff") || path.StartsWithSegments("/api") || path.StartsWithSegments("/.well-known") ? ApiPolicy : PagePolicy;
+        headers.ContentSecurityPolicy = path.StartsWithSegments("/bff") || path.StartsWithSegments("/api") || path.StartsWithSegments("/.well-known") ? ApiPolicy : path.StartsWithSegments("/docs") ? DocsPolicy : PagePolicy;
         headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
         headers["Cross-Origin-Opener-Policy"] = "same-origin";
         headers["Cross-Origin-Resource-Policy"] = "same-origin";

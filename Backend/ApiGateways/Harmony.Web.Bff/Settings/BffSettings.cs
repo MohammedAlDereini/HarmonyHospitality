@@ -1,4 +1,6 @@
-﻿namespace Harmony.Web.Bff.Settings;
+﻿using System.Net;
+
+namespace Harmony.Web.Bff.Settings;
 
 /// <summary>
 /// BffSettings: everything this host needs, checked at startup — a wrong value refuses to start, never at 03:00.
@@ -65,6 +67,7 @@ public sealed class BffSettings
             && settings.SessionAbsoluteHours is >= 1 and <= 24
             && Uri.TryCreate(settings.ApiDestination, UriKind.Absolute, out var api)
             && api.Scheme == Uri.UriSchemeHttps
+            && settings.TrustedProxyAddresses.All(address => IPAddress.TryParse(address, out _))
             && PasskeyEndpointsValid(settings);
 
     private static bool PasskeyEndpointsValid(BffSettings settings)

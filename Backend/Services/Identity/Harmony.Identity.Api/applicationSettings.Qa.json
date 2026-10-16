@@ -1,4 +1,5 @@
-{
+﻿{
+  "AllowedHosts": "identity.harmony.local",
   "ApplicationSettings": {
     "ApplicationKeys": {
       "DefaultDbEngine": "MSSql",
@@ -6,6 +7,10 @@
     },
     "ConnectionStrings": {
       "Default": "Server=localhost;Database=HarmonyIdentity;Trusted_Connection=True;TrustServerCertificate=True"
+    },
+    "ApiDocs": {
+      "UserName": "harmony-docs",
+      "PasswordPath": "/run/secrets/identity-apidocs-password"
     }
   },
   "ValidationSettings": {
@@ -33,6 +38,7 @@
     "PreviousCertificatePaths": []
   },
   "IdentitySettings": {
+    "PlatformTenant": { "Code": "HARMONY", "LegalNameEn": "Harmony", "LegalNameAr": "هارموني" },
     "Passkeys": {
       "ServerDomain": "harmony.local"
     },

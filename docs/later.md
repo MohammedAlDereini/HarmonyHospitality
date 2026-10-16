@@ -8,6 +8,11 @@ When an item is done, delete it from this file.
 ## L1. Swagger behind a user name and password
 
 **Parked:** 2026-10-05, during the Identity security hardening.
+**Done:** 2026-10-12, framework 3.0.46 (item 4 of the security review). Two things settled while proving it: with the section
+removed the docs address answers 401 like every other unknown `/api` path without a token (the API wall is in front of it),
+not 404; and the BFF's `/docs` page sends the same pair itself, so a person opens one page for every service. The settings
+files follow item 2: every environment carries the section; production reads the password from `/run/secrets`
+(decided 2026-10-16: the detailed health pages open with the same pair, and production must stay readable at 2 a.m.).
 
 **Why.** Swagger UI shows every endpoint, parameter and model of a service. Today the framework serves it to anyone, in every
 environment, before any sign-in check. In production that is a free map of the system (OWASP API Security Top 10, API9).
@@ -193,7 +198,7 @@ using Microsoft.Extensions.Logging;
     }
 ```
 
-`applicationSettings.qa.json` and `applicationSettings.uat.json`:
+`applicationSettings.Qa.json` and `applicationSettings.Uat.json`:
 
 ```json
     "ApiDocs": {
@@ -202,7 +207,7 @@ using Microsoft.Extensions.Logging;
     }
 ```
 
-`applicationSettings.prod.json`: no `ApiDocs` section.
+`applicationSettings.json` (production): no `ApiDocs` section.
 
 ### Tests
 
@@ -212,7 +217,7 @@ using Microsoft.Extensions.Logging;
 4. The right password opens Swagger; "Try it out" works with the Bearer token as before.
 5. Opening the docs over plain `http://` answers 403.
 6. With the password file deleted, the service refuses to start and names `ApplicationSettings:ApiDocs`.
-7. With the `ApiDocs` section removed, the service starts, logs "API docs are off", and the Swagger address answers 404.
+7. With the `ApiDocs` section removed, the service starts, logs "API docs are off", and the Swagger address is gone (401 without a token, like any unknown `/api` path).
 
 ### Sources
 
@@ -220,6 +225,30 @@ using Microsoft.Extensions.Logging;
   https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-10.0
 - OWASP API Security Top 10 (2023), API9 Improper Inventory Management: https://owasp.org/API-Security/editions/2023/en/0x11-t10/
 - RFC 7617, The Basic HTTP Authentication Scheme: https://www.rfc-editor.org/rfc/rfc7617
+
+---
+
+## L1b. Server-setup day: the security items that need a server to exist
+
+From the security review of 2026-10-12. None of these can be done or proven on a developer PC.
+
+1. **Secrets out of git, every one rotated**: signing key, data-protection key, BFF client key, Redis TLS CA and server
+   key, Redis passwords, SMTP password, seed admin password, Duende licence, the API-docs password. Served from
+   `/run/secrets`; the repository history purged afterwards.
+2. **Trusted proxies**: Identity `IdentitySettings:TrustedProxies` = the front door and the BFF; BFF
+   `BffSettings:TrustedProxyAddresses` = the front door. Check: two devices, two source addresses in the trail.
+3. **SQL certificate** (decided 2026-10-16 to do here): production, Qa and Uat connection strings become
+   `Encrypt=True;TrustServerCertificate=False` once SQL Server presents a certificate the host trusts (own CA root
+   installed on the host, or a real CA). `Encrypt=Strict` on SQL Server 2022+. Development keeps trust-any.
+4. **Discovery issuer check**: `https://identity.<domain>/.well-known/openid-configuration` shows `https://` everywhere.
+
+5. **Pinned builds** (parked 2026-10-16): `Backend\Directory.Build.props` with `RestorePackagesWithLockFile`, one
+   `packages.lock.json` per project committed, new framework versions taken with `dotnet restore --force-evaluate`;
+   and the framework's `pack.yml` actions pinned to commit hashes instead of `@v4` tags.
+
+**Decided not to change (2026-10-16).** The request body limit stays at Kestrel's default (30 MB) on Identity and the BFF:
+one setting for good, not revisited as payloads grow. The validators bound every field (the largest, a passkey credential,
+at 64 KB), and the per-caller rate limits bound the volume.
 
 ---
 

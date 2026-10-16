@@ -1,10 +1,22 @@
 ﻿{
+  "ApplicationSettings": {
+    "ApplicationKeys": {
+      "PlatformTenantId": "01a0e265-0cad-77e1-b31c-98fed11919e1"
+    }
+  },
   "BffSettings": {
     "Authority": "https://localhost:5000",
     "ClientPrivateKeyPath": "D:/PMS System/Harmony/secrets/web-bff-client-key.pem",
     "ApiDestination": "https://localhost:5000",
     "PasskeyEnrollUrl": "https://localhost:5210/account/security",
     "PasskeyManageUrl": "https://localhost:5210/account/security"
+  },
+  "ApiDocs": {
+    "UserName": "harmony-docs",
+    "PasswordPath": "D:/PMS System/Harmony/secrets/identity-apidocs-password.txt",
+    "Services": [
+      { "Name": "Identity", "Url": "https://localhost:5000/api/identity/swagger/v1/swagger.json" }
+    ]
   },
   "DataProtectionSettings": {
     "CertificatePath": "D:/PMS System/Harmony/secrets/identity-dataprotection.pem"

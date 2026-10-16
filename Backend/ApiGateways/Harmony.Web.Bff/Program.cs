@@ -1,7 +1,9 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using Harmony.Core.DI;
+using Harmony.Web.Bff.ApiDocs;
 using Harmony.Web.Bff.Authentication;
 using Harmony.Web.Bff.Sessions;
 using Harmony.Web.Bff.Settings;
@@ -9,6 +11,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -26,8 +29,39 @@ builder.WebHost.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
 
 builder.Services.AddOptions<BffSettings>()
     .Bind(builder.Configuration.GetSection(BffSettings.Section))
-    .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24, PasskeyEnrollUrl and PasskeyManageUrl both absolute https or both empty.")
+    .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24, PasskeyEnrollUrl and PasskeyManageUrl both absolute https or both empty, every TrustedProxyAddresses entry an IP address.")
     .ValidateOnStart();
+
+// The one API-docs page (/docs) for platform people and the services it lists. No section = no page.
+builder.Services.AddOptions<ApiDocsSettings>()
+    .Bind(builder.Configuration.GetSection(ApiDocsSettings.Section))
+    .Validate(ApiDocsSettings.IsValid, $"{ApiDocsSettings.Section}: every service needs a short Name (letters, digits, dashes) unique on the list and an absolute https Url; UserName and PasswordPath both set (file must exist) or both empty.")
+    .ValidateOnStart();
+builder.Services.AddHttpClient(ApiDocsPage.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(10)).ConfigurePrimaryHttpMessageHandler(() =>
+    builder.Environment.IsDevelopment()
+        ? new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
+        : new HttpClientHandler());
+
+// The front door hides the caller: it writes the real address and scheme into X-Forwarded-For / -Proto. We believe
+// those headers only from the proxies listed in TrustedProxyAddresses. Microsoft trusts this machine by default and, with
+// BOTH lists empty, every sender; here an empty list means the headers are not read at all (trust nobody).
+builder.Services.AddOptions<ForwardedHeadersOptions>()
+    .Configure<IOptions<BffSettings>>((options, bff) =>
+    {
+        options.KnownProxies.Clear();
+        options.KnownIPNetworks.Clear();
+        if (bff.Value.TrustedProxyAddresses.Length == 0)
+        {
+            options.ForwardedHeaders = ForwardedHeaders.None;
+            return;
+        }
+
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        foreach (var address in bff.Value.TrustedProxyAddresses)
+        {
+            options.KnownProxies.Add(IPAddress.Parse(address));
+        }
+    });
 
 // The shared fabric this host stands on: the framework core (AppInfo names every Redis key "webbff", the call
 // context the lock manager leans on), the Redis cache that holds the sessions, and the distributed lock that
@@ -122,6 +156,10 @@ builder.Services.AddReverseProxy()
         transforms.AddRequestHeaderRemove("Cookie");
         transforms.AddRequestHeaderRemove(Harmony.Web.Bff.Security.CsrfHeaderMiddleware.HeaderName);
 
+        // A caller's own Authorization header never passes: the only token the API sees from this door is the
+        // session's, attached below. Without a session the call reaches the API with no token at all.
+        transforms.AddRequestHeaderRemove("Authorization");
+
         // The whole point of the BFF: the browser holds a cookie, the API receives a Bearer token — attached
         // only when a session exists, already refreshed by the cookie refresher on this very request.
         transforms.AddRequestTransform(async context =>
@@ -135,6 +173,10 @@ builder.Services.AddReverseProxy()
     });
 
 var app = builder.Build();
+
+// First of all middleware (Microsoft: before UseHsts): from here on the request carries the caller's real address
+// and scheme when it came through a listed proxy, so HSTS, the proxy transform and the OIDC redirects see the truth.
+app.UseForwardedHeaders();
 
 // Outside Development the browser is told: HTTPS only for this host, from the first answer on.
 if (!app.Environment.IsDevelopment())
@@ -166,6 +208,38 @@ if (bffSettings.ServeStaticFiles)
 }
 
 app.UseAuthentication();
+
+// /docs: the one API-docs page. Platform people only; everyone else gets 404, so nothing is advertised. The wall sits
+// after who-you-are and BEFORE the deny-by-default policy, which would otherwise answer the page's files with a sign-in
+// redirect; it runs before Swagger UI's own middleware (the page and its assets) and before the /docs/{service}.json door.
+var apiDocs = app.Services.GetRequiredService<IOptions<ApiDocsSettings>>().Value;
+if (apiDocs.Services.Length > 0 && !Guid.TryParse(app.Configuration[ApiDocsPage.PlatformTenantKey], out _))
+{
+    throw new InvalidOperationException($"{ApiDocsPage.PlatformTenantKey} must be set when {ApiDocsSettings.Section} lists services: the /docs wall needs to know the platform tenant.");
+}
+app.UseWhen(context => context.Request.Path.StartsWithSegments("/docs"), docs =>
+{
+    docs.Use(async (context, next) =>
+    {
+        if (apiDocs.Services.Length > 0 && await ApiDocsPage.IsPlatformPersonAsync(context))
+        {
+            await next(context);
+            return;
+        }
+
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+    });
+    docs.UseSwaggerUI(options =>
+    {
+        options.RoutePrefix = "docs";
+        options.DocumentTitle = "Harmony API docs";
+        foreach (var service in apiDocs.Services)
+        {
+            options.SwaggerEndpoint($"/docs/{service.Name.ToLowerInvariant()}.json", service.Name);
+        }
+    });
+});
+
 app.UseAuthorization();
 
 app.MapGet("/healthz", () => Results.Ok(new { status = "alive" })).AllowAnonymous();
@@ -272,6 +346,15 @@ app.MapGet("/bff/logout", async (string? sid, HttpContext http, IHttpClientFacto
 app.MapPost(BackChannelLogout.Path, BackChannelLogout.HandleAsync).AllowAnonymous();
 
 // Mapped last: every named /bff door above answers first; everything /api flows through the allow-list.
+// The wall above decides for /docs: this door says anonymous so the fallback policy does not answer with a sign-in
+// redirect first (404 for everyone the wall refuses, never a hint).
+app.MapGet("/docs/{service}.json", ApiDocsPage.GetDocumentAsync).AllowAnonymous();
+
+// Inside-only paths that every service happens to serve under /api/{service}/: the public front door never forwards
+// them, whatever the method. Developers read them on the /docs page or on the service itself, inside the network.
+app.Map("/api/{service}/swagger/{**rest}", () => Results.NotFound()).AllowAnonymous();
+app.Map("/api/{service}/healthchecks/{**rest}", () => Results.NotFound()).AllowAnonymous();
+
 app.MapReverseProxy();
 
 if (bffSettings.ServeStaticFiles)
@@ -286,6 +369,10 @@ else
     // sign-in redirect for /favicon.ico.
     app.MapFallback(() => Results.NotFound()).AllowAnonymous();
 }
+
+// Both fallbacks above skip file-like paths (/old-bundle.js, /nothing.css): with no endpoint, the deny-by-default
+// policy would challenge the stranger (a PAR push at Identity and a sign-in redirect for every such hit). A plain 404.
+app.MapFallback("{*path:file}", () => Results.NotFound()).AllowAnonymous();
 
 await app.RunAsync();
 

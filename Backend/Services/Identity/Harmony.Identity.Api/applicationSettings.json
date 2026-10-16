@@ -1,4 +1,5 @@
-{
+﻿{
+  "AllowedHosts": "identity.harmony.local",
   "ApplicationSettings": {
     "ApplicationKeys": {
       "DefaultDbEngine": "MSSql",
@@ -6,54 +7,59 @@
     },
     "ConnectionStrings": {
       "Default": "Server=localhost;Database=HarmonyIdentity;Trusted_Connection=True;TrustServerCertificate=True"
+    },
+    "ApiDocs": {
+      "UserName": "harmony-docs",
+      "PasswordPath": "/run/secrets/identity-apidocs-password"
     }
   },
   "ValidationSettings": {
     "Errors": []
   },
   "TokenIssuerSettings": {
-    "Issuer": "https://localhost:5000",
+    "Issuer": "https://identity.harmony.local",
     "SigningKeyPem": null,
-    "SigningKeyPath": "D:/PMS System/Harmony/secrets/identity-signing-key.pem",
+    "SigningKeyPath": "/run/secrets/identity-signing-key.pem",
     "PreviousSigningKeyPems": []
   },
   "NotificationSettings": {
     "EmailClient": {
-      "SmtpHost": "smtp.gmail.com",
+      "SmtpHost": "smtp.office365.com",
       "SmtpPort": 587,
       "SmtpSecurity": "StartTls",
-      "SmtpUserName": "mohammed.dereiinii@gmail.com",
-      "SmtpPassword": "hrmc kyvs rpkx wvvz",
-      "FromAddress": "mohammed.dereiinii@gmail.com",
+      "SmtpUserName": "",
+      "SmtpPassword": "",
+      "FromAddress": "no-reply@harmony.local",
       "FromName": "Harmony"
     }
   },
   "DataProtectionSettings": {
-    "CertificatePath": "D:/PMS System/Harmony/secrets/identity-dataprotection.pem",
+    "CertificatePath": "/run/secrets/identity-dataprotection.pem",
     "PreviousCertificatePaths": []
   },
   "IdentitySettings": {
+    "PlatformTenant": { "Code": "HARMONY", "LegalNameEn": "Harmony", "LegalNameAr": "هارموني" },
     "Passkeys": {
-      "ServerDomain": "localhost"
+      "ServerDomain": "harmony.local"
     },
     "WebBff": {
-      "Origins": [ "https://localhost:5173" ],
-      "ClientPublicKeyPath": "D:/PMS System/Harmony/secrets/web-bff-client-key.public.pem",
+      "Origins": [ "https://app.harmony.local" ],
+      "ClientPublicKeyPath": "/run/secrets/web-bff-client-key.public.pem",
       "PreviousClientPublicKeyPaths": []
     },
     "Web": {
-      "ResetPasswordUrl": "https://localhost:5173/account/reset-password?email={email}&token={token}",
-      "InvitationUrl": "https://localhost:5173/account/set-password?email={email}&token={token}"
+      "ResetPasswordUrl": "https://app.harmony.local/account/reset-password?email={email}&token={token}",
+      "InvitationUrl": "https://app.harmony.local/account/set-password?email={email}&token={token}"
     },
     "Platform": {
-      "Issuer": "https://localhost:5000",
-      "MetadataAddress": "https://localhost:5000/.well-known/openid-configuration",
+      "Issuer": "https://identity.harmony.local",
+      "MetadataAddress": "https://identity.harmony.local/.well-known/openid-configuration",
       "RequireHttpsMetadata": true,
       "ValidAudiences": [ "harmony" ]
     },
     "SuperAdmin": {
-      "Email": "mohammed.magd@hotmail.com",
-      "Password": "Kettle-River-Seed-26",
+      "Email": "admin@harmony.local",
+      "Password": "",
       "DisplayName": "Platform Admin"
     }
   },
@@ -68,7 +74,7 @@
         "Connection": "localhost",
         "Port": 6380,
         "User": "identity",
-        "Password": "61vBEgthSzXndY9IMprOCxFL2cRDmKN7",
+        "Password": "CHANGE-ME-identity",
         "AllowAdmin": false,
         "Ssl": true,
         "DistributedLockMode": "RedLock"

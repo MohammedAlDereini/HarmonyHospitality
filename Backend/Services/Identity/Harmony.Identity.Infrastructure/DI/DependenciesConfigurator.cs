@@ -297,7 +297,8 @@ public static class DependenciesConfigurator
                     return;
                 }
 
-                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+                // The caller's address AND scheme: behind a front door that ends TLS, Duende would otherwise print http:// URLs.
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 
                 // Walk back through every listed proxy to the first address not listed: that is the caller. Microsoft's default
                 // stops after one hop, so behind the front door AND the BFF everyone would count as the front door. Safe only
