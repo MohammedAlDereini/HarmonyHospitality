@@ -236,10 +236,11 @@ erDiagram
     nvarchar NameAr
     nvarchar OwnerService "Fiscal registers these"
   }
-  Capabilities {
+  Modules {
     nvarchar Code PK "pms.core multi.property"
     nvarchar NameEn
     nvarchar OwnerService
+    nvarchar Level "Property or Tenant"
     bit HasLimit
   }
 
@@ -266,14 +267,14 @@ erDiagram
           <tr><td>PropertyTypes <span class="flag new">new</span></td><td>Was a string. Now it grows without a migration, carries its Arabic name, and can narrow which standards apply &mdash; a resort default that a hostel never sees.</td></tr>
           <tr><td>PropertyGroupTypes</td><td>Already a reference table. It was the pattern the other nine follow.</td></tr>
           <tr><td>RegulatoryEnvironments <span class="flag new">new</span></td><td>One table for all four codes, separated by <code>Kind</code>. Identity owns the table so the foreign key is real; <strong>Fiscal owns the contents</strong> and fills it through <code>fiscal.environment.registered.v1</code>. A new tax regime stays a Fiscal release.</td></tr>
-          <tr><td>Capabilities <span class="flag new">new</span></td><td><code>Entitlements.CapabilityCode</code> was free text, so a typo silently granted nothing. Services register their capabilities exactly as they register settings.</td></tr>
+          <tr><td>Modules <span class="flag new">new</span></td><td>What a hotel subscribes to (reservations, POS) or, for chain-wide modules, what the customer subscribes to (multi-property, loyalty); <code>Level</code> says which. Mews and Opera both say "module", so we do too (renamed from Capabilities 2026-10-17). <code>TenantSubscriptions.ModuleCode</code> was free text, so a typo silently granted nothing. Services register their modules exactly as they register settings.</td></tr>
         </tbody>
       </table>
     </div>
 
     <div class="callout">
       <h4>The rule, and its one limit</h4>
-      <p><strong>A value becomes a reference table when it is chosen from a curated set and something needs to hang off the members.</strong> City earns it because it carries a time zone and coordinates. Property type earns it because standards narrow by it. Capability earns it because a service owns it.</p>
+      <p><strong>A value becomes a reference table when it is chosen from a curated set and something needs to hang off the members.</strong> City earns it because it carries a time zone and coordinates. Property type earns it because standards narrow by it. Module earns it because a service owns it.</p>
       <p>The limit: <code>SecurityAuditEvents.Action</code> stays free text on purpose. An audit log must record whatever happened, including an action from a service version newer than the reference table &mdash; a foreign key there would drop audit records, which is the one place a dropped row is unforgivable. <code>ExternalIdentifier</code> stays free for the same reason: it is somebody else's key and we do not get to curate it.</p>
     </div>
   </section>
@@ -404,18 +405,21 @@ erDiagram
   Languages {
     nvarchar Code PK
   }
-  Capabilities {
+  Modules {
     nvarchar Code PK
+    nvarchar Level "Property or Tenant"
   }
-  Entitlements {
+  TenantSubscriptions {
     uniqueidentifier Id PK
     uniqueidentifier TenantId FK
-    nvarchar CapabilityCode FK
+    uniqueidentifier PropertyId FK "the hotel this line is for; null = chain-wide"
+    nvarchar ModuleCode FK
     bit IsEnabled
-    int MaxProperties
-    int MaxRooms
-    int MaxTerminals
-    date ExpiresOn
+    nvarchar DisabledReason
+    int Rooms "licensed rooms of that hotel"
+    int Terminals
+    date StartsOn
+    date EndsOn
   }
 
   Cities ||--o{ Properties : "located in"
@@ -423,10 +427,11 @@ erDiagram
   RegulatoryEnvironments ||--o{ Properties : "governed by"
   Currencies ||--o{ Properties : "books kept in"
   Languages ||--o{ Properties : "operates in"
-  Capabilities ||--o{ Entitlements : "sold as"
+  Modules ||--o{ TenantSubscriptions : "sold as lines"
   Tenants ||--o{ Properties : "runs"
   Tenants ||--o{ PropertyGroups : "defines"
-  Tenants ||--o{ Entitlements : "is licensed for"
+  Tenants ||--o{ TenantSubscriptions : "one subscription, many lines"
+  Properties |o--o{ TenantSubscriptions : "named on hotel lines"
   Properties ||--o{ PropertyContacts : "reached through"
   PropertyGroupTypes ||--o{ PropertyGroups : "classifies"
   PropertyGroups ||--o{ PropertyGroupMembers : "contains"
@@ -448,7 +453,7 @@ erDiagram
           <tr><td>PropertyGroups <span class="flag new">new</span></td><td>Replaces <code>Brands</code>. Any named set of hotels. <code>Precedence</code> decides who wins when two groups set the same standard &mdash; a number the customer controls, where Opera has a fixed two-level rule.</td></tr>
           <tr><td>PropertyGroupMembers <span class="flag new">new</span></td><td>The join that makes the whole design work. Dated, so a February invoice still resolves to February's brand after a March rebrand.</td></tr>
           <tr><td>BrandDetails <span class="flag new">new</span></td><td>Brand-only columns hung off the group's own key, the way <code>DirPartyTable</code> subtypes work in D365. Nothing else has to know brands are special.</td></tr>
-          <tr><td>Entitlements</td><td>What the client bought, with limits. REMY's version of what Mews calls subscription level.</td></tr>
+          <tr><td>TenantSubscriptions <span class="flag new">new</span></td><td>The customer's one subscription, as lines. A hotel line names the hotel, the module, its licensed rooms and terminals; a chain-wide line (loyalty, multi-property) names no hotel. Every line is on or off with a reason and runs for a term. Configured to the customer's requirement: one hotel, more hotels, a chain-wide module &mdash; each is one more line, never a quota. This is the commercial shape at both competitors: Mews signs one Agreement with the company that lists its Facilities and charges "Platform Recurring Fees" by "Spaces" (rooms, beds), with true-ups above the agreed quantities; Opera Cloud takes one order per customer with "a maximum number of Guest Rooms as specified in Your order", and "a customer with multiple Properties must purchase, for each Property" its licences. Decided 2026-10-17; replaces Entitlements and the two-table draft.</td></tr>
         </tbody>
       </table>
     </div>
@@ -1007,10 +1012,11 @@ erDiagram
   Currencies ||--o{ Properties : "books in"
   Currencies ||--o{ Tenants : "books in"
   Countries ||--o{ Tenants : "registered in"
-  Capabilities ||--o{ Entitlements : "sold as"
+  Modules ||--o{ TenantSubscriptions : "sold as lines"
   Tenants ||--o{ Properties : "runs"
   Tenants ||--o{ PropertyGroups : "defines"
-  Tenants ||--o{ Entitlements : "licensed"
+  Tenants ||--o{ TenantSubscriptions : "one subscription, many lines"
+  Properties |o--o{ TenantSubscriptions : "named on hotel lines"
   Tenants ||--o{ UserAccounts : "employs"
   Tenants ||--o{ Roles : "defines"
   Tenants ||--o{ ConfigValues : "default for"

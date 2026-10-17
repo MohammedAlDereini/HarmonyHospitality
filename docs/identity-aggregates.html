@@ -220,7 +220,7 @@ flowchart LR
 <b>PropertyTypeRef.cs</b>
 <b>PropertyGroupTypeRef.cs</b>
 <b>RegulatoryEnvironment.cs</b>
-<b>Capability.cs</b></pre></div>
+<b>Module.cs</b></pre></div>
           <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>Countries</b>
 <b>CountrySubdivisions</b>
 <b>Cities</b>
@@ -230,7 +230,7 @@ flowchart LR
 <b>PropertyTypes</b>
 <b>PropertyGroupTypes</b>
 <b>RegulatoryEnvironments</b>
-<b>Capabilities</b></pre></div>
+<b>Modules</b></pre></div>
         </div>
         <p class="inv"><b>Watch the name clash.</b> <code>TimeZone</code> and <code>Currency</code> collide with BCL types. Suffix the reference ones (<code>TimeZoneRef</code>) or your usings will fight you for the rest of the project.</p>
       </div>
@@ -241,16 +241,20 @@ flowchart LR
         <span class="wd">first real aggregate &#183; everything flows from here</span></div>
       <div class="mod">
         <h4>Aggregates/TenantModule/</h4>
-        <p class="why">The customer. Tenant and its entitlements change together &mdash; a contract change moves both &mdash; so they are <b>one aggregate</b>.</p>
+        <p class="why">The customer. Tenant and its subscription change together &mdash; a contract change moves both &mdash; so they are <b>one aggregate</b>. The subscription is one thing per customer, made of <b>lines</b>: a hotel line names the hotel, the module and the licensed rooms and terminals; a chain-wide line (loyalty, multi-property) names no hotel. That is how Mews (one Agreement listing the Facilities, fees by Spaces) and Opera Cloud (one order, guest rooms per property) sell. Configured to the customer's requirement: one hotel, more hotels, a chain-wide module &mdash; one more line each, never a quota. Decided 2026-10-17.</p>
         <div class="grid2">
           <div class="box"><span class="bl">Files</span><pre class="files"><b>Tenant.cs</b>            the root
-<b>Entitlement.cs</b>       owned child
+<b>TenantSubscription.cs</b> owned child, one line &#8212;
+                     PropertyId (null = chain-wide),
+                     ModuleCode, IsEnabled,
+                     DisabledReason, Rooms,
+                     Terminals, StartsOn, EndsOn
 <b>TenantEvents.cs</b>
 <b>TenantStatus.cs</b>      enum</pre></div>
           <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>Tenants</b>
-<b>Entitlements</b></pre></div>
+<b>TenantSubscriptions</b></pre></div>
         </div>
-        <p class="inv"><b>Invariant:</b> a terminated tenant cannot be granted an entitlement, and an entitlement limit can never be set below what the tenant already uses. The second half needs a count from Property, which is a different aggregate &mdash; so that check belongs in the handler, not in Tenant.</p>
+        <p class="inv"><b>Invariant:</b> only an active tenant's subscription changes; one line per hotel and module (chain-wide: per module), so a second subscription to the same thing updates the line instead of adding a twin; a hotel line carries rooms, a chain-wide line carries none. Two checks need other tables and so live in the handler: the module's <code>Level</code> must match the line (Property-level modules on hotel lines, Tenant-level on chain-wide lines), and the hotel must belong to this tenant with a physical <code>TotalRooms</code> no higher than the rooms licensed on its line &mdash; Opera makes the two equal. Every change is published to the shared cache the way role permissions are, so the other services see it at once.</p>
       </div>
     </div>
 
@@ -259,7 +263,7 @@ flowchart LR
         <span class="wd">the hotel &#183; the widest table in the service</span></div>
       <div class="mod">
         <h4>Aggregates/PropertyModule/</h4>
-        <p class="why">One hotel, plus the named people at it. Contacts have no life of their own, so they are owned children.</p>
+        <p class="why">One hotel, plus the named people at it. What the hotel pays for is not here: it is a line of the customer's subscription (1.1) that names this hotel. Contacts have no life of their own, so they are owned children.</p>
         <div class="grid2">
           <div class="box"><span class="bl">Files</span><pre class="files"><b>Property.cs</b>          the root
 <b>PropertyContact.cs</b>   owned child
@@ -270,7 +274,7 @@ flowchart LR
           <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>Properties</b>
 <b>PropertyContacts</b></pre></div>
         </div>
-        <p class="inv"><b>Invariant:</b> exactly one primary contact, at most. And the property's time zone must belong to its country &mdash; which the City reference already knows, so take both from the city rather than letting them be typed independently. That is the bug this design exists to kill.</p>
+        <p class="inv"><b>Invariant:</b> exactly one primary contact, at most. And the property's time zone must belong to its country &mdash; which the City reference already knows, so take both from the city rather than letting them be typed independently. That is the bug this design exists to kill. The hotel's physical <code>TotalRooms</code> may never exceed the rooms licensed on its subscription line &mdash; Opera makes the two equal &mdash; and the line lives in Tenant, so that check is the handler's.</p>
       </div>
     </div>
 
