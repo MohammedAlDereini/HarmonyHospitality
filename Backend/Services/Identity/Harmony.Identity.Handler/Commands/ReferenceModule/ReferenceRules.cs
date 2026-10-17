@@ -9,8 +9,8 @@ public static class ReferenceRules
     /// <summary>2 to 32 characters: letters, digits, . - _ (property types, group types, regulatory environments).</summary>
     public const string CodePattern = "^[A-Za-z0-9._-]{2,32}$";
 
-    /// <summary>2 to 64 characters: letters, digits, . - _ (capabilities, like pms.core).</summary>
-    public const string CapabilityCodePattern = "^[A-Za-z0-9._-]{2,64}$";
+    /// <summary>2 to 64 characters: letters, digits, . - _ (modules, like pms.core).</summary>
+    public const string ModuleCodePattern = "^[A-Za-z0-9._-]{2,64}$";
 
     /// <summary>ISO 3166-1 alpha-2.</summary>
     public const string CountryCodePattern = "^[A-Za-z]{2}$";

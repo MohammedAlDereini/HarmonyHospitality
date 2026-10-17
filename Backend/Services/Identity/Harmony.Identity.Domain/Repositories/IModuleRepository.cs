@@ -3,14 +3,14 @@ using Harmony.Identity.Domain.Entities.Reference;
 
 namespace Harmony.Identity.Domain.Repositories;
 
-public interface ICapabilityRepository : IRepositoryLight<Capability>
+public interface IModuleRepository : IRepositoryLight<Module>
 {
     /// <summary>The row, tracked, for a change.</summary>
-    Task<Capability?> GetByCodeAsync(string code, CancellationToken cancellationToken);
+    Task<Module?> GetByCodeAsync(string code, CancellationToken cancellationToken);
 
     Task<bool> ExistsAsync(string code, CancellationToken cancellationToken);
 
-    Task AddAsync(Capability capability, CancellationToken cancellationToken);
+    Task AddAsync(Module module, CancellationToken cancellationToken);
 
-    IQueryable<Capability> Query();
+    IQueryable<Module> Query();
 }

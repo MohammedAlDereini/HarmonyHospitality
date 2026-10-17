@@ -116,11 +116,12 @@ public static class ReferenceProjections
         ModifiedBy = e.ModifiedBy,
     };
 
-    public static readonly Expression<Func<Capability, CapabilityModel>> Capability = e => new CapabilityModel
+    public static readonly Expression<Func<Module, ModuleModel>> Module = e => new ModuleModel
     {
         Code = e.Code,
         NameEn = e.NameEn,
         OwnerService = e.OwnerService,
+        Level = e.Level,
         HasLimit = e.HasLimit,
         CreatedDate = e.CreatedDate,
         CreatedBy = e.CreatedBy,

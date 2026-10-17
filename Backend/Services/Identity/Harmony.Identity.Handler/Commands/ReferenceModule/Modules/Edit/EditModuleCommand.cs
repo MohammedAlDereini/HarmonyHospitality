@@ -1,26 +1,27 @@
-﻿namespace Harmony.Identity.Handler.Commands.ReferenceModule.Capabilities.Create;
+﻿namespace Harmony.Identity.Handler.Commands.ReferenceModule.Modules.Edit;
 
-/// <summary>Adds a capability: something a tenant can buy, checked by its code in the owning service.</summary>
-public class CreateCapabilityCommand : BaseCommandRequest<CallResponse<string>>
+using Harmony.Identity.Domain.Entities.Reference;
+
+/// <summary>Changes a module's name, owner, level and limit flag. The code stays: services check it.</summary>
+public class EditModuleCommand : BaseCommandRequest<CallResponse>
 {
-    /// <summary>2 to 64 characters: letters, digits, . - _ like pms.core.</summary>
     public string Code { get; set; } = null!;
 
     public string NameEn { get; set; } = null!;
 
-    /// <summary>The service that checks entitlements of this capability, like Identity or Fiscal.</summary>
     public string OwnerService { get; set; } = null!;
 
-    /// <summary>True when an entitlement carries a number (rooms, properties, users).</summary>
+    public ModuleLevel Level { get; set; }
+
     public bool HasLimit { get; set; }
 
-    public class CreateCapabilityCommandValidation : AbstractValidator<CreateCapabilityCommand>
+    public class EditModuleCommandValidation : AbstractValidator<EditModuleCommand>
     {
-        public CreateCapabilityCommandValidation()
+        public EditModuleCommandValidation()
         {
             this.RuleFor(e => e.Code)
                 .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Reference.CodeRequired)
-                .Matches(ReferenceRules.CapabilityCodePattern).WithErrorCode(ModelValidationErrorCodes.Identity.Reference.CodeInvalidFormat);
+                .Matches(ReferenceRules.ModuleCodePattern).WithErrorCode(ModelValidationErrorCodes.Identity.Reference.CodeInvalidFormat);
 
             this.RuleFor(e => e.NameEn)
                 .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Reference.NameEnRequired)
@@ -29,6 +30,9 @@ public class CreateCapabilityCommand : BaseCommandRequest<CallResponse<string>>
             this.RuleFor(e => e.OwnerService)
                 .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Reference.OwnerServiceRequired)
                 .MaximumLength(64).WithErrorCode(ModelValidationErrorCodes.Identity.Reference.OwnerServiceTooLong);
+
+            this.RuleFor(e => e.Level)
+                .IsInEnum().WithErrorCode(ModelValidationErrorCodes.Identity.Reference.LevelInvalid);
         }
     }
 }

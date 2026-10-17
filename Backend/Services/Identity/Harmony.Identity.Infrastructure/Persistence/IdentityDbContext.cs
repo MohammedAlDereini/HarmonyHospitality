@@ -31,7 +31,7 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<PropertyTypeRef> PropertyTypes { get; set; }
     public DbSet<PropertyGroupTypeRef> PropertyGroupTypes { get; set; }
     public DbSet<RegulatoryEnvironment> RegulatoryEnvironments { get; set; }
-    public DbSet<Capability> Capabilities { get; set; }
+    public DbSet<Module> Modules { get; set; }
 
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<User> UserAccounts { get; set; }
