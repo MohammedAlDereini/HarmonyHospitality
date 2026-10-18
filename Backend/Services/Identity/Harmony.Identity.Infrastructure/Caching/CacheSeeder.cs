@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Harmony.Identity.Infrastructure.Caching;
 
 /// <summary>
-/// At every start every role's permissions and every user's security version are published
+/// At every start every role's permissions, every user's security version and every customer's subscription lines are published
 /// again, overwriting what is there, so a fresh Redis, a lost key or a publish that failed while Identity was down are
 /// all healed before the first request. A sentinel key is written last; when a later request finds it gone, Redis was
 /// wiped and <see cref="HealIfLostAsync"/> republishes everything, so the other services heal through Identity.
@@ -24,13 +24,15 @@ public sealed class CacheSeeder : ICacheSeeder
     private readonly IdentityDbContext dbContext;
     private readonly ICacheService cacheService;
     private readonly ICache<Harmony.Core.Cache.Providers.Redis> redis;
+    private readonly ISubscriptionPublisher publisher;
     private readonly ILogger<CacheSeeder> logger;
 
-    public CacheSeeder(IdentityDbContext dbContext, ICacheService cacheService, ICache<Harmony.Core.Cache.Providers.Redis> redis, ILogger<CacheSeeder> logger)
+    public CacheSeeder(IdentityDbContext dbContext, ICacheService cacheService, ICache<Harmony.Core.Cache.Providers.Redis> redis, ISubscriptionPublisher publisher, ILogger<CacheSeeder> logger)
     {
         this.dbContext = dbContext;
         this.cacheService = cacheService;
         this.redis = redis;
+        this.publisher = publisher;
         this.logger = logger;
     }
 
@@ -38,6 +40,7 @@ public sealed class CacheSeeder : ICacheSeeder
     {
         await this.SeedRolesPermissions(cancellationToken);
         await this.SeedUserSecurityVersions(cancellationToken);
+        await this.SeedSubscriptions(cancellationToken);
 
         await this.cacheService.AddAsync(PublishedKey, DateTimeOffset.UtcNow.ToString("O"), PermissionCacheKeys.RolePermissionsLifetime, cancellationToken);
     }
@@ -90,6 +93,23 @@ public sealed class CacheSeeder : ICacheSeeder
             "Role permissions published for {Roles} roles across {Tenants} tenants.",
             roles.Count,
             roles.Select(r => r.TenantId).Distinct().Count());
+    }
+
+    /// <summary>Every customer with lines, published whole; a customer without lines gets no key (nothing to hold). Tenants carry no wall, so no filter to drop.</summary>
+    private async Task SeedSubscriptions(CancellationToken cancellationToken)
+    {
+        var tenants = await this.dbContext.Tenants
+            .AsNoTracking()
+            .Include(t => t.Subscriptions)
+            .Where(t => t.Subscriptions.Any())
+            .ToListAsync(cancellationToken);
+
+        foreach (var tenant in tenants)
+        {
+            await this.publisher.PublishAsync(tenant, cancellationToken);
+        }
+
+        this.logger.LogInformation("Subscription lines published for {Tenants} tenants.", tenants.Count);
     }
 
     private async Task SeedUserSecurityVersions(CancellationToken cancellationToken)

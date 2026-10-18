@@ -208,6 +208,7 @@ public static class DependenciesConfigurator
         // Scoped like the Redis cache and the DbContext it wraps.
         services.TryAddScoped<ICacheService, CacheService>();
         services.TryAddScoped<ICacheSeeder, CacheSeeder>();
+        services.TryAddScoped<ISubscriptionPublisher, SubscriptionPublisher>();
         services.TryAddScoped<ISessionService, SessionService>();
         services.TryAddScoped<MfaChallengeStore>();
 
