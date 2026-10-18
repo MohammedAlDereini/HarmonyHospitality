@@ -69,6 +69,8 @@ public partial class Program
 
         static void ConfigureAppServices(WebApplicationBuilder builder)
         {
+            // The clock the handlers compare contract dates on; a test replaces it with a fixed one.
+            builder.Services.AddSingleton(TimeProvider.System);
             builder.Services.AddApplicationService(builder.Configuration);
             builder.Services.AddInfrastructureService(builder.Configuration);
         }

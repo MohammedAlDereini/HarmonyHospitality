@@ -50,6 +50,13 @@ public class TenantRepository : BaseRepository<Tenant>, ITenantRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<Tenant?> FindWithSubscriptionsAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await this.context.Tenants
+            .Include(t => t.Subscriptions)
+            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+    }
+
     public async Task AddAsync(Tenant tenant, CancellationToken cancellationToken)
     {
         await this.context.Tenants.AddAsync(tenant, cancellationToken);

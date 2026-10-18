@@ -3,6 +3,9 @@
 /// <summary>Hotel, Hostel, Resort... A row, so a new type needs no migration.</summary>
 public sealed class PropertyTypeRef : ReferenceEntity
 {
+    /// <summary>The width of the Code column; the hotel's value objects and the door rules read it from here.</summary>
+    public const int CodeMaxLength = 32;
+
     private PropertyTypeRef()
     {
     }
@@ -23,7 +26,7 @@ public sealed class PropertyTypeRef : ReferenceEntity
 
         return new PropertyTypeRef
         {
-            Code = ReferenceText.Key(code, 32, nameof(code)),
+            Code = ReferenceText.Key(code, CodeMaxLength, nameof(code)),
             NameEn = ReferenceText.Name(nameEn, 128, nameof(nameEn)),
             NameAr = ReferenceText.Name(nameAr, 128, nameof(nameAr)),
             DisplayOrder = displayOrder,

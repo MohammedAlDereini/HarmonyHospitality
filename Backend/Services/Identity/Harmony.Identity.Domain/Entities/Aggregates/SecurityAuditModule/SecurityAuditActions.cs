@@ -69,6 +69,15 @@ public static class SecurityAuditActions
     /// <summary>The administrator account exists but the invitation mail could not be sent; InviteAdministrator repairs it.</summary>
     public const string TenantAdministratorInvitationFailed = "tenant.administrator-invitation-failed";
 
+    /// <summary>The platform created a hotel for a customer; the detail is the hotel code.</summary>
+    public const string PropertyCreated = "property.created";
+
+    /// <summary>Subscription lines were written for a customer; the detail is "HOTEL:module,module" (chain-wide: "-:module").</summary>
+    public const string TenantSubscribed = "tenant.subscribed";
+
+    /// <summary>The hotel's rooms exceed the rooms licensed on its lines; the detail is "HOTEL:rooms>licensed". Flagged for finance, never refused.</summary>
+    public const string PropertyRoomsAboveLicence = "property.rooms-above-licence";
+
     /// <summary>A passkey answer of a known account that did not verify, or a passkey removed meanwhile.</summary>
     public const string SignInPasskeyRefused = "sign-in.passkey-refused";
 }

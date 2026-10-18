@@ -7,6 +7,9 @@
 /// </summary>
 public sealed class RegulatoryEnvironment : ReferenceEntity
 {
+    /// <summary>The width of the Code column; the hotel's value objects and the door rules read it from here.</summary>
+    public const int CodeMaxLength = 32;
+
     private RegulatoryEnvironment()
     {
     }
@@ -32,7 +35,7 @@ public sealed class RegulatoryEnvironment : ReferenceEntity
 
         return new RegulatoryEnvironment
         {
-            Code = ReferenceText.Key(code, 32, nameof(code)),
+            Code = ReferenceText.Key(code, CodeMaxLength, nameof(code)),
             Kind = kind,
             CountryCode = ReferenceText.Letters(countryCode, 2, upper: true, nameof(countryCode)),
             NameEn = ReferenceText.Name(nameEn, 128, nameof(nameEn)),

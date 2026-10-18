@@ -251,6 +251,164 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.ToTable("Permissions", (string)null);
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BusinessId")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("BusinessPremiseId")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("BusinessRegistrationCode")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateOnly?>("ClosesOn")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DefaultCulture")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("DefaultCurrency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<string>("DefaultLanguageCode")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
+                    b.Property<int?>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ExternalIdentifier")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int?>("FiscalYearBeginDay")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FiscalYearBeginMonth")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasPrecision(9, 6)
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<string>("LegalOwnerName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasPrecision(9, 6)
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateOnly?>("OpensOn")
+                        .HasColumnType("date");
+
+                    b.Property<string>("ProductChampionEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PropertyTypeCode")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("ShortName")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int?>("StarRating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Telephone")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("TotalRooms")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UniqueName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("WebsiteUrl")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("DefaultCurrency");
+
+                    b.HasIndex("DefaultLanguageCode");
+
+                    b.HasIndex("PropertyTypeCode");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Properties_TenantId_Code");
+
+                    b.ToTable("Properties", (string)null);
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.RoleModule.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -500,6 +658,80 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.HasIndex("DefaultCurrency");
 
                     b.ToTable("Tenants", (string)null);
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.TenantSubscription", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisabledReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateOnly?>("EndsOn")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModuleCode")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<Guid?>("PropertyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("RenewsAutomatically")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("Rooms")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateOnly>("StartsOn")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("Terminals")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("ModuleCode");
+
+                    b.HasIndex("PropertyId");
+
+                    b.HasIndex("TenantId", "PropertyId", "ModuleCode")
+                        .IsUnique()
+                        .HasDatabaseName("UX_TenantSubscriptions_Line");
+
+                    b.ToTable("TenantSubscriptions", (string)null);
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", b =>
@@ -1418,6 +1650,200 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Reference.CurrencyRef", null)
+                        .WithMany()
+                        .HasForeignKey("DefaultCurrency")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Reference.Language", null)
+                        .WithMany()
+                        .HasForeignKey("DefaultLanguageCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Reference.PropertyTypeRef", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyTypeCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Location", "Location", b1 =>
+                        {
+                            b1.Property<Guid>("PropertyId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<Guid>("CityId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("CityId");
+
+                            b1.Property<string>("CountryCode")
+                                .IsRequired()
+                                .HasMaxLength(2)
+                                .HasColumnType("nvarchar(2)")
+                                .HasColumnName("CountryCode");
+
+                            b1.Property<string>("SubdivisionCode")
+                                .HasMaxLength(8)
+                                .HasColumnType("nvarchar(8)")
+                                .HasColumnName("SubdivisionCode");
+
+                            b1.Property<string>("TimeZoneId")
+                                .IsRequired()
+                                .HasMaxLength(64)
+                                .HasColumnType("nvarchar(64)")
+                                .HasColumnName("TimeZoneId");
+
+                            b1.HasKey("PropertyId");
+
+                            b1.HasIndex("CityId");
+
+                            b1.HasIndex("CountryCode");
+
+                            b1.HasIndex("SubdivisionCode");
+
+                            b1.HasIndex("TimeZoneId");
+
+                            b1.ToTable("Properties");
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Reference.City", null)
+                                .WithMany()
+                                .HasForeignKey("CityId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Reference.Country", null)
+                                .WithMany()
+                                .HasForeignKey("CountryCode")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b1.WithOwner()
+                                .HasForeignKey("PropertyId");
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Reference.CountrySubdivision", null)
+                                .WithMany()
+                                .HasForeignKey("SubdivisionCode")
+                                .OnDelete(DeleteBehavior.Restrict);
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Reference.TimeZoneRef", null)
+                                .WithMany()
+                                .HasForeignKey("TimeZoneId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+                        });
+
+                    b.OwnsOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.PostalAddress", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("PropertyId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Line")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("nvarchar(256)")
+                                .HasColumnName("AddressLine");
+
+                            b1.Property<string>("PostalCode")
+                                .HasMaxLength(16)
+                                .HasColumnType("nvarchar(16)")
+                                .HasColumnName("PostalCode");
+
+                            b1.HasKey("PropertyId");
+
+                            b1.ToTable("Properties");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PropertyId");
+                        });
+
+                    b.OwnsOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.RegulatoryProfile", "Regulatory", b1 =>
+                        {
+                            b1.Property<Guid>("PropertyId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Accommodation")
+                                .IsRequired()
+                                .HasMaxLength(32)
+                                .HasColumnType("nvarchar(32)")
+                                .HasColumnName("AccommodationEnvironmentCode");
+
+                            b1.Property<string>("Accounting")
+                                .IsRequired()
+                                .HasMaxLength(32)
+                                .HasColumnType("nvarchar(32)")
+                                .HasColumnName("AccountingEnvironmentCode");
+
+                            b1.Property<string>("Legal")
+                                .IsRequired()
+                                .HasMaxLength(32)
+                                .HasColumnType("nvarchar(32)")
+                                .HasColumnName("LegalEnvironmentCode");
+
+                            b1.Property<string>("Tax")
+                                .IsRequired()
+                                .HasMaxLength(32)
+                                .HasColumnType("nvarchar(32)")
+                                .HasColumnName("TaxEnvironmentCode");
+
+                            b1.HasKey("PropertyId");
+
+                            b1.HasIndex("Accommodation");
+
+                            b1.HasIndex("Accounting");
+
+                            b1.HasIndex("Legal");
+
+                            b1.HasIndex("Tax");
+
+                            b1.ToTable("Properties");
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Reference.RegulatoryEnvironment", null)
+                                .WithMany()
+                                .HasForeignKey("Accommodation")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Reference.RegulatoryEnvironment", null)
+                                .WithMany()
+                                .HasForeignKey("Accounting")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Reference.RegulatoryEnvironment", null)
+                                .WithMany()
+                                .HasForeignKey("Legal")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b1.WithOwner()
+                                .HasForeignKey("PropertyId");
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Reference.RegulatoryEnvironment", null)
+                                .WithMany()
+                                .HasForeignKey("Tax")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
+
+                    b.Navigation("Location")
+                        .IsRequired();
+
+                    b.Navigation("Regulatory")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.RoleModule.RolePermission", b =>
                 {
                     b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PermissionModule.Permission", "Permission")
@@ -1457,6 +1883,26 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("DefaultCurrency")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.TenantSubscription", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Reference.Module", null)
+                        .WithMany()
+                        .HasForeignKey("ModuleCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.UserDevice", b =>
@@ -1581,6 +2027,11 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.Navigation("Permissions");
 
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", b =>
+                {
+                    b.Navigation("Subscriptions");
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", b =>

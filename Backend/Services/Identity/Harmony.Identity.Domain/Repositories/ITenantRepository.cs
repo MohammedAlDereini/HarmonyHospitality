@@ -15,6 +15,9 @@ public interface ITenantRepository : IRepository<Tenant>
 
     Task<bool> CurrencyExistsAsync(string currencyCode, CancellationToken cancellationToken);
 
+    /// <summary>The customer with its subscription lines, tracked, for a change to the contract; null when unknown.</summary>
+    Task<Tenant?> FindWithSubscriptionsAsync(Guid id, CancellationToken cancellationToken);
+
     /// <summary>The status alone, untracked, for the sign-in wall; null when the tenant has no row.</summary>
     Task<TenantStatus?> StatusOfAsync(Guid id, CancellationToken cancellationToken);
 

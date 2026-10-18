@@ -1,4 +1,5 @@
 using Harmony.Identity.Domain.Entities.Aggregates.TenantModule;
+using Harmony.Identity.Domain.Models.PropertyModule;
 
 namespace Harmony.Identity.Domain.Models.TenantModule;
 
@@ -39,4 +40,7 @@ public class TenantModel
     public DateTime? ModifiedDate { get; set; }
 
     public string? ModifiedBy { get; set; }
+
+    /// <summary>The customer's contract as lines, hotel lines and chain-wide ones. Filled on the detail read only.</summary>
+    public List<SubscriptionLineModel> Subscriptions { get; set; } = [];
 }

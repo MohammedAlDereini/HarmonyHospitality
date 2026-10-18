@@ -42,12 +42,16 @@ public abstract class TenantCommandHandlerBase
     protected bool IsPlatformTenant(Guid id) => id == this.PlatformTenantId;
 
     /// <summary>Stages the trail row on the caller's own account; the handler's save stores it with the change.</summary>
-    protected async Task TrailAsync(string action, Domain.Entities.Aggregates.TenantModule.Tenant tenant, CancellationToken cancellationToken)
+    protected Task TrailAsync(string action, Domain.Entities.Aggregates.TenantModule.Tenant tenant, CancellationToken cancellationToken)
+        => this.TrailAsync(action, tenant.Code, cancellationToken);
+
+    /// <summary>The same, with the detail chosen by the door (a hotel code, a list of modules).</summary>
+    protected async Task TrailAsync(string action, string detail, CancellationToken cancellationToken)
     {
         var caller = await this.UserAccounts.FindByIdAcrossTenantsAsync(RankRules.CallerId(this.CallContext), cancellationToken)
             ?? throw new InvalidOperationException("The caller's account cannot be found for the trail.");
 
-        await this.AuditEvents.AddAsync(this.SecurityEvents.Create(caller, action, tenant.Code), cancellationToken);
+        await this.AuditEvents.AddAsync(this.SecurityEvents.Create(caller, action, detail), cancellationToken);
     }
 
     protected static CallResponse Ok()

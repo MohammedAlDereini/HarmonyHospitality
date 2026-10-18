@@ -9,6 +9,7 @@ namespace Harmony.Identity.Domain.Entities.Aggregates.TenantModule;
 /// of forty hotels is still one row. Everything flows out of it (people, roles, properties), nothing points back into
 /// it. Not a multi-tenant row itself: the table is platform data, read and written by the platform tenant (us) only.
 /// The platform tenant has a row too, seeded, so the wall below treats it like any other; no door ever suspends it.
+/// Its contract is the owned collection of subscription lines (Subscribe, Holds).
 /// </summary>
 public sealed partial class Tenant : BaseEntity<Guid>, IAuditableEntity, IConcurrentEntity
 {
@@ -51,6 +52,9 @@ public sealed partial class Tenant : BaseEntity<Guid>, IAuditableEntity, IConcur
 
     /// <summary>After termination: until when the customer may still export its data. Null before.</summary>
     public DateOnly? ExportWindowEndsOn { get; private set; }
+
+    /// <summary>The contract, as lines: a hotel's module with its counts, or a chain-wide module. Changed only through Subscribe and Unsubscribe.</summary>
+    public ICollection<TenantSubscription> Subscriptions { get; private set; } = new List<TenantSubscription>();
 
     public DateTime CreatedDate { get; private set; }
 
@@ -132,6 +136,44 @@ public sealed partial class Tenant : BaseEntity<Guid>, IAuditableEntity, IConcur
 
         Status = TenantStatus.Active;
         StatusReason = null;
+    }
+
+    /// <summary>
+    /// The line for a hotel and module (or a chain-wide module): born on the first subscribe, renewed and switched back
+    /// on by every later one, so there is never a second row for the same thing. Only while Active.
+    /// </summary>
+    public TenantSubscription Subscribe(Guid? propertyId, string moduleCode, int? rooms, int? terminals, DateOnly startsOn, DateOnly? endsOn, bool renewsAutomatically = true)
+    {
+        AssertActive();
+
+        var line = Subscriptions.FirstOrDefault(s => s.Is(propertyId, moduleCode));
+        if (line is null)
+        {
+            line = TenantSubscription.New(propertyId, moduleCode, rooms, terminals, startsOn, endsOn, renewsAutomatically);
+            Subscriptions.Add(line);
+        }
+        else
+        {
+            line.Renew(rooms, terminals, startsOn, endsOn, renewsAutomatically);
+        }
+
+        return line;
+    }
+
+    /// <summary>Does the customer hold this module today, at this hotel or chain-wide.</summary>
+    public bool Holds(Guid? propertyId, string moduleCode, DateOnly today)
+        => Subscriptions.Any(s => s.Is(propertyId, moduleCode) && s.IsHeldOn(today));
+
+    /// <summary>The most rooms any held line licenses at this hotel; null when none carries rooms.</summary>
+    public int? LicensedRooms(Guid propertyId, DateOnly today)
+        => Subscriptions.Where(s => s.PropertyId == propertyId && s.Rooms is not null && s.IsHeldOn(today)).Max(s => s.Rooms);
+
+    private void AssertActive()
+    {
+        if (Status != TenantStatus.Active)
+        {
+            throw new InvalidOperationException("Only an active tenant's contract changes.");
+        }
     }
 
     private void AssertNotTerminated()

@@ -7,6 +7,9 @@
 /// </summary>
 public sealed class Module : ReferenceEntity
 {
+    /// <summary>The width of the Code column; subscription lines and the door rules read it from here.</summary>
+    public const int CodeMaxLength = 64;
+
     private Module()
     {
     }
@@ -26,7 +29,7 @@ public sealed class Module : ReferenceEntity
     {
         return new Module
         {
-            Code = ReferenceText.Key(code, 64, nameof(code)),
+            Code = ReferenceText.Key(code, CodeMaxLength, nameof(code)),
             NameEn = ReferenceText.Name(nameEn, 128, nameof(nameEn)),
             OwnerService = ReferenceText.Name(ownerService, 64, nameof(ownerService)),
             Level = LevelOf(level),
