@@ -92,6 +92,12 @@ public sealed class TenantSubscription : BaseEntity<Guid>, IAuditableEntity, ICo
             throw new ArgumentException("The term ends before it starts.", nameof(endsOn));
         }
 
+        // Notice given means a real end: without auto-renewal the line must say when it stops.
+        if (!renewsAutomatically && endsOn is null)
+        {
+            throw new ArgumentException("A line that does not renew needs an end date.", nameof(endsOn));
+        }
+
         Rooms = rooms;
         Terminals = terminals;
         StartsOn = startsOn;

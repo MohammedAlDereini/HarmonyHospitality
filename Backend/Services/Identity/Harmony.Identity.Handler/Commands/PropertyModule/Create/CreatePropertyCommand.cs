@@ -94,9 +94,8 @@ public class CreatePropertyCommand : BaseCommandRequest<CallResponse<Guid>>
             this.RuleFor(e => e.CityId)
                 .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Property.CityRequired);
 
-            // One code for the address line: missing or too long, it is not an address we can print.
             this.RuleFor(e => e.AddressLine)
-                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Property.AddressTooLong)
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Property.AddressRequired)
                 .MaximumLength(PostalAddress.LineMaxLength).WithErrorCode(ModelValidationErrorCodes.Identity.Property.AddressTooLong);
 
             this.RuleFor(e => e.PostalCode)
@@ -128,8 +127,17 @@ public class CreatePropertyCommand : BaseCommandRequest<CallResponse<Guid>>
                 .WithErrorCode(ModelValidationErrorCodes.Identity.Property.TermInvalid)
                 .WithName(nameof(ClosesOn));
 
+            // The term: a real start, an end not before it, and an end whenever any line gives notice.
+            this.RuleFor(e => e.StartsOn)
+                .NotEmpty().WithErrorCode(ModelValidationErrorCodes.Identity.Property.TermInvalid);
+
             this.RuleFor(e => e)
                 .Must(e => e.EndsOn is null || e.EndsOn >= e.StartsOn)
+                .WithErrorCode(ModelValidationErrorCodes.Identity.Property.TermInvalid)
+                .WithName(nameof(EndsOn));
+
+            this.RuleFor(e => e)
+                .Must(e => e.EndsOn is not null || e.Lines.All(l => l.RenewsAutomatically))
                 .WithErrorCode(ModelValidationErrorCodes.Identity.Property.TermInvalid)
                 .WithName(nameof(EndsOn));
 

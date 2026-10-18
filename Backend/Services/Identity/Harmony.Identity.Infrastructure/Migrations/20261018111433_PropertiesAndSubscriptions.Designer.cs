@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Harmony.Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20261018102539_PropertiesAndSubscriptions")]
+    [Migration("20261018111433_PropertiesAndSubscriptions")]
     partial class PropertiesAndSubscriptions
     {
         /// <inheritdoc />
@@ -1695,8 +1695,8 @@ namespace Harmony.Identity.Infrastructure.Migrations
                                 .HasColumnName("CountryCode");
 
                             b1.Property<string>("SubdivisionCode")
-                                .HasMaxLength(8)
-                                .HasColumnType("nvarchar(8)")
+                                .HasMaxLength(6)
+                                .HasColumnType("nvarchar(6)")
                                 .HasColumnName("SubdivisionCode");
 
                             b1.Property<string>("TimeZoneId")

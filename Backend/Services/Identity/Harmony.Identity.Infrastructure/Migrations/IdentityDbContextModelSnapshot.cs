@@ -1692,8 +1692,8 @@ namespace Harmony.Identity.Infrastructure.Migrations
                                 .HasColumnName("CountryCode");
 
                             b1.Property<string>("SubdivisionCode")
-                                .HasMaxLength(8)
-                                .HasColumnType("nvarchar(8)")
+                                .HasMaxLength(6)
+                                .HasColumnType("nvarchar(6)")
                                 .HasColumnName("SubdivisionCode");
 
                             b1.Property<string>("TimeZoneId")

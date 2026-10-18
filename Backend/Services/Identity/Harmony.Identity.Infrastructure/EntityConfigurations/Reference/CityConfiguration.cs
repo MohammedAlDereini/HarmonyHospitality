@@ -13,7 +13,7 @@ public class CityConfiguration : IEntityTypeConfiguration<City>
 
         builder.Property(e => e.Id).ValueGeneratedNever();
         builder.Property(e => e.CountryCode).IsRequired().HasMaxLength(2);
-        builder.Property(e => e.SubdivisionCode).HasMaxLength(6);
+        builder.Property(e => e.SubdivisionCode).HasMaxLength(CountrySubdivision.CodeMaxLength);
         builder.Property(e => e.NameEn).IsRequired().HasMaxLength(128);
         builder.Property(e => e.NameAr).IsRequired().HasMaxLength(128);
         builder.Property(e => e.TimeZoneId).IsRequired().HasMaxLength(64);

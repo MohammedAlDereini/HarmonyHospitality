@@ -24,7 +24,7 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     PropertyTypeCode = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
                     CityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CountryCode = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: false),
-                    SubdivisionCode = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: true),
+                    SubdivisionCode = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: true),
                     TimeZoneId = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     AddressLine = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     PostalCode = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: true),

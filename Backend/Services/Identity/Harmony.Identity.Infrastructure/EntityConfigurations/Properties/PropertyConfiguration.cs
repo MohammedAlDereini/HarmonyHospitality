@@ -36,7 +36,7 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Property>
         {
             location.Property(l => l.CityId).HasColumnName("CityId").IsRequired();
             location.Property(l => l.CountryCode).HasColumnName("CountryCode").IsRequired().HasMaxLength(2);
-            location.Property(l => l.SubdivisionCode).HasColumnName("SubdivisionCode").HasMaxLength(8);
+            location.Property(l => l.SubdivisionCode).HasColumnName("SubdivisionCode").HasMaxLength(CountrySubdivision.CodeMaxLength);
             location.Property(l => l.TimeZoneId).HasColumnName("TimeZoneId").IsRequired().HasMaxLength(64);
             location.HasOne<City>().WithMany().HasForeignKey(l => l.CityId).OnDelete(DeleteBehavior.Restrict);
             location.HasOne<Country>().WithMany().HasForeignKey(l => l.CountryCode).OnDelete(DeleteBehavior.Restrict);

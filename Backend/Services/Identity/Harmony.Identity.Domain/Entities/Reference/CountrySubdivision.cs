@@ -3,6 +3,9 @@
 /// <summary>ISO 3166-2: governorates, regions, emirates, states. The code carries the country (JO-AM), so both never change.</summary>
 public sealed class CountrySubdivision : ReferenceEntity
 {
+    /// <summary>The width of the Code column (ISO 3166-2: country, hyphen, up to three characters); every column that points here reads it.</summary>
+    public const int CodeMaxLength = 6;
+
     private CountrySubdivision()
     {
     }
