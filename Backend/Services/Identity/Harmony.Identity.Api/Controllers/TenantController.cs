@@ -4,6 +4,8 @@ using Harmony.Identity.Handler.Commands.TenantModule.Administrator;
 using Harmony.Identity.Handler.Commands.TenantModule.Create;
 using Harmony.Identity.Handler.Commands.TenantModule.Edit;
 using Harmony.Identity.Handler.Commands.TenantModule.State;
+using Harmony.Identity.Handler.Commands.TenantModule.Subscriptions.Subscribe;
+using Harmony.Identity.Handler.Commands.TenantModule.Subscriptions.Unsubscribe;
 using Harmony.Identity.Handler.Queries.TenantModule.Detail;
 using Harmony.Identity.Handler.Queries.TenantModule.List;
 
@@ -63,6 +65,26 @@ public class TenantController(IMediator mediator, ICallResponseManager callRespo
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
     [RequirePermission(PermissionEnum.ManageTenants)]
     public async Task<IActionResult> Reinstate([FromBody] ReinstateTenantCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>A line of the customer's contract: born, or renewed and switched back on. A hotel line names the hotel; a chain-wide line names none.</summary>
+    [HttpPost("[action]")]
+    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
+    [RequirePermission(PermissionEnum.ManageTenants)]
+    public async Task<IActionResult> Subscribe([FromBody] SubscribeCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>A line switched off with a reason, from today; the row stays, and a later Subscribe switches it back on.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageTenants)]
+    public async Task<IActionResult> Unsubscribe([FromBody] UnsubscribeCommand command)
     {
         var response = await this.Mediator.Send(command);
         return await this.CallResponseManager.AsActionResultAsync(response);
