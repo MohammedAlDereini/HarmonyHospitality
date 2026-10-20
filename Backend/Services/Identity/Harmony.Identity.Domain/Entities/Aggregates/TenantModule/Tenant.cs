@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 using Harmony.Identity.Domain.Common;
+using Harmony.Identity.Domain.DomainEvents.TenantModule;
 
 namespace Harmony.Identity.Domain.Entities.Aggregates.TenantModule;
 
@@ -11,7 +12,7 @@ namespace Harmony.Identity.Domain.Entities.Aggregates.TenantModule;
 /// The platform tenant has a row too, seeded, so the wall below treats it like any other; no door ever suspends it.
 /// Its contract is the owned collection of subscription lines (Subscribe, Holds).
 /// </summary>
-public sealed partial class Tenant : BaseEntity<Guid>, IAuditableEntity, IConcurrentEntity
+public sealed partial class Tenant : AggregateRoot<Guid>, IAuditableEntity, IConcurrentEntity
 {
     public const int CodeMaxLength = 32;
     public const int LegalNameMaxLength = 128;
@@ -125,17 +126,26 @@ public sealed partial class Tenant : BaseEntity<Guid>, IAuditableEntity, IConcur
             return;
         }
 
+        // The reason first, the status second: a refused reason leaves the tenant exactly as it was.
+        var text = IdentityText.Reason(reason) ?? throw new ArgumentException("A reason is required.", nameof(reason));
         Status = TenantStatus.Suspended;
-        StatusReason = IdentityText.Reason(reason) ?? throw new ArgumentException("A reason is required.", nameof(reason));
+        StatusReason = text;
+        Raise(new TenantSuspendedDomainEvent(Id, text));
     }
 
-    /// <summary>Back to Active; its people sign in again.</summary>
+    /// <summary>Back to Active; its people sign in again and its lines are served again. Reinstating an active tenant is a no-op.</summary>
     public void Reinstate()
     {
         AssertNotTerminated();
 
+        if (Status != TenantStatus.Suspended)
+        {
+            return;
+        }
+
         Status = TenantStatus.Active;
         StatusReason = null;
+        Raise(new TenantReinstatedDomainEvent(Id));
     }
 
     /// <summary>
@@ -157,6 +167,27 @@ public sealed partial class Tenant : BaseEntity<Guid>, IAuditableEntity, IConcur
             line.Renew(rooms, terminals, startsOn, endsOn, renewsAutomatically);
         }
 
+        RaiseSubscriptionsChanged();
+        return line;
+    }
+
+    /// <summary>
+    /// The line switched off with a reason, today, whatever its term says; the row stays for the history and a later
+    /// Subscribe switches it back on. Null when the customer never had that line (the handler answers 00094).
+    /// Only while Active: a suspended customer's contract waits.
+    /// </summary>
+    public TenantSubscription? Unsubscribe(Guid? propertyId, string moduleCode, string reason)
+    {
+        AssertActive();
+
+        var line = Subscriptions.FirstOrDefault(s => s.Is(propertyId, moduleCode));
+        if (line is null)
+        {
+            return null;
+        }
+
+        line.Disable(reason);
+        RaiseSubscriptionsChanged();
         return line;
     }
 
@@ -173,6 +204,15 @@ public sealed partial class Tenant : BaseEntity<Guid>, IAuditableEntity, IConcur
         if (Status != TenantStatus.Active)
         {
             throw new InvalidOperationException("Only an active tenant's contract changes.");
+        }
+    }
+
+    /// <summary>One event per save, however many lines moved: the handler rewrites the whole key anyway.</summary>
+    private void RaiseSubscriptionsChanged()
+    {
+        if (!DomainEvents.OfType<TenantSubscriptionsChangedDomainEvent>().Any())
+        {
+            Raise(new TenantSubscriptionsChangedDomainEvent(Id));
         }
     }
 

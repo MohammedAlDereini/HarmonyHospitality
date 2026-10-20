@@ -95,7 +95,7 @@ public sealed class CacheSeeder : ICacheSeeder
             roles.Select(r => r.TenantId).Distinct().Count());
     }
 
-    /// <summary>Every customer with lines, published whole; a customer without lines gets no key (nothing to hold). Tenants carry no wall, so no filter to drop.</summary>
+    /// <summary>Every customer with lines, published whole (a suspended one as an empty list); a customer without lines gets no key (nothing to hold). Tenants carry no wall, so no filter to drop.</summary>
     private async Task SeedSubscriptions(CancellationToken cancellationToken)
     {
         var tenants = await this.dbContext.Tenants

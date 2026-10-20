@@ -13,6 +13,7 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
         builder.ToTable("Tenants");
 
         builder.HasKey(e => e.Id);
+        builder.Ignore(e => e.DomainEvents);
 
         builder.Property(e => e.Code).IsRequired().HasMaxLength(Tenant.CodeMaxLength);
         builder.Property(e => e.ExternalIdentifier).HasMaxLength(Tenant.ExternalIdentifierMaxLength);

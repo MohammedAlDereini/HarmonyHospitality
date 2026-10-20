@@ -110,8 +110,10 @@ public sealed class TenantSubscription : BaseEntity<Guid>, IAuditableEntity, ICo
     /// <summary>Switched off with a reason; the row stays for the history. Step 2's door.</summary>
     internal void Disable(string reason)
     {
+        // The reason first, the switch second: a refused reason leaves the line exactly as it was.
+        var text = IdentityText.Reason(reason) ?? throw new ArgumentException("A reason is required.", nameof(reason));
         IsEnabled = false;
-        DisabledReason = IdentityText.Reason(reason) ?? throw new ArgumentException("A reason is required.", nameof(reason));
+        DisabledReason = text;
     }
 
     internal bool Is(Guid? propertyId, string? moduleCode)

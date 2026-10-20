@@ -75,6 +75,9 @@ public static class SecurityAuditActions
     /// <summary>Subscription lines were written for a customer; the detail is "HOTEL:module,module" (chain-wide: "-:module").</summary>
     public const string TenantSubscribed = "tenant.subscribed";
 
+    /// <summary>A subscription line was switched off; the detail is "HOTEL:module:reason" (chain-wide: "-:module:reason").</summary>
+    public const string TenantUnsubscribed = "tenant.unsubscribed";
+
     /// <summary>The hotel's rooms exceed the rooms licensed on its lines; the detail is "HOTEL:rooms>licensed". Flagged for finance, never refused.</summary>
     public const string PropertyRoomsAboveLicence = "property.rooms-above-licence";
 

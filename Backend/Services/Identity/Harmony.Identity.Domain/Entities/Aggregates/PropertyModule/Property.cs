@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 using Harmony.Identity.Domain.Common;
+using Harmony.Identity.Domain.DomainEvents.PropertyModule;
 using Harmony.Identity.Domain.Entities.Reference;
 
 namespace Harmony.Identity.Domain.Entities.Aggregates.PropertyModule;

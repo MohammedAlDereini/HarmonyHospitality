@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 /// <summary>
 /// The sale becomes rows. Every gate refuses before anything is written. Then one save: the hotel (inside the
 /// customer's tenant, its TenantId set explicitly), the lines (platform data, on the customer), the trail. The
-/// framework publishes PropertyCreatedDomainEvent after the commit; the cache publish hangs on it (change 8).
+/// framework publishes the customer's TenantSubscriptionsChangedDomainEvent after the commit; its handler rewrites the cache.
 /// The hotel's rooms are saved whatever the licence says: the gap is flagged and trailed, never refused (Mews).
 /// </summary>
 public class CreatePropertyCommandHandler : PropertyCommandHandlerBase, IRequestHandler<CreatePropertyCommand, CallResponse<Guid>>
