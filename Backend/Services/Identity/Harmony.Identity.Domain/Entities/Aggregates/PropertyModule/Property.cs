@@ -20,6 +20,17 @@ public sealed partial class Property : AggregateRoot<Guid>, IAuditableEntity, IM
     public const int CodeMaxLength = 32;
     public const int NameMaxLength = 128;
     public const int ExternalIdentifierMaxLength = 64;
+    public const int ShortNameMaxLength = 64;
+    public const int UniqueNameMaxLength = 128;
+    public const int BusinessTextMaxLength = 64;
+    public const int DefaultCultureMaxLength = 16;
+    public const int EmailMaxLength = 256;
+    public const int TelephoneMaxLength = 32;
+    public const int WebsiteUrlMaxLength = 512;
+    public const int LegalOwnerNameMaxLength = 128;
+
+    /// <summary>The hotel star scale runs 1 to 5 (HotelStars Union, AAA, the national schemes); "six" and "seven" stars are marketing.</summary>
+    public const int StarRatingMax = 5;
 
     private Property()
     {
@@ -165,6 +176,93 @@ public sealed partial class Property : AggregateRoot<Guid>, IAuditableEntity, IM
 
         property.Raise(new PropertyCreatedDomainEvent(property));
         return property;
+    }
+
+    /// <summary>
+    /// What the hotel may change about itself: names, address, dates and the rooms it really has. Never the code, the
+    /// place, the money, the language or the regimes. The licence gap is the handler's to flag, never a refusal.
+    /// </summary>
+    public void Update(string nameEn, string nameAr, PostalAddress address, DateOnly? opensOn, DateOnly? closesOn, int totalRooms)
+    {
+        ArgumentNullException.ThrowIfNull(address);
+        if (totalRooms < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(totalRooms), totalRooms, "A hotel has at least one room.");
+        }
+
+        if (closesOn is { } closes && opensOn is { } opens && closes < opens)
+        {
+            throw new ArgumentException("A hotel cannot close before it opens.", nameof(closesOn));
+        }
+
+        NameEn = Name(nameEn, nameof(nameEn));
+        NameAr = Name(nameAr, nameof(nameAr));
+        Address = address;
+        OpensOn = opensOn;
+        ClosesOn = closesOn;
+        TotalRooms = totalRooms;
+    }
+
+    /// <summary>The hotel's own details, replaced whole: an empty value clears the column. Pairs travel together: both coordinates, both fiscal-year parts.</summary>
+    public void UpdateDetails(
+        string? shortName,
+        string? uniqueName,
+        decimal? latitude,
+        decimal? longitude,
+        string? businessId,
+        string? businessRegistrationCode,
+        string? businessPremiseId,
+        int? fiscalYearBeginMonth,
+        int? fiscalYearBeginDay,
+        string? defaultCulture,
+        int? starRating,
+        string? email,
+        string? telephone,
+        string? websiteUrl,
+        string? productChampionEmail,
+        string? legalOwnerName,
+        int? displayOrder)
+    {
+        if (latitude.HasValue != longitude.HasValue || latitude is < -90 or > 90 || longitude is < -180 or > 180)
+        {
+            throw new ArgumentException("Coordinates travel together: latitude -90 to 90, longitude -180 to 180.", nameof(latitude));
+        }
+
+        // 2025 is not a leap year: a fiscal year never begins on 29 February.
+        if (fiscalYearBeginMonth.HasValue != fiscalYearBeginDay.HasValue
+            || fiscalYearBeginMonth is < 1 or > 12
+            || (fiscalYearBeginMonth is { } month && fiscalYearBeginDay is { } day && (day < 1 || day > DateTime.DaysInMonth(2025, month))))
+        {
+            throw new ArgumentException("A fiscal year begins on a real day of a month, or is not set.", nameof(fiscalYearBeginDay));
+        }
+
+        if (starRating is < 1 or > StarRatingMax)
+        {
+            throw new ArgumentOutOfRangeException(nameof(starRating), starRating, $"Stars run 1 to {StarRatingMax}.");
+        }
+
+        if (displayOrder is < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(displayOrder), displayOrder, "Display order is zero or more.");
+        }
+
+        ShortName = Optional(shortName, ShortNameMaxLength, nameof(shortName));
+        UniqueName = Optional(uniqueName, UniqueNameMaxLength, nameof(uniqueName));
+        Latitude = latitude;
+        Longitude = longitude;
+        BusinessId = Optional(businessId, BusinessTextMaxLength, nameof(businessId));
+        BusinessRegistrationCode = Optional(businessRegistrationCode, BusinessTextMaxLength, nameof(businessRegistrationCode));
+        BusinessPremiseId = Optional(businessPremiseId, BusinessTextMaxLength, nameof(businessPremiseId));
+        FiscalYearBeginMonth = fiscalYearBeginMonth;
+        FiscalYearBeginDay = fiscalYearBeginDay;
+        DefaultCulture = Optional(defaultCulture, DefaultCultureMaxLength, nameof(defaultCulture));
+        StarRating = starRating;
+        Email = Optional(email, EmailMaxLength, nameof(email));
+        Telephone = Optional(telephone, TelephoneMaxLength, nameof(telephone));
+        WebsiteUrl = Optional(websiteUrl, WebsiteUrlMaxLength, nameof(websiteUrl));
+        ProductChampionEmail = Optional(productChampionEmail, EmailMaxLength, nameof(productChampionEmail));
+        LegalOwnerName = Optional(legalOwnerName, LegalOwnerNameMaxLength, nameof(legalOwnerName));
+        DisplayOrder = displayOrder;
     }
 
     /// <summary>The hotel's own calendar day for a moment in UTC: Amman opens at Amman's midnight, not at UTC's.</summary>

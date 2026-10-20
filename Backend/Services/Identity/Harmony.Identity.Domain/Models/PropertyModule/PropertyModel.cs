@@ -49,6 +49,40 @@ public class PropertyModel
 
     public bool IsActive { get; set; }
 
+    public string? ShortName { get; set; }
+
+    public string? UniqueName { get; set; }
+
+    public decimal? Latitude { get; set; }
+
+    public decimal? Longitude { get; set; }
+
+    public string? BusinessId { get; set; }
+
+    public string? BusinessRegistrationCode { get; set; }
+
+    public string? BusinessPremiseId { get; set; }
+
+    public int? FiscalYearBeginMonth { get; set; }
+
+    public int? FiscalYearBeginDay { get; set; }
+
+    public string? DefaultCulture { get; set; }
+
+    public int? StarRating { get; set; }
+
+    public string? Email { get; set; }
+
+    public string? Telephone { get; set; }
+
+    public string? WebsiteUrl { get; set; }
+
+    public string? ProductChampionEmail { get; set; }
+
+    public string? LegalOwnerName { get; set; }
+
+    public int? DisplayOrder { get; set; }
+
     /// <summary>Active, opened and not yet closed on the hotel's own local day. Detail only.</summary>
     public bool? IsOpenToday { get; set; }
 

@@ -47,6 +47,11 @@ public class PropertyRepository : BaseRepository<Property>, IPropertyRepository
         return this.context.Properties.AsNoTracking();
     }
 
+    public async Task<Property?> FindAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await this.context.Properties.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+    }
+
     public IQueryable<Property> QueryAcrossTenants()
     {
         return this.context.Properties

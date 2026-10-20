@@ -7,7 +7,7 @@ using Harmony.Identity.Infrastructure.Tenants;
 using Microsoft.Extensions.Options;
 
 /// <summary>
-/// What the tenant doors share. They are platform doors: only a person of the platform tenant (us) may call them, the
+/// What the tenant doors share, and the hotel's own doors borrow for the trail. The tenant doors are platform doors: only a person of the platform tenant (us) may call them, the
 /// permission alone is not enough (00073), and the platform's own row is never suspended. Every change writes a trail
 /// row on the ACTING platform person's account with the tenant's code as the detail, saved with the change.
 /// </summary>

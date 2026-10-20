@@ -64,19 +64,19 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Property>
         });
 
         // The hotel's own details (step 3): widths now, doors later.
-        builder.Property(e => e.ShortName).HasMaxLength(64);
-        builder.Property(e => e.UniqueName).HasMaxLength(128);
+        builder.Property(e => e.ShortName).HasMaxLength(Property.ShortNameMaxLength);
+        builder.Property(e => e.UniqueName).HasMaxLength(Property.UniqueNameMaxLength);
         builder.Property(e => e.Latitude).HasPrecision(9, 6);
         builder.Property(e => e.Longitude).HasPrecision(9, 6);
-        builder.Property(e => e.BusinessId).HasMaxLength(64);
-        builder.Property(e => e.BusinessRegistrationCode).HasMaxLength(64);
-        builder.Property(e => e.BusinessPremiseId).HasMaxLength(64);
-        builder.Property(e => e.DefaultCulture).HasMaxLength(16);
-        builder.Property(e => e.Email).HasMaxLength(256);
-        builder.Property(e => e.Telephone).HasMaxLength(32);
-        builder.Property(e => e.WebsiteUrl).HasMaxLength(512);
-        builder.Property(e => e.ProductChampionEmail).HasMaxLength(256);
-        builder.Property(e => e.LegalOwnerName).HasMaxLength(128);
+        builder.Property(e => e.BusinessId).HasMaxLength(Property.BusinessTextMaxLength);
+        builder.Property(e => e.BusinessRegistrationCode).HasMaxLength(Property.BusinessTextMaxLength);
+        builder.Property(e => e.BusinessPremiseId).HasMaxLength(Property.BusinessTextMaxLength);
+        builder.Property(e => e.DefaultCulture).HasMaxLength(Property.DefaultCultureMaxLength);
+        builder.Property(e => e.Email).HasMaxLength(Property.EmailMaxLength);
+        builder.Property(e => e.Telephone).HasMaxLength(Property.TelephoneMaxLength);
+        builder.Property(e => e.WebsiteUrl).HasMaxLength(Property.WebsiteUrlMaxLength);
+        builder.Property(e => e.ProductChampionEmail).HasMaxLength(Property.EmailMaxLength);
+        builder.Property(e => e.LegalOwnerName).HasMaxLength(Property.LegalOwnerNameMaxLength);
 
         // One code per customer. The handler asks first; this is the answer when two console users race.
         builder.HasIndex(e => new { e.TenantId, e.Code }).IsUnique().HasDatabaseName("UX_Properties_TenantId_Code");

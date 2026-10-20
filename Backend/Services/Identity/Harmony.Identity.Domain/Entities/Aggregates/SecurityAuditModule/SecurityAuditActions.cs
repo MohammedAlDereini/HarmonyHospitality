@@ -81,6 +81,9 @@ public static class SecurityAuditActions
     /// <summary>The hotel's rooms exceed the rooms licensed on its lines; the detail is "HOTEL:rooms>licensed". Flagged for finance, never refused.</summary>
     public const string PropertyRoomsAboveLicence = "property.rooms-above-licence";
 
+    /// <summary>A hotel's own details were changed by its people; the detail is the hotel code.</summary>
+    public const string PropertyUpdated = "property.updated";
+
     /// <summary>A passkey answer of a known account that did not verify, or a passkey removed meanwhile.</summary>
     public const string SignInPasskeyRefused = "sign-in.passkey-refused";
 }

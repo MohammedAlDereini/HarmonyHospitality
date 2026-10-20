@@ -1,6 +1,7 @@
 ﻿using Harmony.Core.Models;
 using Harmony.Identity.Domain.Models.PropertyModule;
 using Harmony.Identity.Handler.Commands.PropertyModule.Create;
+using Harmony.Identity.Handler.Commands.PropertyModule.Update;
 using Harmony.Identity.Handler.Queries.PropertyModule.Detail;
 using Harmony.Identity.Handler.Queries.PropertyModule.List;
 using Harmony.Identity.Handler.Queries.PropertyModule.Mine;
@@ -61,6 +62,16 @@ public class PropertyController(IMediator mediator, ICallResponseManager callRes
     public async Task<IActionResult> GetMineById(Guid id)
     {
         var response = await this.Mediator.Send(new GetMyPropertyByIdQuery { Id = id });
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The hotel's own details, replaced whole, by its own people. Never the code, the place, the money, the language or the regimes.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageProperties)]
+    public async Task<IActionResult> Update([FromBody] UpdatePropertyCommand command)
+    {
+        var response = await this.Mediator.Send(command);
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 }
