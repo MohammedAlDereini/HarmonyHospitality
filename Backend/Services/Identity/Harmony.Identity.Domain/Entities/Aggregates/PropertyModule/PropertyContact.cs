@@ -18,11 +18,6 @@ public sealed class PropertyContact : BaseEntity<Guid>, IAuditableEntity, IMulti
     {
     }
 
-    private PropertyContact(Guid id)
-        : base(id)
-    {
-    }
-
     public Guid TenantId { get; private set; }
 
     public Guid PropertyId { get; private set; }
@@ -48,8 +43,8 @@ public sealed class PropertyContact : BaseEntity<Guid>, IAuditableEntity, IMulti
 
     internal static PropertyContact New(Guid tenantId, Guid propertyId, string name, string? role, string? email, string? telephone, bool isPrimary)
     {
-        // The id is given at birth, so one list can be reconciled against itself before any save.
-        var contact = new PropertyContact(Guid.CreateVersion7()) { TenantId = tenantId, PropertyId = propertyId };
+        // The id is EF's, assigned when the save tracks the row: a new row with a key already set would be taken for an existing one.
+        var contact = new PropertyContact { TenantId = tenantId, PropertyId = propertyId };
         contact.Update(name, role, email, telephone, isPrimary);
         return contact;
     }
