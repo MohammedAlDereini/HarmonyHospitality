@@ -42,6 +42,11 @@ public class PropertyRepository : BaseRepository<Property>, IPropertyRepository
         await this.context.Properties.AddAsync(property, cancellationToken);
     }
 
+    public IQueryable<Property> Query()
+    {
+        return this.context.Properties.AsNoTracking();
+    }
+
     public IQueryable<Property> QueryAcrossTenants()
     {
         return this.context.Properties

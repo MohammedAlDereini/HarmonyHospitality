@@ -3,6 +3,7 @@ using Harmony.Identity.Domain.Models.PropertyModule;
 using Harmony.Identity.Handler.Commands.PropertyModule.Create;
 using Harmony.Identity.Handler.Queries.PropertyModule.Detail;
 using Harmony.Identity.Handler.Queries.PropertyModule.List;
+using Harmony.Identity.Handler.Queries.PropertyModule.Mine;
 
 namespace Harmony.Identity.Api.Controllers;
 
@@ -40,6 +41,26 @@ public class PropertyController(IMediator mediator, ICallResponseManager callRes
     public async Task<IActionResult> GetById(Guid id)
     {
         var response = await this.Mediator.Send(new GetPropertyByIdQuery { Id = id });
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The caller's own hotels, paged; the rows only. Walled by the caller's tenant.</summary>
+    [HttpPost("mine")]
+    [ProducesResponseType(typeof(PagedResult<PropertyModel>), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewProperties)]
+    public async Task<IActionResult> GetMine([FromBody] GetMyPropertiesQuery query)
+    {
+        var response = await this.Mediator.Send(query);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>One of the caller's hotels with its lines and the computed facts; another customer's hotel is 00092.</summary>
+    [HttpGet("mine/{id:guid}")]
+    [ProducesResponseType(typeof(PropertyModel), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewProperties)]
+    public async Task<IActionResult> GetMineById(Guid id)
+    {
+        var response = await this.Mediator.Send(new GetMyPropertyByIdQuery { Id = id });
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 }

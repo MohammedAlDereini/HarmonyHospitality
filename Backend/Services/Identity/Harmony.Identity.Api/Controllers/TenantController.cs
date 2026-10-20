@@ -8,6 +8,7 @@ using Harmony.Identity.Handler.Commands.TenantModule.Subscriptions.Subscribe;
 using Harmony.Identity.Handler.Commands.TenantModule.Subscriptions.Unsubscribe;
 using Harmony.Identity.Handler.Queries.TenantModule.Detail;
 using Harmony.Identity.Handler.Queries.TenantModule.List;
+using Harmony.Identity.Handler.Queries.TenantModule.Mine;
 
 namespace Harmony.Identity.Api.Controllers;
 
@@ -106,6 +107,16 @@ public class TenantController(IMediator mediator, ICallResponseManager callRespo
     public async Task<IActionResult> GetById(Guid id)
     {
         var response = await this.Mediator.Send(new GetTenantByIdQuery { Id = id });
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The caller's own customer with every line it holds: what the hotel pays for, read by the hotel.</summary>
+    [HttpGet("mine")]
+    [ProducesResponseType(typeof(TenantModel), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewProperties)]
+    public async Task<IActionResult> GetMine()
+    {
+        var response = await this.Mediator.Send(new GetMyTenantQuery());
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 }

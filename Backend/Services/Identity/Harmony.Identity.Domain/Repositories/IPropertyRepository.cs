@@ -17,6 +17,9 @@ public interface IPropertyRepository : IRepository<Property>
 
     Task AddAsync(Property property, CancellationToken cancellationToken);
 
+    /// <summary>The caller's own hotels, untracked, inside the wall: the tenant filter does the work.</summary>
+    IQueryable<Property> Query();
+
     /// <summary>Every customer's hotels, untracked, for the console's reads.</summary>
     IQueryable<Property> QueryAcrossTenants();
 }
