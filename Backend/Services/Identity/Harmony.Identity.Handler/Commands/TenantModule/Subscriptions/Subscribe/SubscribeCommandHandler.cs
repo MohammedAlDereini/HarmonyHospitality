@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 /// <summary>
-/// A line born or renewed. Gates first; then the line on the tracked customer, the trail, one save; the customer's
+/// A line born (201) or renewed (200). Gates first; then the line on the tracked customer, the trail, one save; the customer's
 /// event rewrites the cache after the commit. A hotel's rooms above the renewed licence are flagged, never refused.
 /// </summary>
 public class SubscribeCommandHandler : SubscriptionCommandHandlerBase, IRequestHandler<SubscribeCommand, CallResponse<Guid>>
@@ -58,6 +58,7 @@ public class SubscribeCommandHandler : SubscriptionCommandHandlerBase, IRequestH
         }
 
         var line = tenant.Subscribe(property?.Id, module!.Code, command.Rooms, command.Terminals, command.StartsOn, command.EndsOn, command.RenewsAutomatically);
+        var born = line.Id == Guid.Empty; // a new row gets its id when the save tracks it; a renewed one already has it
         await this.TrailAsync(SecurityAuditActions.TenantSubscribed, LineName(property, module.Code), cancellationToken);
 
         if (property is not null)
@@ -72,6 +73,6 @@ public class SubscribeCommandHandler : SubscriptionCommandHandlerBase, IRequestH
 
         await this.Tenants.SaveChangesAsync(cancellationToken);
         this.logger.LogInformation("Tenant {Tenant}: line {Line} subscribed.", tenant.Code, LineName(property, module.Code));
-        return CallResponseBuilder.CreateResponse<Guid>(eCallResponseStatus.Success).HasData(line.Id);
+        return CallResponseBuilder.CreateResponse<Guid>(born ? eCallResponseStatus.Created : eCallResponseStatus.Success).HasData(line.Id);
     }
 }

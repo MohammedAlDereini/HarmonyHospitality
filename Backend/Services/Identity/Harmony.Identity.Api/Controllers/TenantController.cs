@@ -1,4 +1,4 @@
-using Harmony.Core.Models;
+﻿using Harmony.Core.Models;
 using Harmony.Identity.Domain.Models.TenantModule;
 using Harmony.Identity.Handler.Commands.TenantModule.Administrator;
 using Harmony.Identity.Handler.Commands.TenantModule.Create;
@@ -70,9 +70,10 @@ public class TenantController(IMediator mediator, ICallResponseManager callRespo
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 
-    /// <summary>A line of the customer's contract: born, or renewed and switched back on. A hotel line names the hotel; a chain-wide line names none.</summary>
+    /// <summary>A line of the customer's contract: born (201), or renewed and switched back on (200). A hotel line names the hotel; a chain-wide line names none.</summary>
     [HttpPost("[action]")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
     [RequirePermission(PermissionEnum.ManageTenants)]
     public async Task<IActionResult> Subscribe([FromBody] SubscribeCommand command)
     {
