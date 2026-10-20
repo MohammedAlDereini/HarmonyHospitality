@@ -95,6 +95,9 @@ public class PropertyModel
     /// <summary>This hotel's lines. Detail only.</summary>
     public List<SubscriptionLineModel> Subscriptions { get; set; } = [];
 
+    /// <summary>The named people at the hotel, the primary first. Detail only.</summary>
+    public List<PropertyContactModel> Contacts { get; set; } = [];
+
     public DateTime CreatedDate { get; set; }
 
     public string CreatedBy { get; set; } = null!;

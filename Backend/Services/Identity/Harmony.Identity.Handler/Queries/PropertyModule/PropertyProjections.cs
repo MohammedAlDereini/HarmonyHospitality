@@ -76,6 +76,17 @@ internal static class PropertyProjections
     };
 
     /// <summary>IsHeld by the one definition every service uses (the framework record), for the given UTC day.</summary>
+    /// <summary>A contact row as the detail reads show it.</summary>
+    public static readonly Expression<Func<PropertyContact, PropertyContactModel>> Contact = c => new PropertyContactModel
+    {
+        Id = c.Id,
+        Name = c.Name,
+        Role = c.Role,
+        Email = c.Email,
+        Telephone = c.Telephone,
+        IsPrimary = c.IsPrimary,
+    };
+
     public static void MarkHeld(IEnumerable<SubscriptionLineModel> lines, DateOnly utcToday)
     {
         foreach (var line in lines)

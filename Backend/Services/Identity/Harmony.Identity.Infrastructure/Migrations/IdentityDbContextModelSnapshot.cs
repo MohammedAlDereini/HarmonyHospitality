@@ -409,6 +409,72 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.ToTable("Properties", (string)null);
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.PropertyContact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Role")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Telephone")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("PropertyId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_PropertyContacts_Primary")
+                        .HasFilter("[IsPrimary] = 1");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("PropertyContacts", (string)null);
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.RoleModule.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1844,6 +1910,21 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.PropertyContact", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", null)
+                        .WithMany("Contacts")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.RoleModule.RolePermission", b =>
                 {
                     b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PermissionModule.Permission", "Permission")
@@ -2020,6 +2101,11 @@ namespace Harmony.Identity.Infrastructure.Migrations
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PermissionModule.Permission", b =>
                 {
                     b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", b =>
+                {
+                    b.Navigation("Contacts");
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.RoleModule.Role", b =>

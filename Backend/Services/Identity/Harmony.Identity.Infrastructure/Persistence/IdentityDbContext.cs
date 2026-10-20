@@ -37,6 +37,7 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantSubscription> TenantSubscriptions { get; set; }
     public DbSet<Property> Properties { get; set; }
+    public DbSet<PropertyContact> PropertyContacts { get; set; }
     public DbSet<User> UserAccounts { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<UserDevice> UserDevices { get; set; }

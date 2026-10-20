@@ -49,6 +49,13 @@ public class GetPropertyByIdQueryHandler : IRequestHandler<GetPropertyByIdQuery,
             .Select(PropertyProjections.Line)
             .ToListAsync(cancellationToken);
 
+        model.Contacts = await this.properties.QueryAcrossTenants()
+            .Where(p => p.Id == model.Id)
+            .SelectMany(p => p.Contacts)
+            .OrderByDescending(c => c.IsPrimary).ThenBy(c => c.Name)
+            .Select(PropertyProjections.Contact)
+            .ToListAsync(cancellationToken);
+
         PropertyProjections.Complete(model, lines, this.clock.GetUtcNow());
         return CallResponseBuilder.CreateResponse<PropertyModel>(eCallResponseStatus.Success).HasData(model);
     }

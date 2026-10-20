@@ -84,6 +84,9 @@ public static class SecurityAuditActions
     /// <summary>A hotel's own details were changed by its people; the detail is the hotel code.</summary>
     public const string PropertyUpdated = "property.updated";
 
+    /// <summary>A hotel's contact list was replaced by its people; the detail is "HOTEL:count".</summary>
+    public const string PropertyContactsChanged = "property.contacts-changed";
+
     /// <summary>A passkey answer of a known account that did not verify, or a passkey removed meanwhile.</summary>
     public const string SignInPasskeyRefused = "sign-in.passkey-refused";
 }

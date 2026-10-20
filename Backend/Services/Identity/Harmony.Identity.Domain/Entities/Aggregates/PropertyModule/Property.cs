@@ -66,6 +66,9 @@ public sealed partial class Property : AggregateRoot<Guid>, IAuditableEntity, IM
 
     public RegulatoryProfile Regulatory { get; private set; } = null!;
 
+    /// <summary>The named people at the hotel. Changed only through SetContacts.</summary>
+    public ICollection<PropertyContact> Contacts { get; private set; } = new List<PropertyContact>();
+
     /// <summary>Accepts reservations from this local day; null = open now (Opera: Begin Date).</summary>
     public DateOnly? OpensOn { get; private set; }
 
@@ -263,6 +266,47 @@ public sealed partial class Property : AggregateRoot<Guid>, IAuditableEntity, IM
         ProductChampionEmail = Optional(productChampionEmail, EmailMaxLength, nameof(productChampionEmail));
         LegalOwnerName = Optional(legalOwnerName, LegalOwnerNameMaxLength, nameof(legalOwnerName));
         DisplayOrder = displayOrder;
+    }
+
+    /// <summary>A wanted contact: an existing one by id, or a new one when the id is empty.</summary>
+    public sealed record ContactRequest(Guid? Id, string Name, string? Role, string? Email, string? Telephone, bool IsPrimary);
+
+    /// <summary>
+    /// The contact list replaced whole: listed with an id = updated, listed without = born, not listed = removed. One
+    /// primary at most. Returns the id that was not this hotel's, or null when every id was.
+    /// </summary>
+    public Guid? SetContacts(IReadOnlyList<ContactRequest> wanted)
+    {
+        ArgumentNullException.ThrowIfNull(wanted);
+        if (wanted.Count(c => c.IsPrimary) > 1)
+        {
+            throw new ArgumentException("One primary contact at most.", nameof(wanted));
+        }
+
+        var unknown = wanted.Where(c => c.Id is { } id && Contacts.All(x => x.Id != id)).Select(c => c.Id).FirstOrDefault();
+        if (unknown is { } missing)
+        {
+            return missing;
+        }
+
+        foreach (var gone in Contacts.Where(c => wanted.All(w => w.Id != c.Id)).ToList())
+        {
+            Contacts.Remove(gone);
+        }
+
+        foreach (var request in wanted)
+        {
+            if (request.Id is { } id)
+            {
+                Contacts.First(c => c.Id == id).Update(request.Name, request.Role, request.Email, request.Telephone, request.IsPrimary);
+            }
+            else
+            {
+                Contacts.Add(PropertyContact.New(TenantId, Id, request.Name, request.Role, request.Email, request.Telephone, request.IsPrimary));
+            }
+        }
+
+        return null;
     }
 
     /// <summary>The hotel's own calendar day for a moment in UTC: Amman opens at Amman's midnight, not at UTC's.</summary>
