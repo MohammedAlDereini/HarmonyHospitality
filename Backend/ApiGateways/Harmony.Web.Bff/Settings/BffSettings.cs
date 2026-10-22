@@ -41,6 +41,18 @@ public sealed class BffSettings
     /// <summary>Serve the built web app from wwwroot (production). Off in development, where the dev server serves it.</summary>
     public bool ServeStaticFiles { get; set; }
 
+    /// <summary>
+    /// Trusted Types enforced on the web app's page (a string pushed into a script sink throws). Off: the same directives
+    /// go out report-only, so violations are seen in the browser before anything is blocked (the staging week), then on.
+    /// </summary>
+    public bool EnforceTrustedTypes { get; set; }
+
+    /// <summary>CSP violation reports one client address may post per minute; the rest answer 429. A page in trouble sends a handful; a flood is somebody else.</summary>
+    public int CspReportsPerMinute { get; set; } = 60;
+
+    /// <summary>Days the browser pins HTTPS for this host (Strict-Transport-Security), 1 to 730. Start at 1 on a new domain, raise to 365 once HTTPS is proven; 730 is OWASP's ceiling.</summary>
+    public int HstsMaxAgeDays { get; set; } = 365;
+
     /// <summary>Front doors whose X-Forwarded-For is believed. EMPTY MEANS TRUST NOBODY — the safe default.</summary>
     public string[] TrustedProxyAddresses { get; set; } = [];
 
@@ -68,6 +80,8 @@ public sealed class BffSettings
             && Uri.TryCreate(settings.ApiDestination, UriKind.Absolute, out var api)
             && api.Scheme == Uri.UriSchemeHttps
             && settings.TrustedProxyAddresses.All(address => IPAddress.TryParse(address, out _))
+            && settings.CspReportsPerMinute >= 1
+            && settings.HstsMaxAgeDays is >= 1 and <= 730
             && PasskeyEndpointsValid(settings);
 
     private static bool PasskeyEndpointsValid(BffSettings settings)

@@ -2,9 +2,12 @@ using System.Net.Http.Headers;
 using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.RateLimiting;
 using Harmony.Core.DI;
 using Harmony.Web.Bff.ApiDocs;
 using Harmony.Web.Bff.Authentication;
+using Harmony.Web.Bff.Pages;
+using Harmony.Web.Bff.Security;
 using Harmony.Web.Bff.Sessions;
 using Harmony.Web.Bff.Settings;
 using Microsoft.AspNetCore.Authentication;
@@ -12,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -29,7 +33,7 @@ builder.WebHost.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
 
 builder.Services.AddOptions<BffSettings>()
     .Bind(builder.Configuration.GetSection(BffSettings.Section))
-    .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24, PasskeyEnrollUrl and PasskeyManageUrl both absolute https or both empty, every TrustedProxyAddresses entry an IP address.")
+    .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24, PasskeyEnrollUrl and PasskeyManageUrl both absolute https or both empty, CspReportsPerMinute at least 1, HstsMaxAgeDays 1 to 730, every TrustedProxyAddresses entry an IP address.")
     .ValidateOnStart();
 
 // The one API-docs page (/docs) for platform people and the services it lists. No section = no page.
@@ -121,6 +125,16 @@ builder.Services.AddAuthorization(options =>
 // would 401 the API's anonymous doors before the API could answer. The API stays the authority:
 // protected doors demand the Bearer token this BFF attaches only when a session exists.
 var bffSettings = builder.Configuration.GetSection(BffSettings.Section).Get<BffSettings>() ?? new BffSettings();
+
+// The report door's limiter: ASP.NET Core's own, one fixed window per client address (the real one: forwarded
+// headers run first). A flood answers 429 and is never logged.
+builder.Services.AddRateLimiter(limiter =>
+{
+    limiter.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    limiter.AddPolicy(CspViolationReports.RateLimitPolicy, context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = bffSettings.CspReportsPerMinute, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+});
 builder.Services.AddReverseProxy()
     .LoadFromMemory(
         [
@@ -172,6 +186,16 @@ builder.Services.AddReverseProxy()
         });
     });
 
+// HSTS for the days the setting says, subdomains included (OWASP: up to two years; Microsoft: start low on a new
+// domain, raise once HTTPS is proven). Preload stays off until the apex is submitted at hstspreload.org. The front
+// door must say the same or nothing: YARP keeps the proxy's value over the destination's. Loopback hosts stay
+// excluded (the framework's default), so a developer's browser never pins localhost.
+builder.Services.AddHsts(hsts =>
+{
+    hsts.MaxAge = TimeSpan.FromDays(bffSettings.HstsMaxAgeDays);
+    hsts.IncludeSubDomains = true;
+});
+
 var app = builder.Build();
 
 // First of all middleware (Microsoft: before UseHsts): from here on the request carries the caller's real address
@@ -189,23 +213,27 @@ app.UseMiddleware<Harmony.Web.Bff.Security.SecurityHeadersMiddleware>();
 app.UseMiddleware<Harmony.Web.Bff.Security.CsrfHeaderMiddleware>();
 
 // Production: the built web app lives in wwwroot. Its files are served BEFORE authentication runs — a stylesheet
-// needs no session and must not spend a token refresh. The hashed assets may be cached forever; index.html never,
-// or a deployment would show the old app until the browser felt like asking.
-var staticFiles = new StaticFileOptions
-{
-    OnPrepareResponse = context =>
-    {
-        if (context.File.Name.Equals("index.html", StringComparison.OrdinalIgnoreCase))
-        {
-            context.Context.Response.Headers.CacheControl = "no-cache";
-        }
-    },
-};
+// needs no session and must not spend a token refresh. The hashed assets may be cached forever. The page itself
+// (index.html) is never a file: it is rendered per request with its nonce (WebAppPage, the fallback below), so a
+// request for /index.html is the page too, not the raw file with the marker in it.
 if (bffSettings.ServeStaticFiles)
 {
-    app.UseDefaultFiles();
-    app.UseStaticFiles(staticFiles);
+    app.Use((context, next) =>
+    {
+        if (context.Request.Path.Equals("/index.html", StringComparison.OrdinalIgnoreCase))
+        {
+            context.Request.Path = "/";
+        }
+
+        return next(context);
+    });
+    app.UseStaticFiles();
 }
+
+// Routing picks the endpoint only from here. Left implicit it would run FIRST, and the "{*path:file}" fallback below
+// would claim every asset before the static files above could serve it (a built app with every script answered 404).
+app.UseRouting();
+app.UseRateLimiter();
 
 app.UseAuthentication();
 
@@ -286,6 +314,9 @@ app.MapGet("/bff/user", (ClaimsPrincipal user, HttpContext http) =>
     });
 }).AllowAnonymous();
 
+// Where the browser sends CSP and Trusted Types violations. See CspViolationReports for what keeps it harmless.
+app.MapPost(CspViolationReports.Path, CspViolationReports.ReceiveAsync).AllowAnonymous().RequireRateLimiting(CspViolationReports.RateLimitPolicy);
+
 // Signing out is a top-level NAVIGATION, never a fetch(): Identity ends its own session only when the browser
 // itself walks to its end-session door carrying Identity's cookie, which a redirect inside a fetch() never does.
 // A navigation cannot carry the CSRF header, so the proof here is the session's own sid in the link — a value no
@@ -337,6 +368,10 @@ app.MapGet("/bff/logout", async (string? sid, HttpContext http, IHttpClientFacto
         }
     }
 
+    // At sign-out the browser itself wipes what the person left on this site (cached pages, every cookie, local
+    // storage), so a shared front-desk PC hands the next shift nothing. "cookies" reaches the whole registrable domain,
+    // Identity's session cookie included: at sign-out, that is the point. The theme and language hints go too.
+    http.Response.Headers["Clear-Site-Data"] = "\"cache\", \"cookies\", \"storage\"";
     await http.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     await http.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/" });
     return Results.Empty;
@@ -359,8 +394,9 @@ app.MapReverseProxy();
 
 if (bffSettings.ServeStaticFiles)
 {
-    // Every path that is no door above is the web app's own (its router reads the address): index.html.
-    app.MapFallbackToFile("index.html", staticFiles).AllowAnonymous();
+    // Every path that is no door above is the web app's own (its router reads the address): the page, rendered
+    // with this request's nonce.
+    app.MapFallback(WebAppPage.RenderAsync).AllowAnonymous();
 }
 else
 {

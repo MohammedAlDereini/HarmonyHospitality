@@ -16,7 +16,9 @@ internal sealed class CsrfHeaderMiddleware
     /// <summary>
     /// Top-level navigations of the sign-in/sign-out walk (no fetch(), so no custom header possible): sign-in,
     /// the callback, sign-out (guarded by the session's own sid in the link instead) and its callbacks; plus
-    /// the back-channel receiver: Identity's own server POST, guarded by its signed logout_token instead.
+    /// the back-channel receiver: Identity's own server POST, guarded by its signed logout_token instead; plus the CSP
+    /// report door: the browser posts reports without custom headers, and the door takes only report content types,
+    /// which no form can send.
     /// </summary>
     private static readonly string[] ExemptPaths =
     [
@@ -26,6 +28,7 @@ internal sealed class CsrfHeaderMiddleware
         "/signout-callback-oidc",
         "/signout-oidc",
         "/bff/backchannel-logout",
+        CspViolationReports.Path,
     ];
 
     private readonly RequestDelegate next;
