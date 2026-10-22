@@ -101,9 +101,17 @@ public partial class Program
             }
 
             // Every answer, the stylesheet and script included: the browser must trust the declared type, never guess one.
+            // Every API answer is per person: never stored by a browser, a proxy or a cache in between (the BFF forces the
+            // same on proxied answers; this covers every caller that reaches Identity without it). Pages keep their own
+            // caching (the sign-in pages set theirs); the fingerprinted static assets keep their long one.
             app.Use((context, next) =>
             {
                 context.Response.Headers.XContentTypeOptions = "nosniff";
+                if (context.Request.Path.StartsWithSegments("/api"))
+                {
+                    context.Response.Headers.CacheControl = "no-store";
+                }
+
                 return next(context);
             });
 
