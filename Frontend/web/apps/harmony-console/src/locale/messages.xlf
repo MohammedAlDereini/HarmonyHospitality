@@ -100,6 +100,13 @@
           <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="platform.session.signed-in" datatype="html">
+        <source> You are signed in. You can close this window. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/signed-in-page.ts</context>
+          <context context-type="linenumber">18,21</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

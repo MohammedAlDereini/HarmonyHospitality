@@ -28,6 +28,11 @@ export function fromResponse<T>(response: HttpResponse<Envelope<T>>): ApiResult<
   return { kind: 'ok', status: response.status, data: response.body?.data as T };
 }
 
+/** A BFF door (/bff/user) answers the thing itself, not an envelope; its refusals still carry the statuses above. */
+export function fromPlainResponse<T>(response: HttpResponse<T>): ApiResult<T> {
+  return { kind: 'ok', status: response.status, data: response.body as T };
+}
+
 /** What each refusing status means; a status not listed here is "unavailable". */
 const outcomeByStatus: Record<number, (codes: string[]) => ApiResult<never>> = {
   [HttpStatus.badRequest]: (codes) => ({ kind: 'invalid', status: HttpStatus.badRequest, codes }),

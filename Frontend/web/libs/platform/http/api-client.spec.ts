@@ -60,6 +60,12 @@ describe('ApiClient', () => {
     expect(await answer).toEqual({ kind: 'ok', status: HttpStatus.ok, data: { n: 1 } });
   });
 
+  it('a BFF door answers plain JSON: the body itself is the data', async () => {
+    const answer = firstValueFrom(client.getPlain<{ sub: string }>('/bff/user'));
+    http.expectOne('/bff/user').flush({ sub: 'u1' });
+    expect(await answer).toEqual({ kind: 'ok', status: HttpStatus.ok, data: { sub: 'u1' } });
+  });
+
   it('a 202 is a business refusal with its codes', async () => {
     const answer = firstValueFrom(client.post('/api/x', {}));
     http
