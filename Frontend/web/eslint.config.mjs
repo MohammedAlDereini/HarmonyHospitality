@@ -25,6 +25,9 @@ export default defineConfig(
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-deprecated': 'error',
+      // A response type parameter (get<T>) is the caller's contract and appears only in the return type; the rule
+      // would call every such signature unnecessary.
+      '@typescript-eslint/no-unnecessary-type-parameters': 'off',
       '@angular-eslint/component-selector': [
         'error',
         { type: 'element', prefix: 'hr', style: 'kebab-case' },
