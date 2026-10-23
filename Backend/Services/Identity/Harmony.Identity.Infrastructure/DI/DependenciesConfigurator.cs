@@ -232,9 +232,9 @@ public static class DependenciesConfigurator
 
         services.AddOptions<PasskeySettings>()
             .Bind(configuration.GetSection(PasskeySettings.Section))
-            .Validate<IOptions<WebBffSettings>, IOptions<TokenIssuerSettings>>(
-                (settings, bff, issuer) => PasskeySettings.IsValid(settings, bff.Value.Origins, issuer.Value.Issuer),
-                $"{PasskeySettings.Section}:ServerDomain must be a domain the issuer's host and every WebBff origin's host equal or sit under (empty = the issuer's host, right only when they are all that host).")
+            .Validate<IOptions<WebBffSettings>, IOptions<ConsoleBffSettings>, IOptions<TokenIssuerSettings>>(
+                (settings, bff, console, issuer) => PasskeySettings.IsValid(settings, bff.Value.Origins.Concat(console.Value.Origins), issuer.Value.Issuer),
+                $"{PasskeySettings.Section}:ServerDomain must be a domain the issuer's host and every WebBff and ConsoleBff origin's host equal or sit under (empty = the issuer's host, right only when they are all that host).")
             .ValidateOnStart();
         services.ConfigureOptions<PasskeyOptionsSetup>();
 
@@ -247,6 +247,14 @@ public static class DependenciesConfigurator
             .Validate(settings => settings.Origins.Length > 0 && settings.Origins.All(WebLinkSettings.IsValidOrigin), $"{WebBffSettings.Section}:Origins must list at least one https origin without a path.")
             .Validate(settings => WebBffSettings.ReadPublicJwk(settings.ClientPublicKeyPath) is not null, $"{WebBffSettings.Section}:ClientPublicKeyPath must name a PEM file holding an EC P-256 public key, and no private key.")
             .Validate(settings => settings.PreviousClientPublicKeyPaths.All(path => WebBffSettings.ReadPublicJwk(path) is not null), $"{WebBffSettings.Section}:PreviousClientPublicKeyPaths must each name a PEM file holding an EC P-256 public key, and no private key.")
+            .ValidateOnStart();
+
+        // The console BFF client's settings (B9): no section, no console client; a present one obeys the web client's rules.
+        services.AddOptions<ConsoleBffSettings>()
+            .Bind(configuration.GetSection(ConsoleBffSettings.Section))
+            .Validate(settings => !settings.IsPresent || settings.Origins.All(WebLinkSettings.IsValidOrigin), $"{ConsoleBffSettings.Section}:Origins must list https origins without a path.")
+            .Validate(settings => !settings.IsPresent || BffClientSettings.ReadPublicJwk(settings.ClientPublicKeyPath) is not null, $"{ConsoleBffSettings.Section}:ClientPublicKeyPath must name a PEM file holding an EC P-256 public key, and no private key.")
+            .Validate(settings => !settings.IsPresent || settings.PreviousClientPublicKeyPaths.All(path => BffClientSettings.ReadPublicJwk(path) is not null), $"{ConsoleBffSettings.Section}:PreviousClientPublicKeyPaths must each name a PEM file holding an EC P-256 public key, and no private key.")
             .ValidateOnStart();
 
         services.TryAddScoped<IAccountMailer, AccountMailer>();
@@ -411,13 +419,21 @@ public static class DependenciesConfigurator
     /// management is off. The licence key is read from configuration (Duende:IdentityServer:LicenseKey).
     /// Sign-in flows and clients arrive with S5. 🔴 SERVICES: the harmony:service grant lived here.
     /// </summary>
+    /// <summary>A BFF host's public keys as JSON Web Keys: the current one first, then those kept during a rotation.</summary>
+    private static string[] PublicJwksOf(BffClientSettings host)
+        => new[] { host.ClientPublicKeyPath }.Concat(host.PreviousClientPublicKeyPaths)
+            .Select(BffClientSettings.ReadPublicJwk)
+            .OfType<string>()
+            .ToArray();
+
     private static void AddIdentityServerHost(this IServiceCollection services, IConfiguration configuration)
     {
         var bff = configuration.GetSection(WebBffSettings.Section).Get<WebBffSettings>() ?? new WebBffSettings();
-        var bffPublicKeys = new[] { bff.ClientPublicKeyPath }.Concat(bff.PreviousClientPublicKeyPaths)
-            .Select(WebBffSettings.ReadPublicJwk)
-            .OfType<string>()
-            .ToArray();
+        var bffPublicKeys = PublicJwksOf(bff);
+
+        // The console host (B9): registered only when its section names an origin.
+        var console = configuration.GetSection(ConsoleBffSettings.Section).Get<ConsoleBffSettings>() ?? new ConsoleBffSettings();
+        var consolePublicKeys = console.IsPresent ? PublicJwksOf(console) : [];
 
         services.AddIdentityServer(options =>
         {
@@ -448,7 +464,7 @@ public static class DependenciesConfigurator
         .AddInMemoryIdentityResources(IdentityServerResources.IdentityResources)
         .AddInMemoryApiScopes(IdentityServerResources.ApiScopes)
         .AddInMemoryApiResources(IdentityServerResources.ApiResources)
-        .AddInMemoryClients(IdentityServerResources.Clients(bff.Origins, bffPublicKeys))
+        .AddInMemoryClients(IdentityServerResources.Clients(bff.Origins, bffPublicKeys, console.Origins, consolePublicKeys))
         // private_key_jwt client authentication (RFC 7523), used by the BFF.
         .AddJwtBearerClientAuthentication()
         // The token claims (tenant, roles, security version), run by Duende for every token it issues.

@@ -2,7 +2,6 @@ namespace Harmony.Web.Bff.Sessions;
 
 using Harmony.Core.Cache.Abstractions;
 using Harmony.Core.Cache.Enums;
-using Harmony.Core.Models;
 using Providers = Harmony.Core.Cache.Providers;
 using Harmony.Web.Bff.Settings;
 using Microsoft.AspNetCore.Authentication;
@@ -29,13 +28,15 @@ internal sealed class RedisTicketStore : ITicketStore
     private readonly string prefix;
     private readonly string sidPrefix;
 
-    public RedisTicketStore(IServiceScopeFactory scopes, IDataProtectionProvider dataProtection, AppInfo appInfo, IOptions<BffSettings> options)
+    // Internal level: the framework files every key under this host's own name (WebBff:session:…), the one shelf the
+    // host's Redis user alone may read. Public would put them under Global:, which every service user may read.
+    public RedisTicketStore(IServiceScopeFactory scopes, IDataProtectionProvider dataProtection, IOptions<BffSettings> options)
     {
         this.scopes = scopes;
         this.protector = dataProtection.CreateProtector("Harmony.Web.Bff.SessionTickets");
         this.idle = TimeSpan.FromMinutes(options.Value.SessionIdleMinutes);
-        this.prefix = $"{appInfo.Name.ToLowerInvariant()}:{SessionPrefix}";
-        this.sidPrefix = $"{appInfo.Name.ToLowerInvariant()}:{SidPrefix}";
+        this.prefix = SessionPrefix;
+        this.sidPrefix = SidPrefix;
     }
 
     public async Task<string> StoreAsync(AuthenticationTicket ticket)
@@ -48,7 +49,7 @@ internal sealed class RedisTicketStore : ITicketStore
         {
             using var scope = this.scopes.CreateScope();
             var cache = scope.ServiceProvider.GetRequiredService<ICache<Providers.Redis>>();
-            _ = await cache.SaveAsync(this.sidPrefix + sid, key, this.LifetimeOf(ticket), eCacheAccessLevel.Public, CancellationToken.None);
+            _ = await cache.SaveAsync(this.sidPrefix + sid, key, this.LifetimeOf(ticket), eCacheAccessLevel.Internal, CancellationToken.None);
         }
 
         return key;
@@ -60,7 +61,7 @@ internal sealed class RedisTicketStore : ITicketStore
     {
         using var scope = this.scopes.CreateScope();
         var cache = scope.ServiceProvider.GetRequiredService<ICache<Providers.Redis>>();
-        var stored = await cache.GetAsync<string>(this.prefix + key, eCacheAccessLevel.Public, CancellationToken.None);
+        var stored = await cache.GetAsync<string>(this.prefix + key, eCacheAccessLevel.Internal, CancellationToken.None);
         if (stored.CacheOperationResult != eCacheOperationResult.Success || string.IsNullOrEmpty(stored.Value))
         {
             return null;
@@ -86,10 +87,10 @@ internal sealed class RedisTicketStore : ITicketStore
         var ticket = await this.RetrieveAsync(key);
         if (ticket?.Principal.FindFirst("sid")?.Value is string sid)
         {
-            _ = await cache.DeleteAsync(this.sidPrefix + sid, eCacheAccessLevel.Public, CancellationToken.None);
+            _ = await cache.DeleteAsync(this.sidPrefix + sid, eCacheAccessLevel.Internal, CancellationToken.None);
         }
 
-        _ = await cache.DeleteAsync(this.prefix + key, eCacheAccessLevel.Public, CancellationToken.None);
+        _ = await cache.DeleteAsync(this.prefix + key, eCacheAccessLevel.Internal, CancellationToken.None);
     }
 
     /// <summary>The session key Identity's sid points at, or null. The back-channel logout endpoint asks this.</summary>
@@ -97,7 +98,7 @@ internal sealed class RedisTicketStore : ITicketStore
     {
         using var scope = this.scopes.CreateScope();
         var cache = scope.ServiceProvider.GetRequiredService<ICache<Providers.Redis>>();
-        var found = await cache.GetAsync<string>(this.sidPrefix + sid, eCacheAccessLevel.Public, cancellationToken);
+        var found = await cache.GetAsync<string>(this.sidPrefix + sid, eCacheAccessLevel.Internal, cancellationToken);
         return found.CacheOperationResult == eCacheOperationResult.Success ? found.Value : null;
     }
 
@@ -108,14 +109,14 @@ internal sealed class RedisTicketStore : ITicketStore
 
         using var scope = this.scopes.CreateScope();
         var cache = scope.ServiceProvider.GetRequiredService<ICache<Providers.Redis>>();
-        _ = await cache.SaveAsync(this.prefix + key, sealedTicket, life, eCacheAccessLevel.Public, CancellationToken.None);
+        _ = await cache.SaveAsync(this.prefix + key, sealedTicket, life, eCacheAccessLevel.Internal, CancellationToken.None);
 
         // Identity's session id points at ours, so a back-channel logout can end exactly this session. Written
         // on EVERY renewal, not only at sign-in: an index left at its sign-in lifetime would expire before a
         // long shift's session does, and the logout would then find nothing to end.
         if (ticket.Principal.FindFirst("sid")?.Value is string sid)
         {
-            _ = await cache.SaveAsync(this.sidPrefix + sid, key, life, eCacheAccessLevel.Public, CancellationToken.None);
+            _ = await cache.SaveAsync(this.sidPrefix + sid, key, life, eCacheAccessLevel.Internal, CancellationToken.None);
         }
     }
 

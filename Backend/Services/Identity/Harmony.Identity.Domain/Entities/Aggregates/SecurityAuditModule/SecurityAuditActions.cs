@@ -89,4 +89,7 @@ public static class SecurityAuditActions
 
     /// <summary>A passkey answer of a known account that did not verify, or a passkey removed meanwhile.</summary>
     public const string SignInPasskeyRefused = "sign-in.passkey-refused";
+
+    /// <summary>A hotel account, credential right, at a client kept for the platform's own people (the console).</summary>
+    public const string SignInPlatformOnly = "sign-in.platform-only-refused";
 }

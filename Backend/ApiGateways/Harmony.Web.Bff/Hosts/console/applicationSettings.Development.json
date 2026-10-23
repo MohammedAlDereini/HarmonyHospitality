@@ -1,0 +1,53 @@
+{
+  "ApplicationSettings": {
+    "ApplicationKeys": {
+      "PlatformTenantId": "01a0e265-0cad-77e1-b31c-98fed11919e1"
+    }
+  },
+  "BffSettings": {
+    "Name": "ConsoleBff",
+    "ClientId": "harmony-console-bff",
+    "CookieName": "__Host-Http-harmony-console",
+    "Authority": "https://localhost:5000",
+    "ClientPrivateKeyPath": "D:/PMS System/Harmony/secrets/console-bff-client-key.pem",
+    "ApiDestination": "https://localhost:5000"
+  },
+  "ApiDocs": {
+    "UserName": "harmony-docs",
+    "PasswordPath": "D:/PMS System/Harmony/secrets/identity-apidocs-password.txt",
+    "Services": [
+      { "Name": "Identity", "Url": "https://localhost:5000/api/identity/swagger/v1/swagger.json" }
+    ]
+  },
+  "DataProtectionSettings": {
+    "CertificatePath": "D:/PMS System/Harmony/secrets/identity-dataprotection.pem"
+  },
+  "CacheSettings": {
+    "CacheProviders": {
+      "Redis": {
+        "Connection": "localhost",
+        "Port": 6379,
+        "User": "consolebff",
+        "Password": "KwgTCAmmPvSqoe2ik5N8hhsmMGCp0O2t",
+        "AllowAdmin": false,
+        "Ssl": false,
+        "DistributedLockMode": "RedLock"
+      }
+    },
+    "InterceptionSettings": {
+      "CachingEnabled": false,
+      "DefaultCacheProvider": "Redis",
+      "DefaultCacheAccessLevel": "Private",
+      "CachingMethods": [
+        {
+          "TypeName": "",
+          "CacheProvider": "Memory",
+          "Name": "",
+          "ExpiryInMinutes": 0,
+          "Enabled": false,
+          "CacheAccessLevel": null
+        }
+      ]
+    }
+  }
+}

@@ -17,6 +17,9 @@
 	<ItemGroup>
 		<Content Update="applicationSettings.json" CopyToOutputDirectory="PreserveNewest" />
 		<Content Update="applicationSettings.Development.json" CopyToOutputDirectory="PreserveNewest" />
+		<!-- The console host's settings: one build, two run folders; these files are deployed by hand, never with the build. -->
+		<Content Remove="Hosts/**" />
+		<None Include="Hosts/**" />
 	</ItemGroup>
 
 </Project>

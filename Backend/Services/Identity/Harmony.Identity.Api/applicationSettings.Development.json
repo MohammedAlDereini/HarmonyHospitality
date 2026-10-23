@@ -49,6 +49,11 @@
       "ClientPublicKeyPath": "D:/PMS System/Harmony/secrets/web-bff-client-key.public.pem",
       "PreviousClientPublicKeyPaths": []
     },
+    "ConsoleBff": {
+      "Origins": [ "https://localhost:5220" ],
+      "ClientPublicKeyPath": "D:/PMS System/Harmony/secrets/console-bff-client-key.public.pem",
+      "PreviousClientPublicKeyPaths": []
+    },
     "Web": {
       "ResetPasswordUrl": "https://localhost:5173/account/reset-password?email={email}&token={token}",
       "InvitationUrl": "https://localhost:5173/account/set-password?email={email}&token={token}"

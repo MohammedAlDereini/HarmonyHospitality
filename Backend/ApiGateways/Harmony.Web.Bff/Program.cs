@@ -34,7 +34,7 @@ builder.WebHost.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
 
 builder.Services.AddOptions<BffSettings>()
     .Bind(builder.Configuration.GetSection(BffSettings.Section))
-    .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24, PasskeyEnrollUrl and PasskeyManageUrl both absolute https or both empty, CspReportsPerMinute at least 1, HstsMaxAgeDays 1 to 730, Languages two-letter lower-case codes with DefaultLanguage among them, every TrustedProxyAddresses entry an IP address.")
+    .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, Name letters and digits 2 to 32, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24, PasskeyEnrollUrl and PasskeyManageUrl both absolute https or both empty, CspReportsPerMinute at least 1, HstsMaxAgeDays 1 to 730, Languages two-letter lower-case codes with DefaultLanguage among them, every TrustedProxyAddresses entry an IP address.")
     .ValidateOnStart();
 
 // The one API-docs page (/docs) for platform people and the services it lists. No section = no page.
@@ -68,15 +68,17 @@ builder.Services.AddOptions<ForwardedHeadersOptions>()
         }
     });
 
-// The shared fabric this host stands on: the framework core (AppInfo names every Redis key "webbff", the call
+// The shared fabric this host stands on: the framework core (AppInfo names every Redis key after this host, the call
 // context the lock manager leans on), the Redis cache that holds the sessions, and the distributed lock that
-// makes token refresh single-flight.
+// makes token refresh single-flight. The name comes from settings: the console host runs this same code under its
+// own name, so its keys, its key ring and its tickets never meet the web host's.
+var hostSettings = builder.Configuration.GetSection(BffSettings.Section).Get<BffSettings>() ?? new BffSettings();
 Harmony.Core.DI.DependenciesConfigurator.AddCore(builder.Services, builder.Configuration, core =>
     core.AddAppInfo(app =>
     {
-        app.Name = "WebBff";
-        app.Title = "Harmony.Web.Bff";
-        app.Description = "Harmony web BFF";
+        app.Name = hostSettings.Name;
+        app.Title = hostSettings.DataProtectionApplicationName;
+        app.Description = $"Harmony {hostSettings.Name}";
     }));
 Harmony.Core.Cache.DI.DependenciesConfigurator.AddCache(builder.Services, builder.Configuration, cache =>
 {
@@ -93,8 +95,8 @@ if (!DataProtectionSettings.IsValid(dataProtectionSettings))
 }
 
 builder.Services.AddDataProtection()
-    .SetApplicationName("Harmony.Web.Bff")
-    .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(RedisConnection(builder.Configuration)), "Global:webbff:dataprotection-keys")
+    .SetApplicationName(hostSettings.DataProtectionApplicationName)
+    .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(RedisConnection(builder.Configuration)), hostSettings.KeyRingKey)
     .ProtectKeysWithCertificate(X509Certificate2.CreateFromPemFile(dataProtectionSettings.CertificatePath));
 
 builder.Services.AddSingleton<ClientAssertionFactory>();

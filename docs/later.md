@@ -233,7 +233,8 @@ using Microsoft.Extensions.Logging;
 From the security review of 2026-10-12. None of these can be done or proven on a developer PC.
 
 1. **Secrets out of git, every one rotated**: signing key, data-protection key, BFF client key, Redis TLS CA and server
-   key, Redis passwords, SMTP password, seed admin password, Duende licence, the API-docs password. Served from
+   key, Redis passwords, SMTP password, seed admin password, Duende licence, the API-docs password, and since B9 the
+   console host's client key and Redis password. Served from
    `/run/secrets`; the repository history purged afterwards.
 2. **Trusted proxies**: Identity `IdentitySettings:TrustedProxies` = the front door and the BFF; BFF
    `BffSettings:TrustedProxyAddresses` = the front door. Check: two devices, two source addresses in the trail.
@@ -348,6 +349,10 @@ Docker network such as `"172.18.0.0/16"`):
 **Also at deploy.**
 - `AllowedHosts` in each service's settings: Identity answers any `Host` header today, and Duende builds its addresses
   from it.
+- Two BFF run folders from ONE build (B9, 2026-10-23): `app.harmony.local` runs with the project's `applicationSettings.json`,
+  `console.harmony.local` with `Hosts/console/applicationSettings.json` copied into its own folder. The console's secrets:
+  `console-bff-client-key.pem` (its public half at Identity) and the password of its Redis user `consolebff`. Each host
+  keeps its own Redis shelf (`WebBff:*`, `ConsoleBff:*`), its own Data Protection name and key ring, its own cookie.
 - Rate limiting per client IP on sign-in, forgot and reset only works once the real IP arrives (point 4 above).
 
 **Tests at deploy.**
@@ -934,3 +939,8 @@ masked). What it adds to this list, in the order to take it up:
    (`CookieOidcRefresher`); CSP-report strings go into the log unfiltered; the sign-in page tells account states apart
    and answers faster for an unknown name; two-step setup asks for no fresh proof of identity (passkeys do); the two
    fail-open decisions (used-code store, HIBP) if they are ever revisited.
+9. **Identity's one-time secrets under `Global:`** (found by B9's proof, 2026-10-23). Every Redis user has `%R~Global:*`,
+   read on everything global, and Identity files its two-step challenges, passkey holds, identity confirmations and
+   link marks under `Global:identity:…` (`eCacheAccessLevel.Public`). Any service user can read them. The BFF got the
+   cure in B9: the host's own shelf (`eCacheAccessLevel.Internal`, `Identity:…`, readable by its user alone). Do the
+   same here, and trim `%R~Global:*` to the keys services really share (the subscription lines).

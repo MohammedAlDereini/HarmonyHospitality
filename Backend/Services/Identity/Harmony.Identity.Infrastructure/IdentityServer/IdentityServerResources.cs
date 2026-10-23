@@ -71,61 +71,86 @@ public static class IdentityServerResources
     /// </summary>
     public static readonly TimeSpan PushedAuthorizationLifetime = TimeSpan.FromMinutes(10);
 
-    /// <param name="bffOrigins">The BFF origins (IdentitySettings:WebBff:Origins).</param>
-    /// <param name="bffPublicKeys">The BFF's public keys as JSON Web Keys (current first, then those kept during a rotation).</param>
-    public static IEnumerable<Client> Clients(IReadOnlyCollection<string> bffOrigins, IEnumerable<string> bffPublicKeys) =>
-    [
+    /// <summary>
+    /// Set on a client whose people are the platform's own (Entra calls this "assignment required" on an application):
+    /// a hotel account is refused there, on the sign-in page and at every token. Duende's Client.Properties is the place
+    /// for a client-specific rule like this one.
+    /// </summary>
+    public const string PlatformOnlyProperty = "harmony:platform-only";
+
+    public static bool IsPlatformOnly(Client client)
+        => client.Properties.TryGetValue(PlatformOnlyProperty, out var value) && value == "true";
+
+    /// <param name="bffOrigins">The web BFF's origins (IdentitySettings:WebBff:Origins).</param>
+    /// <param name="bffPublicKeys">The web BFF's public keys as JSON Web Keys (current first, then those kept during a rotation).</param>
+    /// <param name="consoleOrigins">The console BFF's origins (IdentitySettings:ConsoleBff:Origins); empty = no console client yet.</param>
+    /// <param name="consolePublicKeys">The console BFF's public keys as JSON Web Keys.</param>
+    public static IEnumerable<Client> Clients(
+        IReadOnlyCollection<string> bffOrigins,
+        IEnumerable<string> bffPublicKeys,
+        IReadOnlyCollection<string> consoleOrigins,
+        IEnumerable<string> consolePublicKeys)
+    {
         // The ONE way a person signs in (BFF step 5 removed the web app's password grant): RFC 10017 §6.1, the BFF as a
         // confidential client using the authorization code grant with PKCE; the tokens stay on it, no browser ever
         // calls the token endpoint.
-        new Client
+        yield return BffClient(WebBffSettings.ClientId, "Harmony web (BFF)", bffOrigins, bffPublicKeys, platformOnly: false);
+
+        // The console: the same BFF code on its own host, for the platform's own people only (B9).
+        if (consoleOrigins.Count > 0)
         {
-            ClientId = WebBffSettings.ClientId,
-            ClientName = "Harmony web (BFF)",
+            yield return BffClient(ConsoleBffSettings.ClientId, "Harmony console (BFF)", consoleOrigins, consolePublicKeys, platformOnly: true);
+        }
+    }
 
-            // private_key_jwt (RFC 7523): the BFF signs, Identity checks with the public key. No shared secret exists.
-            ClientSecrets = [.. bffPublicKeys.Select(jwk => new Secret { Type = IdentityServerConstants.SecretTypes.JsonWebKey, Value = jwk })],
-            RequireClientSecret = true,
+    private static Client BffClient(string clientId, string clientName, IReadOnlyCollection<string> origins, IEnumerable<string> publicKeys, bool platformOnly) => new()
+    {
+        ClientId = clientId,
+        ClientName = clientName,
+        Properties = platformOnly ? new Dictionary<string, string> { [PlatformOnlyProperty] = "true" } : new Dictionary<string, string>(),
 
-            AllowedGrantTypes = GrantTypes.Code,
-            RequirePkce = true,
-            AllowPlainTextPkce = false,
+        // private_key_jwt (RFC 7523): the BFF signs, Identity checks with the public key. No shared secret exists.
+        ClientSecrets = [.. publicKeys.Select(jwk => new Secret { Type = IdentityServerConstants.SecretTypes.JsonWebKey, Value = jwk })],
+        RequireClientSecret = true,
 
-            // PAR (RFC 9126): the sign-in details are pushed server to server; the browser carries only a one-time reference.
-            RequirePushedAuthorization = true,
-            PushedAuthorizationLifetime = (int)PushedAuthorizationLifetime.TotalSeconds,
+        AllowedGrantTypes = GrantTypes.Code,
+        RequirePkce = true,
+        AllowPlainTextPkce = false,
 
-            RedirectUris = [.. bffOrigins.Select(origin => origin + WebBffSettings.RedirectPath)],
-            PostLogoutRedirectUris = [.. bffOrigins.Select(origin => origin + WebBffSettings.PostLogoutRedirectPath)],
+        // PAR (RFC 9126): the sign-in details are pushed server to server; the browser carries only a one-time reference.
+        RequirePushedAuthorization = true,
+        PushedAuthorizationLifetime = (int)PushedAuthorizationLifetime.TotalSeconds,
 
-            // Ending a session here tells the BFF too — twice over: the best-effort iframe (front-channel) and
-            // the reliable server-to-server POST (back-channel; suspend and sign-out-everywhere ride it, because
-            // the session service removes sessions through Duende, which notifies by default). Never throw here
-            // on an empty list: startup validation refuses it with the NAMED message.
-            FrontChannelLogoutUri = bffOrigins.Count > 0 ? bffOrigins.First() + WebBffSettings.FrontChannelLogoutPath : null,
-            BackChannelLogoutUri = bffOrigins.Count > 0 ? bffOrigins.First() + WebBffSettings.BackChannelLogoutPath : null,
+        RedirectUris = [.. origins.Select(origin => origin + BffClientSettings.RedirectPath)],
+        PostLogoutRedirectUris = [.. origins.Select(origin => origin + BffClientSettings.PostLogoutRedirectPath)],
 
-            // A server-side client: no browser calls Identity's endpoints for it, so no CORS origin.
-            AllowedCorsOrigins = [],
+        // Ending a session here tells the BFF too — twice over: the best-effort iframe (front-channel) and
+        // the reliable server-to-server POST (back-channel; suspend and sign-out-everywhere ride it, because
+        // the session service removes sessions through Duende, which notifies by default). Never throw here
+        // on an empty list: startup validation refuses it with the NAMED message.
+        FrontChannelLogoutUri = origins.Count > 0 ? origins.First() + BffClientSettings.FrontChannelLogoutPath : null,
+        BackChannelLogoutUri = origins.Count > 0 ? origins.First() + BffClientSettings.BackChannelLogoutPath : null,
 
-            AllowedScopes =
-            {
-                IdentityServerConstants.StandardScopes.OpenId,
-                IdentityServerConstants.StandardScopes.Profile,
-                UserProfileScope,
-                PlatformScope,
-                IdentityServerConstants.StandardScopes.OfflineAccess,
-            },
-            AllowOfflineAccess = true,
-            RequireConsent = false,
-            AlwaysIncludeUserClaimsInIdToken = false,
+        // A server-side client: no browser calls Identity's endpoints for it, so no CORS origin.
+        AllowedCorsOrigins = [],
 
-            AccessTokenLifetime = (int)AccessTokenLifetime.TotalSeconds,
-            RefreshTokenUsage = TokenUsage.OneTimeOnly,
-            RefreshTokenExpiration = TokenExpiration.Sliding,
-            SlidingRefreshTokenLifetime = (int)RefreshIdleLifetime.TotalSeconds,
-            AbsoluteRefreshTokenLifetime = (int)RefreshAbsoluteLifetime.TotalSeconds,
-            UpdateAccessTokenClaimsOnRefresh = true,
+        AllowedScopes =
+        {
+            IdentityServerConstants.StandardScopes.OpenId,
+            IdentityServerConstants.StandardScopes.Profile,
+            UserProfileScope,
+            PlatformScope,
+            IdentityServerConstants.StandardScopes.OfflineAccess,
         },
-    ];
+        AllowOfflineAccess = true,
+        RequireConsent = false,
+        AlwaysIncludeUserClaimsInIdToken = false,
+
+        AccessTokenLifetime = (int)AccessTokenLifetime.TotalSeconds,
+        RefreshTokenUsage = TokenUsage.OneTimeOnly,
+        RefreshTokenExpiration = TokenExpiration.Sliding,
+        SlidingRefreshTokenLifetime = (int)RefreshIdleLifetime.TotalSeconds,
+        AbsoluteRefreshTokenLifetime = (int)RefreshAbsoluteLifetime.TotalSeconds,
+        UpdateAccessTokenClaimsOnRefresh = true,
+    };
 }

@@ -7,6 +7,7 @@ using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Harmony.Identity.Infrastructure.RateLimiting;
+using Harmony.Identity.Infrastructure.Tenants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -45,6 +46,7 @@ public sealed class LoginModel : PageModel
     private readonly IIssuerNameService issuer;
     private readonly IMediator mediator;
     private readonly IOptions<IdentityPasskeyOptions> passkeyOptions;
+    private readonly IOptions<PlatformTenantSettings> platformTenant;
 
     public LoginModel(
         IIdentityServerInteractionService interaction,
@@ -57,9 +59,11 @@ public sealed class LoginModel : PageModel
         IAccountMailer mailer,
         IIssuerNameService issuer,
         IMediator mediator,
-        IOptions<IdentityPasskeyOptions> passkeyOptions)
+        IOptions<IdentityPasskeyOptions> passkeyOptions,
+        IOptions<PlatformTenantSettings> platformTenant)
     {
         this.passkeyOptions = passkeyOptions;
+        this.platformTenant = platformTenant;
         this.interaction = interaction;
         this.passwordCheck = passwordCheck;
         this.passkeySignIn = passkeySignIn;
@@ -128,6 +132,18 @@ public sealed class LoginModel : PageModel
         if (result.User is not null && RefusalOf(result.Status) is { } refusal)
         {
             await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = refusal }, this.HttpContext.RequestAborted);
+        }
+
+        // The password passed; is this client for this person? A platform-only client (the console) refuses a hotel
+        // account here, before any challenge, link or session: shown on this page, never returned to the client.
+        if (result.User is not null
+            && result.Status is PasswordCheckStatus.Accepted or PasswordCheckStatus.SecondFactorRequired or PasswordCheckStatus.Exempt
+            && !PlatformOnly.Admits(request.Client, result.User, this.platformTenant.Value.TenantId))
+        {
+            await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = SecurityAuditActions.SignInPlatformOnly }, this.HttpContext.RequestAborted);
+            this.ForgotPasswordUrl = ForgotPasswordOf(request);
+            this.Error = PlatformOnly.Message;
+            return this.Page();
         }
 
         if (result.Status == PasswordCheckStatus.Exempt)
@@ -226,6 +242,18 @@ public sealed class LoginModel : PageModel
         if (result.User is not null && refusal is not null)
         {
             await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = refusal }, this.HttpContext.RequestAborted);
+        }
+
+        // The passkey verified; is this client for this person? The same door as the password path.
+        if (result.User is not null
+            && result.Status == PasskeySignInStatus.Accepted
+            && !PlatformOnly.Admits(request.Client, result.User, this.platformTenant.Value.TenantId))
+        {
+            await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = SecurityAuditActions.SignInPlatformOnly }, this.HttpContext.RequestAborted);
+            SignInSession.EnsureDeviceKey(this.HttpContext);
+            this.ForgotPasswordUrl = ForgotPasswordOf(request);
+            this.Error = PlatformOnly.Message;
+            return this.Page();
         }
 
         if (result.Status == PasskeySignInStatus.Accepted)

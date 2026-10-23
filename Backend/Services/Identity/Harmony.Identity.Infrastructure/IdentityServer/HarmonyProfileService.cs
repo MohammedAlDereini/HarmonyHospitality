@@ -8,7 +8,9 @@ using Harmony.Core.Identity.Implementations.Platform;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Entities.Aggregates.TenantModule;
 using Harmony.Identity.Infrastructure.Persistence;
+using Harmony.Identity.Infrastructure.Tenants;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Harmony.Identity.Infrastructure.IdentityServer;
 
@@ -23,10 +25,12 @@ namespace Harmony.Identity.Infrastructure.IdentityServer;
 public sealed class HarmonyProfileService : IProfileService
 {
     private readonly IdentityDbContext dbContext;
+    private readonly PlatformTenantSettings platformTenant;
 
-    public HarmonyProfileService(IdentityDbContext dbContext)
+    public HarmonyProfileService(IdentityDbContext dbContext, IOptions<PlatformTenantSettings> platformTenant)
     {
         this.dbContext = dbContext;
+        this.platformTenant = platformTenant.Value;
     }
 
     public async Task GetProfileDataAsync(ProfileDataRequestContext context, CancellationToken cancellationToken)
@@ -62,6 +66,14 @@ public sealed class HarmonyProfileService : IProfileService
         // in it ends within the access token's life.
         var active = user is not null && user.CanSignIn
             && await this.dbContext.Tenants.AnyAsync(t => t.Id == user.TenantId && t.Status == TenantStatus.Active, cancellationToken);
+
+        // Duende asks per connected application (v8: Application, an OIDC client or a SAML service provider). A platform-only
+        // client (the console) issues nothing to a hotel account: no code, no token, no refresh. At the authorize endpoint
+        // "not active" means "sign in again", and the sign-in page then says why.
+        if (active && context.Application is Client client && IdentityServerResources.IsPlatformOnly(client))
+        {
+            active = user!.TenantId == this.platformTenant.TenantId;
+        }
 
         // Every session remembers the version it started with: the refresh token (the grants put it on the subject), the
         // sign-in cookie and the one-time code (the sign-in pages put it there). A bump since then (password changed,

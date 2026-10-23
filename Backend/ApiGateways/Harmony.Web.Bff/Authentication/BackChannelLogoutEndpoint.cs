@@ -67,7 +67,8 @@ internal static class BackChannelLogout
         using (var scope = scopes.CreateScope())
         {
             var cache = scope.ServiceProvider.GetRequiredService<ICache<Providers.Redis>>();
-            if (await cache.AddAsync("webbff:logout-jti:" + jti, "1", ReplayMemory, eCacheAccessLevel.Public, http.RequestAborted) == eCacheOperationResult.KeyAlreadyExists)
+            // Internal: filed under this host's own name (WebBff:logout-jti:…), readable by its Redis user alone.
+            if (await cache.AddAsync("logout-jti:" + jti, "1", ReplayMemory, eCacheAccessLevel.Internal, http.RequestAborted) == eCacheOperationResult.KeyAlreadyExists)
             {
                 return Results.BadRequest();
             }

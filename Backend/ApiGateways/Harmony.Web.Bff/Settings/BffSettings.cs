@@ -16,6 +16,22 @@ public sealed class BffSettings
     /// <summary>The registered confidential client. Never a secret string: the key below signs a private_key_jwt.</summary>
     public string ClientId { get; set; } = "harmony-web-bff";
 
+    /// <summary>
+    /// This host's name, letters and digits, 2 to 32: WebBff here, ConsoleBff on the console host. It names this host's
+    /// Redis keys (sessions, locks, key ring) and its Data Protection application, so two hosts on one Redis never read
+    /// each other's sessions or open each other's tickets.
+    /// </summary>
+    public string Name { get; set; } = "WebBff";
+
+    /// <summary>
+    /// The Redis key of this host's Data Protection key ring (WebBff:dataprotection-keys): under the host's own name, the
+    /// one prefix its Redis user alone may read. Never under Global:, which every service user may read.
+    /// </summary>
+    public string KeyRingKey => $"{this.Name}:dataprotection-keys";
+
+    /// <summary>The Data Protection application name (Harmony.WebBff): tickets sealed by one host stay closed to the other.</summary>
+    public string DataProtectionApplicationName => $"Harmony.{this.Name}";
+
     /// <summary>PEM file holding the EC P-256 PRIVATE key this host signs client assertions with.</summary>
     public string ClientPrivateKeyPath { get; set; } = null!;
 
@@ -77,6 +93,7 @@ public sealed class BffSettings
         => Uri.TryCreate(settings.Authority, UriKind.Absolute, out var authority)
             && authority.Scheme == Uri.UriSchemeHttps
             && !string.IsNullOrWhiteSpace(settings.ClientId)
+            && System.Text.RegularExpressions.Regex.IsMatch(settings.Name, "^[A-Za-z][A-Za-z0-9]{1,31}$")
             && !string.IsNullOrWhiteSpace(settings.ClientPrivateKeyPath)
             && File.Exists(settings.ClientPrivateKeyPath)
             && settings.Scopes.Length > 0

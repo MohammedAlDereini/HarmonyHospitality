@@ -4,3 +4,4 @@ user webbff       on >kXp2WrB8NfTqL5zYhJ3cVdMG9jRuAE6D     ~WebBff:*       ~Glob
 user reservations on >HWwszvtgUbORprqmBCF871k2XEKLNifG ~Reservations:* %R~Global:*                       +@all -@dangerous
 user folio        on >nzYktKvcfbemE7LJUFBSgZo6iWNxrM4V        ~Folio:*        %R~Global:*                       +@all -@dangerous
 user housekeeping on >p9MWSVE43GrU7u2tzQmkAZ0foFjxRJOH ~Housekeeping:* %R~Global:*                       +@all -@dangerous
+user consolebff   on >KwgTCAmmPvSqoe2ik5N8hhsmMGCp0O2t     ~ConsoleBff:*   ~Global:consolebff:* %R~Global:*  +@all -@dangerous
