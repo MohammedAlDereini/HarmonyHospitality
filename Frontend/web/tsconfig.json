@@ -29,6 +29,9 @@
   "files": [],
   "references": [
     {
+      "path": "./tsconfig.libs.json"
+    },
+    {
       "path": "./apps/harmony-web/tsconfig.app.json"
     },
     {

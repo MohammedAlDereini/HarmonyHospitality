@@ -16,7 +16,8 @@
     "format:check": "prettier --check .",
     "check:translations": "node tools/check-translations.mjs",
     "check:architecture": "node tools/check-architecture.mjs .",
-    "check": "eslint . && prettier --check . && node tools/check-translations.mjs && node tools/check-architecture.mjs ."
+    "check:styles": "node tools/check-styles.mjs",
+    "check": "eslint . && prettier --check . && node tools/check-translations.mjs && node tools/check-architecture.mjs . && node tools/check-styles.mjs"
   },
   "dependencies": {
     "@angular/common": "22.2.3",

@@ -1,0 +1,131 @@
+/* Harmony design tokens: copied from the approved prototype home(8), never retuned. Colour lives here and nowhere else. */
+:root {
+  color-scheme: light;
+  --canvas: #ffffff;
+  --surface: #ffffff;
+  --sunk: #f3f5f7;
+  --shell: #101923;
+  --shell-2: #1d2a35;
+  --shell-ink: #edf2f5;
+  --shell-dim: #889aa8;
+
+  --ink: #17202a;
+  --ink-2: #394756;
+  --ink-3: #66717e; /* D31: was #6c7885 */
+  --ink-4: #6c7885;
+  --rule: #dce1e6;
+  --rule-2: #c8d0d8;
+  --control-border: #898e94; /* D31: input and control borders, 3:1 */
+
+  /* Mineral bronze. Brand and NOW only, never a status. */
+  --brand: #9a753c;
+  --brand-2: #c39b5c;
+  --brand-soft: #f3ede3;
+  --brand-text: #94703a; /* D31: bronze small text, 4.5:1; marks keep --brand */
+
+  /* Operational semantics. Red intervenes, amber is emerging, blue is active, green is verified, violet is special handling. */
+  --stop: #a73831;
+  --stop-bg: #fff0ee;
+  --warn: #906019;
+  --warn-bg: #fff5e3;
+  --ok: #26704a;
+  --ok-bg: #eaf6ef;
+  --info: #35658a;
+  --info-bg: #eaf2f7;
+  --vip: #765493;
+  --vip-bg: #f2edf7;
+
+  /* Shared geometry: one dialect for controls, surfaces and overlays. */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 28px;
+  --s7: 40px;
+  --control-sm: 28px;
+  --control-md: 32px;
+  --radius-control: 3px;
+  --radius-surface: 5px;
+  --radius-overlay: 7px;
+  --shadow-overlay: 0 18px 55px rgba(11, 19, 27, 0.18);
+
+  --sans: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --ar: 'Dubai', 'Segoe UI', Tahoma, system-ui, sans-serif;
+
+  --t: 140ms cubic-bezier(0.2, 0.6, 0.3, 1);
+  --bar: 44px; /* global bar height */
+  --row: 46px; /* stream row height, density-driven */
+  --elev: #fafbfc;
+  --focus: #4c89aa;
+  --slate: #1c2834;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --canvas: #171e25;
+  --surface: #171e25;
+  --sunk: #10161c;
+  --shell: #101923;
+  --shell-2: #1d2a35;
+  --shell-ink: #edf2f5;
+  --shell-dim: #889aa8;
+  --ink: #eef2f5;
+  --ink-2: #c6cfd7;
+  --ink-3: #9ca8b3;
+  --ink-4: #9ca8b3;
+  --rule: #313b45;
+  --rule-2: #46525e;
+  --control-border: #646e78; /* D31 */
+  --brand: #c39b5c;
+  --brand-2: #c39b5c;
+  --brand-soft: #33291d;
+  --brand-text: #c39b5c;
+  --stop: #ff9289;
+  --stop-bg: #3b201f;
+  --warn: #edbc6e;
+  --warn-bg: #392d1c;
+  --ok: #78d09e;
+  --ok-bg: #1d3428;
+  --info: #8bb8d3;
+  --info-bg: #20323e;
+  --vip: #c4a7df;
+  --vip-bg: #31283c;
+  --elev: #1b232b;
+}
+
+/* Density: an attribute on <html>, nothing else. */
+html {
+  --rowpad: 12px;
+}
+html[data-density='comfortable'] {
+  --row: 56px;
+  --rowpad: 16px;
+}
+html[data-density='compact'] {
+  --row: 38px;
+  --rowpad: 6px;
+  --s5: 14px;
+  --s6: 20px;
+  --s7: 28px;
+}
+@media (max-height: 820px) {
+  html {
+    --rowpad: 8px;
+  }
+  html[data-density='comfortable'] {
+    --rowpad: 12px;
+  }
+  html[data-density='compact'] {
+    --rowpad: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

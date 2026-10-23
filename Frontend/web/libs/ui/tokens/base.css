@@ -1,0 +1,40 @@
+/* Base rules from the prototype home(8). body's overflow:hidden is not copied: the shell brings its own scroll model (D32). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font: 13px/1.45 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+html[lang='ar'] body {
+  font-family: var(--ar);
+}
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: inherit;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
