@@ -903,3 +903,34 @@ route that path of the relying-party apex, https://harmony.local/.well-known/pas
 passkey doors rate-limited per person (`RateLimits:PasskeyBurst/PasskeyPerMinute`); the origin check compares scheme,
 host and port field by field; the FIDO remove dialog (named key, last-key warning) and the shared-desk warning; the
 creation options exclude every key the account holds. s45 = 74 checks.
+
+## L25. The OWASP Top 10:2025 audit of 2026-10-22 (parked here on 2026-10-23)
+
+The whole repository was read line by line against the OWASP Top 10:2025: the BFF with B2, Identity, every settings
+file, `secrets/`, `infra/redis`, the docs and the old React app. The report is
+`docs/security/owasp-top10-2025-audit-2026-10-22.md` (16 findings, none Critical, 18 informational notes; every secret
+masked). What it adds to this list, in the order to take it up:
+
+1. **Secrets out of git** (High; L1b item 1 already says so). In git today: the three private keys in `secrets/`
+   (token signing, Data Protection wrapping, BFF client assertion), the Redis CA and server keys, the Redis passwords
+   (settings and `users.acl`), the Development SuperAdmin password, the Duende license key, and a personal Gmail app
+   password in Identity's Development settings. Revoke the Gmail one first; rotate every key and password; purge history.
+2. **The passkey naming walker** (High). `PasskeyMakers.Skip` recurses once per CBOR level, so a 64 KB credential made
+   of nested arrays overflows the stack and ends the Identity process; one signed-in person can do it. Replace it with
+   `System.Formats.Cbor.CborReader`, or cap the depth, or read the AAGUID from the authData Identity already parsed.
+3. **Identity packages at 10.0.3** (High if real). `Microsoft.AspNetCore.Identity.EntityFrameworkCore` and
+   `Microsoft.Extensions.Identity.Stores` sit behind the 10.0.12 stack and the April and July 2026 fixes. Raise them and
+   run `dotnet list package --vulnerable --include-transitive`.
+4. **Two open redirects in the BFF** (Medium). The `?lang=` redirect sends the request path back as it came, so a path
+   that starts with two slashes leaves the site; `LocalPathOnly` refuses two slashes but not a slash followed by a
+   backslash, which browsers read the same way. Refuse both as the second character, and control characters; mirror it
+   in the app's `goSignIn` guard.
+5. **Global lookup rows from a hotel** (Medium). `ManageLookups` is a tenant permission and the two create commands bind
+   `IsGlobal` from the body, so a hotel administrator can create categories and values every hotel sees. Require
+   `CallerIsPlatform` for the global flag, or a platform-scoped permission.
+6. **Server day** (Medium; L1b items 2 and 3): trusted proxies in both production files, `TrustServerCertificate=False`.
+7. **Pinned builds** (Medium; L1b item 5): `Harmony.Core.*` floats on `Version="*"` with no lock file.
+8. **Low, when convenient:** the refresher's `UnlockAsync` runs even when the lock was never acquired
+   (`CookieOidcRefresher`); CSP-report strings go into the log unfiltered; the sign-in page tells account states apart
+   and answers faster for an unknown name; two-step setup asks for no fresh proof of identity (passkeys do); the two
+   fail-open decisions (used-code store, HIBP) if they are ever revisited.
