@@ -1,0 +1,104 @@
+/* The frame, from the prototype home(8): .skip, .gbar, .brand, .gbtn, .gspace copied; fixed heights became
+   min-heights (text may grow, rule 15); every colour is a token. */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+.skip {
+  position: fixed;
+  inset-block-start: -60px;
+  inset-inline-start: 10px;
+  z-index: 400;
+  background: var(--surface);
+  padding: 10px 14px;
+  border: 1px solid var(--rule-2);
+  border-radius: 4px;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip:focus {
+  inset-block-start: 8px;
+}
+.gbar {
+  min-height: var(--bar);
+  background: var(--shell);
+  color: var(--shell-ink);
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-inline-end: 8px;
+  min-width: 0;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  flex: none;
+  padding-inline: 6px 14px;
+}
+.gspace {
+  flex: 1;
+  min-width: 8px;
+}
+.gbtn {
+  min-height: var(--control-md);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+  border-radius: 4px;
+  color: var(--shell-ink);
+  font-size: 13px;
+  white-space: nowrap;
+  min-width: 0;
+  flex: none;
+}
+.gbtn:hover {
+  background: var(--shell-2);
+}
+.gbtn .bdi {
+  color: var(--shell-dim);
+  flex: none;
+}
+.strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  padding: var(--s2) var(--s4);
+  min-height: var(--row);
+  border-block-end: 1px solid var(--rule);
+}
+.strip-session {
+  background: var(--warn-bg);
+}
+.strip-down {
+  background: var(--info-bg);
+}
+.strip-failure {
+  background: var(--stop-bg);
+}
+.btn {
+  min-height: var(--control-sm);
+  padding: 0 var(--s3);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+}
+.btn-quiet {
+  border-color: transparent;
+  background: none;
+  font-weight: 400;
+}
+.work {
+  flex: 1;
+  min-width: 0;
+  padding: var(--s4);
+}
+.work:focus {
+  outline: none;
+}

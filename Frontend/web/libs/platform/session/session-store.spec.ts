@@ -117,11 +117,11 @@ describe('SessionStore', () => {
     expect(await ready).toBe('unavailable');
   });
 
-  it('a 401 from any call marks the session gone; the page and the person stay', async () => {
+  it('a 401 from any call marks the session expired; the page and the person stay', async () => {
     await signedInAsAhmad();
     events.unauthenticated.update((n) => n + 1);
     TestBed.tick();
-    expect(store.state()).toBe('signed-out');
+    expect(store.state()).toBe('expired');
     expect(store.user()).toEqual(ahmad);
     expect(navigation.went).toEqual([]);
   });
@@ -162,10 +162,10 @@ describe('SessionStore', () => {
     expect(navigation.went).toEqual(['/bff/logout?sid=abc']);
   });
 
-  it('another tab signed out: this tab is signed out too, its work kept', async () => {
+  it('another tab signed out: this tab is expired too, its work kept', async () => {
     await signedInAsAhmad();
     channel.receive({ type: 'signed-out' });
-    expect(store.state()).toBe('signed-out');
+    expect(store.state()).toBe('expired');
     expect(navigation.went).toEqual([]);
   });
 

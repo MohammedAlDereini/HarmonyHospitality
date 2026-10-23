@@ -4,6 +4,8 @@ export const signInPath = '/bff/login';
 /** The small page a separate sign-in window lands on; it tells the original tab and closes. */
 export const signedInRoute = 'signed-in';
 export const signedInPath = `/${signedInRoute}`;
+/** Where a person lands after signing out; outside the signed-in frame, so nothing bounces them to sign-in. */
+export const signedOutRoute = 'signed-out';
 
 /**
  * Mirrors the BFF's own rule: "/reservations" is welcome; "//evil.example" and "https://evil.example" fall back to

@@ -52,10 +52,16 @@ const allowed = {
   domain: ['shared'],
   'ui-domain': ['domain', 'ui', 'shared'], // a domain's own ui library
   ui: ['ui', 'shared'],
+  shell: ['ui', 'platform', 'shared'], // ui/shell draws the session, access and context (architecture 4)
   platform: ['platform', 'shared'],
   shared: ['shared'],
 };
-const typeKey = (lib) => (lib.group === 'domain' && lib.type === 'ui' ? 'ui-domain' : lib.type);
+const typeKey = (lib) =>
+  lib.id === 'ui/shell'
+    ? 'shell'
+    : lib.group === 'domain' && lib.type === 'ui'
+      ? 'ui-domain'
+      : lib.type;
 
 // The app walls (architecture 3 and 4.1): platform people never act inside a hotel; hotel staff never see the platform.
 const consoleDomains = new Set(['platform-admin', 'identity']);

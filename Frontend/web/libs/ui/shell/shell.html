@@ -1,0 +1,58 @@
+<a class="skip" href="#main" (click)="skipToMain($event)" i18n="@@ui.shell.skip"
+  >Skip to main content</a
+>
+<header class="gbar">
+  <div class="brand"><hr-brand-lockup /></div>
+  <div class="gspace"></div>
+  @if (session.user(); as person) {
+    <button type="button" class="gbtn" (click)="session.signOut()">
+      @if (person.name) {
+        <bdi>{{ person.name }}</bdi>
+        <span class="bdi" aria-hidden="true">·</span>
+      }
+      <span i18n="@@ui.shell.sign-out">Sign out</span>
+    </button>
+  }
+</header>
+@if (session.state() === 'expired') {
+  <div class="strip strip-session" role="status">
+    <span i18n="@@ui.shell.session-ended"
+      >Your session has ended. Sign in again to continue; the work on this page is kept.</span
+    >
+    <button type="button" class="btn" (click)="signInAgain()" i18n="@@ui.shell.sign-in-again">
+      Sign in again
+    </button>
+  </div>
+}
+@if (session.state() === 'unavailable') {
+  <div class="strip strip-down" role="status">
+    <span i18n="@@ui.shell.not-responding">Harmony is not responding. Check your connection.</span>
+    <button type="button" class="btn" (click)="tryAgain()" i18n="@@ui.shell.try-again">
+      Try again
+    </button>
+  </div>
+}
+@if (notice.current(); as failure) {
+  <div class="strip strip-failure" role="alert">
+    <span
+      >{{ failure.message }} <span i18n="@@ui.shell.reference">Reference</span>&ngsp;<span
+        class="num"
+        >{{ failure.reference }}</span
+      ></span
+    >
+    <button type="button" class="btn" (click)="notice.reload()" i18n="@@ui.shell.reload">
+      Reload
+    </button>
+    <button
+      type="button"
+      class="btn btn-quiet"
+      (click)="notice.dismiss()"
+      i18n="@@ui.shell.dismiss"
+    >
+      Dismiss
+    </button>
+  </div>
+}
+<main class="work" id="main" tabindex="-1" #main>
+  <router-outlet />
+</main>

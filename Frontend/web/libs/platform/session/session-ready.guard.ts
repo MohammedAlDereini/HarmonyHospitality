@@ -12,7 +12,7 @@ export const sessionReady: CanMatchFn = async () => {
   const attempted = router.currentNavigation()?.extractedUrl;
   const state = await store.ready();
   if (state === 'signed-in') return true;
-  if (state === 'signed-out') {
+  if (state === 'signed-out' || state === 'expired') {
     store.signIn(attempted === undefined ? '/' : router.serializeUrl(attempted));
   }
   return false;

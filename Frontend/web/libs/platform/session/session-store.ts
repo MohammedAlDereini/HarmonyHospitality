@@ -120,8 +120,9 @@ export class SessionStore {
     this.stateSignal.set('unavailable');
   }
 
+  /** A session the page had is gone: expired. Before anyone was named it is simply signed-out. */
   private sessionGone(): void {
-    this.stateSignal.set('signed-out');
+    this.stateSignal.set(this.userSignal() === null ? 'signed-out' : 'expired');
   }
 
   private refreshAfterForbidden(): void {

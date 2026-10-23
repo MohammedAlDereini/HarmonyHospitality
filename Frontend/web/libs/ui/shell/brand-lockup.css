@@ -1,0 +1,25 @@
+/* From the prototype home(8), .lockup and .lk-*: copied, never retuned. */
+.lockup {
+  display: flex;
+  align-items: center;
+  color: var(--shell-ink);
+}
+.lockup svg {
+  display: block;
+  width: auto;
+}
+.lk-en {
+  height: 17px;
+}
+.lk-ar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.lk-ar .lk-sym {
+  height: 19px;
+}
+.lk-ar b {
+  font: 600 15px/1 var(--ar);
+  letter-spacing: 0;
+}

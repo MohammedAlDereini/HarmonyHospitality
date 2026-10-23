@@ -44,6 +44,12 @@ describe('sessionReady', () => {
     expect(signedIn).toEqual(['/']);
   });
 
+  it('expired: the sign-in door as well', async () => {
+    state = 'expired';
+    expect(await run()).toBe(false);
+    expect(signedIn).toEqual(['/']);
+  });
+
   it('unavailable: nothing matches and nobody is sent anywhere', async () => {
     state = 'unavailable';
     expect(await run()).toBe(false);

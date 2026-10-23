@@ -122,6 +122,126 @@
           <context context-type="linenumber">18,21</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="platform.session.signed-out.title" datatype="html">
+        <source>You have signed out</source>
+        <target>لقد سجّلت الخروج</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/signed-out-page.ts</context>
+          <context context-type="linenumber">10,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.signed-out.sign-in" datatype="html">
+        <source> Sign in </source>
+        <target>تسجيل الدخول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/signed-out-page.ts</context>
+          <context context-type="linenumber">13,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.brand" datatype="html">
+        <source>HARMONY</source>
+        <target>هارموني</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/brand-lockup.html</context>
+          <context context-type="linenumber">1,3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.not-found.title" datatype="html">
+        <source>This page does not exist</source>
+        <target>هذه الصفحة غير موجودة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/not-found-page.ts</context>
+          <context context-type="linenumber">11,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.not-found.home" datatype="html">
+        <source>Go to the start</source>
+        <target>الانتقال إلى البداية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/not-found-page.ts</context>
+          <context context-type="linenumber">12,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.skip" datatype="html">
+        <source>Skip to main content</source>
+        <target>تخطَّ إلى المحتوى الرئيسي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">2,5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.sign-out" datatype="html">
+        <source>Sign out</source>
+        <target>تسجيل الخروج</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">13,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.session-ended" datatype="html">
+        <source>Your session has ended. Sign in again to continue; the work on this page is kept.</source>
+        <target>انتهت جلستك. سجّل الدخول مجدداً للمتابعة؛ عملك في هذه الصفحة محفوظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">20,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.sign-in-again" datatype="html">
+        <source> Sign in again </source>
+        <target>تسجيل الدخول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">23,27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.not-responding" datatype="html">
+        <source>Harmony is not responding. Check your connection.</source>
+        <target>هارموني لا يستجيب. تحقق من اتصالك.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">29,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.try-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">31,35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.reference" datatype="html">
+        <source>Reference</source>
+        <target>المرجع</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">38,39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.reload" datatype="html">
+        <source> Reload </source>
+        <target>إعادة التحميل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">42,44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.dismiss" datatype="html">
+        <source> Dismiss </source>
+        <target>إغلاق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">50,54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.leave-warning" datatype="html">
+        <source>The sign-in window could not open. Sign in on this page instead? Changes not saved will be lost.</source>
+        <target>تعذّر فتح نافذة تسجيل الدخول. هل تريد تسجيل الدخول في هذه الصفحة بدلاً من ذلك؟ ستفقد التغييرات غير المحفوظة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

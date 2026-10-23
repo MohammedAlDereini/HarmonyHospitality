@@ -1,8 +1,17 @@
 import { Routes } from '@angular/router';
-import { sessionRoutes } from '@harmony/platform/session';
+import { sessionReady, sessionRoutes } from '@harmony/platform/session';
 
+// The shape every screen follows (architecture 10): the session pages outside, everything else inside the shell.
 export const routes: Routes = [
   ...sessionRoutes,
-  { path: '', loadComponent: () => import('./home').then((m) => m.Home) },
-  { path: 'hello', loadComponent: () => import('./hello').then((m) => m.Hello) },
+  {
+    path: '',
+    canMatch: [sessionReady],
+    loadComponent: async () => (await import('@harmony/ui/shell')).Shell,
+    children: [
+      { path: '', loadComponent: async () => (await import('./home')).Home },
+      { path: 'hello', loadComponent: async () => (await import('./hello')).Hello },
+    ],
+  },
+  { path: '**', loadComponent: async () => (await import('@harmony/ui/shell')).NotFoundPage },
 ];
