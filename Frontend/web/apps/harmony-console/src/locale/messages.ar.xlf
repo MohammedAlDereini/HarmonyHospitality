@@ -26,6 +26,94 @@
           <context context-type="linenumber">10,13</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="platform.errors.code.000-06" datatype="html">
+        <source>Still working… please wait a moment.</source>
+        <target>لا يزال العمل جارياً… يرجى الانتظار لحظة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.000-07" datatype="html">
+        <source>This request was already used. Reload the page and try again.</source>
+        <target>هذا الطلب استُخدم من قبل. أعد تحميل الصفحة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.unreachable" datatype="html">
+        <source>Connection lost. Check your network and try again.</source>
+        <target>انقطع الاتصال. تحقق من الشبكة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.kind.refused" datatype="html">
+        <source>Harmony did not allow this action.</source>
+        <target>لم يسمح هارموني بهذا الإجراء.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.kind.invalid" datatype="html">
+        <source>Some fields need attention.</source>
+        <target>بعض الحقول تحتاج إلى مراجعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.kind.unauthenticated" datatype="html">
+        <source>Sign in again to continue.</source>
+        <target>سجّل الدخول مجدداً للمتابعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.kind.forbidden" datatype="html">
+        <source>Your role cannot do this.</source>
+        <target>دورك لا يسمح بهذا.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.kind.busy" datatype="html">
+        <source>Still working… please wait a moment.</source>
+        <target>لا يزال العمل جارياً… يرجى الانتظار لحظة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.kind.conflict" datatype="html">
+        <source>Changed by someone else. Reload to see the latest.</source>
+        <target>عدّله شخص آخر. أعد التحميل لرؤية الأحدث.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.kind.unavailable" datatype="html">
+        <source>Harmony is not responding. Try again in a moment.</source>
+        <target>هارموني لا يستجيب. حاول مجدداً بعد قليل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.kind.unexpected" datatype="html">
+        <source>Something went wrong.</source>
+        <target>حدث خطأ ما.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

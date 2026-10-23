@@ -3,7 +3,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/libs",
-    "types": []
+    "types": ["@angular/localize"]
   },
   "include": ["libs/**/*.ts"],
   "exclude": ["libs/**/*.spec.ts"]
