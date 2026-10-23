@@ -1,0 +1,156 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "pnpm"
+  },
+  "newProjectRoot": "apps",
+  "projects": {
+    "harmony-web": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "apps/harmony-web",
+      "sourceRoot": "apps/harmony-web/src",
+      "prefix": "hr",
+      "i18n": {
+        "sourceLocale": { "code": "en", "baseHref": "" },
+        "locales": {
+          "ar": { "translation": "apps/harmony-web/src/locale/messages.ar.xlf", "baseHref": "" }
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "apps/harmony-web/src/main.ts",
+            "tsConfig": "apps/harmony-web/tsconfig.app.json",
+            "polyfills": ["@angular/localize/init"],
+            "localize": true,
+            "i18nMissingTranslation": "error",
+            "i18nDuplicateTranslation": "error",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "apps/harmony-web/public"
+              }
+            ],
+            "styles": ["apps/harmony-web/src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "en": { "localize": ["en"], "deployUrl": "/en/" },
+            "ar": { "localize": ["ar"], "deployUrl": "/ar/", "deleteOutputPath": false }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "harmony-web:build:production"
+            },
+            "development": {
+              "buildTarget": "harmony-web:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    },
+    "harmony-console": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "apps/harmony-console",
+      "sourceRoot": "apps/harmony-console/src",
+      "prefix": "hr",
+      "i18n": {
+        "sourceLocale": { "code": "en", "baseHref": "" },
+        "locales": {
+          "ar": { "translation": "apps/harmony-console/src/locale/messages.ar.xlf", "baseHref": "" }
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "apps/harmony-console/src/main.ts",
+            "tsConfig": "apps/harmony-console/tsconfig.app.json",
+            "polyfills": ["@angular/localize/init"],
+            "localize": true,
+            "i18nMissingTranslation": "error",
+            "i18nDuplicateTranslation": "error",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "apps/harmony-console/public"
+              }
+            ],
+            "styles": ["apps/harmony-console/src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "en": { "localize": ["en"], "deployUrl": "/en/" },
+            "ar": { "localize": ["ar"], "deployUrl": "/ar/", "deleteOutputPath": false }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "harmony-console:build:production"
+            },
+            "development": {
+              "buildTarget": "harmony-console:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    }
+  }
+}

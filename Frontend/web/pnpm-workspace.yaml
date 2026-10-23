@@ -1,0 +1,14 @@
+# Supply-chain rules (architecture v2.2, 15.2). pnpm reads them here, never from .npmrc.
+minimumReleaseAge: 4320
+minimumReleaseAgeExclude: []
+trustPolicy: no-downgrade
+strictPeerDependencies: true
+autoInstallPeers: false
+blockExoticSubdeps: true
+allowBuilds:
+  esbuild: true
+  # The Angular CLI's optional native helpers ship prebuilt binaries; their install scripts only build from source.
+  # Denied on purpose: pnpm 12 refuses to install until every package with a script has a yes or a no here.
+  '@parcel/watcher': false
+  lmdb: false
+  msgpackr-extract: false

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.7173973">
+  <PropertyGroup>
+    <!-- Visual Studio shows and edits the files, nothing more. pnpm installs, builds and serves from the terminal under
+         the workspace's own supply-chain rules (pnpm-workspace.yaml), so Visual Studio never runs npm here. -->
+    <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <StartupCommand>corepack pnpm@12.14.0 exec ng serve harmony-web</StartupCommand>
+    <TestCommand>corepack pnpm@12.14.0 exec ng test</TestCommand>
+  </PropertyGroup>
+</Project>

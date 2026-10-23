@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" target-language="ar" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="harmony-console.hello.title" datatype="html">
+        <source>Hello from a deep link</source>
+        <target>مرحباً من رابط عميق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-console/src/app/hello.ts</context>
+          <context context-type="linenumber">6,8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="harmony-console.home.title" datatype="html">
+        <source>Harmony console</source>
+        <target>وحدة تحكم هارموني</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-console/src/app/home.ts</context>
+          <context context-type="linenumber">9,10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="harmony-console.home.hello-link" datatype="html">
+        <source>A deep link</source>
+        <target>رابط عميق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-console/src/app/home.ts</context>
+          <context context-type="linenumber">10,13</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
