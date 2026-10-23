@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 using System.Threading.RateLimiting;
 using Harmony.Core.DI;
 using Harmony.Web.Bff.ApiDocs;
@@ -33,7 +34,7 @@ builder.WebHost.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
 
 builder.Services.AddOptions<BffSettings>()
     .Bind(builder.Configuration.GetSection(BffSettings.Section))
-    .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24, PasskeyEnrollUrl and PasskeyManageUrl both absolute https or both empty, CspReportsPerMinute at least 1, HstsMaxAgeDays 1 to 730, every TrustedProxyAddresses entry an IP address.")
+    .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24, PasskeyEnrollUrl and PasskeyManageUrl both absolute https or both empty, CspReportsPerMinute at least 1, HstsMaxAgeDays 1 to 730, Languages two-letter lower-case codes with DefaultLanguage among them, every TrustedProxyAddresses entry an IP address.")
     .ValidateOnStart();
 
 // The one API-docs page (/docs) for platform people and the services it lists. No section = no page.
@@ -212,22 +213,51 @@ if (!app.Environment.IsDevelopment())
 app.UseMiddleware<Harmony.Web.Bff.Security.SecurityHeadersMiddleware>();
 app.UseMiddleware<Harmony.Web.Bff.Security.CsrfHeaderMiddleware>();
 
-// Production: the built web app lives in wwwroot. Its files are served BEFORE authentication runs — a stylesheet
-// needs no session and must not spend a token refresh. The hashed assets may be cached forever. The page itself
-// (index.html) is never a file: it is rendered per request with its nonce (WebAppPage, the fallback below), so a
-// request for /index.html is the page too, not the raw file with the marker in it.
+// Production: the built web app lives in wwwroot, one folder per language (wwwroot/en, wwwroot/ar). Its files are
+// served BEFORE authentication runs — a stylesheet needs no session and must not spend a token refresh. The hashed
+// assets may be cached forever. The page itself (index.html) is never a file: it is rendered per request with its
+// nonce from the chosen language's folder (WebAppPage, the fallback below).
 if (bffSettings.ServeStaticFiles)
 {
     app.Use((context, next) =>
     {
-        if (context.Request.Path.Equals("/index.html", StringComparison.OrdinalIgnoreCase))
+        // The page is rendered, never served as a file: /index.html and a language's /ar, /ar/, /ar/index.html are
+        // the page too (in that language), not the raw file with the marker in it.
+        var path = context.Request.Path;
+
+        // ?lang=ar on a page: remember it in the cookie and come back to the same address without it (D7: URLs stay
+        // identical in both languages; the cookie carries the choice until the profile does, D26).
+        if (!DoorPaths.IsDoor(path) && context.Request.Query.TryGetValue(PageLanguage.Query, out var wanted) && bffSettings.Languages.Contains(wanted.ToString(), StringComparer.Ordinal))
         {
+            PageLanguage.Remember(context, wanted.ToString());
+            var rest = QueryString.Create(context.Request.Query.Where(q => q.Key != PageLanguage.Query).SelectMany(q => q.Value.Select(v => new KeyValuePair<string, string?>(q.Key, v))));
+            context.Response.Redirect(path + rest);
+            return Task.CompletedTask;
+        }
+
+        if (path.Equals("/index.html", StringComparison.OrdinalIgnoreCase))
+        {
+            context.Request.Path = "/";
+        }
+        else if (PageLanguage.IsLocaleIndex(path, bffSettings, out var language))
+        {
+            PageLanguage.Set(context, language);
             context.Request.Path = "/";
         }
 
         return next(context);
     });
-    app.UseStaticFiles();
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = response =>
+        {
+            // The CLI names an asset by its content (main-K3Q7X2BA.js): a change is a new name, so the old one may live
+            // a year in any cache. A stable name (favicon.ico) is asked about every time; the ETag answers 304.
+            response.Context.Response.Headers.CacheControl = FingerprintedName().IsMatch(response.File.Name)
+                ? "public, max-age=31536000, immutable"
+                : "no-cache";
+        },
+    });
 }
 
 // Routing picks the endpoint only from here. Left implicit it would run FIRST, and the "{*path:file}" fallback below
@@ -558,4 +588,12 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
                 };
             }
         });
+}
+
+/// <summary>What the top-level statements need as members: the asset-name pattern the static file caching reads.</summary>
+public partial class Program
+{
+    /// <summary>A content-hashed asset name the CLI emits: main-K3Q7X2BA.js, styles-9F2C1D0E.css, media.K3Q7X2BA.woff2.</summary>
+    [GeneratedRegex(@"[-.][0-9A-Za-z]{8}\.(js|mjs|css|woff2?|ttf|otf|png|jpe?g|gif|svg|webp|ico|json|map)$")]
+    private static partial Regex FingerprintedName();
 }

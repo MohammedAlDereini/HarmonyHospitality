@@ -53,6 +53,12 @@ public sealed class BffSettings
     /// <summary>Days the browser pins HTTPS for this host (Strict-Transport-Security), 1 to 730. Start at 1 on a new domain, raise to 365 once HTTPS is proven; 730 is OWASP's ceiling.</summary>
     public int HstsMaxAgeDays { get; set; } = 365;
 
+    /// <summary>The web app's locale builds under wwwroot, one folder each (en, ar): what the BFF may serve. Two lower-case letters each.</summary>
+    public string[] Languages { get; set; } = ["en", "ar"];
+
+    /// <summary>The build served when nothing names a language; one of Languages.</summary>
+    public string DefaultLanguage { get; set; } = "en";
+
     /// <summary>Front doors whose X-Forwarded-For is believed. EMPTY MEANS TRUST NOBODY — the safe default.</summary>
     public string[] TrustedProxyAddresses { get; set; } = [];
 
@@ -82,6 +88,9 @@ public sealed class BffSettings
             && settings.TrustedProxyAddresses.All(address => IPAddress.TryParse(address, out _))
             && settings.CspReportsPerMinute >= 1
             && settings.HstsMaxAgeDays is >= 1 and <= 730
+            && settings.Languages.Length > 0
+            && settings.Languages.All(language => language.Length == 2 && language.All(char.IsAsciiLetterLower))
+            && settings.Languages.Contains(settings.DefaultLanguage, StringComparer.Ordinal)
             && PasskeyEndpointsValid(settings);
 
     private static bool PasskeyEndpointsValid(BffSettings settings)
