@@ -1,0 +1,7 @@
+# Generated or foreign files Prettier must not touch.
+dist
+node_modules
+.angular
+obj
+bin
+pnpm-lock.yaml

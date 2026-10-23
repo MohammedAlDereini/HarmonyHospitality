@@ -12,7 +12,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "check:translations": "node tools/check-translations.mjs"
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "check:translations": "node tools/check-translations.mjs",
+    "check:architecture": "node tools/check-architecture.mjs .",
+    "check": "eslint . && prettier --check . && node tools/check-translations.mjs && node tools/check-architecture.mjs ."
   },
   "dependencies": {
     "@angular/common": "22.2.3",
@@ -29,9 +33,12 @@
     "@angular/build": "22.2.3",
     "@angular/cli": "22.2.3",
     "@angular/compiler-cli": "22.2.3",
+    "angular-eslint": "22.6.0",
+    "eslint": "10.13.0",
     "jsdom": "30.1.3",
     "prettier": "3.9.10",
     "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0",
     "vitest": "5.0.5"
   }
 }
