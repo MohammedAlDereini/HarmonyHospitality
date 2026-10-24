@@ -89,6 +89,14 @@ public sealed class BffSettings
 
     public bool ServesPasskeyEndpoints => !string.IsNullOrWhiteSpace(this.PasskeyEnrollUrl) && !string.IsNullOrWhiteSpace(this.PasskeyManageUrl);
 
+    /// <summary>
+    /// Where a security researcher reports a weakness (RFC 9116, served at /.well-known/security.txt): a mailto: or an
+    /// https: address. Empty: the document is not served. The owner decides the address (D33).
+    /// </summary>
+    public string? SecurityContact { get; set; }
+
+    public bool ServesSecurityTxt => !string.IsNullOrWhiteSpace(this.SecurityContact);
+
     public static bool IsValid(BffSettings settings)
         => Uri.TryCreate(settings.Authority, UriKind.Absolute, out var authority)
             && authority.Scheme == Uri.UriSchemeHttps
@@ -108,7 +116,13 @@ public sealed class BffSettings
             && settings.Languages.Length > 0
             && settings.Languages.All(language => language.Length == 2 && language.All(char.IsAsciiLetterLower))
             && settings.Languages.Contains(settings.DefaultLanguage, StringComparer.Ordinal)
-            && PasskeyEndpointsValid(settings);
+            && PasskeyEndpointsValid(settings)
+            && SecurityContactValid(settings);
+
+    private static bool SecurityContactValid(BffSettings settings)
+        => string.IsNullOrWhiteSpace(settings.SecurityContact)
+            || settings.SecurityContact.StartsWith("mailto:", StringComparison.Ordinal)
+            || (Uri.TryCreate(settings.SecurityContact, UriKind.Absolute, out var contact) && contact.Scheme == Uri.UriSchemeHttps);
 
     private static bool PasskeyEndpointsValid(BffSettings settings)
     {

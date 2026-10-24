@@ -11,6 +11,7 @@ using Harmony.Web.Bff.Pages;
 using Harmony.Web.Bff.Security;
 using Harmony.Web.Bff.Sessions;
 using Harmony.Web.Bff.Settings;
+using Harmony.Web.Bff.Telemetry;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -35,6 +36,12 @@ builder.WebHost.ConfigureKestrel(kestrel => kestrel.AddServerHeader = false);
 builder.Services.AddOptions<BffSettings>()
     .Bind(builder.Configuration.GetSection(BffSettings.Section))
     .Validate(BffSettings.IsValid, $"{BffSettings.Section}: Authority and ApiDestination must be absolute https URLs, Name letters and digits 2 to 32, the private key file must exist, the cookie must keep its __Host- prefix, SessionIdleMinutes 5 to 720, SessionAbsoluteHours 1 to 24, PasskeyEnrollUrl and PasskeyManageUrl both absolute https or both empty, CspReportsPerMinute at least 1, HstsMaxAgeDays 1 to 730, Languages two-letter lower-case codes with DefaultLanguage among them, every TrustedProxyAddresses entry an IP address.")
+    .ValidateOnStart();
+
+// What this deployment tells the web app: environment, release, the oldest client allowed, the ring and the flags.
+builder.Services.AddOptions<ReleaseSettings>()
+    .Bind(builder.Configuration.GetSection(ReleaseSettings.Section))
+    .Validate(ReleaseSettings.IsValid, $"{ReleaseSettings.Section}: Ring is canary, early or all; a flag's name is lower-case letters, digits and dashes; a flag's rings are from the same three.")
     .ValidateOnStart();
 
 // The one API-docs page (/docs) for platform people and the services it lists. No section = no page.
@@ -135,6 +142,10 @@ builder.Services.AddRateLimiter(limiter =>
 {
     limiter.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     limiter.AddPolicy(CspViolationReports.RateLimitPolicy, context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = bffSettings.CspReportsPerMinute, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    // The telemetry door shares the report door's budget: a page sends a few batches a minute, a flood is somebody else.
+    limiter.AddPolicy(TelemetryDoor.RateLimitPolicy, context => RateLimitPartition.GetFixedWindowLimiter(
         context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = bffSettings.CspReportsPerMinute, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
 });
@@ -316,6 +327,39 @@ if (bffSettings.ServesPasskeyEndpoints)
     }).AllowAnonymous();
 }
 
+// RFC 9116: where a researcher reports a weakness, at the well-known path, plain text, valid for a year from the first
+// day of this month (the Expires field is a MUST; a date far ahead would be read as stale advice). Only when the owner
+// named a contact (D33).
+if (bffSettings.ServesSecurityTxt)
+{
+    app.MapGet("/.well-known/security.txt", (HttpContext http) =>
+    {
+        var now = DateTimeOffset.UtcNow;
+        var start = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
+        var text = $"Contact: {bffSettings.SecurityContact}\nExpires: {start.AddYears(1):yyyy-MM-dd'T'HH:mm:ss'Z'}\nPreferred-Languages: en, ar\nCanonical: https://{http.Request.Host}/.well-known/security.txt\n";
+        http.Response.Headers.CacheControl = "public, max-age=86400";
+        return Results.Text(text, "text/plain; charset=utf-8");
+    }).AllowAnonymous();
+}
+
+// The feature flags for this host's ring (D37, D38): names and on/off, nothing else; never cached, inside the session so
+// the list is not a public fingerprint of the deployment.
+app.MapGet("/bff/flags", (IOptions<ReleaseSettings> release, HttpContext http) =>
+{
+    http.Response.Headers.CacheControl = "no-store";
+    var settings = release.Value;
+    return Results.Json(new
+    {
+        ring = settings.Ring,
+        release = settings.EffectiveVersion,
+        minimumClientVersion = settings.EffectiveMinimumClientVersion,
+        flags = settings.Flags.ToDictionary(flag => flag.Key, flag => settings.IsOn(flag.Value), StringComparer.Ordinal),
+    });
+});
+
+// What the web app measured: see TelemetryDoor for what keeps it harmless.
+app.MapPost(TelemetryDoor.Path, TelemetryDoor.ReceiveAsync).RequireRateLimiting(TelemetryDoor.RateLimitPolicy);
+
 // The browser never signs in itself: this door starts the dance and the BFF does the rest (RFC 10017 §6.1).
 // Only a LOCAL path may ride along, or a crafted link could land a fresh sign-in on someone else's site.
 app.MapGet("/bff/login", (string? returnUrl) =>
@@ -405,7 +449,8 @@ app.MapGet("/bff/logout", async (string? sid, HttpContext http, IHttpClientFacto
     // Identity's session cookie included: at sign-out, that is the point. The theme and language hints go too.
     http.Response.Headers["Clear-Site-Data"] = "\"cache\", \"cookies\", \"storage\"";
     await http.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-    await http.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/" });
+    // Back on the app's own signed-out page (architecture 10), never on a page that would start a sign-in at once.
+    await http.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/signed-out" });
     return Results.Empty;
 }).AllowAnonymous();
 
