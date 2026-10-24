@@ -12,6 +12,18 @@
   flex: 1 1 24rem;
   min-width: 0;
 }
+.warning {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--stop);
+}
+.btn.solid.stop {
+  background: var(--stop);
+  border-color: var(--stop);
+  color: var(--on-stop);
+}
 .field-error {
   flex-basis: 100%;
   margin: 0;

@@ -1,0 +1,268 @@
+@if (problem(); as problem) {
+  <p class="empty" role="alert">
+    {{ problem }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="reload()"
+      i18n="@@platform-admin.property.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (property(); as property) {
+  <div class="sec-h head">
+    <span class="code num" dir="ltr">{{ property.code }}</span>
+    <h1>
+      <bdi>{{ name(property) }}</bdi>
+    </h1>
+    <div class="obj">
+      <b dir="ltr">{{ property.propertyTypeCode }}</b>
+      <span i18n="@@platform-admin.property.type">Type</span>
+    </div>
+    <div class="obj">
+      <b dir="ltr">{{ property.countryCode }} · {{ property.timeZoneId }}</b>
+      <span i18n="@@platform-admin.property.where">Country · zone</span>
+    </div>
+    <div class="obj">
+      <b dir="ltr">{{ property.defaultCurrency }} · {{ property.defaultLanguageCode }}</b>
+      <span i18n="@@platform-admin.property.currency-language">Currency · language</span>
+    </div>
+    <div class="obj">
+      <b class="num">{{ property.totalRooms }}</b>
+      <span i18n="@@platform-admin.property.rooms">Rooms</span>
+    </div>
+    <div class="obj" [attr.data-s]="property.isActive ? null : 'warn'">
+      @if (property.isActive) {
+        <b i18n="@@platform-admin.property.active">Active</b>
+      } @else {
+        <b i18n="@@platform-admin.property.inactive">Inactive</b>
+      }
+      <span i18n="@@platform-admin.property.state">State</span>
+    </div>
+  </div>
+  <p class="line">
+    <bdi>{{ property.addressLine }}</bdi>
+    @if (property.postalCode; as postal) {
+      <span dir="ltr">· {{ postal }}</span>
+    }
+  </p>
+  <div class="acts" *hrIfAllowed="manageProperties">
+    <button
+      type="button"
+      class="btn"
+      data-act="edit"
+      (click)="openEditor()"
+      [attr.aria-expanded]="editing()"
+      i18n="@@platform-admin.property.edit"
+    >
+      Edit
+    </button>
+  </div>
+  @if (editing()) {
+    <form class="editor" (submit)="onSave($event, property)" novalidate>
+      <h2 i18n="@@platform-admin.property.edit.title">Edit property</h2>
+      <div class="fields">
+        <div class="f">
+          <label for="edit-name-en" i18n="@@platform-admin.property.field.name-en"
+            >Name (English)</label
+          >
+          <input
+            id="edit-name-en"
+            class="field"
+            type="text"
+            autocomplete="off"
+            lang="en"
+            dir="ltr"
+            [formField]="form.nameEn"
+          />
+          @if (form.nameEn().touched() && form.nameEn().errors().length > 0) {
+            <p class="field-error" role="alert">
+              @for (error of form.nameEn().errors(); track error.kind) {
+                <span>{{ error.message }}</span>
+              }
+            </p>
+          }
+        </div>
+        <div class="f">
+          <label for="edit-name-ar" i18n="@@platform-admin.property.field.name-ar"
+            >Name (Arabic)</label
+          >
+          <input
+            id="edit-name-ar"
+            class="field"
+            type="text"
+            autocomplete="off"
+            lang="ar"
+            dir="rtl"
+            [formField]="form.nameAr"
+          />
+          @if (form.nameAr().touched() && form.nameAr().errors().length > 0) {
+            <p class="field-error" role="alert">
+              @for (error of form.nameAr().errors(); track error.kind) {
+                <span>{{ error.message }}</span>
+              }
+            </p>
+          }
+        </div>
+        <div class="f">
+          <label for="edit-address" i18n="@@platform-admin.property.field.address">Address</label>
+          <input
+            id="edit-address"
+            class="field"
+            type="text"
+            autocomplete="off"
+            dir="auto"
+            [formField]="form.addressLine"
+          />
+        </div>
+        <div class="f">
+          <label for="edit-postal" i18n="@@platform-admin.property.field.postal">Postal code</label>
+          <input
+            id="edit-postal"
+            class="field"
+            type="text"
+            autocomplete="off"
+            dir="ltr"
+            [formField]="form.postalCode"
+          />
+        </div>
+        <div class="f">
+          <label for="edit-rooms" i18n="@@platform-admin.property.field.rooms">Rooms</label>
+          <input
+            id="edit-rooms"
+            class="field"
+            type="text"
+            inputmode="numeric"
+            dir="ltr"
+            [formField]="form.totalRooms"
+          />
+          @if (form.totalRooms().touched() && form.totalRooms().errors().length > 0) {
+            <p class="field-error" role="alert">
+              @for (error of form.totalRooms().errors(); track error.kind) {
+                <span>{{ error.message }}</span>
+              }
+            </p>
+          }
+        </div>
+        <div class="f">
+          <label for="edit-opens" i18n="@@platform-admin.property.field.opens-on">Opens on</label>
+          <input id="edit-opens" class="field" type="date" [formField]="form.opensOn" />
+        </div>
+        <div class="f">
+          <label for="edit-closes" i18n="@@platform-admin.property.field.closes-on"
+            >Closes on</label
+          >
+          <input id="edit-closes" class="field" type="date" [formField]="form.closesOn" />
+        </div>
+      </div>
+      <div class="acts">
+        <button
+          type="submit"
+          class="btn solid"
+          [disabled]="form().submitting()"
+          i18n="@@platform-admin.property.edit.go"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          class="btn"
+          (click)="closeEditor()"
+          i18n="@@platform-admin.property.edit.cancel"
+        >
+          Cancel
+        </button>
+      </div>
+      @if (editProblem(); as text) {
+        <p class="field-error" role="alert">{{ text }}</p>
+      }
+    </form>
+  }
+  <section class="part" aria-labelledby="lines-heading">
+    <h2 id="lines-heading">
+      <span i18n="@@platform-admin.property.lines">Subscriptions</span>&ngsp;<span class="num">{{
+        property.subscriptions.length
+      }}</span>
+    </h2>
+    @if (property.subscriptions.length === 0) {
+      <p class="line" i18n="@@platform-admin.property.lines.none">No module yet.</p>
+    } @else {
+      <div class="rows" role="list">
+        @for (line of property.subscriptions; track line.id) {
+          <div class="srow lrow" role="listitem">
+            <div class="s-who">
+              <span class="code num" dir="ltr">{{ line.moduleCode }}</span>
+              <div class="s-nm">
+                <b>{{ scopeOf(line) }}</b>
+              </div>
+            </div>
+            <div class="obj">
+              @if (line.isEnabled) {
+                <b i18n="@@platform-admin.property.line.enabled">Enabled</b>
+              } @else {
+                <b i18n="@@platform-admin.property.line.disabled">Disabled</b>
+              }
+              <span i18n="@@platform-admin.property.line.state">State</span>
+            </div>
+            <div class="s-when">
+              <span class="num"
+                >{{ line.startsOn }}
+                @if (line.endsOn; as endsOn) {
+                  – {{ endsOn }}
+                }
+              </span>
+              <small i18n="@@platform-admin.property.line.period">Period</small>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+  <section class="part" aria-labelledby="contacts-heading">
+    <h2 id="contacts-heading">
+      <span i18n="@@platform-admin.property.contacts">Contacts</span>&ngsp;<span class="num">{{
+        property.contacts.length
+      }}</span>
+    </h2>
+    @if (property.contacts.length === 0) {
+      <p class="line" i18n="@@platform-admin.property.contacts.none">No contact yet.</p>
+    } @else {
+      <div class="rows" role="list">
+        @for (contact of property.contacts; track contact.id) {
+          <div class="srow crow" role="listitem">
+            <div class="s-who">
+              <div class="s-nm">
+                <b
+                  ><bdi>{{ contact.name }}</bdi></b
+                >
+                @if (contact.role; as role) {
+                  <span
+                    ><bdi>{{ role }}</bdi></span
+                  >
+                }
+              </div>
+            </div>
+            <div class="obj">
+              <b dir="ltr">{{ contact.email ?? '' }}</b>
+              <span i18n="@@platform-admin.property.contact.email">Email</span>
+            </div>
+            <div class="obj">
+              <b dir="ltr">{{ contact.telephone ?? '' }}</b>
+              <span i18n="@@platform-admin.property.contact.telephone">Telephone</span>
+            </div>
+            <div class="obj">
+              @if (contact.isPrimary) {
+                <b i18n="@@platform-admin.property.contact.primary">Primary</b>
+              } @else {
+                <b>&nbsp;</b>
+              }
+              <span i18n="@@platform-admin.property.contact.kind">Kind</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+} @else {
+  <p class="empty" role="status" i18n="@@platform-admin.property.loading">Loading…</p>
+}

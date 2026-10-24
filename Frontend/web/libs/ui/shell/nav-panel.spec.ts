@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { NavItem, NavPanel } from './nav-panel';
 
 const places: readonly NavItem[] = [
@@ -44,5 +44,28 @@ describe('hr-nav-panel', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     expect(page.textContent).toContain('No place matches');
+  });
+
+  it('as the command palette: Enter goes to the first match, ArrowDown moves focus into the results', async () => {
+    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const page = fixture.nativeElement as HTMLElement;
+    const search = page.querySelector<HTMLInputElement>('input');
+    if (search === null) throw new Error('no search box');
+    search.value = 'use';
+    search.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    search.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(navigate).toHaveBeenCalledWith(['/p', 'GRD', 'admin']);
+    const link = page.querySelector<HTMLElement>('a.ni');
+    if (link === null) throw new Error('no result link');
+    // jsdom cannot focus inside a closed popover; the call is the unit, the real focus is the page gate's proof.
+    const focus = vi.spyOn(link, 'focus');
+    search.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    expect(focus).toHaveBeenCalledOnce();
   });
 });

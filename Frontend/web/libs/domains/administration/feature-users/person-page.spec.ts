@@ -1,0 +1,232 @@
+import { signal } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PersonStore, RolesStore, UsersStore } from '@harmony/administration/data-access';
+import {
+  AccountState,
+  Device,
+  Passkey,
+  PrivilegeLevel,
+  Role,
+  SecurityEvent,
+  UserAccount,
+} from '@harmony/administration/domain';
+import { AccessStore } from '@harmony/platform/access';
+import { InstantFormatter } from '@harmony/platform/context';
+import { ApiResult, IntentKey } from '@harmony/platform/http';
+import { PersonPage } from './person-page';
+
+const OK = 200;
+const ACCEPTED = 202;
+// Runs of whitespace (spaces, newlines) collapse to one space: matches "a \n b" (→ "a b"); rejects "ab" (nothing to do).
+// Tester: https://regex101.com/?regex=%5Cs%2B&flags=g&testString=a%20%0A%20b
+const whitespace = /\s+/g;
+
+const rana: UserAccount = {
+  id: 'u5',
+  userName: 'rana@ritz.test',
+  email: 'rana@ritz.test',
+  displayName: 'Rana Qasem',
+  twoFactorEnabled: false,
+  twoStepExemptReason: null,
+  state: AccountState.active,
+  stateReason: null,
+  createdDate: '2026-10-24T08:00:00Z',
+  roleIds: ['r1'],
+};
+const frontDesk: Role = {
+  id: 'r1',
+  code: 'FRONT-DESK',
+  nameEn: 'Front desk',
+  nameAr: null,
+  privilegeLevel: PrivilegeLevel.standard,
+  isSystemRole: false,
+  isSuperRole: false,
+};
+const manager: Role = { ...frontDesk, id: 'r2', code: 'MANAGER', nameEn: 'Manager' };
+const laptop: Device = {
+  id: 'd1',
+  label: 'Chrome on Windows',
+  firstSeenUtc: '2026-10-24T08:00:00Z',
+  lastSeenUtc: '2026-10-24T09:00:00Z',
+  lastAddress: '10.0.0.5',
+  signedIn: true,
+};
+const key: Passkey = {
+  id: 'k1',
+  name: 'Work laptop',
+  createdUtc: '2026-10-24T08:00:00Z',
+  lastUsedUtc: null,
+  isBackedUp: true,
+};
+const created: SecurityEvent = {
+  action: 'account.created',
+  occurredAtUtc: '2026-10-24T08:00:00Z',
+  actorSubject: 'u2',
+  sourceAddress: '10.0.0.9',
+  device: 'Chrome on Windows',
+  detail: 'an invitation link was sent',
+};
+
+class FakeStore {
+  readonly person = signal<UserAccount | null>(rana);
+  readonly loading = signal(false);
+  readonly problem = signal<string | null>(null);
+  readonly deviceRows = signal<readonly Device[]>([laptop]);
+  readonly devicesProblem = signal<string | null>(null);
+  readonly passkeyRows = signal<readonly Passkey[]>([key]);
+  readonly passkeysProblem = signal<string | null>(null);
+  readonly eventRows = signal<readonly SecurityEvent[]>([created]);
+  readonly eventsProblem = signal<string | null>(null);
+  opened: string[] = [];
+  reloads = 0;
+  calls: string[] = [];
+  answer: ApiResult<unknown> = { kind: 'ok', status: OK, data: undefined };
+  open(id: string): void {
+    this.opened.push(id);
+  }
+  reload(): void {
+    this.reloads += 1;
+  }
+  updateRoles(
+    _user: UserAccount,
+    roleIds: readonly string[],
+    k: IntentKey,
+  ): Promise<ApiResult<unknown>> {
+    this.calls.push(`roles:${roleIds.join('+')}:${String(k.value.length)}`);
+    return Promise.resolve(this.answer);
+  }
+  resetTwoFactor(): Promise<ApiResult<unknown>> {
+    this.calls.push('reset');
+    return Promise.resolve(this.answer);
+  }
+  endExemption(): Promise<ApiResult<unknown>> {
+    this.calls.push('end-exemption');
+    return Promise.resolve(this.answer);
+  }
+  signOutDevice(_user: UserAccount, device: Device): Promise<ApiResult<unknown>> {
+    this.calls.push(`sign-out:${device.id}`);
+    return Promise.resolve(this.answer);
+  }
+  removePasskey(_user: UserAccount, passkey: Passkey): Promise<ApiResult<unknown>> {
+    this.calls.push(`remove-passkey:${passkey.id}`);
+    return Promise.resolve(this.answer);
+  }
+}
+
+describe('PersonPage', () => {
+  let store: FakeStore;
+  let fixture: ComponentFixture<PersonPage>;
+  let page: HTMLElement;
+  let mayManage = true;
+
+  const settle = async (): Promise<void> => {
+    await new Promise((resolve) => setTimeout(resolve, 1));
+    fixture.detectChanges();
+    await fixture.whenStable();
+  };
+  const text = (selector: string): string =>
+    page.querySelector(selector)?.textContent.replace(whitespace, ' ').trim() ?? '';
+  const click = (selector: string): void => {
+    page.querySelector<HTMLElement>(selector)?.click();
+  };
+
+  beforeEach(async () => {
+    store = new FakeStore();
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: InstantFormatter, useValue: { formatInstant: () => 'Oct 24, 2026, 09:00' } },
+        { provide: AccessStore, useValue: { can: () => mayManage } },
+        {
+          provide: RolesStore,
+          useValue: {
+            roles: signal([frontDesk, manager]),
+            problem: signal(null),
+            load: () => undefined,
+          },
+        },
+        { provide: UsersStore, useValue: {} },
+      ],
+    });
+    // The page provides its own PersonStore; the fake takes that slot.
+    TestBed.overrideComponent(PersonPage, {
+      set: { providers: [{ provide: PersonStore, useValue: store }] },
+    });
+    fixture = TestBed.createComponent(PersonPage);
+    fixture.componentRef.setInput('id', 'u5');
+    page = fixture.nativeElement as HTMLElement;
+    await settle();
+  });
+
+  it('names the account to the store, shows who they are, their roles ticked, devices, passkeys and the trail', () => {
+    expect(store.opened).toEqual(['u5']);
+    expect(text('.person h1')).toBe('Rana Qasem');
+    expect(text('[data-two-step] b')).toBe('Not set');
+    expect(page.querySelector<HTMLInputElement>('input[data-role="FRONT-DESK"]')?.checked).toBe(
+      true,
+    );
+    expect(page.querySelector<HTMLInputElement>('input[data-role="MANAGER"]')?.checked).toBe(false);
+    expect(text('.drow .s-nm b')).toBe('Chrome on Windows');
+    expect(text('.krow .s-nm b')).toBe('Work laptop');
+    expect(text('.erow .s-nm b')).toBe('account.created');
+  });
+
+  it('roles: Save is off until something changes; then the whole set goes with a key; a refusal is worded', async () => {
+    const save = page.querySelector<HTMLButtonElement>('[data-act="save-roles"]');
+    expect(save?.disabled).toBe(true);
+    click('input[data-role="MANAGER"]');
+    await settle();
+    expect(save?.disabled).toBe(false);
+    store.answer = { kind: 'refused', status: ACCEPTED, codes: ['00077'] };
+    click('[data-act="save-roles"]');
+    await settle();
+    expect(store.calls).toEqual(['roles:r1+r2:36']);
+    expect(text('hr-role-assignment [role="alert"]')).toContain('above your own rank');
+    expect(store.reloads).toBe(0);
+    store.answer = { kind: 'ok', status: OK, data: undefined };
+    click('[data-act="save-roles"]');
+    await settle();
+    expect(store.reloads).toBe(1);
+  });
+
+  it('two-step: Exempt opens the reason form; an exempt person gets End exemption; an enrolled one gets Reset', async () => {
+    expect(page.querySelector('[data-act="reset-two-step"]')).toBeNull();
+    click('[data-act="exempt"]');
+    await settle();
+    expect(
+      page.querySelector('hr-account-state-editor button[type="submit"]')?.textContent,
+    ).toContain('Exempt from two-step');
+    store.person.set({ ...rana, twoStepExemptReason: 'night desk' });
+    await settle();
+    expect(text('[data-two-step] b')).toBe('Exempt');
+    click('[data-act="end-exemption"]');
+    await settle();
+    expect(store.calls).toEqual(['end-exemption']);
+    store.person.set({ ...rana, twoFactorEnabled: true });
+    await settle();
+    click('[data-act="reset-two-step"]');
+    await settle();
+    expect(store.calls).toEqual(['end-exemption', 'reset']);
+  });
+
+  it('a device is signed out and a passkey removed with one press each', async () => {
+    click('[data-act="sign-out-device"]');
+    await settle();
+    click('[data-act="remove-passkey"]');
+    await settle();
+    expect(store.calls).toEqual(['sign-out:d1', 'remove-passkey:k1']);
+  });
+
+  it('without ManageUsers: the roles are read-only and no action is offered', async () => {
+    mayManage = false;
+    fixture.destroy();
+    fixture = TestBed.createComponent(PersonPage);
+    fixture.componentRef.setInput('id', 'u5');
+    page = fixture.nativeElement as HTMLElement;
+    await settle();
+    expect(page.querySelector<HTMLInputElement>('input[data-role="FRONT-DESK"]')?.disabled).toBe(
+      true,
+    );
+    expect(page.querySelector('[data-act]')).toBeNull();
+    mayManage = true;
+  });
+});

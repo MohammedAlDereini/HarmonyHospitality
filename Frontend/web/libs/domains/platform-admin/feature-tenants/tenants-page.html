@@ -1,0 +1,133 @@
+<ng-template hrPageActions>
+  <button
+    *hrIfAllowed="manageTenants"
+    type="button"
+    class="pbtn primary"
+    (click)="openCreator()"
+    [attr.aria-expanded]="creating()"
+  >
+    <hr-icon name="plus" size="13" />
+    <span i18n="@@platform-admin.tenants.add">Add tenant</span>
+  </button>
+</ng-template>
+<div class="sec-h">
+  <h1 i18n="@@platform-admin.tenants.title">Tenants</h1>
+  @if (!store.loading() && store.problem() === null) {
+    <span class="note"
+      ><span class="num">{{ store.total() }}</span
+      >&ngsp;<span i18n="@@platform-admin.tenants.count">tenants</span></span
+    >
+  }
+  <div
+    class="seg"
+    role="group"
+    i18n-aria-label="@@platform-admin.tenants.filter"
+    aria-label="Status"
+  >
+    @for (choice of choices; track choice.label) {
+      <button
+        type="button"
+        [attr.aria-pressed]="store.filters().status === choice.status"
+        (click)="store.showStatus(choice.status)"
+      >
+        {{ choice.label }}
+      </button>
+    }
+  </div>
+  <form class="r" (submit)="onSearch($event, search.value)">
+    <label class="vh" for="tenants-search" i18n="@@platform-admin.tenants.search">Search</label>
+    <input
+      id="tenants-search"
+      #search
+      class="field"
+      type="search"
+      autocomplete="off"
+      dir="auto"
+      i18n-placeholder="@@platform-admin.tenants.search-placeholder"
+      placeholder="Code or name"
+      [value]="store.filters().search"
+    />
+    <button type="submit" class="btn" i18n="@@platform-admin.tenants.find">Find</button>
+  </form>
+</div>
+@if (creating()) {
+  <hr-tenant-editor (done)="closeCreator()" (cancelled)="closeCreator()" />
+}
+@if (store.problem(); as problem) {
+  <p class="empty" role="alert">
+    {{ problem }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="store.reload()"
+      i18n="@@platform-admin.tenants.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (store.loading()) {
+  <p class="empty" role="status" i18n="@@platform-admin.tenants.loading">Loading…</p>
+} @else if (store.rows().length === 0) {
+  <p class="empty" i18n="@@platform-admin.tenants.none">No tenants match.</p>
+} @else {
+  <div class="rows" role="list">
+    @for (tenant of store.rows(); track tenant.id) {
+      <div class="srow trow" role="listitem">
+        <div class="s-who">
+          <span class="code num" dir="ltr">{{ tenant.code }}</span>
+          <div class="s-nm">
+            <b
+              ><a class="nm-link" [routerLink]="[tenant.id]"
+                ><bdi>{{ name(tenant) }}</bdi></a
+              ></b
+            >
+            @if (tenant.isPlatform) {
+              <span i18n="@@platform-admin.tenants.platform">The platform itself</span>
+            } @else {
+              <span dir="ltr"
+                >{{ tenant.countryCode ?? '' }} · {{ tenant.defaultCurrency ?? '' }}</span
+              >
+            }
+          </div>
+        </div>
+        <div class="obj">
+          <b class="num">{{ tenant.tier }}</b>
+          <span i18n="@@platform-admin.tenants.column.tier">Tier</span>
+        </div>
+        <div class="obj" [attr.data-s]="tone(tenant)">
+          <b>{{ status(tenant) }}</b>
+          <span i18n="@@platform-admin.tenants.column.status">Status</span>
+        </div>
+        <div class="s-when">
+          <span class="num">{{ tenant.onboardedOn }}</span>
+          <small i18n="@@platform-admin.tenants.column.onboarded">Onboarded</small>
+        </div>
+      </div>
+    }
+  </div>
+  <nav class="paging" i18n-aria-label="@@platform-admin.tenants.paging" aria-label="Pages">
+    <button
+      type="button"
+      class="btn"
+      (click)="previous()"
+      [disabled]="!hasPrevious()"
+      i18n="@@platform-admin.tenants.previous"
+    >
+      Previous
+    </button>
+    <span
+      ><span class="num">{{ from() }}–{{ to() }}</span
+      >&ngsp;<span i18n="@@platform-admin.tenants.of">of</span>&ngsp;<span class="num">{{
+        store.total()
+      }}</span></span
+    >
+    <button
+      type="button"
+      class="btn"
+      (click)="next()"
+      [disabled]="!hasNext()"
+      i18n="@@platform-admin.tenants.next"
+    >
+      Next
+    </button>
+  </nav>
+}

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { RolesStore, UsersStore } from '@harmony/administration/data-access';
-import { NewAccount, RoleOption } from '@harmony/administration/domain';
+import { NewAccount, PrivilegeLevel, Role } from '@harmony/administration/domain';
 import { ApiResult, IntentKey } from '@harmony/platform/http';
 import { AccountCreator } from './account-creator';
 
@@ -13,8 +13,23 @@ const BAD_REQUEST = 400;
 // Tester: https://regex101.com/?regex=%5E%5B0-9a-f-%5D%7B36%7D%24&testString=3b241101-e2bb-4255-8caf-4136c566a962
 const uuid = /^[0-9a-f-]{36}$/;
 
-const frontDesk: RoleOption = { id: 'r1', code: 'FRONT-DESK', nameEn: 'Front desk', nameAr: null };
-const manager: RoleOption = { id: 'r2', code: 'MANAGER', nameEn: 'Manager', nameAr: 'مدير' };
+const frontDesk: Role = {
+  id: 'r1',
+  code: 'FRONT-DESK',
+  nameEn: 'Front desk',
+  nameAr: null,
+  privilegeLevel: PrivilegeLevel.standard,
+  isSystemRole: false,
+  isSuperRole: false,
+};
+const manager: Role = {
+  ...frontDesk,
+  id: 'r2',
+  code: 'MANAGER',
+  nameEn: 'Manager',
+  nameAr: 'مدير',
+  privilegeLevel: PrivilegeLevel.manager,
+};
 
 @Component({
   selector: 'hr-host',
@@ -50,7 +65,7 @@ describe('hr-account-creator', () => {
         {
           provide: RolesStore,
           useValue: {
-            options: signal([frontDesk, manager]),
+            roles: signal([frontDesk, manager]),
             loading: signal(false),
             problem: signal(null),
             load: () => {

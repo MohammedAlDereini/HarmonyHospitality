@@ -64,7 +64,8 @@ const typeKey = (lib) =>
       : lib.type;
 
 // The app walls (architecture 3 and 4.1): platform people never act inside a hotel; hotel staff never see the platform.
-const consoleDomains = new Set(['platform-admin', 'identity']);
+// Tenant administration (people, roles) is the platform tenant's own administration too: the console shows it for platform people.
+const consoleDomains = new Set(['platform-admin', 'identity', 'administration']);
 const appWall = (from, to) =>
   (from.app === 'harmony-web' &&
     to.domain === 'platform-admin' &&

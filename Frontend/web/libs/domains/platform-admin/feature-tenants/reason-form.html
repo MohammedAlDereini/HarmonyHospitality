@@ -1,0 +1,39 @@
+<form class="editor" (submit)="onSubmit($event)" novalidate>
+  @if (warning(); as text) {
+    <p class="warning" role="note">{{ text }}</p>
+  }
+  <label class="vh" for="reason-box">{{ label() }}</label>
+  <input
+    id="reason-box"
+    #box
+    class="field"
+    type="text"
+    autocomplete="off"
+    dir="auto"
+    [formField]="form.reason"
+    [placeholder]="placeholder()"
+    [attr.aria-invalid]="form.reason().touched() && form.reason().invalid() ? 'true' : null"
+    [attr.aria-describedby]="form.reason().errors().length > 0 ? 'reason-box-error' : null"
+  />
+  <button
+    type="submit"
+    class="btn solid"
+    [class.stop]="warning() !== null"
+    [disabled]="busy() || form().submitting()"
+  >
+    {{ go() }}
+  </button>
+  <button type="button" class="btn" (click)="cancel()" i18n="@@platform-admin.reason.cancel">
+    Cancel
+  </button>
+  @if (form.reason().touched() && form.reason().errors().length > 0) {
+    <p id="reason-box-error" class="field-error" role="alert">
+      @for (error of form.reason().errors(); track error.kind) {
+        <span>{{ error.message }}</span>
+      }
+    </p>
+  }
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
+</form>

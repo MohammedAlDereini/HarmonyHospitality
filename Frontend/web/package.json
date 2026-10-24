@@ -17,7 +17,11 @@
     "check:translations": "node tools/check-translations.mjs",
     "check:architecture": "node tools/check-architecture.mjs .",
     "check:styles": "node tools/check-styles.mjs",
-    "check": "eslint . && prettier --check . && node tools/check-translations.mjs && node tools/check-architecture.mjs . && node tools/check-styles.mjs"
+    "check": "eslint . && prettier --check . && node tools/check-translations.mjs && node tools/check-architecture.mjs . && node tools/check-styles.mjs && node tools/check-dependencies.mjs && node tools/check-error-codes.mjs",
+    "check:dependencies": "node tools/check-dependencies.mjs",
+    "check:error-codes": "node tools/check-error-codes.mjs",
+    "size:report": "node tools/size-report.mjs",
+    "stamp:version": "node tools/stamp-version.mjs"
   },
   "dependencies": {
     "@angular/common": "22.2.3",
@@ -28,7 +32,8 @@
     "@angular/platform-browser": "22.2.3",
     "@angular/router": "22.2.3",
     "rxjs": "7.8.2",
-    "tslib": "2.8.1"
+    "tslib": "2.8.1",
+    "web-vitals": "6.2.3"
   },
   "devDependencies": {
     "@angular/build": "22.2.3",

@@ -11,6 +11,7 @@
     placeholder="Find a place…"
     [value]="query()"
     (input)="search($event)"
+    (keydown)="onSearchKey($event)"
   />
 </div>
 <nav class="navp-b" i18n-aria-label="@@ui.shell.nav.label" aria-label="All places">

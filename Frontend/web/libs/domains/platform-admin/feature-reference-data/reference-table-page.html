@@ -1,0 +1,151 @@
+@if (description(); as description) {
+  @if (mayManage()) {
+    <ng-template hrPageActions>
+      <button
+        type="button"
+        class="pbtn primary"
+        (click)="openCreator()"
+        [attr.aria-expanded]="creating()"
+      >
+        <hr-icon name="plus" size="13" />
+        <span i18n="@@platform-admin.reference.add">Add row</span>
+      </button>
+    </ng-template>
+  }
+  <div class="sec-h">
+    <h1>{{ description.title }}</h1>
+    @if (rows(); as rows) {
+      @if (!rows.loading() && rows.problem() === null) {
+        <span class="note"
+          ><span class="num">{{ rows.rows().length }}</span
+          >&ngsp;<span i18n="@@platform-admin.reference.count">rows</span></span
+        >
+      }
+    }
+    @if (description.scopedBy; as scopedBy) {
+      <label class="r">
+        <span class="vh" i18n="@@platform-admin.reference.field.category">Category</span>
+        <select
+          class="field"
+          data-scope
+          (change)="chooseCategory(categoryBox.value)"
+          #categoryBox
+          [value]="category()"
+        >
+          <option value="" i18n="@@platform-admin.reference.category.choose">
+            Choose a category
+          </option>
+          @for (row of categories.rows(); track cell(row, 'id')) {
+            <option [value]="cell(row, 'id')">{{ cell(row, 'name') }}</option>
+          }
+        </select>
+      </label>
+    }
+  </div>
+  @if (creating()) {
+    <hr-row-editor [table]="description" (done)="closeCreator()" (cancelled)="closeCreator()" />
+  }
+  @if (rows(); as rows) {
+    @if (description.scopedBy !== undefined && category() === '') {
+      <p class="empty" i18n="@@platform-admin.reference.category.first">Choose a category first.</p>
+    } @else if (rows.problem(); as problem) {
+      <p class="empty" role="alert">
+        {{ problem }}&ngsp;<button
+          type="button"
+          class="btn"
+          (click)="rows.load()"
+          i18n="@@platform-admin.reference.try-again"
+        >
+          Try again
+        </button>
+      </p>
+    } @else if (rows.loading()) {
+      <p class="empty" role="status" i18n="@@platform-admin.reference.loading">Loading…</p>
+    } @else if (rows.rows().length === 0) {
+      <p class="empty" i18n="@@platform-admin.reference.none">No rows yet.</p>
+    } @else {
+      @if (actionProblem(); as text) {
+        <p class="empty" role="alert">{{ text }}</p>
+      }
+      <div class="rows" role="list">
+        @for (row of rows.rows(); track idOf(row)) {
+          <div role="listitem">
+            <div class="srow xrow">
+              @for (column of description.columns; track column) {
+                <div class="obj">
+                  <b [attr.dir]="column === 'nameAr' ? 'rtl' : 'auto'">
+                    <bdi>{{ cell(row, column) }}</bdi>
+                  </b>
+                  <span>{{ columnLabel(column) }}</span>
+                </div>
+              }
+              <div class="row-act">
+                @if (mayManage()) {
+                  <button
+                    type="button"
+                    class="act"
+                    data-act="edit"
+                    (click)="open(row, 'edit')"
+                    [attr.aria-expanded]="opened(row) === 'edit'"
+                    i18n="@@platform-admin.reference.edit"
+                  >
+                    Edit
+                  </button>
+                  @if (description.canDelete) {
+                    <button
+                      type="button"
+                      class="act"
+                      data-act="delete"
+                      (click)="open(row, 'delete')"
+                      [attr.aria-expanded]="opened(row) === 'delete'"
+                      i18n="@@platform-admin.reference.delete"
+                    >
+                      Delete
+                    </button>
+                  }
+                }
+              </div>
+            </div>
+            @if (opened(row) === 'edit') {
+              <hr-row-editor
+                [table]="description"
+                [row]="row"
+                (done)="close()"
+                (cancelled)="close()"
+              />
+            }
+            @if (opened(row) === 'delete') {
+              <div class="confirm" role="group">
+                <p class="warning" i18n="@@platform-admin.reference.delete.ask">
+                  Delete this row? This cannot be undone.
+                </p>
+                <button
+                  type="button"
+                  class="btn solid stop"
+                  data-act="delete-confirm"
+                  (click)="remove(row)"
+                  [disabled]="removing() === idOf(row)"
+                  i18n="@@platform-admin.reference.delete.go"
+                >
+                  Delete row
+                </button>
+                <button
+                  type="button"
+                  class="btn"
+                  (click)="close()"
+                  i18n="@@platform-admin.reference.cancel"
+                >
+                  Cancel
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+} @else {
+  <p class="empty" role="alert" i18n="@@platform-admin.reference.unknown">
+    There is no such table.
+  </p>
+}

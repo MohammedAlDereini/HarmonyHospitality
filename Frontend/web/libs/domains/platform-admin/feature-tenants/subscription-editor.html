@@ -1,0 +1,118 @@
+<form class="editor" (submit)="onSubmit($event)" novalidate>
+  <h2 i18n="@@platform-admin.subscriptions.new.title">New subscription</h2>
+  <div class="fields">
+    <div class="f">
+      <label for="sub-module" i18n="@@platform-admin.subscriptions.field.module">Module</label>
+      <select
+        id="sub-module"
+        #moduleBox
+        class="field"
+        [formField]="form.moduleCode"
+        [attr.aria-invalid]="
+          form.moduleCode().touched() && form.moduleCode().invalid() ? 'true' : null
+        "
+        [attr.aria-describedby]="form.moduleCode().errors().length > 0 ? 'sub-module-error' : null"
+      >
+        <option value="" i18n="@@platform-admin.subscriptions.field.module.choose">
+          Choose a module
+        </option>
+        @for (row of modules.rows(); track moduleCode(row)) {
+          <option [value]="moduleCode(row)">{{ moduleLabel(row) }}</option>
+        }
+      </select>
+      @if (form.moduleCode().touched() && form.moduleCode().errors().length > 0) {
+        <p id="sub-module-error" class="field-error" role="alert">
+          @for (error of form.moduleCode().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="sub-property" i18n="@@platform-admin.subscriptions.field.property"
+        >Property</label
+      >
+      <select id="sub-property" class="field" [formField]="form.propertyId">
+        <option value="" i18n="@@platform-admin.subscriptions.field.property.whole">
+          The whole tenant
+        </option>
+        @for (property of properties.rows(); track property.id) {
+          <option [value]="property.id">{{ propertyLabel(property) }}</option>
+        }
+      </select>
+    </div>
+    <div class="f">
+      <label for="sub-starts" i18n="@@platform-admin.subscriptions.field.starts-on"
+        >Starts on</label
+      >
+      <input
+        id="sub-starts"
+        class="field"
+        type="date"
+        [formField]="form.startsOn"
+        [attr.aria-invalid]="form.startsOn().touched() && form.startsOn().invalid() ? 'true' : null"
+        [attr.aria-describedby]="form.startsOn().errors().length > 0 ? 'sub-starts-error' : null"
+      />
+      @if (form.startsOn().touched() && form.startsOn().errors().length > 0) {
+        <p id="sub-starts-error" class="field-error" role="alert">
+          @for (error of form.startsOn().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="sub-ends" i18n="@@platform-admin.subscriptions.field.ends-on">Ends on</label>
+      <input id="sub-ends" class="field" type="date" [formField]="form.endsOn" />
+    </div>
+    <div class="f">
+      <label for="sub-rooms" i18n="@@platform-admin.subscriptions.field.rooms">Rooms</label>
+      <input
+        id="sub-rooms"
+        class="field"
+        type="text"
+        inputmode="numeric"
+        dir="ltr"
+        [formField]="form.rooms"
+      />
+    </div>
+    <div class="f">
+      <label for="sub-terminals" i18n="@@platform-admin.subscriptions.field.terminals"
+        >Terminals</label
+      >
+      <input
+        id="sub-terminals"
+        class="field"
+        type="text"
+        inputmode="numeric"
+        dir="ltr"
+        [formField]="form.terminals"
+      />
+    </div>
+    <label class="perm">
+      <input type="checkbox" [formField]="form.renewsAutomatically" />
+      <span i18n="@@platform-admin.subscriptions.field.renews">Renews automatically</span>
+    </label>
+  </div>
+  <div class="acts">
+    <button
+      type="submit"
+      class="btn solid"
+      [disabled]="form().submitting()"
+      i18n="@@platform-admin.subscriptions.new.go"
+    >
+      Subscribe
+    </button>
+    <button
+      type="button"
+      class="btn"
+      (click)="cancel()"
+      i18n="@@platform-admin.subscriptions.cancel"
+    >
+      Cancel
+    </button>
+  </div>
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
+</form>

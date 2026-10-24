@@ -29,10 +29,21 @@ export const routes: Routes = [
         children: [
           {
             path: 'admin',
-            canMatch: [allowed(Permission.ViewUsers)],
             data: { crumb: $localize`:@@administration.crumb:Administration` },
-            loadChildren: async () =>
-              (await import('@harmony/administration/feature-users')).routes,
+            children: [
+              {
+                path: '',
+                canMatch: [allowed(Permission.ViewUsers)],
+                loadChildren: async () =>
+                  (await import('@harmony/administration/feature-users')).routes,
+              },
+              {
+                path: 'roles',
+                canMatch: [allowed(Permission.ViewRoles)],
+                loadChildren: async () =>
+                  (await import('@harmony/administration/feature-roles')).routes,
+              },
+            ],
           },
           { path: '', pathMatch: 'full', redirectTo: 'admin' },
         ],

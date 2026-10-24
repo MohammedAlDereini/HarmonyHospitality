@@ -1,0 +1,279 @@
+@if (problem(); as problem) {
+  <p class="empty" role="alert">
+    {{ problem }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="reload()"
+      i18n="@@platform-admin.tenant.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (tenant(); as tenant) {
+  <div class="sec-h head">
+    <span class="code num" dir="ltr">{{ tenant.code }}</span>
+    <h1>
+      <bdi>{{ name(tenant) }}</bdi>
+    </h1>
+    <div class="obj" [attr.data-s]="tone(tenant)">
+      <b data-status>{{ status(tenant) }}</b>
+      <span i18n="@@platform-admin.tenant.status">Status</span>
+    </div>
+    <div class="obj">
+      <b class="num">{{ tenant.tier }}</b>
+      <span i18n="@@platform-admin.tenant.tier">Tier</span>
+    </div>
+    <div class="obj">
+      <b dir="ltr">{{ tenant.countryCode ?? '' }} · {{ tenant.defaultCurrency ?? '' }}</b>
+      <span i18n="@@platform-admin.tenant.country-currency">Country · currency</span>
+    </div>
+    <div class="obj">
+      <b class="num">{{ tenant.onboardedOn }}</b>
+      <span i18n="@@platform-admin.tenant.onboarded">Onboarded</span>
+    </div>
+  </div>
+  @if (tenant.statusReason; as reason) {
+    <p class="line">
+      <span i18n="@@platform-admin.tenant.status-reason">Reason:</span>&ngsp;<bdi>{{ reason }}</bdi>
+    </p>
+  }
+  @if (actionProblem(); as text) {
+    <p class="empty" role="alert">{{ text }}</p>
+  }
+  @if (invited()) {
+    <p class="line" role="status" i18n="@@platform-admin.tenant.invited">
+      The invitation went out.
+    </p>
+  }
+  <div class="acts" *hrIfAllowed="manageTenants">
+    <button
+      type="button"
+      class="btn"
+      data-act="edit"
+      (click)="open('edit')"
+      [attr.aria-expanded]="opened() === 'edit'"
+      i18n="@@platform-admin.tenant.edit"
+    >
+      Edit
+    </button>
+    @if (isActive(tenant)) {
+      <button
+        type="button"
+        class="btn"
+        data-act="suspend"
+        (click)="open('suspend')"
+        [attr.aria-expanded]="opened() === 'suspend'"
+        i18n="@@platform-admin.tenant.suspend"
+      >
+        Suspend
+      </button>
+    } @else if (isSuspended(tenant)) {
+      <button
+        type="button"
+        class="btn"
+        data-act="reinstate"
+        (click)="reinstate(tenant)"
+        [disabled]="busy()"
+        i18n="@@platform-admin.tenant.reinstate"
+      >
+        Reinstate
+      </button>
+    }
+    <button
+      type="button"
+      class="btn"
+      data-act="invite"
+      (click)="open('invite')"
+      [attr.aria-expanded]="opened() === 'invite'"
+      i18n="@@platform-admin.tenant.invite"
+    >
+      Invite administrator
+    </button>
+    <a
+      class="btn"
+      [routerLink]="['/properties']"
+      [queryParams]="{ tenant: tenant.id }"
+      i18n="@@platform-admin.tenant.properties"
+    >
+      Properties
+    </a>
+  </div>
+  @if (opened() === 'edit') {
+    <hr-tenant-editor [tenant]="tenant" (done)="changed()" (cancelled)="close()" />
+  }
+  @if (opened() === 'suspend') {
+    <hr-reason-form
+      [label]="suspendLabel"
+      [placeholder]="suspendPlaceholder"
+      [go]="suspendGo"
+      [busy]="busy()"
+      [problem]="actionProblem()"
+      (submitted)="suspend(tenant, $event)"
+      (cancelled)="close()"
+    />
+  }
+  @if (opened() === 'invite') {
+    <form class="editor" (submit)="onInvite($event, tenant)" novalidate>
+      <h2 i18n="@@platform-admin.tenant.invite.title">Invite the administrator</h2>
+      <p class="note" i18n="@@platform-admin.tenant.invite.note">
+        A new invitation goes to this person; leave both empty to send it again to the one already
+        known.
+      </p>
+      <div class="fields">
+        <div class="f">
+          <label for="invite-email" i18n="@@platform-admin.tenant.invite.email">Email</label>
+          <input
+            id="invite-email"
+            class="field"
+            type="email"
+            autocomplete="off"
+            dir="ltr"
+            [formField]="inviteForm.administratorEmail"
+          />
+          @if (
+            inviteForm.administratorEmail().touched() &&
+            inviteForm.administratorEmail().errors().length > 0
+          ) {
+            <p class="field-error" role="alert">
+              @for (error of inviteForm.administratorEmail().errors(); track error.kind) {
+                <span>{{ error.message }}</span>
+              }
+            </p>
+          }
+        </div>
+        <div class="f">
+          <label for="invite-name" i18n="@@platform-admin.tenant.invite.name">Name</label>
+          <input
+            id="invite-name"
+            class="field"
+            type="text"
+            autocomplete="off"
+            dir="auto"
+            [formField]="inviteForm.administratorDisplayName"
+          />
+          @if (
+            inviteForm.administratorDisplayName().touched() &&
+            inviteForm.administratorDisplayName().errors().length > 0
+          ) {
+            <p class="field-error" role="alert">
+              @for (error of inviteForm.administratorDisplayName().errors(); track error.kind) {
+                <span>{{ error.message }}</span>
+              }
+            </p>
+          }
+        </div>
+      </div>
+      <div class="acts">
+        <button
+          type="submit"
+          class="btn solid"
+          [disabled]="busy()"
+          i18n="@@platform-admin.tenant.invite.go"
+        >
+          Send invitation
+        </button>
+        <button
+          type="button"
+          class="btn"
+          (click)="close()"
+          i18n="@@platform-admin.tenant.invite.cancel"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  }
+  <section class="part" aria-labelledby="subscriptions-heading">
+    <h2 id="subscriptions-heading">
+      <span i18n="@@platform-admin.subscriptions.title">Subscriptions</span>&ngsp;<span
+        class="num"
+        >{{ tenant.subscriptions.length }}</span
+      >
+    </h2>
+    @if (tenant.subscriptions.length === 0) {
+      <p class="line" i18n="@@platform-admin.subscriptions.none">No module yet.</p>
+    } @else {
+      <div class="rows" role="list">
+        @for (line of tenant.subscriptions; track line.id) {
+          <div role="listitem">
+            <div class="srow lrow">
+              <div class="s-who">
+                <span class="code num" dir="ltr">{{ line.moduleCode }}</span>
+                <div class="s-nm">
+                  <b>{{ scopeOf(line) }}</b>
+                  @if (line.propertyId; as propertyId) {
+                    <span class="num" dir="ltr">{{ propertyId }}</span>
+                  }
+                </div>
+              </div>
+              <div class="obj">
+                <b>{{ lineState(line) }}</b>
+                <span i18n="@@platform-admin.subscriptions.column.state">State</span>
+              </div>
+              <div class="s-when">
+                <span class="num"
+                  >{{ line.startsOn }}
+                  @if (line.endsOn; as endsOn) {
+                    – {{ endsOn }}
+                  }
+                </span>
+                <small i18n="@@platform-admin.subscriptions.column.period">Period</small>
+              </div>
+              <div class="obj">
+                @if (line.renewsAutomatically) {
+                  <b i18n="@@platform-admin.subscriptions.renews.yes">Renews</b>
+                } @else {
+                  <b i18n="@@platform-admin.subscriptions.renews.no">Fixed term</b>
+                }
+                <span i18n="@@platform-admin.subscriptions.column.renewal">Renewal</span>
+              </div>
+              <div class="row-act">
+                @if (line.isEnabled) {
+                  <button
+                    *hrIfAllowed="manageTenants"
+                    type="button"
+                    class="act"
+                    data-act="end-line"
+                    (click)="askEnd(line)"
+                    [attr.aria-expanded]="ending() === line.id"
+                    i18n="@@platform-admin.subscriptions.end"
+                  >
+                    End
+                  </button>
+                }
+              </div>
+            </div>
+            @if (ending() === line.id) {
+              <hr-reason-form
+                [label]="unsubscribeLabel"
+                [placeholder]="unsubscribePlaceholder"
+                [go]="unsubscribeGo"
+                [busy]="busy()"
+                [problem]="actionProblem()"
+                (submitted)="endLine(tenant, line, $event)"
+                (cancelled)="askEnd(line)"
+              />
+            }
+          </div>
+        }
+      </div>
+    }
+    <div class="acts" *hrIfAllowed="manageTenants">
+      <button
+        type="button"
+        class="btn"
+        data-act="subscribe"
+        (click)="open('subscribe')"
+        [attr.aria-expanded]="opened() === 'subscribe'"
+        i18n="@@platform-admin.subscriptions.add"
+      >
+        Add module
+      </button>
+    </div>
+    @if (opened() === 'subscribe') {
+      <hr-subscription-editor [tenant]="tenant" (done)="changed()" (cancelled)="close()" />
+    }
+  </section>
+} @else {
+  <p class="empty" role="status" i18n="@@platform-admin.tenant.loading">Loading…</p>
+}

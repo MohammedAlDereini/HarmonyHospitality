@@ -1,0 +1,50 @@
+<section class="part" aria-labelledby="roles-heading">
+  <h2 id="roles-heading" i18n="@@administration.person.roles">Roles</h2>
+  @if (roles.problem(); as text) {
+    <p class="field-error" role="alert">
+      {{ text }}&ngsp;<button
+        type="button"
+        class="btn"
+        (click)="roles.load()"
+        i18n="@@administration.person.roles-again"
+      >
+        Try again
+      </button>
+    </p>
+  } @else {
+    <fieldset class="picker">
+      <legend class="vh" i18n="@@administration.person.roles">Roles</legend>
+      @for (role of roles.roles(); track role.id) {
+        <label class="perm">
+          <input
+            type="checkbox"
+            [attr.data-role]="role.code"
+            [checked]="selected().has(role.id)"
+            [disabled]="!mayAssign()"
+            (change)="toggle(role.id)"
+          />
+          <span
+            ><bdi>{{ name(role) }}</bdi></span
+          >
+        </label>
+      }
+    </fieldset>
+    @if (mayAssign()) {
+      <div class="acts">
+        <button
+          type="button"
+          class="btn solid"
+          data-act="save-roles"
+          (click)="save()"
+          [disabled]="saving() || !changed()"
+          i18n="@@administration.person.roles.save"
+        >
+          Save roles
+        </button>
+      </div>
+    }
+    @if (problem(); as text) {
+      <p class="field-error" role="alert">{{ text }}</p>
+    }
+  }
+</section>

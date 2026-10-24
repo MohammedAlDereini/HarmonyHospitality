@@ -1,0 +1,27 @@
+/* Under its row: the checklist and the two buttons. */
+.editor {
+  padding: var(--s3) var(--s6);
+  background: var(--sunk);
+  border-block-end: 1px solid var(--rule);
+}
+.editor h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.note {
+  margin: var(--s2) 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.acts {
+  display: flex;
+  gap: var(--s2);
+  margin-block-start: var(--s3);
+}
+.field-error {
+  margin: var(--s2) 0 0;
+  font-size: 12px;
+  color: var(--stop);
+}

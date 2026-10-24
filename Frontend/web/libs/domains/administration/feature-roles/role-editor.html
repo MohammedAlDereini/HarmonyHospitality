@@ -1,0 +1,144 @@
+<form class="editor" (submit)="onSubmit($event)" novalidate>
+  @if (creating()) {
+    <h2 i18n="@@administration.roles.new.title">New role</h2>
+  } @else {
+    <h2 i18n="@@administration.roles.edit.title">Edit role</h2>
+  }
+  <div class="fields">
+    <div class="f">
+      <label for="role-code" i18n="@@administration.roles.field.code">Code</label>
+      <input
+        id="role-code"
+        #codeBox
+        class="field"
+        type="text"
+        autocomplete="off"
+        dir="ltr"
+        [formField]="form.code"
+        [attr.aria-invalid]="form.code().touched() && form.code().invalid() ? 'true' : null"
+        [attr.aria-describedby]="form.code().errors().length > 0 ? 'role-code-error' : null"
+      />
+      @if (form.code().touched() && form.code().errors().length > 0) {
+        <p id="role-code-error" class="field-error" role="alert">
+          @for (error of form.code().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="role-name-en" i18n="@@administration.roles.field.name-en">English name</label>
+      <input
+        id="role-name-en"
+        class="field"
+        type="text"
+        autocomplete="off"
+        lang="en"
+        dir="ltr"
+        [formField]="form.nameEn"
+        [attr.aria-invalid]="form.nameEn().touched() && form.nameEn().invalid() ? 'true' : null"
+        [attr.aria-describedby]="form.nameEn().errors().length > 0 ? 'role-name-en-error' : null"
+      />
+      @if (form.nameEn().touched() && form.nameEn().errors().length > 0) {
+        <p id="role-name-en-error" class="field-error" role="alert">
+          @for (error of form.nameEn().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="role-name-ar" i18n="@@administration.roles.field.name-ar">Arabic name</label>
+      <input
+        id="role-name-ar"
+        class="field"
+        type="text"
+        autocomplete="off"
+        lang="ar"
+        dir="rtl"
+        [formField]="form.nameAr"
+        [attr.aria-invalid]="form.nameAr().touched() && form.nameAr().invalid() ? 'true' : null"
+        [attr.aria-describedby]="form.nameAr().errors().length > 0 ? 'role-name-ar-error' : null"
+      />
+      @if (form.nameAr().touched() && form.nameAr().errors().length > 0) {
+        <p id="role-name-ar-error" class="field-error" role="alert">
+          @for (error of form.nameAr().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="role-level" i18n="@@administration.roles.field.level">Privilege level</label>
+      <select
+        id="role-level"
+        class="field"
+        [formField]="form.privilegeLevel"
+        [attr.aria-describedby]="
+          form.privilegeLevel().errors().length > 0 ? 'role-level-error' : null
+        "
+      >
+        @for (level of levels; track level) {
+          <option [value]="level">{{ levelLabel(level) }}</option>
+        }
+      </select>
+      @if (form.privilegeLevel().errors().length > 0) {
+        <p id="role-level-error" class="field-error" role="alert">
+          @for (error of form.privilegeLevel().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+  </div>
+  @if (creating()) {
+    @if (store.catalogueProblem(); as text) {
+      <p class="field-error" role="alert">
+        {{ text }}&ngsp;<button
+          type="button"
+          class="btn"
+          (click)="store.loadCatalogue()"
+          i18n="@@administration.roles.catalogue-again"
+        >
+          Try again
+        </button>
+      </p>
+    } @else {
+      <hr-permission-picker
+        [entries]="store.permissions()"
+        [selected]="selected()"
+        (toggled)="toggle($event)"
+      />
+    }
+    @if (permissionsProblem(); as text) {
+      <p class="field-error" role="alert">{{ text }}</p>
+    }
+  }
+  <div class="acts">
+    @if (creating()) {
+      <button
+        type="submit"
+        class="btn solid"
+        [disabled]="form().submitting()"
+        i18n="@@administration.roles.new.go"
+      >
+        Create role
+      </button>
+    } @else {
+      <button
+        type="submit"
+        class="btn solid"
+        [disabled]="form().submitting()"
+        i18n="@@administration.roles.edit.go"
+      >
+        Save
+      </button>
+    }
+    <button type="button" class="btn" (click)="cancel()" i18n="@@administration.roles.cancel">
+      Cancel
+    </button>
+  </div>
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
+</form>

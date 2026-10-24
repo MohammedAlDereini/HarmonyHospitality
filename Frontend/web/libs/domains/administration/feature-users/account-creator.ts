@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormField, email, form, maxLength, required, submit } from '@angular/forms/signals';
 import { RolesStore, UsersStore } from '@harmony/administration/data-access';
-import { NewAccount, RoleOption, roleName } from '@harmony/administration/domain';
+import { NewAccount, Role, roleName } from '@harmony/administration/domain';
 import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
 
@@ -72,7 +72,7 @@ export class AccountCreator {
     });
   }
 
-  protected label(role: RoleOption): string {
+  protected label(role: Role): string {
     return roleName(role, this.locale);
   }
 

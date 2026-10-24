@@ -1,0 +1,98 @@
+/* One property: the header row, the address, the editor, the lines and contacts as prototype rows. */
+.head h1 {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 16px;
+}
+.head .obj {
+  margin-inline-start: var(--s4);
+}
+.code {
+  flex: none;
+  min-width: 2.5rem;
+  padding: 2px 8px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-control);
+  background: var(--sunk);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+.line {
+  margin: 0;
+  padding: var(--s2) var(--s6);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  padding: var(--s2) var(--s6);
+}
+.editor {
+  padding: var(--s3) var(--s6);
+  background: var(--sunk);
+  border-block-end: 1px solid var(--rule);
+}
+.editor h2 {
+  margin: 0 0 var(--s3);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s3);
+}
+.f {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  min-width: 0;
+}
+.f label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.f .field {
+  width: 100%;
+  min-width: 0;
+}
+.editor .acts {
+  padding: 0;
+  margin-block-start: var(--s3);
+}
+.part {
+  padding: var(--s3) 0 0;
+  border-block-start: 1px solid var(--rule);
+}
+.part h2 {
+  margin: 0 var(--s6) var(--s2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.lrow {
+  grid-template-columns: minmax(220px, 1.4fr) 140px 220px;
+}
+.crow {
+  grid-template-columns: minmax(220px, 1.4fr) 220px 160px 120px;
+}
+.field-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--stop);
+}
+@media (max-width: 900px) {
+  .fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lrow,
+  .crow {
+    grid-template-columns: minmax(0, 1fr) 140px;
+    row-gap: 6px;
+  }
+}

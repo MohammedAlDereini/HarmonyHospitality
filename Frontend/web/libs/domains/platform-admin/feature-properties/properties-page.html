@@ -1,0 +1,123 @@
+<ng-template hrPageActions>
+  <button
+    *hrIfAllowed="manageTenants"
+    type="button"
+    class="pbtn primary"
+    (click)="openCreator()"
+    [attr.aria-expanded]="creating()"
+  >
+    <hr-icon name="plus" size="13" />
+    <span i18n="@@platform-admin.properties.add">Add property</span>
+  </button>
+</ng-template>
+<div class="sec-h">
+  <h1 i18n="@@platform-admin.properties.title">Properties</h1>
+  @if (!store.loading() && store.problem() === null) {
+    <span class="note"
+      ><span class="num">{{ store.total() }}</span
+      >&ngsp;<span i18n="@@platform-admin.properties.count">properties</span></span
+    >
+  }
+  <form class="r" (submit)="onSearch($event, search.value)">
+    <label class="vh" for="properties-search" i18n="@@platform-admin.properties.search"
+      >Search</label
+    >
+    <input
+      id="properties-search"
+      #search
+      class="field"
+      type="search"
+      autocomplete="off"
+      dir="auto"
+      i18n-placeholder="@@platform-admin.properties.search-placeholder"
+      placeholder="Code or name"
+      [value]="store.filters().search"
+    />
+    <button type="submit" class="btn" i18n="@@platform-admin.properties.find">Find</button>
+  </form>
+</div>
+@if (creating()) {
+  <hr-property-editor
+    [tenantId]="tenantId()"
+    (done)="closeCreator()"
+    (cancelled)="closeCreator()"
+  />
+}
+@if (store.problem(); as problem) {
+  <p class="empty" role="alert">
+    {{ problem }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="store.reload()"
+      i18n="@@platform-admin.properties.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (store.loading()) {
+  <p class="empty" role="status" i18n="@@platform-admin.properties.loading">Loading…</p>
+} @else if (store.rows().length === 0) {
+  <p class="empty" i18n="@@platform-admin.properties.none">No properties match.</p>
+} @else {
+  <div class="rows" role="list">
+    @for (property of store.rows(); track property.id) {
+      <div class="srow prow" role="listitem">
+        <div class="s-who">
+          <span class="code num" dir="ltr">{{ property.code }}</span>
+          <div class="s-nm">
+            <b
+              ><a class="nm-link" [routerLink]="[property.id]"
+                ><bdi>{{ name(property) }}</bdi></a
+              ></b
+            >
+            <span dir="ltr">{{ property.countryCode }} · {{ property.timeZoneId }}</span>
+          </div>
+        </div>
+        <div class="obj">
+          <b class="num">{{ property.totalRooms }}</b>
+          <span i18n="@@platform-admin.properties.column.rooms">Rooms</span>
+        </div>
+        <div class="obj">
+          <b dir="ltr">{{ property.defaultCurrency }} · {{ property.defaultLanguageCode }}</b>
+          <span i18n="@@platform-admin.properties.column.currency-language"
+            >Currency · language</span
+          >
+        </div>
+        <div class="obj" [attr.data-s]="property.isActive ? null : 'warn'">
+          @if (property.isActive) {
+            <b i18n="@@platform-admin.properties.active">Active</b>
+          } @else {
+            <b i18n="@@platform-admin.properties.inactive">Inactive</b>
+          }
+          <span i18n="@@platform-admin.properties.column.state">State</span>
+        </div>
+      </div>
+    }
+  </div>
+  <nav class="paging" i18n-aria-label="@@platform-admin.properties.paging" aria-label="Pages">
+    <button
+      type="button"
+      class="btn"
+      (click)="previous()"
+      [disabled]="!hasPrevious()"
+      i18n="@@platform-admin.properties.previous"
+    >
+      Previous
+    </button>
+    <span
+      ><span class="num">{{ from() }}–{{ to() }}</span
+      >&ngsp;<span i18n="@@platform-admin.properties.of">of</span>&ngsp;<span class="num">{{
+        store.total()
+      }}</span></span
+    >
+    <button
+      type="button"
+      class="btn"
+      (click)="next()"
+      [disabled]="!hasNext()"
+      i18n="@@platform-admin.properties.next"
+    >
+      Next
+    </button>
+  </nav>
+}

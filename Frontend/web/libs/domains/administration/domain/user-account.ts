@@ -20,6 +20,8 @@ export interface UserAccount {
   readonly stateReason: string | null;
   /** As Identity sends it; shown in the property's zone. */
   readonly createdDate: string;
+  /** The roles the account holds. */
+  readonly roleIds: readonly string[];
 }
 
 /** What the list is filtered by; page is 1-based. */

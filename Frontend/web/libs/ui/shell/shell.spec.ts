@@ -1,11 +1,15 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { AccessStore } from '@harmony/platform/access';
+import { AppUpdate } from '@harmony/platform/app-update';
 import { CurrentProperty, MyProperties, PropertySummary } from '@harmony/platform/context';
 import { FailureNotice } from '@harmony/platform/errors';
 import { SessionState, SessionStore, SessionUser } from '@harmony/platform/session';
+import { NavItem, NavPanel } from './nav-panel';
 import { PageActions } from './page-actions';
+import { DockLink, SHELL_PLACES, ShellPlaces } from './places';
 import { Shell } from './shell';
 
 /** Stands for a page that offers one button to the context bar. */
@@ -17,6 +21,10 @@ import { Shell } from './shell';
 class Offer {
   readonly template = viewChild.required<TemplateRef<unknown>>('offer');
 }
+
+const stale = signal(false);
+const newer = signal(false);
+const reloadApp = vi.fn();
 
 const ahmad: SessionUser = {
   sub: 'u1',
@@ -73,7 +81,9 @@ describe('Shell', () => {
   let page: HTMLElement;
   const properties = signal<readonly PropertySummary[]>([]);
   const code = signal<string | null>(null);
-  let canViewUsers = false;
+  const items = signal<readonly NavItem[]>([]);
+  const dock = signal<readonly DockLink[]>([]);
+  const places: ShellPlaces = { scope: 'property', items, dock };
 
   const text = (selector: string): string =>
     page.querySelector(selector)?.textContent.replace(whitespace, ' ').trim() ?? '';
@@ -87,16 +97,22 @@ describe('Shell', () => {
 
   beforeEach(async () => {
     session = new FakeSession();
+    stale.set(false);
+    newer.set(false);
+    reloadApp.mockClear();
     properties.set([]);
     code.set(null);
-    canViewUsers = false;
+    items.set([]);
+    dock.set([]);
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
         { provide: SessionStore, useValue: session },
+        { provide: SHELL_PLACES, useValue: places },
+        { provide: AppUpdate, useValue: { stale, newer, reload: reloadApp } },
         {
           provide: AccessStore,
-          useValue: { ready: () => Promise.resolve(), can: () => canViewUsers },
+          useValue: { ready: () => Promise.resolve(), can: () => false },
         },
         {
           provide: MyProperties,
@@ -132,17 +148,27 @@ describe('Shell', () => {
     expect(text('#prop-pop .pcode')).toBe('GRD');
   });
 
-  it('the dock shows Users only inside a property and only with the permission', async () => {
+  it("the dock and the nav panel show the app's places as they are offered", async () => {
     expect(page.querySelectorAll('.dock a')).toHaveLength(1);
-    code.set('GRD');
-    await render();
-    expect(page.querySelectorAll('.dock a')).toHaveLength(1);
-    canViewUsers = true;
-    code.set('RYD');
+    dock.set([
+      { label: 'Users', link: ['/p', 'RYD', 'admin'], icon: 'guest', exact: true },
+      { label: 'Roles', link: ['/p', 'RYD', 'admin', 'roles'], icon: 'tape' },
+    ]);
+    items.set([
+      { label: 'Users', link: ['/p', 'RYD', 'admin'], icon: 'guest', group: 'Administration' },
+      {
+        label: 'Roles',
+        link: ['/p', 'RYD', 'admin', 'roles'],
+        icon: 'tape',
+        group: 'Administration',
+      },
+    ]);
     await render();
     const links = [...page.querySelectorAll('.dock a')].map((a) => a.getAttribute('href'));
-    expect(links).toEqual(['/', '/p/RYD/admin']);
+    expect(links).toEqual(['/', '/p/RYD/admin', '/p/RYD/admin/roles']);
+    expect(page.querySelector('.dock a[aria-label="Roles"]')).not.toBeNull();
     expect(text('hr-nav-panel')).toContain('Administration');
+    expect(text('hr-nav-panel')).toContain('Roles');
   });
 
   it('a gone session: the strip; Sign in again opens the window; when refused, it asks before a full-page sign-in', async () => {
@@ -153,13 +179,37 @@ describe('Shell', () => {
     expect(session.opened).toBe(1);
     expect(session.signedInTo).toEqual([]);
     session.windowRefused = true;
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
     click('.strip-session button');
+    await render();
+    const dialog = page.querySelector<HTMLDialogElement>('dialog.dlg');
+    expect(dialog?.hasAttribute('open')).toBe(true);
+    expect(text('.dlg-h')).toBe('Sign in on this page?');
+    click('.dlg-a .btn:not(.solid)');
+    await render();
     expect(session.signedInTo).toEqual([]);
-    confirm.mockReturnValue(true);
+    expect(dialog?.hasAttribute('open')).toBe(false);
     click('.strip-session button');
+    await render();
+    click('.dlg-a .solid');
+    await render();
     expect(session.signedInTo).toEqual(['/']);
-    confirm.mockRestore();
+  });
+
+  it('Ctrl K is the command palette: the places panel is asked to open and the browser keeps its own Ctrl K', () => {
+    const panel = fixture.debugElement.query(By.directive(NavPanel)).componentInstance as NavPanel;
+    const open = vi.spyOn(panel, 'open');
+    const plainK = new KeyboardEvent('keydown', { key: 'k', bubbles: true, cancelable: true });
+    document.dispatchEvent(plainK);
+    expect(open).not.toHaveBeenCalled();
+    const ctrlK = new KeyboardEvent('keydown', {
+      key: 'k',
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(ctrlK);
+    expect(open).toHaveBeenCalledOnce();
+    expect(ctrlK.defaultPrevented).toBe(true);
   });
 
   it('the BFF not responding: the strip and Try again', async () => {
@@ -181,6 +231,18 @@ describe('Shell', () => {
     await render();
     expect(page.querySelector('[role="alert"]')).toBeNull();
     reload.mockRestore();
+  });
+
+  it('a build below the floor: an alert that asks for a reload; a merely newer release: a quiet offer', async () => {
+    expect(page.querySelector('.strip-update, .strip-update-soft')).toBeNull();
+    newer.set(true);
+    await render();
+    expect(page.querySelector('.strip-update-soft[role="status"]')).not.toBeNull();
+    stale.set(true);
+    await render();
+    expect(page.querySelector('.strip-update-soft')).toBeNull();
+    click('.strip-update[role="alert"] .btn');
+    expect(reloadApp).toHaveBeenCalledOnce();
   });
 
   it('the skip link moves focus to the main landmark', () => {

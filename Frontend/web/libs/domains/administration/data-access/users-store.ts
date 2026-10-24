@@ -11,6 +11,8 @@ export const usersPath = '/api/UserAccount/get-all';
 export const suspendPath = '/api/UserAccount/Suspend';
 export const reinstatePath = '/api/UserAccount/Reinstate';
 export const createPath = '/api/UserAccount/Create';
+export const terminatePath = '/api/UserAccount/Terminate';
+export const exemptPath = '/api/UserAccount/ExemptFromTwoStep';
 /** Identity accepts 1 to 100 rows a page. */
 export const USERS_PAGE_SIZE = 25;
 const FIRST_PAGE = 1;
@@ -74,6 +76,16 @@ export class UsersStore {
 
   reinstate(user: UserAccount, intent: IntentKey): Promise<ApiResult<unknown>> {
     return this.write(this.api.put(reinstatePath, { id: user.id }, intent));
+  }
+
+  /** Final: Identity destroys the credential and kills the tokens; a terminated account is never reinstated. */
+  terminate(user: UserAccount, reason: string, intent: IntentKey): Promise<ApiResult<unknown>> {
+    return this.write(this.api.put(terminatePath, { id: user.id, reason }, intent));
+  }
+
+  /** Puts the person on the two-step exception list, with the reason the list keeps. */
+  exempt(user: UserAccount, reason: string, intent: IntentKey): Promise<ApiResult<unknown>> {
+    return this.write(this.api.put(exemptPath, { id: user.id, reason }, intent));
   }
 
   /** A new account with one role and no password: Identity mails the invitation (CreateUserAccountCommand). */

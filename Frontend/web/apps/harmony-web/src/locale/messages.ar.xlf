@@ -218,14 +218,6 @@
           <context context-type="linenumber">50,54</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="ui.shell.leave-warning" datatype="html">
-        <source>The sign-in window could not open. Sign in on this page instead? Changes not saved will be lost.</source>
-        <target>تعذّر فتح نافذة تسجيل الدخول. هل تريد تسجيل الدخول في هذه الصفحة بدلاً من ذلك؟ ستفقد التغييرات غير المحفوظة.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
-          <context context-type="linenumber">41</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="platform.context.chooser.title" datatype="html">
         <source>Choose a property</source>
         <target>اختر فندقاً</target>
@@ -570,14 +562,6 @@
           <context context-type="linenumber">63,64</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="ui.shell.dock.users" datatype="html">
-        <source>Users</source>
-        <target>المستخدمون</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">73,74</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="ui.shell.dock.all" datatype="html">
         <source>All places</source>
         <target>كل الأماكن</target>
@@ -692,38 +676,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
           <context context-type="linenumber">76</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="ui.shell.nav.group.workspaces" datatype="html">
-        <source>Workspaces</source>
-        <target>مساحات العمل</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
-          <context context-type="linenumber">86</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="ui.shell.nav.home" datatype="html">
-        <source>Home</source>
-        <target>الرئيسية</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
-          <context context-type="linenumber">88</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="ui.shell.nav.users" datatype="html">
-        <source>Users</source>
-        <target>المستخدمون</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
-          <context context-type="linenumber">100</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="ui.shell.nav.group.administration" datatype="html">
-        <source>Administration</source>
-        <target>الإدارة</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
-          <context context-type="linenumber">103</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.suspend.reason" datatype="html">
@@ -1012,6 +964,1750 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
           <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.terminate.reason" datatype="html">
+        <source>Reason for the termination</source>
+        <target>سبب الإنهاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.terminate.placeholder" datatype="html">
+        <source>Why this account is being terminated</source>
+        <target>لماذا يُنهى هذا الحساب</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.terminate.go" datatype="html">
+        <source>Terminate account</source>
+        <target>إنهاء الحساب</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.terminate.warning" datatype="html">
+        <source>This cannot be undone: the person loses access for good.</source>
+        <target>لا يمكن التراجع عن هذا: يفقد الشخص صلاحية الدخول نهائياً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.terminate" datatype="html">
+        <source> Terminate </source>
+        <target>إنهاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">119,121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.permissions" datatype="html">
+        <source>Permissions</source>
+        <target>الصلاحيات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/permission-picker.html</context>
+          <context context-type="linenumber">2,3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">95,97</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.permissions.of" datatype="html">
+        <source>Permissions of</source>
+        <target>صلاحيات الدور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
+          <context context-type="linenumber">3,6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.loading" datatype="html">
+        <source>Loading…</source>
+        <target>جارٍ التحميل…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
+          <context context-type="linenumber">8,9</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">37,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.catalogue-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
+          <context context-type="linenumber">17,21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
+          <context context-type="linenumber">103,106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.permissions.save" datatype="html">
+        <source> Save permissions </source>
+        <target>حفظ الصلاحيات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
+          <context context-type="linenumber">36,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.cancel" datatype="html">
+        <source> Cancel </source>
+        <target>إلغاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
+          <context context-type="linenumber">39,42</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
+          <context context-type="linenumber">138,141</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">138,140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.new.title" datatype="html">
+        <source>New role</source>
+        <target>دور جديد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
+          <context context-type="linenumber">3,5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.edit.title" datatype="html">
+        <source>Edit role</source>
+        <target>تعديل الدور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
+          <context context-type="linenumber">5,8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.field.code" datatype="html">
+        <source>Code</source>
+        <target>الرمز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.field.name-en" datatype="html">
+        <source>English name</source>
+        <target>الاسم بالإنجليزية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
+          <context context-type="linenumber">30,33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.field.name-ar" datatype="html">
+        <source>Arabic name</source>
+        <target>الاسم بالعربية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
+          <context context-type="linenumber">51,54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.field.level" datatype="html">
+        <source>Privilege level</source>
+        <target>مستوى الصلاحية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
+          <context context-type="linenumber">72,75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.new.go" datatype="html">
+        <source> Create role </source>
+        <target>إنشاء الدور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
+          <context context-type="linenumber">125,128</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.edit.go" datatype="html">
+        <source> Save </source>
+        <target>حفظ</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
+          <context context-type="linenumber">134,137</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.add" datatype="html">
+        <source>Add role</source>
+        <target>إضافة دور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">10,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.title" datatype="html">
+        <source>Roles</source>
+        <target>الأدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">14,15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.count" datatype="html">
+        <source>roles</source>
+        <target>أدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">18,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.try-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">33,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.none" datatype="html">
+        <source>No roles yet.</source>
+        <target>لا أدوار بعد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">39,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.column.level" datatype="html">
+        <source>Privilege level</source>
+        <target>مستوى الصلاحية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">63,65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.kind.system" datatype="html">
+        <source>System</source>
+        <target>نظامي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">67,69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.kind.custom" datatype="html">
+        <source>Custom</source>
+        <target>مخصّص</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">69,71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.column.kind" datatype="html">
+        <source>Kind</source>
+        <target>النوع</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">71,73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.edit" datatype="html">
+        <source> Edit </source>
+        <target>تعديل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">84,86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.delete" datatype="html">
+        <source> Delete </source>
+        <target>حذف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">106,108</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.delete.ask" datatype="html">
+        <source> Delete this role? This cannot be undone. </source>
+        <target>حذف هذا الدور؟ لا يمكن التراجع عن هذا.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">120,122</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.delete.go" datatype="html">
+        <source> Delete role </source>
+        <target>حذف الدور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">130,132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.page-title" datatype="html">
+        <source>Roles</source>
+        <target>الأدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/routes.ts</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.view-lookups" datatype="html">
+        <source>View lookups</source>
+        <target>عرض القوائم المرجعية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.manage-lookups" datatype="html">
+        <source>Manage lookups</source>
+        <target>إدارة القوائم المرجعية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.view-roles" datatype="html">
+        <source>View roles</source>
+        <target>عرض الأدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.create-role" datatype="html">
+        <source>Create roles</source>
+        <target>إنشاء الأدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.edit-role" datatype="html">
+        <source>Edit roles</source>
+        <target>تعديل الأدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.delete-role" datatype="html">
+        <source>Delete roles</source>
+        <target>حذف الأدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.manage-role-permissions" datatype="html">
+        <source>Manage role permissions</source>
+        <target>إدارة صلاحيات الأدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.assign-users-to-role" datatype="html">
+        <source>Assign roles to people</source>
+        <target>إسناد الأدوار للأشخاص</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.view-users" datatype="html">
+        <source>View users</source>
+        <target>عرض المستخدمين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.manage-users" datatype="html">
+        <source>Manage users</source>
+        <target>إدارة المستخدمين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.view-tenants" datatype="html">
+        <source>View tenants</source>
+        <target>عرض المستأجرين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.manage-tenants" datatype="html">
+        <source>Manage tenants</source>
+        <target>إدارة المستأجرين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.view-properties" datatype="html">
+        <source>View properties</source>
+        <target>عرض العقارات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.manage-properties" datatype="html">
+        <source>Manage properties</source>
+        <target>إدارة العقارات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.level.standard" datatype="html">
+        <source>Standard</source>
+        <target>عادي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.level.supervisor" datatype="html">
+        <source>Supervisor</source>
+        <target>مشرف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.level.manager" datatype="html">
+        <source>Manager</source>
+        <target>مدير</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.level.administrator" datatype="html">
+        <source>Administrator</source>
+        <target>مدير النظام</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00006" datatype="html">
+        <source>The code is 2 to 32 letters, digits or dashes.</source>
+        <target>الرمز من 2 إلى 32 حرفاً أو رقماً أو شرطة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00007" datatype="html">
+        <source>Give the role a name.</source>
+        <target>أعطِ الدور اسماً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00009" datatype="html">
+        <source>That permission is unknown.</source>
+        <target>هذه الصلاحية غير معروفة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00012" datatype="html">
+        <source>System roles cannot be changed.</source>
+        <target>لا يمكن تغيير أدوار النظام.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00013" datatype="html">
+        <source>System roles cannot be deleted.</source>
+        <target>لا يمكن حذف أدوار النظام.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00014" datatype="html">
+        <source>That privilege level does not exist.</source>
+        <target>مستوى الصلاحية هذا غير موجود.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00016" datatype="html">
+        <source>That code is already used by another role.</source>
+        <target>هذا الرمز مستخدم لدور آخر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00017" datatype="html">
+        <source>That code is reserved.</source>
+        <target>هذا الرمز محجوز.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10201" datatype="html">
+        <source>Which role? Reload the page and try again.</source>
+        <target>أي دور؟ أعد تحميل الصفحة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10202" datatype="html">
+        <source>Give the role a code.</source>
+        <target>أعطِ الدور رمزاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10203" datatype="html">
+        <source>The code is too long: 32 characters at most.</source>
+        <target>الرمز طويل جداً: 32 حرفاً على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10204" datatype="html">
+        <source>Give the role an English name.</source>
+        <target>أعطِ الدور اسماً بالإنجليزية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10205" datatype="html">
+        <source>The English name is too long: 128 characters at most.</source>
+        <target>الاسم الإنجليزي طويل جداً: 128 حرفاً على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10206" datatype="html">
+        <source>The Arabic name is too long: 128 characters at most.</source>
+        <target>الاسم العربي طويل جداً: 128 حرفاً على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10207" datatype="html">
+        <source>Choose a privilege level.</source>
+        <target>اختر مستوى الصلاحية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10208" datatype="html">
+        <source>Choose at least one permission.</source>
+        <target>اختر صلاحية واحدة على الأقل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10209" datatype="html">
+        <source>Choose at least one permission.</source>
+        <target>اختر صلاحية واحدة على الأقل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.exempt.reason" datatype="html">
+        <source>Reason for the exemption</source>
+        <target>سبب الاستثناء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.exempt.placeholder" datatype="html">
+        <source>Why this person is on the two-step exception list</source>
+        <target>لماذا هذا الشخص على قائمة استثناء التحقق بخطوتين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.exempt.go" datatype="html">
+        <source>Exempt from two-step</source>
+        <target>استثناء من التحقق بخطوتين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.try-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.state" datatype="html">
+        <source>State</source>
+        <target>الحالة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">22,24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.two-step" datatype="html">
+        <source>Two-step</source>
+        <target>التحقق بخطوتين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">26,29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.two-step.title" datatype="html">
+        <source>Two-step sign-in</source>
+        <target>تسجيل الدخول بخطوتين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">34,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.two-step.exempt" datatype="html">
+        <source>On the exception list:</source>
+        <target>على قائمة الاستثناء:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">37,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.two-step.on" datatype="html">
+        <source>Set up; a code is asked at each sign-in.</source>
+        <target>مفعّل؛ يُطلب رمز عند كل تسجيل دخول.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">41,44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.two-step.off" datatype="html">
+        <source>Not set up yet; the person is asked to set it up at the next sign-in.</source>
+        <target>غير مفعّل بعد؛ يُطلب من الشخص تفعيله عند تسجيل الدخول التالي.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">45,49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.two-step.end-exemption" datatype="html">
+        <source> End exemption </source>
+        <target>إنهاء الاستثناء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">59,62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.two-step.reset" datatype="html">
+        <source> Reset two-step </source>
+        <target>إعادة ضبط التحقق بخطوتين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">71,74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.two-step.exempt-go" datatype="html">
+        <source> Exempt from two-step </source>
+        <target>استثناء من التحقق بخطوتين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">82,86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.devices" datatype="html">
+        <source>Devices</source>
+        <target>الأجهزة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">97,98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.devices.none" datatype="html">
+        <source>No device has signed in yet.</source>
+        <target>لم يسجّل أي جهاز الدخول بعد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">104,106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.devices.signed-in" datatype="html">
+        <source>Signed in</source>
+        <target>مسجّل الدخول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">119,121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.devices.signed-out" datatype="html">
+        <source>Signed out</source>
+        <target>خرج</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">121,123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.devices.now" datatype="html">
+        <source>Now</source>
+        <target>الآن</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">123,125</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.devices.last-seen" datatype="html">
+        <source>Last seen</source>
+        <target>آخر ظهور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">127,129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.devices.sign-out" datatype="html">
+        <source> Sign out </source>
+        <target>تسجيل الخروج</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">140,142</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.passkeys" datatype="html">
+        <source>Passkeys</source>
+        <target>مفاتيح المرور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">151,152</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.passkeys.none" datatype="html">
+        <source>No passkey yet.</source>
+        <target>لا مفتاح مرور بعد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">158,160</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.passkeys.backed-up" datatype="html">
+        <source>Backed up</source>
+        <target>منسوخ احتياطياً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">169,172</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.passkeys.created" datatype="html">
+        <source>Created</source>
+        <target>تاريخ الإنشاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">175,177</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.passkeys.never" datatype="html">
+        <source>Never</source>
+        <target>لم يُستخدم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">181,183</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.passkeys.last-used" datatype="html">
+        <source>Last used</source>
+        <target>آخر استخدام</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">183,185</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.passkeys.remove" datatype="html">
+        <source> Remove </source>
+        <target>إزالة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">195,197</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.trail" datatype="html">
+        <source>Security trail</source>
+        <target>سجل الأمان</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">205,206</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.trail.none" datatype="html">
+        <source>Nothing recorded yet.</source>
+        <target>لا شيء مسجّل بعد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">212,214</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.trail.when" datatype="html">
+        <source>When</source>
+        <target>متى</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">229,231</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.trail.address" datatype="html">
+        <source>Address</source>
+        <target>العنوان</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">233,235</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.trail.device" datatype="html">
+        <source>Device</source>
+        <target>الجهاز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">239,242</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.loading" datatype="html">
+        <source>Loading…</source>
+        <target>جارٍ التحميل…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">247,249</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.roles" datatype="html">
+        <source>Roles</source>
+        <target>الأدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/role-assignment.html</context>
+          <context context-type="linenumber">2,4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/role-assignment.html</context>
+          <context context-type="linenumber">16,17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.roles-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/role-assignment.html</context>
+          <context context-type="linenumber">11,15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.roles.save" datatype="html">
+        <source> Save roles </source>
+        <target>حفظ الأدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/role-assignment.html</context>
+          <context context-type="linenumber">42,46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.page-title" datatype="html">
+        <source>Person</source>
+        <target>الشخص</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/routes.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.crumb" datatype="html">
+        <source>Users</source>
+        <target>المستخدمون</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/routes.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00050" datatype="html">
+        <source>Two-step is not set up on that account.</source>
+        <target>التحقق بخطوتين غير مفعّل على هذا الحساب.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00066" datatype="html">
+        <source>Your own two-step cannot be exempted here. Ask another administrator.</source>
+        <target>لا يمكن استثناء تحققك أنت من هنا. اطلب من مدير آخر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00067" datatype="html">
+        <source>Administrators cannot be exempt from two-step.</source>
+        <target>لا يمكن استثناء المديرين من التحقق بخطوتين.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00074" datatype="html">
+        <source>That device is not on the list any more.</source>
+        <target>هذا الجهاز لم يعد في القائمة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00080" datatype="html">
+        <source>That passkey is not on the list any more.</source>
+        <target>مفتاح المرور هذا لم يعد في القائمة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10301" datatype="html">
+        <source>Which account? Reload the page and try again.</source>
+        <target>أي حساب؟ أعد تحميل الصفحة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10302" datatype="html">
+        <source>Keep at least one role.</source>
+        <target>أبقِ دوراً واحداً على الأقل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10320" datatype="html">
+        <source>Which device? Reload the page and try again.</source>
+        <target>أي جهاز؟ أعد تحميل الصفحة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10324" datatype="html">
+        <source>Which passkey? Reload the page and try again.</source>
+        <target>أي مفتاح مرور؟ أعد تحميل الصفحة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.home" datatype="html">
+        <source>Home</source>
+        <target>الرئيسية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-web/src/app/places.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.users" datatype="html">
+        <source>Users</source>
+        <target>المستخدمون</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-web/src/app/places.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.roles" datatype="html">
+        <source>Roles</source>
+        <target>الأدوار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-web/src/app/places.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.group.workspaces" datatype="html">
+        <source>Workspaces</source>
+        <target>مساحات العمل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-web/src/app/places.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.group.administration" datatype="html">
+        <source>Administration</source>
+        <target>الإدارة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-web/src/app/places.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00070" datatype="html">
+        <source>That tenant no longer exists.</source>
+        <target>هذا المستأجر لم يعد موجوداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00071" datatype="html">
+        <source>That code is already used by another tenant.</source>
+        <target>هذا الرمز مستخدم لمستأجر آخر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00072" datatype="html">
+        <source>That tenant is not active.</source>
+        <target>هذا المستأجر غير نشط.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00073" datatype="html">
+        <source>Only the platform may do this.</source>
+        <target>المنصة وحدها تفعل هذا.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00085" datatype="html">
+        <source>An account with this email already exists.</source>
+        <target>يوجد حساب بهذا البريد الإلكتروني.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00086" datatype="html">
+        <source>The administrator already has an active account; no invitation is needed.</source>
+        <target>للمدير حساب نشط بالفعل؛ لا حاجة إلى دعوة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00087" datatype="html">
+        <source>No administrator is known for this tenant yet: give an email and a name.</source>
+        <target>لا مدير معروف لهذا المستأجر بعد: اذكر بريداً إلكترونياً واسماً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00088" datatype="html">
+        <source>That module does not exist.</source>
+        <target>هذه الوحدة غير موجودة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00089" datatype="html">
+        <source>That module is sold at the other level: for one property or for the whole tenant.</source>
+        <target>هذه الوحدة تُباع على المستوى الآخر: لعقار واحد أو للمستأجر كله.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00094" datatype="html">
+        <source>That subscription line no longer exists.</source>
+        <target>سطر الاشتراك هذا لم يعد موجوداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10501" datatype="html">
+        <source>Which tenant? Reload the page and try again.</source>
+        <target>أي مستأجر؟ أعد تحميل الصفحة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10502" datatype="html">
+        <source>Give the tenant a code.</source>
+        <target>أعطِ المستأجر رمزاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10503" datatype="html">
+        <source>The code is 2 to 32 letters, digits, dots, dashes or underscores.</source>
+        <target>الرمز من 2 إلى 32 حرفاً أو رقماً أو نقطة أو شرطة أو شرطة سفلية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10504" datatype="html">
+        <source>Give the legal name in English.</source>
+        <target>اذكر الاسم القانوني بالإنجليزية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10505" datatype="html">
+        <source>The English legal name is too long.</source>
+        <target>الاسم القانوني الإنجليزي طويل جداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10506" datatype="html">
+        <source>Give the legal name in Arabic.</source>
+        <target>اذكر الاسم القانوني بالعربية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10507" datatype="html">
+        <source>The Arabic legal name is too long.</source>
+        <target>الاسم القانوني العربي طويل جداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10508" datatype="html">
+        <source>Choose a country.</source>
+        <target>اختر بلداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10509" datatype="html">
+        <source>The country code is two letters.</source>
+        <target>رمز البلد حرفان.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10510" datatype="html">
+        <source>Choose a currency.</source>
+        <target>اختر عملة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10511" datatype="html">
+        <source>The currency code is three letters.</source>
+        <target>رمز العملة ثلاثة أحرف.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10512" datatype="html">
+        <source>The external identifier is too long.</source>
+        <target>المعرّف الخارجي طويل جداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10513" datatype="html">
+        <source>Give a reason.</source>
+        <target>اذكر سبباً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10514" datatype="html">
+        <source>The reason is too long: 500 characters at most.</source>
+        <target>السبب طويل جداً: 500 حرف على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10515" datatype="html">
+        <source>The tier is 1 to 5.</source>
+        <target>الفئة من 1 إلى 5.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10516" datatype="html">
+        <source>Give the administrator&apos;s email address.</source>
+        <target>اذكر بريد المدير الإلكتروني.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10517" datatype="html">
+        <source>That does not look like an email address.</source>
+        <target>هذا لا يبدو بريداً إلكترونياً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10518" datatype="html">
+        <source>The email is too long: 256 characters at most.</source>
+        <target>البريد الإلكتروني طويل جداً: 256 حرفاً على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10519" datatype="html">
+        <source>Give the administrator&apos;s name.</source>
+        <target>اذكر اسم المدير.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10520" datatype="html">
+        <source>The name is too long: 128 characters at most.</source>
+        <target>الاسم طويل جداً: 128 حرفاً على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00091" datatype="html">
+        <source>That code is already used by another property of this tenant.</source>
+        <target>هذا الرمز مستخدم لعقار آخر لهذا المستأجر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00092" datatype="html">
+        <source>That property no longer exists.</source>
+        <target>هذا العقار لم يعد موجوداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00093" datatype="html">
+        <source>One of the environments belongs to another country.</source>
+        <target>إحدى البيئات تتبع بلداً آخر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00095" datatype="html">
+        <source>That contact no longer exists.</source>
+        <target>جهة الاتصال هذه لم تعد موجودة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10601" datatype="html">
+        <source>Give the property a code.</source>
+        <target>أعطِ العقار رمزاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10602" datatype="html">
+        <source>The code is 2 to 32 letters, digits, dots, dashes or underscores.</source>
+        <target>الرمز من 2 إلى 32 حرفاً أو رقماً أو نقطة أو شرطة أو شرطة سفلية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10603" datatype="html">
+        <source>Give the name in English.</source>
+        <target>اذكر الاسم بالإنجليزية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10604" datatype="html">
+        <source>The English name is too long.</source>
+        <target>الاسم الإنجليزي طويل جداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10605" datatype="html">
+        <source>Give the name in Arabic.</source>
+        <target>اذكر الاسم بالعربية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10606" datatype="html">
+        <source>The Arabic name is too long.</source>
+        <target>الاسم العربي طويل جداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10607" datatype="html">
+        <source>Choose a property type.</source>
+        <target>اختر نوع العقار.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10608" datatype="html">
+        <source>Choose a city.</source>
+        <target>اختر مدينة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10609" datatype="html">
+        <source>The currency code is three letters.</source>
+        <target>رمز العملة ثلاثة أحرف.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10610" datatype="html">
+        <source>The language code is two letters.</source>
+        <target>رمز اللغة حرفان.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10611" datatype="html">
+        <source>The number of rooms is out of range.</source>
+        <target>عدد الغرف خارج النطاق.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10612" datatype="html">
+        <source>Choose every environment.</source>
+        <target>اختر كل بيئة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">105</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10613" datatype="html">
+        <source>The address is too long.</source>
+        <target>العنوان طويل جداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10614" datatype="html">
+        <source>The postal code is too long.</source>
+        <target>الرمز البريدي طويل جداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10615" datatype="html">
+        <source>The external identifier is too long.</source>
+        <target>المعرّف الخارجي طويل جداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10616" datatype="html">
+        <source>Choose at least one module.</source>
+        <target>اختر وحدة واحدة على الأقل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10617" datatype="html">
+        <source>A module is listed twice.</source>
+        <target>وحدة مذكورة مرتين.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00055" datatype="html">
+        <source>That row no longer exists.</source>
+        <target>هذا الصف لم يعد موجوداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">112</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00056" datatype="html">
+        <source>That code is already used.</source>
+        <target>هذا الرمز مستخدم بالفعل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00057" datatype="html">
+        <source>That name is already used.</source>
+        <target>هذا الاسم مستخدم بالفعل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00058" datatype="html">
+        <source>That country does not exist.</source>
+        <target>هذا البلد غير موجود.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">115</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00059" datatype="html">
+        <source>That subdivision does not exist.</source>
+        <target>هذا التقسيم غير موجود.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00060" datatype="html">
+        <source>That time zone does not exist.</source>
+        <target>هذه المنطقة الزمنية غير موجودة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00061" datatype="html">
+        <source>That currency does not exist.</source>
+        <target>هذه العملة غير موجودة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00062" datatype="html">
+        <source>That currency is not in the ISO registry.</source>
+        <target>هذه العملة ليست في سجل ISO.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10401" datatype="html">
+        <source>Give a code.</source>
+        <target>اذكر رمزاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10402" datatype="html">
+        <source>The code is not in the expected format.</source>
+        <target>الرمز ليس بالصيغة المتوقعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10403" datatype="html">
+        <source>Choose a kind.</source>
+        <target>اختر نوعاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10404" datatype="html">
+        <source>Choose a country.</source>
+        <target>اختر بلداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10405" datatype="html">
+        <source>The country code is two letters.</source>
+        <target>رمز البلد حرفان.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10406" datatype="html">
+        <source>Give the name in English.</source>
+        <target>اذكر الاسم بالإنجليزية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10407" datatype="html">
+        <source>The English name is too long: 128 characters at most.</source>
+        <target>الاسم الإنجليزي طويل جداً: 128 حرفاً على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">126</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10408" datatype="html">
+        <source>Give the name in Arabic.</source>
+        <target>اذكر الاسم بالعربية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">127</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10409" datatype="html">
+        <source>The Arabic name is too long: 128 characters at most.</source>
+        <target>الاسم العربي طويل جداً: 128 حرفاً على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">128</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10410" datatype="html">
+        <source>Name the owning service.</source>
+        <target>اذكر الخدمة المالكة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10411" datatype="html">
+        <source>The owning service&apos;s name is too long.</source>
+        <target>اسم الخدمة المالكة طويل جداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">130</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10412" datatype="html">
+        <source>Give the three-letter code.</source>
+        <target>اذكر الرمز الثلاثي.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10413" datatype="html">
+        <source>The three-letter code is three letters.</source>
+        <target>الرمز الثلاثي ثلاثة أحرف.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10414" datatype="html">
+        <source>Give the dialling code.</source>
+        <target>اذكر رمز الاتصال.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10415" datatype="html">
+        <source>The dialling code is a plus sign and digits.</source>
+        <target>رمز الاتصال علامة زائد وأرقام.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">134</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00001" datatype="html">
+        <source>That category name is already used.</source>
+        <target>اسم الفئة هذا مستخدم بالفعل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00002" datatype="html">
+        <source>That category no longer exists.</source>
+        <target>هذه الفئة لم تعد موجودة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">136</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00003" datatype="html">
+        <source>That value name is already used in this category.</source>
+        <target>اسم القيمة هذا مستخدم بالفعل في هذه الفئة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">137</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00004" datatype="html">
+        <source>That value no longer exists.</source>
+        <target>هذه القيمة لم تعد موجودة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">138</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00005" datatype="html">
+        <source>A global value cannot go into a tenant&apos;s category.</source>
+        <target>لا يمكن وضع قيمة عامة في فئة مستأجر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">139</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10101" datatype="html">
+        <source>Which category? Reload the page and try again.</source>
+        <target>أي فئة؟ أعد تحميل الصفحة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10102" datatype="html">
+        <source>Give the category a name.</source>
+        <target>أعطِ الفئة اسماً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">141</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10103" datatype="html">
+        <source>The name is too long: 200 characters at most.</source>
+        <target>الاسم طويل جداً: 200 حرف على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">142</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10104" datatype="html">
+        <source>The description is too long: 500 characters at most.</source>
+        <target>الوصف طويل جداً: 500 حرف على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">143</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10105" datatype="html">
+        <source>Which value? Reload the page and try again.</source>
+        <target>أي قيمة؟ أعد تحميل الصفحة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">144</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10106" datatype="html">
+        <source>Choose a category.</source>
+        <target>اختر فئة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">145</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10107" datatype="html">
+        <source>Give the value a name.</source>
+        <target>أعطِ القيمة اسماً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">146</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10108" datatype="html">
+        <source>The name is too long: 200 characters at most.</source>
+        <target>الاسم طويل جداً: 200 حرف على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">147</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10109" datatype="html">
+        <source>The description is too long: 500 characters at most.</source>
+        <target>الوصف طويل جداً: 500 حرف على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">148</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.update-required" datatype="html">
+        <source>A newer Harmony is required. Reload to continue; unsaved work on this page is lost.</source>
+        <target>مطلوب إصدار أحدث من هارموني. أعد التحميل للمتابعة؛ العمل غير المحفوظ في هذه الصفحة سيُفقد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">108,110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.reload-now" datatype="html">
+        <source> Reload now </source>
+        <target>أعد التحميل الآن</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">111,113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.update-available" datatype="html">
+        <source>A newer Harmony is available. Reload when it suits you.</source>
+        <target>يتوفر إصدار أحدث من هارموني. أعد التحميل عندما يناسبك.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">117,119</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.leave-heading" datatype="html">
+        <source>Sign in on this page?</source>
+        <target>تسجيل الدخول في هذه الصفحة؟</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">304,305</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.leave-message" datatype="html">
+        <source>The sign-in window could not open. Changes not saved on this page will be lost.</source>
+        <target>تعذّر فتح نافذة تسجيل الدخول. ستفقد التغييرات غير المحفوظة في هذه الصفحة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">306,308</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.leave-go" datatype="html">
+        <source>Sign in here</source>
+        <target>سجّل الدخول هنا</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">308,309</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.leave-stay" datatype="html">
+        <source>Stay on this page</source>
+        <target>ابقَ في هذه الصفحة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">310,312</context>
         </context-group>
       </trans-unit>
     </body>

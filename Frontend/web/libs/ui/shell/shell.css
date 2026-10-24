@@ -258,6 +258,12 @@ html[lang='ar'] .dock :is(a, button):focus-visible::after {
 .strip-failure {
   background: var(--stop-bg);
 }
+.strip-update {
+  background: var(--warn-bg);
+}
+.strip-update-soft {
+  background: var(--info-bg);
+}
 .btn.quiet {
   border-color: transparent;
   background: none;

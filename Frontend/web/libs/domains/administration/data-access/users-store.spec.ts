@@ -9,6 +9,7 @@ import {
   createPath,
   reinstatePath,
   suspendPath,
+  terminatePath,
   usersPath,
 } from './users-store';
 
@@ -28,6 +29,7 @@ const ahmad: UserAccount = {
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',
+  roleIds: ['r1'],
 };
 
 describe('UsersStore', () => {
@@ -131,6 +133,21 @@ describe('UsersStore', () => {
     expect(await refused).toEqual({ kind: 'refused', status: ACCEPTED, codes: ['00076'] });
     await settle();
     http.expectNone(usersPath);
+  });
+
+  it('terminate sends the reason with the intent key to the termination door', async () => {
+    await settle();
+    http.expectOne(usersPath).flush({ data: { results: [ahmad], totalCount: 1 } });
+    const intent = newIntentKey();
+    const done = store.terminate(ahmad, 'contract ended', intent);
+    const request = http.expectOne(terminatePath);
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({ id: 'u1', reason: 'contract ended' });
+    expect(request.request.headers.get('Idempotency-Key')).toBe(intent.value);
+    request.flush({ data: 1 });
+    expect((await done).kind).toBe('ok');
+    await settle();
+    http.expectOne(usersPath).flush({ data: { results: [ahmad], totalCount: 1 } });
   });
 
   it('create posts the name, the email and the one role with the intent key, no password; then reads the list again', async () => {

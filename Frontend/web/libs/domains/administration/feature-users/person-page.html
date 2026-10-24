@@ -1,0 +1,248 @@
+@if (store.problem(); as problem) {
+  <p class="empty" role="alert">
+    {{ problem }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="store.reload()"
+      i18n="@@administration.person.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (store.person(); as person) {
+  <div class="sec-h person">
+    <h1>
+      <bdi>{{ person.displayName }}</bdi>
+    </h1>
+    <span class="note" dir="ltr"
+      ><bdi>{{ person.email ?? person.userName }}</bdi></span
+    >
+    <div class="obj" [attr.data-s]="tone(person)">
+      <b>{{ stateOf(person) }}</b>
+      <span i18n="@@administration.person.state">State</span>
+    </div>
+    <div class="obj" data-two-step>
+      <b>{{ twoStepOf(person) }}</b>
+      <span i18n="@@administration.person.two-step">Two-step</span>
+    </div>
+  </div>
+  @if (actionProblem(); as text) {
+    <p class="empty" role="alert">{{ text }}</p>
+  }
+  <hr-role-assignment [user]="person" (done)="store.reload()" />
+  <section class="part" aria-labelledby="two-step-heading">
+    <h2 id="two-step-heading" i18n="@@administration.person.two-step.title">Two-step sign-in</h2>
+    <p class="line">
+      @if (person.twoStepExemptReason !== null) {
+        <span i18n="@@administration.person.two-step.exempt">On the exception list:</span
+        >&ngsp;<bdi>{{ person.twoStepExemptReason }}</bdi>
+      } @else if (person.twoFactorEnabled) {
+        <span i18n="@@administration.person.two-step.on"
+          >Set up; a code is asked at each sign-in.</span
+        >
+      } @else {
+        <span i18n="@@administration.person.two-step.off"
+          >Not set up yet; the person is asked to set it up at the next sign-in.</span
+        >
+      }
+    </p>
+    <div class="acts" *hrIfAllowed="manageUsers">
+      @if (person.twoStepExemptReason !== null) {
+        <button
+          type="button"
+          class="btn"
+          data-act="end-exemption"
+          (click)="endExemption(person)"
+          [disabled]="busy()"
+          i18n="@@administration.person.two-step.end-exemption"
+        >
+          End exemption
+        </button>
+      } @else {
+        @if (person.twoFactorEnabled) {
+          <button
+            type="button"
+            class="btn"
+            data-act="reset-two-step"
+            (click)="resetTwoFactor(person)"
+            [disabled]="busy()"
+            i18n="@@administration.person.two-step.reset"
+          >
+            Reset two-step
+          </button>
+        }
+        <button
+          type="button"
+          class="btn"
+          data-act="exempt"
+          (click)="openExempt()"
+          [attr.aria-expanded]="exempting()"
+          i18n="@@administration.person.two-step.exempt-go"
+        >
+          Exempt from two-step
+        </button>
+      }
+    </div>
+    @if (exempting()) {
+      <hr-account-state-editor
+        [user]="person"
+        mode="exempt"
+        (done)="onExempted()"
+        (cancelled)="closeExempt()"
+      />
+    }
+  </section>
+  <section class="part" aria-labelledby="devices-heading">
+    <h2 id="devices-heading">
+      <span i18n="@@administration.person.devices">Devices</span>&ngsp;<span class="num">{{
+        deviceCount()
+      }}</span>
+    </h2>
+    @if (store.devicesProblem(); as text) {
+      <p class="field-error" role="alert">{{ text }}</p>
+    } @else if (deviceCount() === 0) {
+      <p class="line" i18n="@@administration.person.devices.none">No device has signed in yet.</p>
+    } @else {
+      <div class="rows" role="list">
+        @for (device of store.deviceRows(); track device.id) {
+          <div class="srow drow" role="listitem">
+            <div class="s-who">
+              <div class="s-nm">
+                <b
+                  ><bdi>{{ device.label }}</bdi></b
+                >
+                <span dir="ltr">{{ device.lastAddress ?? '' }}</span>
+              </div>
+            </div>
+            <div class="obj">
+              @if (device.signedIn) {
+                <b i18n="@@administration.person.devices.signed-in">Signed in</b>
+              } @else {
+                <b i18n="@@administration.person.devices.signed-out">Signed out</b>
+              }
+              <span i18n="@@administration.person.devices.now">Now</span>
+            </div>
+            <div class="s-when">
+              <span class="num">{{ when(device.lastSeenUtc) }}</span>
+              <small i18n="@@administration.person.devices.last-seen">Last seen</small>
+            </div>
+            <div class="row-act">
+              @if (device.signedIn) {
+                <button
+                  *hrIfAllowed="manageUsers"
+                  type="button"
+                  class="act"
+                  data-act="sign-out-device"
+                  (click)="signOut(person, device)"
+                  [disabled]="busy()"
+                  i18n="@@administration.person.devices.sign-out"
+                >
+                  Sign out
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+  <section class="part" aria-labelledby="passkeys-heading">
+    <h2 id="passkeys-heading">
+      <span i18n="@@administration.person.passkeys">Passkeys</span>&ngsp;<span class="num">{{
+        passkeyCount()
+      }}</span>
+    </h2>
+    @if (store.passkeysProblem(); as text) {
+      <p class="field-error" role="alert">{{ text }}</p>
+    } @else if (passkeyCount() === 0) {
+      <p class="line" i18n="@@administration.person.passkeys.none">No passkey yet.</p>
+    } @else {
+      <div class="rows" role="list">
+        @for (passkey of store.passkeyRows(); track passkey.id) {
+          <div class="srow krow" role="listitem">
+            <div class="s-who">
+              <div class="s-nm">
+                <b
+                  ><bdi>{{ passkey.name }}</bdi></b
+                >
+                @if (passkey.isBackedUp) {
+                  <span i18n="@@administration.person.passkeys.backed-up">Backed up</span>
+                }
+              </div>
+            </div>
+            <div class="s-when">
+              <span class="num">{{ when(passkey.createdUtc) }}</span>
+              <small i18n="@@administration.person.passkeys.created">Created</small>
+            </div>
+            <div class="s-when">
+              @if (passkey.lastUsedUtc; as used) {
+                <span class="num">{{ when(used) }}</span>
+              } @else {
+                <span i18n="@@administration.person.passkeys.never">Never</span>
+              }
+              <small i18n="@@administration.person.passkeys.last-used">Last used</small>
+            </div>
+            <div class="row-act">
+              <button
+                *hrIfAllowed="manageUsers"
+                type="button"
+                class="act"
+                data-act="remove-passkey"
+                (click)="removePasskey(person, passkey)"
+                [disabled]="busy()"
+                i18n="@@administration.person.passkeys.remove"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+  <section class="part" aria-labelledby="trail-heading">
+    <h2 id="trail-heading">
+      <span i18n="@@administration.person.trail">Security trail</span>&ngsp;<span class="num">{{
+        eventCount()
+      }}</span>
+    </h2>
+    @if (store.eventsProblem(); as text) {
+      <p class="field-error" role="alert">{{ text }}</p>
+    } @else if (eventCount() === 0) {
+      <p class="line" i18n="@@administration.person.trail.none">Nothing recorded yet.</p>
+    } @else {
+      <div class="rows" role="list">
+        @for (event of store.eventRows(); track $index) {
+          <div class="srow erow" role="listitem">
+            <div class="s-who">
+              <div class="s-nm">
+                <b dir="ltr">{{ event.action }}</b>
+                @if (event.detail; as detail) {
+                  <span
+                    ><bdi>{{ detail }}</bdi></span
+                  >
+                }
+              </div>
+            </div>
+            <div class="s-when">
+              <span class="num">{{ when(event.occurredAtUtc) }}</span>
+              <small i18n="@@administration.person.trail.when">When</small>
+            </div>
+            <div class="obj">
+              <b dir="ltr">{{ event.sourceAddress ?? '' }}</b>
+              <span i18n="@@administration.person.trail.address">Address</span>
+            </div>
+            <div class="obj">
+              <b
+                ><bdi>{{ event.device ?? '' }}</bdi></b
+              >
+              <span i18n="@@administration.person.trail.device">Device</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+} @else {
+  <p class="empty" role="status" i18n="@@administration.person.loading">Loading…</p>
+}

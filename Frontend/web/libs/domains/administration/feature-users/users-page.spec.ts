@@ -1,9 +1,10 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { RolesStore, UsersStore } from '@harmony/administration/data-access';
 import { AccountState, UserAccount, UserFilters } from '@harmony/administration/domain';
 import { AccessStore } from '@harmony/platform/access';
-import { PropertyContext } from '@harmony/platform/context';
+import { InstantFormatter } from '@harmony/platform/context';
 import { ApiResult, IntentKey } from '@harmony/platform/http';
 import { PageActions } from '@harmony/ui/shell';
 import { UsersPage } from './users-page';
@@ -26,6 +27,7 @@ const ahmad: UserAccount = {
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',
+  roleIds: ['r1'],
 };
 const lina: UserAccount = {
   ...ahmad,
@@ -80,17 +82,18 @@ describe('UsersPage', () => {
     store = new FakeStore();
     TestBed.configureTestingModule({
       providers: [
+        provideRouter([]),
         { provide: UsersStore, useValue: store },
         {
           provide: RolesStore,
           useValue: {
-            options: signal([]),
+            roles: signal([]),
             loading: signal(false),
             problem: signal(null),
             load: () => undefined,
           },
         },
-        { provide: PropertyContext, useValue: { formatInstant: () => 'Oct 24, 2026' } },
+        { provide: InstantFormatter, useValue: { formatInstant: () => 'Oct 24, 2026' } },
         { provide: AccessStore, useValue: { can: () => mayManage } },
       ],
     });
@@ -155,17 +158,37 @@ describe('UsersPage', () => {
     store.rows.set([ahmad, lina]);
     store.total.set(TOTAL);
     await render();
-    expect(text('.act')).toEqual(['Suspend', 'Reinstate']);
-    page.querySelector<HTMLButtonElement>('[role="listitem"]:first-child .act')?.click();
+    expect(text('.act')).toEqual(['Suspend', 'Terminate', 'Reinstate', 'Terminate']);
+    page
+      .querySelector<HTMLButtonElement>('[role="listitem"]:first-child [data-act="suspend"]')
+      ?.click();
     await render();
     expect(
       page.querySelector('[role="listitem"]:first-child hr-account-state-editor'),
     ).not.toBeNull();
     expect(page.querySelector('[role="listitem"]:last-child hr-account-state-editor')).toBeNull();
-    page.querySelector<HTMLButtonElement>('[role="listitem"]:last-child .act')?.click();
+    page
+      .querySelector<HTMLButtonElement>('[role="listitem"]:last-child [data-act="reinstate"]')
+      ?.click();
     await render();
     expect(store.reinstated.map((call) => call.id)).toEqual(['u2']);
     expect(store.reinstated[0]?.key.value).not.toBe('');
+  });
+
+  it('Terminate opens the editor in its final mode; a terminated account offers nothing', async () => {
+    const gone: UserAccount = { ...lina, id: 'u3', state: AccountState.terminated };
+    store.rows.set([ahmad, gone]);
+    await render();
+    expect(text('[role="listitem"]:last-child .act')).toEqual([]);
+    page
+      .querySelector<HTMLButtonElement>('[role="listitem"]:first-child [data-act="terminate"]')
+      ?.click();
+    await render();
+    const editor = page.querySelector('[role="listitem"]:first-child hr-account-state-editor');
+    expect(editor?.querySelector('.warning')?.textContent).toContain('cannot be undone');
+    expect(editor?.querySelector('button[type="submit"]')?.textContent.trim()).toBe(
+      'Terminate account',
+    );
   });
 
   it('without ManageUsers: no action buttons at all', async () => {

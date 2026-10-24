@@ -12,7 +12,8 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AccessStore, Permission } from '@harmony/platform/access';
+import { AccessStore } from '@harmony/platform/access';
+import { AppUpdate } from '@harmony/platform/app-update';
 import {
   CurrentProperty,
   MyProperties,
@@ -23,12 +24,14 @@ import { FailureNotice } from '@harmony/platform/errors';
 import { SessionStore } from '@harmony/platform/session';
 import { initialsOf } from '@harmony/shared/domain';
 import { Icon } from '@harmony/ui/icons';
+import { ConfirmDialog } from '@harmony/ui/overlays';
 import { filter, map, skip, startWith } from 'rxjs';
 import { BrandLockup } from './brand-lockup';
 import { crumbsOf } from './crumbs';
 import { LookStore } from './look-store';
-import { NavItem, NavPanel } from './nav-panel';
+import { NavPanel } from './nav-panel';
 import { PageActions } from './page-actions';
+import { SHELL_PLACES } from './places';
 import { PopAt } from './pop-at.directive';
 
 /** The navigation that brought the shell itself to life; focus moves only on the ones after it. */
@@ -54,7 +57,10 @@ const FOCUSABLE_BY_SCRIPT_ONLY = -1;
     Icon,
     NavPanel,
     PopAt,
+    ConfirmDialog,
   ],
+  // Ctrl K (Cmd K on a Mac) opens the places panel as the command palette (architecture 8.3).
+  host: { '(document:keydown)': 'onKey($event)' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './shell.html',
   styleUrl: './shell.css',
@@ -66,15 +72,20 @@ export class Shell {
   protected readonly current = inject(CurrentProperty);
   protected readonly look = inject(LookStore);
   protected readonly actions = inject(PageActions);
+  /** Whether this build may keep running (D38): below the floor the strip asks for a reload. */
+  protected readonly update = inject(AppUpdate);
+  /** The app's places: what the nav panel lists and the dock shows; whether the bar carries a property scope. */
+  protected readonly places = inject(SHELL_PLACES);
   private readonly access = inject(AccessStore);
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
   private readonly injector = inject(Injector);
   private readonly main = viewChild.required<ElementRef<HTMLElement>>('main');
+  private readonly navPanel = viewChild.required(NavPanel);
+  private readonly leaveDialog = viewChild.required<ConfirmDialog>('leave');
   private readonly propButton = viewChild<ElementRef<HTMLElement>>('propButton');
   private readonly meButton = viewChild<ElementRef<HTMLElement>>('meButton');
   private readonly locale = $localize.locale ?? 'en';
-  private readonly leaveWarning = $localize`:@@ui.shell.leave-warning:The sign-in window could not open. Sign in on this page instead? Changes not saved will be lost.`;
 
   protected readonly arabic = this.locale.startsWith('ar');
   protected readonly propAnchor = computed(() => this.propButton()?.nativeElement);
@@ -89,35 +100,7 @@ export class Shell {
     return code ?? $localize`:@@ui.shell.choose-property:Choose a property`;
   });
 
-  /** Users exists for the dock only inside a property and only with the permission (presentation, not security). */
-  protected readonly adminLink = computed(() => {
-    const code = this.current.code();
-    return code !== null && this.access.can(Permission.ViewUsers) ? ['/p', code, 'admin'] : null;
-  });
-
-  protected readonly navItems = computed<readonly NavItem[]>(() => {
-    const workspaces = $localize`:@@ui.shell.nav.group.workspaces:Workspaces`;
-    const home: NavItem = {
-      label: $localize`:@@ui.shell.nav.home:Home`,
-      link: ['/'],
-      icon: 'home',
-      group: workspaces,
-      exact: true,
-    };
-    const admin = this.adminLink();
-    const users: NavItem[] =
-      admin === null
-        ? []
-        : [
-            {
-              label: $localize`:@@ui.shell.nav.users:Users`,
-              link: admin,
-              icon: 'guest',
-              group: $localize`:@@ui.shell.nav.group.administration:Administration`,
-            },
-          ];
-    return [home, ...users];
-  });
+  protected readonly inProperty = this.places.scope === 'property';
 
   /** Where am I (the context bar): sections from route data, the page from the route title. */
   protected readonly crumbs = toSignal(
@@ -131,9 +114,9 @@ export class Shell {
 
   constructor() {
     void this.session.ready();
-    // The menus, the dock and the guards draw from the grants and the hotels; read them once the frame is up.
+    // The menus, the dock and the guards draw from the grants, and inside a hotel from the hotels; read them once the frame is up.
     void this.access.ready();
-    void this.properties.ready();
+    if (this.inProperty) void this.properties.ready();
     // Rule 15: after each navigation the main heading takes focus, so a screen reader starts at the new page.
     this.router.events
       .pipe(
@@ -166,11 +149,17 @@ export class Shell {
   }
 
   /** The separate window first; when the browser refuses it, a full-page sign-in only after the person agrees. */
-  protected signInAgain(): void {
+  protected async signInAgain(): Promise<void> {
     if (this.session.signInAgain()) return;
-    if (this.document.defaultView?.confirm(this.leaveWarning) === true) {
-      this.session.signIn(this.router.url);
-    }
+    if (await this.leaveDialog().ask()) this.session.signIn(this.router.url);
+  }
+
+  /** Ctrl K or Cmd K, nothing else held: the places panel opens with its search focused. */
+  protected onKey(event: KeyboardEvent): void {
+    if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) return;
+    if (event.key.toLowerCase() !== 'k') return;
+    event.preventDefault();
+    this.navPanel().open();
   }
 
   protected tryAgain(): void {

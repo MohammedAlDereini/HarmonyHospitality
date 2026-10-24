@@ -6,10 +6,20 @@
   min-width: 16rem;
 }
 .urow {
-  grid-template-columns: minmax(240px, 1.4fr) 150px 150px 160px 136px;
+  grid-template-columns: minmax(240px, 1.4fr) 150px 150px 160px 220px;
 }
 .row-act {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s1);
   min-width: 0;
+}
+.nm-link {
+  color: inherit;
+  text-decoration: none;
+}
+.nm-link:hover {
+  text-decoration: underline;
 }
 .paging {
   display: flex;

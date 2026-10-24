@@ -1,0 +1,18 @@
+<dialog
+  #box
+  class="dlg"
+  [attr.aria-labelledby]="headingId()"
+  [attr.aria-describedby]="message() === '' ? null : messageId()"
+  (close)="onClose()"
+>
+  <h2 class="dlg-h" [id]="headingId()">{{ heading() }}</h2>
+  @if (message() !== '') {
+    <p class="dlg-m" [id]="messageId()">{{ message() }}</p>
+  }
+  <div class="dlg-a">
+    <button type="button" class="btn" autofocus (click)="answer(false)">{{ stay() }}</button>
+    <button type="button" class="btn solid" [class.stop]="tone() === 'stop'" (click)="answer(true)">
+      {{ go() }}
+    </button>
+  </div>
+</dialog>

@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { USERS_PAGE_SIZE, UsersStore } from '@harmony/administration/data-access';
 import { AccountState, UserAccount } from '@harmony/administration/domain';
 import { IfAllowed, Permission } from '@harmony/platform/access';
-import { PropertyContext } from '@harmony/platform/context';
+import { InstantFormatter } from '@harmony/platform/context';
 import { messageOf } from '@harmony/platform/errors';
 import { newIntentKey } from '@harmony/platform/http';
 import { initialsOf } from '@harmony/shared/domain';
@@ -10,26 +11,33 @@ import { Icon } from '@harmony/ui/icons';
 import { Tone } from '@harmony/ui/primitives';
 import { PageActionsTemplate } from '@harmony/ui/shell';
 import { AccountCreator } from './account-creator';
-import { AccountStateEditor } from './account-state-editor';
+import { AccountAction, AccountStateEditor } from './account-state-editor';
+import { stateLabel, toneOf, twoStepLabel } from './account-wording';
 
 const PAGE_STEP = 1;
 const dateOnly: Intl.DateTimeFormatOptions = { dateStyle: 'medium' };
 
+/** The row whose reason form is open, and which write it makes. */
+interface Editing {
+  readonly id: string;
+  readonly mode: AccountAction;
+}
+
 /**
  * The accounts of the customer: who may sign in, how they sign in, since when; and, with ManageUsers, the writes:
- * a new account from the context bar's action slot, suspend with a reason, reinstate (architecture 6,
+ * a new account from the context bar's action slot, suspend with a reason, reinstate, terminate (architecture 6,
  * administration). The buttons are presentation: the API refuses on its own.
  */
 @Component({
   selector: 'hr-users-page',
-  imports: [IfAllowed, Icon, PageActionsTemplate, AccountCreator, AccountStateEditor],
+  imports: [RouterLink, IfAllowed, Icon, PageActionsTemplate, AccountCreator, AccountStateEditor],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './users-page.html',
   styleUrl: './users-page.css',
 })
 export class UsersPage {
   protected readonly store = inject(UsersStore);
-  private readonly context = inject(PropertyContext);
+  private readonly context = inject(InstantFormatter);
 
   protected readonly manageUsers = Permission.ManageUsers;
   protected readonly page = computed(() => this.store.filters().page);
@@ -42,25 +50,12 @@ export class UsersPage {
 
   /** True while the new-account form is open. */
   protected readonly creating = signal(false);
-  /** The account whose suspension is being written, if any. */
-  protected readonly editing = signal<string | null>(null);
+  /** The account whose suspension or termination is being written, if any. */
+  protected readonly editing = signal<Editing | null>(null);
   /** The account being reinstated right now, if any. */
   protected readonly reinstating = signal<string | null>(null);
   /** One sentence when a reinstatement was refused; null while all is well. */
   protected readonly actionProblem = signal<string | null>(null);
-
-  private readonly stateWording: Readonly<Record<AccountState, string>> = {
-    [AccountState.active]: $localize`:@@administration.users.state.active:Active`,
-    [AccountState.suspended]: $localize`:@@administration.users.state.suspended:Suspended`,
-    [AccountState.terminated]: $localize`:@@administration.users.state.terminated:Terminated`,
-  };
-
-  /** Text says the state; the tone only underlines it (status never by colour alone). */
-  private readonly stateTone: Readonly<Record<AccountState, Tone | null>> = {
-    [AccountState.active]: null,
-    [AccountState.suspended]: 'warn',
-    [AccountState.terminated]: 'stop',
-  };
 
   protected onSearch(event: Event, text: string): void {
     event.preventDefault();
@@ -80,11 +75,11 @@ export class UsersPage {
   }
 
   protected stateOf(user: UserAccount): string {
-    return this.stateWording[user.state];
+    return stateLabel(user);
   }
 
   protected toneOf(user: UserAccount): Tone | null {
-    return this.stateTone[user.state];
+    return toneOf(user);
   }
 
   protected canSuspend(user: UserAccount): boolean {
@@ -95,12 +90,19 @@ export class UsersPage {
     return user.state === AccountState.suspended;
   }
 
+  /** Termination is final: never offered twice. */
+  protected canTerminate(user: UserAccount): boolean {
+    return user.state !== AccountState.terminated;
+  }
+
+  /** The write whose form is open under this row, or null. */
+  protected editorFor(user: UserAccount): AccountAction | null {
+    const editing = this.editing();
+    return editing !== null && editing.id === user.id ? editing.mode : null;
+  }
+
   protected twoStepOf(user: UserAccount): string {
-    if (user.twoStepExemptReason !== null)
-      return $localize`:@@administration.users.two-step.exempt:Exempt`;
-    return user.twoFactorEnabled
-      ? $localize`:@@administration.users.two-step.on:On`
-      : $localize`:@@administration.users.two-step.off:Not set`;
+    return twoStepLabel(user);
   }
 
   protected createdOn(user: UserAccount): string {
@@ -118,7 +120,12 @@ export class UsersPage {
 
   protected openSuspend(user: UserAccount): void {
     this.actionProblem.set(null);
-    this.editing.set(user.id);
+    this.editing.set({ id: user.id, mode: 'suspend' });
+  }
+
+  protected openTerminate(user: UserAccount): void {
+    this.actionProblem.set(null);
+    this.editing.set({ id: user.id, mode: 'terminate' });
   }
 
   protected closeEditor(): void {

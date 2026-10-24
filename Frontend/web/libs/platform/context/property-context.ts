@@ -1,6 +1,7 @@
 import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { SessionStore } from '@harmony/platform/session';
 import { CurrentProperty } from './current-property';
+import { InstantFormatter, formatInZone } from './instant-formatter';
 import { MyProperties } from './my-properties';
 import { PropertyScope } from './property-scope';
 import { PropertySummary, propertyName } from './property-summary';
@@ -11,17 +12,12 @@ export interface PropertyScopeKey {
   readonly property: string | null;
 }
 
-const defaultInstantFormat: Intl.DateTimeFormatOptions = {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-};
-
 /**
  * The property everything is about (architecture 4, 9): its code from the URL, its zone, currency and business date;
  * provided by providePropertyContext() on the /p/:property route.
  */
 @Injectable()
-export class PropertyContext {
+export class PropertyContext extends InstantFormatter {
   private readonly session = inject(SessionStore);
   private readonly properties = inject(MyProperties);
   private readonly resets = inject(PropertyScope);
@@ -51,6 +47,7 @@ export class PropertyContext {
   }));
 
   constructor() {
+    super();
     let previous = untracked(this.code);
     effect(() => {
       const code = this.code();
@@ -68,12 +65,7 @@ export class PropertyContext {
   }
 
   /** An instant shown in the property's zone, in the build's language; the device's zone plays no part. */
-  formatInstant(instant: string | number | Date, options = defaultInstantFormat): string {
-    const zone = this.zone();
-    const formatter = new Intl.DateTimeFormat(
-      $localize.locale ?? 'en',
-      zone === null ? options : { ...options, timeZone: zone },
-    );
-    return formatter.format(typeof instant === 'string' ? new Date(instant) : instant);
+  formatInstant(instant: string | number | Date, options?: Intl.DateTimeFormatOptions): string {
+    return formatInZone(instant, this.zone(), options);
   }
 }

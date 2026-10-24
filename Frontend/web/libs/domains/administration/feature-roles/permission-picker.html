@@ -1,0 +1,14 @@
+<fieldset class="picker">
+  <legend i18n="@@administration.roles.permissions">Permissions</legend>
+  @for (entry of entries(); track entry.id) {
+    <label class="perm">
+      <input
+        type="checkbox"
+        [attr.data-permission]="entry.permissionValue"
+        [checked]="selected().has(entry.id)"
+        (change)="toggled.emit(entry.id)"
+      />
+      <span>{{ label(entry) }}</span>
+    </label>
+  }
+</fieldset>

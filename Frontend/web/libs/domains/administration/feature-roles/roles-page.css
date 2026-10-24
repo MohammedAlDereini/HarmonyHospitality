@@ -1,0 +1,51 @@
+/* The roles as prototype rows: code chip and names, level, kind, the actions. Tokens only; rows grow with text. */
+.rrow {
+  grid-template-columns: minmax(240px, 1.4fr) 170px 150px 300px;
+}
+.code {
+  flex: none;
+  min-width: 2.5rem;
+  padding: 2px 8px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-control);
+  background: var(--sunk);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+.row-act {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s1);
+  min-width: 0;
+}
+.confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s2) var(--s6) var(--s3);
+  background: var(--sunk);
+  border-block-end: 1px solid var(--rule);
+}
+.warning {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--stop);
+}
+.btn.solid.stop {
+  background: var(--stop);
+  border-color: var(--stop);
+  color: var(--on-stop);
+}
+@media (max-width: 900px) {
+  .rrow {
+    grid-template-columns: minmax(0, 1fr) 120px 120px;
+    row-gap: 6px;
+  }
+  .rrow .row-act {
+    grid-column: 1 / -1;
+  }
+}

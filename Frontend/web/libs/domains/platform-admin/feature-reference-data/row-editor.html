@@ -1,0 +1,92 @@
+<form class="editor" (submit)="onSubmit($event)" novalidate>
+  @if (creating()) {
+    <h2 i18n="@@platform-admin.reference.new.title">New row</h2>
+  } @else {
+    <h2 i18n="@@platform-admin.reference.edit.title">Edit row</h2>
+  }
+  <div class="fields">
+    @for (field of fields(); track field.key) {
+      @if (field.kind === 'checkbox') {
+        <label class="perm">
+          <input type="checkbox" [attr.data-field]="field.key" [formField]="flag(field.key)" />
+          <span>{{ field.label }}</span>
+        </label>
+      } @else {
+        <div class="f">
+          <label [for]="'row-' + field.key">{{ field.label }}</label>
+          @if (field.kind === 'select') {
+            <select
+              [id]="'row-' + field.key"
+              [attr.data-field]="field.key"
+              class="field"
+              [formField]="text(field.key)"
+              [attr.aria-invalid]="
+                text(field.key)().touched() && text(field.key)().invalid() ? 'true' : null
+              "
+              [attr.aria-describedby]="
+                text(field.key)().errors().length > 0 ? errorId(field) : null
+              "
+            >
+              <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+              @for (option of options(field); track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          } @else {
+            <input
+              [id]="'row-' + field.key"
+              [attr.data-field]="field.key"
+              class="field"
+              type="text"
+              autocomplete="off"
+              [attr.inputmode]="field.kind === 'number' ? 'decimal' : null"
+              [attr.lang]="field.lang ?? null"
+              [attr.dir]="field.dir ?? 'auto'"
+              [formField]="text(field.key)"
+              [attr.aria-invalid]="
+                text(field.key)().touched() && text(field.key)().invalid() ? 'true' : null
+              "
+              [attr.aria-describedby]="
+                text(field.key)().errors().length > 0 ? errorId(field) : null
+              "
+            />
+          }
+          @if (text(field.key)().touched() && text(field.key)().errors().length > 0) {
+            <p [id]="errorId(field)" class="field-error" role="alert">
+              @for (error of text(field.key)().errors(); track error.kind) {
+                <span>{{ error.message }}</span>
+              }
+            </p>
+          }
+        </div>
+      }
+    }
+  </div>
+  <div class="acts">
+    @if (creating()) {
+      <button
+        type="submit"
+        class="btn solid"
+        [disabled]="form().submitting()"
+        i18n="@@platform-admin.reference.new.go"
+      >
+        Create row
+      </button>
+    } @else {
+      <button
+        type="submit"
+        class="btn solid"
+        [disabled]="form().submitting()"
+        i18n="@@platform-admin.reference.edit.go"
+      >
+        Save
+      </button>
+    }
+    <button type="button" class="btn" (click)="cancel()" i18n="@@platform-admin.reference.cancel">
+      Cancel
+    </button>
+  </div>
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
+</form>

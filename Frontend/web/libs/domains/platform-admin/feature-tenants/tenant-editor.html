@@ -1,0 +1,269 @@
+<form class="editor" (submit)="onSubmit($event)" novalidate>
+  @if (creating()) {
+    <h2 i18n="@@platform-admin.tenants.new.title">New tenant</h2>
+    <p class="note" i18n="@@platform-admin.tenants.new.note">
+      The first administrator gets an email with a link to choose a password; the tenant's own
+      administrator role is made for them.
+    </p>
+  } @else {
+    <h2 i18n="@@platform-admin.tenants.edit.title">Edit tenant</h2>
+  }
+  <div class="fields">
+    <div class="f">
+      <label for="tenant-code" i18n="@@platform-admin.tenants.field.code">Code</label>
+      <input
+        id="tenant-code"
+        #firstBox
+        class="field"
+        type="text"
+        autocomplete="off"
+        dir="ltr"
+        [formField]="form.code"
+        [attr.aria-invalid]="
+          (form.code().touched() || submitted()) && form.code().invalid() ? 'true' : null
+        "
+        [attr.aria-describedby]="form.code().errors().length > 0 ? 'tenant-code-error' : null"
+      />
+      @if ((form.code().touched() || submitted()) && form.code().errors().length > 0) {
+        <p id="tenant-code-error" class="field-error" role="alert">
+          @for (error of form.code().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="tenant-name-en" i18n="@@platform-admin.tenants.field.name-en"
+        >Legal name (English)</label
+      >
+      <input
+        id="tenant-name-en"
+        class="field"
+        type="text"
+        autocomplete="off"
+        lang="en"
+        dir="ltr"
+        [formField]="form.legalNameEn"
+        [attr.aria-invalid]="
+          form.legalNameEn().touched() && form.legalNameEn().invalid() ? 'true' : null
+        "
+        [attr.aria-describedby]="
+          form.legalNameEn().errors().length > 0 ? 'tenant-name-en-error' : null
+        "
+      />
+      @if (form.legalNameEn().touched() && form.legalNameEn().errors().length > 0) {
+        <p id="tenant-name-en-error" class="field-error" role="alert">
+          @for (error of form.legalNameEn().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="tenant-name-ar" i18n="@@platform-admin.tenants.field.name-ar"
+        >Legal name (Arabic)</label
+      >
+      <input
+        id="tenant-name-ar"
+        class="field"
+        type="text"
+        autocomplete="off"
+        lang="ar"
+        dir="rtl"
+        [formField]="form.legalNameAr"
+        [attr.aria-invalid]="
+          form.legalNameAr().touched() && form.legalNameAr().invalid() ? 'true' : null
+        "
+        [attr.aria-describedby]="
+          form.legalNameAr().errors().length > 0 ? 'tenant-name-ar-error' : null
+        "
+      />
+      @if (form.legalNameAr().touched() && form.legalNameAr().errors().length > 0) {
+        <p id="tenant-name-ar-error" class="field-error" role="alert">
+          @for (error of form.legalNameAr().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="tenant-country" i18n="@@platform-admin.tenants.field.country">Country</label>
+      <select
+        id="tenant-country"
+        class="field"
+        [formField]="form.countryCode"
+        [attr.aria-invalid]="
+          form.countryCode().touched() && form.countryCode().invalid() ? 'true' : null
+        "
+        [attr.aria-describedby]="
+          form.countryCode().errors().length > 0 ? 'tenant-country-error' : null
+        "
+      >
+        <option value="" i18n="@@platform-admin.tenants.field.country.choose">
+          Choose a country
+        </option>
+        @for (row of countries.rows(); track code(row)) {
+          <option [value]="code(row)">{{ label(row) }}</option>
+        }
+      </select>
+      @if (form.countryCode().touched() && form.countryCode().errors().length > 0) {
+        <p id="tenant-country-error" class="field-error" role="alert">
+          @for (error of form.countryCode().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="tenant-currency" i18n="@@platform-admin.tenants.field.currency">Currency</label>
+      <select
+        id="tenant-currency"
+        class="field"
+        [formField]="form.defaultCurrency"
+        [attr.aria-invalid]="
+          form.defaultCurrency().touched() && form.defaultCurrency().invalid() ? 'true' : null
+        "
+        [attr.aria-describedby]="
+          form.defaultCurrency().errors().length > 0 ? 'tenant-currency-error' : null
+        "
+      >
+        <option value="" i18n="@@platform-admin.tenants.field.currency.choose">
+          Choose a currency
+        </option>
+        @for (row of currencies.rows(); track code(row)) {
+          <option [value]="code(row)">{{ code(row) }} · {{ label(row) }}</option>
+        }
+      </select>
+      @if (form.defaultCurrency().touched() && form.defaultCurrency().errors().length > 0) {
+        <p id="tenant-currency-error" class="field-error" role="alert">
+          @for (error of form.defaultCurrency().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="tenant-tier" i18n="@@platform-admin.tenants.field.tier">Tier</label>
+      <select id="tenant-tier" class="field" [formField]="form.tier">
+        @for (tier of tiers; track tier) {
+          <option [value]="tier">{{ tier }}</option>
+        }
+      </select>
+      @if (form.tier().errors().length > 0) {
+        <p class="field-error" role="alert">
+          @for (error of form.tier().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="tenant-external" i18n="@@platform-admin.tenants.field.external"
+        >External identifier</label
+      >
+      <input
+        id="tenant-external"
+        class="field"
+        type="text"
+        autocomplete="off"
+        dir="ltr"
+        [formField]="form.externalIdentifier"
+      />
+      @if (form.externalIdentifier().errors().length > 0) {
+        <p class="field-error" role="alert">
+          @for (error of form.externalIdentifier().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    @if (creating()) {
+      <div class="f">
+        <label for="tenant-admin-email" i18n="@@platform-admin.tenants.field.admin-email"
+          >Administrator's email</label
+        >
+        <input
+          id="tenant-admin-email"
+          class="field"
+          type="email"
+          autocomplete="off"
+          dir="ltr"
+          [formField]="form.administratorEmail"
+          [attr.aria-invalid]="
+            form.administratorEmail().touched() && form.administratorEmail().invalid()
+              ? 'true'
+              : null
+          "
+          [attr.aria-describedby]="
+            form.administratorEmail().errors().length > 0 ? 'tenant-admin-email-error' : null
+          "
+        />
+        @if (form.administratorEmail().touched() && form.administratorEmail().errors().length > 0) {
+          <p id="tenant-admin-email-error" class="field-error" role="alert">
+            @for (error of form.administratorEmail().errors(); track error.kind) {
+              <span>{{ error.message }}</span>
+            }
+          </p>
+        }
+      </div>
+      <div class="f">
+        <label for="tenant-admin-name" i18n="@@platform-admin.tenants.field.admin-name"
+          >Administrator's name</label
+        >
+        <input
+          id="tenant-admin-name"
+          class="field"
+          type="text"
+          autocomplete="off"
+          dir="auto"
+          [formField]="form.administratorDisplayName"
+          [attr.aria-invalid]="
+            form.administratorDisplayName().touched() && form.administratorDisplayName().invalid()
+              ? 'true'
+              : null
+          "
+          [attr.aria-describedby]="
+            form.administratorDisplayName().errors().length > 0 ? 'tenant-admin-name-error' : null
+          "
+        />
+        @if (
+          form.administratorDisplayName().touched() &&
+          form.administratorDisplayName().errors().length > 0
+        ) {
+          <p id="tenant-admin-name-error" class="field-error" role="alert">
+            @for (error of form.administratorDisplayName().errors(); track error.kind) {
+              <span>{{ error.message }}</span>
+            }
+          </p>
+        }
+      </div>
+    }
+  </div>
+  <div class="acts">
+    @if (creating()) {
+      <button
+        type="submit"
+        class="btn solid"
+        [disabled]="form().submitting()"
+        i18n="@@platform-admin.tenants.new.go"
+      >
+        Create tenant
+      </button>
+    } @else {
+      <button
+        type="submit"
+        class="btn solid"
+        [disabled]="form().submitting()"
+        i18n="@@platform-admin.tenants.edit.go"
+      >
+        Save
+      </button>
+    }
+    <button type="button" class="btn" (click)="cancel()" i18n="@@platform-admin.tenants.cancel">
+      Cancel
+    </button>
+  </div>
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
+</form>

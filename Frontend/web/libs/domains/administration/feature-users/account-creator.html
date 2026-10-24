@@ -57,7 +57,7 @@
         [attr.aria-describedby]="form.roleId().errors().length > 0 ? 'new-role-error' : null"
       >
         <option value="" i18n="@@administration.users.new.choose-role">Choose a role</option>
-        @for (role of roles.options(); track role.id) {
+        @for (role of roles.roles(); track role.id) {
           <option [value]="role.id">{{ label(role) }}</option>
         }
       </select>

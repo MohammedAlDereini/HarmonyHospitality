@@ -1,0 +1,64 @@
+/* The person's page: the header row, then one section per concern, each with prototype rows. Tokens only. */
+.person h1 {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 16px;
+}
+.person .obj {
+  margin-inline-start: var(--s4);
+}
+.part {
+  padding: var(--s3) var(--s6);
+  border-block-end: 1px solid var(--rule);
+}
+.part h2 {
+  margin: 0 0 var(--s2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.line {
+  margin: 0 0 var(--s2);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.part .rows {
+  margin: 0 calc(-1 * var(--s6));
+}
+.drow {
+  grid-template-columns: minmax(200px, 1.4fr) 140px 220px 120px;
+}
+.krow {
+  grid-template-columns: minmax(200px, 1.4fr) 220px 220px 120px;
+}
+.erow {
+  grid-template-columns: minmax(220px, 1.6fr) 220px 160px 160px;
+}
+.row-act {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+.field-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--stop);
+}
+@media (max-width: 900px) {
+  .drow,
+  .krow,
+  .erow {
+    grid-template-columns: minmax(0, 1fr) 140px;
+    row-gap: 6px;
+  }
+  .drow .row-act,
+  .krow .row-act,
+  .erow .obj {
+    grid-column: 1 / -1;
+  }
+}

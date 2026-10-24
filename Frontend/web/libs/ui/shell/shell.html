@@ -13,7 +13,7 @@
     <hr-icon name="menu" size="18" />
   </button>
   <div class="brand"><hr-brand-lockup /></div>
-  @if (session.user()) {
+  @if (session.user() && inProperty) {
     <button
       type="button"
       class="gbtn gprop"
@@ -31,7 +31,13 @@
     <span class="gsep" aria-hidden="true"></span>
   }
   <span class="gspace"></span>
-  <button type="button" class="cmd" popovertarget="nav-panel" aria-expanded="false">
+  <button
+    type="button"
+    class="cmd"
+    popovertarget="nav-panel"
+    aria-expanded="false"
+    aria-keyshortcuts="Control+K"
+  >
     <hr-icon name="search" size="14" />
     <span class="lbl" i18n="@@ui.shell.find">Find a place…</span>
   </button>
@@ -63,15 +69,15 @@
     >
       <hr-icon name="home" size="18" />
     </a>
-    @if (adminLink(); as link) {
+    @for (place of places.dock(); track place.link.join('/')) {
       <a
-        [routerLink]="link"
+        [routerLink]="place.link"
         routerLinkActive
         ariaCurrentWhenActive="page"
-        i18n-aria-label="@@ui.shell.dock.users"
-        aria-label="Users"
+        [routerLinkActiveOptions]="{ exact: place.exact === true }"
+        [attr.aria-label]="place.label"
       >
-        <hr-icon name="guest" size="18" />
+        <hr-icon [name]="place.icon" size="18" />
       </a>
     }
     <button
@@ -102,6 +108,25 @@
         }
       </div>
     </div>
+    @if (update.stale()) {
+      <div class="strip strip-update" role="alert">
+        <span i18n="@@ui.shell.update-required"
+          >A newer Harmony is required. Reload to continue; unsaved work on this page is lost.</span
+        >
+        <button type="button" class="btn" (click)="update.reload()" i18n="@@ui.shell.reload-now">
+          Reload now
+        </button>
+      </div>
+    } @else if (update.newer()) {
+      <div class="strip strip-update-soft" role="status">
+        <span i18n="@@ui.shell.update-available"
+          >A newer Harmony is available. Reload when it suits you.</span
+        >
+        <button type="button" class="btn quiet" (click)="update.reload()" i18n="@@ui.shell.reload">
+          Reload
+        </button>
+      </div>
+    }
     @if (session.state() === 'expired') {
       <div class="strip strip-session" role="status">
         <span i18n="@@ui.shell.session-ended"
@@ -149,35 +174,37 @@
   </main>
 </div>
 
-<div
-  class="pop wide"
-  id="prop-pop"
-  popover
-  [hrPopAt]="propAnchor()"
-  i18n-aria-label="@@ui.shell.scope"
-  aria-label="Operating scope"
->
-  <h3 class="pop-h" i18n="@@ui.shell.scope">Operating scope</h3>
-  @for (property of properties.list(); track property.code) {
-    <a
-      class="pop-i"
-      [routerLink]="['/p', property.code]"
-      [attr.aria-current]="property.code === current.code() ? 'true' : null"
-    >
-      <span class="pcode">{{ property.code }}</span>
-      <span
-        ><b
-          ><bdi>{{ name(property) }}</bdi></b
-        ><small>{{ property.timeZoneId }} · {{ property.currency }}</small></span
+@if (inProperty) {
+  <div
+    class="pop wide"
+    id="prop-pop"
+    popover
+    [hrPopAt]="propAnchor()"
+    i18n-aria-label="@@ui.shell.scope"
+    aria-label="Operating scope"
+  >
+    <h3 class="pop-h" i18n="@@ui.shell.scope">Operating scope</h3>
+    @for (property of properties.list(); track property.code) {
+      <a
+        class="pop-i"
+        [routerLink]="['/p', property.code]"
+        [attr.aria-current]="property.code === current.code() ? 'true' : null"
       >
-      @if (property.code === current.code()) {
-        <hr-icon class="ck" name="check" size="14" />
-      }
-    </a>
-  } @empty {
-    <p class="pop-note" i18n="@@ui.shell.no-property">No property is assigned to you yet.</p>
-  }
-</div>
+        <span class="pcode">{{ property.code }}</span>
+        <span
+          ><b
+            ><bdi>{{ name(property) }}</bdi></b
+          ><small>{{ property.timeZoneId }} · {{ property.currency }}</small></span
+        >
+        @if (property.code === current.code()) {
+          <hr-icon class="ck" name="check" size="14" />
+        }
+      </a>
+    } @empty {
+      <p class="pop-note" i18n="@@ui.shell.no-property">No property is assigned to you yet.</p>
+    }
+  </div>
+}
 
 <div
   class="pop wide"
@@ -266,7 +293,19 @@
 <hr-nav-panel
   id="nav-panel"
   popover
-  [items]="navItems()"
+  [items]="places.items()"
   i18n-aria-label="@@ui.shell.nav.label"
   aria-label="All places"
+/>
+<hr-confirm-dialog
+  #leave
+  tone="stop"
+  i18n-heading="@@ui.shell.leave-heading"
+  heading="Sign in on this page?"
+  i18n-message="@@ui.shell.leave-message"
+  message="The sign-in window could not open. Changes not saved on this page will be lost."
+  i18n-go="@@ui.shell.leave-go"
+  go="Sign in here"
+  i18n-stay="@@ui.shell.leave-stay"
+  stay="Stay on this page"
 />

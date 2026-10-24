@@ -64,7 +64,9 @@
             <span class="ini" aria-hidden="true">{{ initials(user) }}</span>
             <div class="s-nm">
               <b
-                ><bdi>{{ user.displayName }}</bdi></b
+                ><a class="nm-link" [routerLink]="['account', user.id]"
+                  ><bdi>{{ user.displayName }}</bdi></a
+                ></b
               >
               <span dir="ltr"
                 ><bdi>{{ user.email ?? user.userName }}</bdi></span
@@ -83,23 +85,23 @@
             <span class="num">{{ createdOn(user) }}</span>
             <small i18n="@@administration.users.column.created">Created</small>
           </div>
-          <div class="row-act">
+          <div class="row-act" *hrIfAllowed="manageUsers">
             @if (canSuspend(user)) {
               <button
-                *hrIfAllowed="manageUsers"
                 type="button"
                 class="act"
+                data-act="suspend"
                 (click)="openSuspend(user)"
-                [attr.aria-expanded]="editing() === user.id"
+                [attr.aria-expanded]="editorFor(user) === 'suspend'"
                 i18n="@@administration.users.suspend"
               >
                 Suspend
               </button>
             } @else if (canReinstate(user)) {
               <button
-                *hrIfAllowed="manageUsers"
                 type="button"
                 class="act"
+                data-act="reinstate"
                 (click)="reinstate(user)"
                 [disabled]="reinstating() === user.id"
                 i18n="@@administration.users.reinstate"
@@ -107,11 +109,24 @@
                 Reinstate
               </button>
             }
+            @if (canTerminate(user)) {
+              <button
+                type="button"
+                class="act"
+                data-act="terminate"
+                (click)="openTerminate(user)"
+                [attr.aria-expanded]="editorFor(user) === 'terminate'"
+                i18n="@@administration.users.terminate"
+              >
+                Terminate
+              </button>
+            }
           </div>
         </div>
-        @if (editing() === user.id) {
+        @if (editorFor(user); as mode) {
           <hr-account-state-editor
             [user]="user"
+            [mode]="mode"
             (done)="closeEditor()"
             (cancelled)="closeEditor()"
           />
