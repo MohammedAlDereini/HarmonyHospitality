@@ -16,6 +16,7 @@ namespace Harmony.Identity.Handler.Queries.UserAccountModule.List
             DisplayName = a.DisplayName,
             TwoFactorEnabled = a.TwoFactorEnabled,
             TwoStepExemptReason = a.TwoStepExemptReason,
+            RoleIds = a.UserRoles.Select(r => r.RoleId).ToList(),
             State = a.State,
             StateReason = a.StateReason,
             SecurityVersion = a.SecurityVersion,

@@ -12,6 +12,8 @@ public class UserAccountModel
     public bool TwoFactorEnabled { get; set; }
     /// <summary>Why the person is on the two-step exception list; null when they are not.</summary>
     public string? TwoStepExemptReason { get; set; }
+    /// <summary>The roles the account holds; the person's standing is the highest privilege level among them.</summary>
+    public List<Guid> RoleIds { get; set; } = new();
     public AdministrativeState State { get; set; }
     public string? StateReason { get; set; }
     public int SecurityVersion { get; set; }
