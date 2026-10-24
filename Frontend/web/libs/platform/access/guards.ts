@@ -11,6 +11,7 @@ export const allowed =
     const session = inject(SessionStore);
     const access = inject(AccessStore);
     await session.ready();
+    await access.ready();
     return access.can(permission);
   };
 
@@ -21,6 +22,7 @@ export const moduleEntitled =
     const session = inject(SessionStore);
     const access = inject(AccessStore);
     await session.ready();
+    await access.ready();
     const property: unknown = snapshot.params['property'];
     return typeof property === 'string' && access.entitled(module, property);
   };

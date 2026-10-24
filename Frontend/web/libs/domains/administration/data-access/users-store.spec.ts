@@ -1,6 +1,6 @@
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { UserAccount } from '@harmony/administration/domain';
+import { AccountState, UserAccount } from '@harmony/administration/domain';
 import { PropertyScope } from '@harmony/platform/context';
 import { API_RETRY_DELAYS, provideHarmonyHttp } from '@harmony/platform/http';
 import { USERS_PAGE_SIZE, UsersStore, usersPath } from './users-store';
@@ -17,7 +17,7 @@ const ahmad: UserAccount = {
   displayName: 'Ahmad Saleh',
   twoFactorEnabled: true,
   twoStepExemptReason: null,
-  state: 1,
+  state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',
 };

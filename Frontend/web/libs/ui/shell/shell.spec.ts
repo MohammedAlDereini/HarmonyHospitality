@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { AccessStore } from '@harmony/platform/access';
 import { FailureNotice } from '@harmony/platform/errors';
 import { SessionState, SessionStore, SessionUser } from '@harmony/platform/session';
 import { Shell } from './shell';
@@ -65,7 +66,11 @@ describe('Shell', () => {
   beforeEach(async () => {
     session = new FakeSession();
     TestBed.configureTestingModule({
-      providers: [provideRouter([]), { provide: SessionStore, useValue: session }],
+      providers: [
+        provideRouter([]),
+        { provide: SessionStore, useValue: session },
+        { provide: AccessStore, useValue: { ready: () => Promise.resolve() } },
+      ],
     });
     notice = TestBed.inject(FailureNotice);
     fixture = TestBed.createComponent(Shell);

@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { AccessStore } from '@harmony/platform/access';
 import { FailureNotice } from '@harmony/platform/errors';
 import { SessionStore } from '@harmony/platform/session';
 import { filter, skip } from 'rxjs';
@@ -34,6 +35,7 @@ const FOCUSABLE_BY_SCRIPT_ONLY = -1;
 export class Shell {
   protected readonly session = inject(SessionStore);
   protected readonly notice = inject(FailureNotice);
+  private readonly access = inject(AccessStore);
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
   private readonly injector = inject(Injector);
@@ -42,6 +44,8 @@ export class Shell {
 
   constructor() {
     void this.session.ready();
+    // The menus and guards draw from the grants; read them once the frame is up.
+    void this.access.ready();
     // Rule 15: after each navigation the main heading takes focus, so a screen reader starts at the new page.
     this.router.events
       .pipe(

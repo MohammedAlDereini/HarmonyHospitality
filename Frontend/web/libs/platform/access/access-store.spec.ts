@@ -1,64 +1,107 @@
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { SessionStore, SessionUser } from '@harmony/platform/session';
-import { ACCESS_GRANTS, AccessGrants } from './access-grants';
+import { API_RETRY_DELAYS, HttpStatusEvents, provideHarmonyHttp } from '@harmony/platform/http';
+import { SessionStore } from '@harmony/platform/session';
+import { myPermissionsPath } from './access-grants';
 import { AccessStore } from './access-store';
 import { Permission } from './permission';
 
-const ahmad: SessionUser = {
-  sub: 'u1',
-  name: 'Ahmad',
-  tenant: 't1',
-  roles: ['FrontDesk'],
-  amr: ['pwd'],
-  logoutUrl: '/bff/logout?sid=1',
-};
-
-const grants: AccessGrants = {
-  permissions: new Set<Permission>([Permission.ViewUsers]),
-  modules: { GRD: ['front-office'], '*': ['reports'] },
-};
-
-const configure = (
-  user: SessionUser | null,
-  source: (user: SessionUser) => AccessGrants | null,
-) => {
-  TestBed.configureTestingModule({
-    providers: [
-      { provide: SessionStore, useValue: { user: signal(user) } },
-      { provide: ACCESS_GRANTS, useValue: source },
-    ],
-  });
-  return TestBed.inject(AccessStore);
-};
+const SERVICE_UNAVAILABLE = 503;
+const ATTEMPTS = 3;
+const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 1));
 
 describe('AccessStore', () => {
-  it('nobody signed in: nothing is known, nothing is allowed', () => {
-    const access = configure(null, () => grants);
-    expect(access.known()).toBe(false);
-    expect(access.can(Permission.ViewUsers)).toBe(false);
-    expect(access.entitled('front-office', 'GRD')).toBe(false);
+  let access: AccessStore;
+  let http: HttpTestingController;
+  let events: HttpStatusEvents;
+  const resumed = signal(0);
+
+  const settle = async (): Promise<void> => {
+    TestBed.tick();
+    await tick();
+  };
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHarmonyHttp(),
+        provideHttpClientTesting(),
+        { provide: API_RETRY_DELAYS, useValue: [0, 0] },
+        { provide: SessionStore, useValue: { resumed, user: signal(null) } },
+      ],
+    });
+    access = TestBed.inject(AccessStore);
+    http = TestBed.inject(HttpTestingController);
+    events = TestBed.inject(HttpStatusEvents);
   });
 
-  it('the default source answers unknown until the session payload exists (D2)', () => {
-    const access = TestBed.configureTestingModule({
-      providers: [{ provide: SessionStore, useValue: { user: signal(ahmad) } }],
-    }).inject(AccessStore);
-    expect(access.known()).toBe(false);
-    expect(access.can(Permission.ViewUsers)).toBe(false);
+  afterEach(() => {
+    http.verify();
   });
 
-  it('with grants: a held permission is allowed, another is not', () => {
-    const access = configure(ahmad, () => grants);
+  it('nothing is known, nothing is allowed, until the door answers', async () => {
+    expect(access.known()).toBe(false);
+    expect(access.can(Permission.ViewUsers)).toBe(false);
+    const ready = access.ready();
+    void access.ready();
+    const request = http.expectOne(myPermissionsPath);
+    expect(request.request.method).toBe('GET');
+    expect(request.request.headers.get('x-csrf')).toBe('1');
+    request.flush({ data: [Permission.ViewUsers, Permission.ViewProperties] });
+    await ready;
     expect(access.known()).toBe(true);
     expect(access.can(Permission.ViewUsers)).toBe(true);
     expect(access.can(Permission.ManageUsers)).toBe(false);
   });
 
-  it('modules: held for the property, or chain-wide, or not at all', () => {
-    const access = configure(ahmad, () => grants);
-    expect(access.entitled('front-office', 'GRD')).toBe(true);
-    expect(access.entitled('front-office', 'RYD')).toBe(false);
-    expect(access.entitled('reports', 'RYD')).toBe(true);
+  it('the door not answering leaves everything hidden; reload asks again', async () => {
+    const ready = access.ready();
+    await Array.from({ length: ATTEMPTS }).reduce<Promise<void>>(async (previous) => {
+      await previous;
+      http
+        .expectOne(myPermissionsPath)
+        .flush(null, { status: SERVICE_UNAVAILABLE, statusText: 'Down' });
+      await tick();
+    }, Promise.resolve());
+    await ready;
+    expect(access.status()).toBe('unavailable');
+    expect(access.can(Permission.ViewUsers)).toBe(false);
+    const again = access.reload();
+    http.expectOne(myPermissionsPath).flush({ data: [Permission.ViewUsers] });
+    await again;
+    expect(access.can(Permission.ViewUsers)).toBe(true);
+  });
+
+  it('modules are not in the payload yet: no line is held', async () => {
+    const ready = access.ready();
+    http.expectOne(myPermissionsPath).flush({ data: [] });
+    await ready;
+    expect(access.entitled('front-office', 'GRD')).toBe(false);
+  });
+
+  it('a 403 reads the grants once more; a second 403 soon after does not', async () => {
+    const ready = access.ready();
+    http.expectOne(myPermissionsPath).flush({ data: [] });
+    await ready;
+    events.forbidden.update((n) => n + 1);
+    await settle();
+    http.expectOne(myPermissionsPath).flush({ data: [Permission.ViewUsers] });
+    await tick();
+    expect(access.can(Permission.ViewUsers)).toBe(true);
+    events.forbidden.update((n) => n + 1);
+    await settle();
+    http.expectNone(myPermissionsPath);
+  });
+
+  it('after a separate-window sign-in finished, the grants are read again', async () => {
+    const ready = access.ready();
+    http.expectOne(myPermissionsPath).flush({ data: [] });
+    await ready;
+    resumed.update((n) => n + 1);
+    await settle();
+    http.expectOne(myPermissionsPath).flush({ data: [Permission.ViewRoles] });
+    await tick();
+    expect(access.can(Permission.ViewRoles)).toBe(true);
   });
 });

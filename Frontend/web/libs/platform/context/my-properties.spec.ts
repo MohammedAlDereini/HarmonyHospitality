@@ -7,7 +7,7 @@ import { MyProperties, myPropertiesPath } from './my-properties';
 
 const FORBIDDEN = 403;
 const SERVICE_UNAVAILABLE = 503;
-const EXPECTED_PAGE_SIZE = 200;
+const EXPECTED_PAGE_SIZE = 100;
 /** A field Identity sends that no screen reads; it must not survive the mapping. */
 const ROOMS_NOBODY_READS = 120;
 const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 1));

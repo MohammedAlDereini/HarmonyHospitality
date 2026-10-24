@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { SessionStore, SessionUser } from '@harmony/platform/session';
-import { ACCESS_GRANTS, AccessGrants } from './access-grants';
+import { AccessStore } from './access-store';
 import { IfAllowed } from './if-allowed.directive';
 import { Permission } from './permission';
 
@@ -15,38 +14,36 @@ class Host {
   protected readonly permission: Permission = Permission.ViewUsers;
 }
 
-const ahmad: SessionUser = {
-  sub: 'u1',
-  name: 'Ahmad',
-  tenant: 't1',
-  roles: [],
-  amr: ['pwd'],
-  logoutUrl: '/bff/logout?sid=1',
-};
-
 describe('*hrIfAllowed', () => {
-  const render = async (grants: AccessGrants | null): Promise<string> => {
-    TestBed.resetTestingModule();
+  const held = signal<ReadonlySet<number>>(new Set());
+
+  const render = async (): Promise<{ text: () => string; settle: () => Promise<void> }> => {
     TestBed.configureTestingModule({
       providers: [
-        { provide: SessionStore, useValue: { user: signal(ahmad) } },
-        { provide: ACCESS_GRANTS, useValue: () => grants },
+        {
+          provide: AccessStore,
+          useValue: { can: (permission: Permission) => held().has(permission) },
+        },
       ],
     });
     const fixture = TestBed.createComponent(Host);
-    fixture.detectChanges();
-    await fixture.whenStable();
-    return (fixture.nativeElement as HTMLElement).textContent.trim();
+    const settle = async (): Promise<void> => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+    };
+    await settle();
+    return { text: () => (fixture.nativeElement as HTMLElement).textContent.trim(), settle };
   };
 
-  it('shows the content for a held permission', async () => {
-    expect(
-      await render({ permissions: new Set<Permission>([Permission.ViewUsers]), modules: {} }),
-    ).toBe('Users');
-  });
-
-  it('shows nothing for a missing permission, and nothing while grants are unknown', async () => {
-    expect(await render({ permissions: new Set<Permission>(), modules: {} })).toBe('');
-    expect(await render(null)).toBe('');
+  it('shows the content only while the permission is held, and follows changes', async () => {
+    held.set(new Set());
+    const page = await render();
+    expect(page.text()).toBe('');
+    held.set(new Set([Permission.ViewUsers]));
+    await page.settle();
+    expect(page.text()).toBe('Users');
+    held.set(new Set());
+    await page.settle();
+    expect(page.text()).toBe('');
   });
 });

@@ -16,6 +16,7 @@ using Harmony.Identity.Handler.Queries.UserAccountModule.Detail;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Devices;
 using Harmony.Identity.Handler.Queries.UserAccountModule.List;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Passkeys;
+using Harmony.Identity.Handler.Queries.UserAccountModule.Permissions;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Security;
 
 namespace Harmony.Identity.Api.Controllers;
@@ -164,6 +165,19 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     public async Task<IActionResult> MySecurityEvents()
     {
         var response = await this.Mediator.Send(new GetSecurityEventsQuery());
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>
+    /// The caller's own effective permissions: the values of every role the token names, the same set the permission
+    /// check decides from. The web app shows and hides with it; it authorises nothing.
+    /// </summary>
+    [HttpGet("[action]")]
+    [ProducesResponseType(typeof(List<int>), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> MyPermissions()
+    {
+        var response = await this.Mediator.Send(new GetMyPermissionsQuery());
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 

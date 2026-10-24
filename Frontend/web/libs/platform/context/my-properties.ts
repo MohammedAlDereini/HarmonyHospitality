@@ -5,8 +5,8 @@ import { Paged } from '@harmony/shared/domain';
 import { firstValueFrom } from 'rxjs';
 import { PropertyRow, PropertySummary, summaryOf } from './property-summary';
 
-/** Identity pages its answers; a person's own hotels fit in one page of this size. */
-const PAGE_SIZE = 200;
+/** Identity pages its answers, at most 100 a page; a person's own hotels fit in one. */
+const PAGE_SIZE = 100;
 const FIRST_PAGE = 1;
 
 export const myPropertiesPath = '/api/Property/mine';
@@ -24,6 +24,7 @@ export class MyProperties {
   private readonly listSignal = signal<readonly PropertySummary[]>([]);
   private readonly statusSignal = signal<MyPropertiesStatus>('unknown');
   private inFlight: Promise<void> | null = null;
+  private seenResumed = 0;
 
   readonly list = this.listSignal.asReadonly();
   readonly status = this.statusSignal.asReadonly();
@@ -31,9 +32,12 @@ export class MyProperties {
   constructor() {
     // A separate-window sign-in finished: what was read before may be stale.
     effect(() => {
-      this.session.resumed();
+      const count = this.session.resumed();
       untracked(() => {
-        if (this.statusSignal() !== 'unknown') void this.reload();
+        if (count > this.seenResumed) {
+          this.seenResumed = count;
+          if (this.statusSignal() !== 'unknown') void this.reload();
+        }
       });
     });
   }

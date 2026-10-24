@@ -1,12 +1,8 @@
-/** Identity's AdministrativeState, sent as a number (UserAccountModel.State). */
-const ACTIVE = 1;
-const SUSPENDED = 2;
-const TERMINATED = 3;
-
+/** Identity's AdministrativeState, sent by name (the platform serialises enums as strings). */
 export const AccountState = {
-  active: ACTIVE,
-  suspended: SUSPENDED,
-  terminated: TERMINATED,
+  active: 'Active',
+  suspended: 'Suspended',
+  terminated: 'Terminated',
 } as const;
 
 export type AccountState = (typeof AccountState)[keyof typeof AccountState];
