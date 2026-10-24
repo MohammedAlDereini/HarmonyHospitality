@@ -1,10 +1,11 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UsersStore } from '@harmony/administration/data-access';
+import { RolesStore, UsersStore } from '@harmony/administration/data-access';
 import { AccountState, UserAccount, UserFilters } from '@harmony/administration/domain';
 import { AccessStore } from '@harmony/platform/access';
 import { PropertyContext } from '@harmony/platform/context';
 import { ApiResult, IntentKey } from '@harmony/platform/http';
+import { PageActions } from '@harmony/ui/shell';
 import { UsersPage } from './users-page';
 
 const OK = 200;
@@ -80,6 +81,15 @@ describe('UsersPage', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: UsersStore, useValue: store },
+        {
+          provide: RolesStore,
+          useValue: {
+            options: signal([]),
+            loading: signal(false),
+            problem: signal(null),
+            load: () => undefined,
+          },
+        },
         { provide: PropertyContext, useValue: { formatInstant: () => 'Oct 24, 2026' } },
         { provide: AccessStore, useValue: { can: () => mayManage } },
       ],
@@ -164,5 +174,26 @@ describe('UsersPage', () => {
     await render();
     expect(page.querySelector('.act')).toBeNull();
     mayManage = true;
+  });
+
+  it('the page offers Add user to the context bar; pressing it opens the new-account form above the rows', async () => {
+    store.rows.set([ahmad]);
+    await render();
+    const offered = TestBed.inject(PageActions).template();
+    if (offered === null) throw new Error('nothing offered to the slot');
+    const slot = document.createElement('div');
+    const view = offered.createEmbeddedView(undefined);
+    view.detectChanges();
+    view.rootNodes.forEach((node: Node) => slot.appendChild(node));
+    const button = slot.querySelector<HTMLButtonElement>('.pbtn');
+    expect(button?.textContent.trim()).toBe('Add user');
+    expect(page.querySelector('hr-account-creator')).toBeNull();
+    button?.click();
+    await render();
+    expect(page.querySelector('hr-account-creator')).not.toBeNull();
+    page.querySelector<HTMLButtonElement>('hr-account-creator .btn:not(.solid)')?.click();
+    await render();
+    expect(page.querySelector('hr-account-creator')).toBeNull();
+    view.destroy();
   });
 });

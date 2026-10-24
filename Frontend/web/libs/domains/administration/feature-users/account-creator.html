@@ -1,0 +1,101 @@
+<form class="creator" (submit)="onSubmit($event)" novalidate>
+  <h2 i18n="@@administration.users.new.title">New account</h2>
+  <p class="note" i18n="@@administration.users.new.invitation">
+    The person gets an email with a link to choose a password; nobody types one here.
+  </p>
+  <div class="fields">
+    <div class="f">
+      <label for="new-name" i18n="@@administration.users.new.name">Display name</label>
+      <input
+        id="new-name"
+        #nameBox
+        class="field"
+        type="text"
+        autocomplete="off"
+        dir="auto"
+        [formField]="form.displayName"
+        [attr.aria-invalid]="
+          form.displayName().touched() && form.displayName().invalid() ? 'true' : null
+        "
+        [attr.aria-describedby]="form.displayName().errors().length > 0 ? 'new-name-error' : null"
+      />
+      @if (form.displayName().touched() && form.displayName().errors().length > 0) {
+        <p id="new-name-error" class="field-error" role="alert">
+          @for (error of form.displayName().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="new-email" i18n="@@administration.users.new.email">Email</label>
+      <input
+        id="new-email"
+        class="field"
+        type="email"
+        autocomplete="off"
+        dir="ltr"
+        [formField]="form.email"
+        [attr.aria-invalid]="form.email().touched() && form.email().invalid() ? 'true' : null"
+        [attr.aria-describedby]="form.email().errors().length > 0 ? 'new-email-error' : null"
+      />
+      @if (form.email().touched() && form.email().errors().length > 0) {
+        <p id="new-email-error" class="field-error" role="alert">
+          @for (error of form.email().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="new-role" i18n="@@administration.users.new.role">Role</label>
+      <select
+        id="new-role"
+        class="field"
+        [formField]="form.roleId"
+        [attr.aria-invalid]="form.roleId().touched() && form.roleId().invalid() ? 'true' : null"
+        [attr.aria-describedby]="form.roleId().errors().length > 0 ? 'new-role-error' : null"
+      >
+        <option value="" i18n="@@administration.users.new.choose-role">Choose a role</option>
+        @for (role of roles.options(); track role.id) {
+          <option [value]="role.id">{{ label(role) }}</option>
+        }
+      </select>
+      @if (roles.problem(); as text) {
+        <p class="field-error" role="alert">
+          {{ text }}&ngsp;<button
+            type="button"
+            class="btn"
+            (click)="roles.load()"
+            i18n="@@administration.users.new.roles-again"
+          >
+            Try again
+          </button>
+        </p>
+      }
+      @if (form.roleId().touched() && form.roleId().errors().length > 0) {
+        <p id="new-role-error" class="field-error" role="alert">
+          @for (error of form.roleId().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+  </div>
+  <div class="acts">
+    <button
+      type="submit"
+      class="btn solid"
+      [disabled]="form().submitting()"
+      i18n="@@administration.users.new.go"
+    >
+      Create account
+    </button>
+    <button type="button" class="btn" (click)="cancel()" i18n="@@administration.users.new.cancel">
+      Cancel
+    </button>
+  </div>
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
+</form>

@@ -838,6 +838,182 @@
           <context context-type="linenumber">14</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="administration.users.new.title" datatype="html">
+        <source>New account</source>
+        <target>حساب جديد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
+          <context context-type="linenumber">2,3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.new.invitation" datatype="html">
+        <source> The person gets an email with a link to choose a password; nobody types one here. </source>
+        <target>يصل الشخص بريد إلكتروني فيه رابط لاختيار كلمة المرور؛ لا أحد يكتبها هنا.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
+          <context context-type="linenumber">4,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.new.name" datatype="html">
+        <source>Display name</source>
+        <target>الاسم الظاهر</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
+          <context context-type="linenumber">8,11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.new.email" datatype="html">
+        <source>Email</source>
+        <target>البريد الإلكتروني</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
+          <context context-type="linenumber">31,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.new.role" datatype="html">
+        <source>Role</source>
+        <target>الدور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
+          <context context-type="linenumber">51,53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.new.choose-role" datatype="html">
+        <source>Choose a role</source>
+        <target>اختر دوراً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
+          <context context-type="linenumber">59,60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.new.roles-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
+          <context context-type="linenumber">72,75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.new.go" datatype="html">
+        <source> Create account </source>
+        <target>إنشاء الحساب</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
+          <context context-type="linenumber">92,94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.new.cancel" datatype="html">
+        <source> Cancel </source>
+        <target>إلغاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
+          <context context-type="linenumber">95,98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.add" datatype="html">
+        <source>Add user</source>
+        <target>إضافة مستخدم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">10,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00015" datatype="html">
+        <source>That role no longer exists.</source>
+        <target>هذا الدور لم يعد موجوداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00042" datatype="html">
+        <source>The account could not be stored. Try again.</source>
+        <target>تعذّر حفظ الحساب. حاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00048" datatype="html">
+        <source>An account with this email already exists.</source>
+        <target>يوجد حساب بهذا البريد الإلكتروني.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00054" datatype="html">
+        <source>The invitation could not be sent, so the account was not created. Try again later.</source>
+        <target>تعذّر إرسال الدعوة، فلم يُنشأ الحساب. حاول لاحقاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00077" datatype="html">
+        <source>That role stands above your own rank.</source>
+        <target>هذا الدور أعلى رتبةً منك.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10308" datatype="html">
+        <source>Give a display name.</source>
+        <target>اذكر الاسم الظاهر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10309" datatype="html">
+        <source>The name is too long: 128 characters at most.</source>
+        <target>الاسم طويل جداً: 128 حرفاً على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10310" datatype="html">
+        <source>Give an email address.</source>
+        <target>اذكر البريد الإلكتروني.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10311" datatype="html">
+        <source>That does not look like an email address.</source>
+        <target>هذا لا يبدو بريداً إلكترونياً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10312" datatype="html">
+        <source>The email is too long: 256 characters at most.</source>
+        <target>البريد الإلكتروني طويل جداً: 256 حرفاً على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10315" datatype="html">
+        <source>Choose a role.</source>
+        <target>اختر دوراً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10316" datatype="html">
+        <source>Choose a role.</source>
+        <target>اختر دوراً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

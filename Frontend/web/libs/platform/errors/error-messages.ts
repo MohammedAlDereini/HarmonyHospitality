@@ -14,6 +14,19 @@ const byCode: Readonly<Record<string, string>> = {
   '00079': $localize`:@@platform.errors.code.00079:This is the last administrator; the tenant would be left with nobody in charge.`,
   '10303': $localize`:@@platform.errors.code.10303:Give a reason.`,
   '10304': $localize`:@@platform.errors.code.10304:The reason is too long: 500 characters at most.`,
+  // Identity, a new account
+  '00015': $localize`:@@platform.errors.code.00015:That role no longer exists.`,
+  '00042': $localize`:@@platform.errors.code.00042:The account could not be stored. Try again.`,
+  '00048': $localize`:@@platform.errors.code.00048:An account with this email already exists.`,
+  '00054': $localize`:@@platform.errors.code.00054:The invitation could not be sent, so the account was not created. Try again later.`,
+  '00077': $localize`:@@platform.errors.code.00077:That role stands above your own rank.`,
+  '10308': $localize`:@@platform.errors.code.10308:Give a display name.`,
+  '10309': $localize`:@@platform.errors.code.10309:The name is too long: 128 characters at most.`,
+  '10310': $localize`:@@platform.errors.code.10310:Give an email address.`,
+  '10311': $localize`:@@platform.errors.code.10311:That does not look like an email address.`,
+  '10312': $localize`:@@platform.errors.code.10312:The email is too long: 256 characters at most.`,
+  '10315': $localize`:@@platform.errors.code.10315:Choose a role.`,
+  '10316': $localize`:@@platform.errors.code.10316:Choose a role.`,
 };
 
 /** Wording per kind, used when no code has its own (the "Person sees" column of architecture 14). */

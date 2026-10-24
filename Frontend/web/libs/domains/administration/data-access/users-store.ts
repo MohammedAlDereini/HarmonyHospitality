@@ -1,6 +1,6 @@
 import { httpResource } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { AccountState, UserAccount, UserFilters } from '@harmony/administration/domain';
+import { AccountState, NewAccount, UserAccount, UserFilters } from '@harmony/administration/domain';
 import { PropertyScope } from '@harmony/platform/context';
 import { messageOf } from '@harmony/platform/errors';
 import { ApiClient, ApiResult, Envelope, IntentKey, fromError } from '@harmony/platform/http';
@@ -10,6 +10,7 @@ import { PageRequest, Paged } from '@harmony/shared/domain';
 export const usersPath = '/api/UserAccount/get-all';
 export const suspendPath = '/api/UserAccount/Suspend';
 export const reinstatePath = '/api/UserAccount/Reinstate';
+export const createPath = '/api/UserAccount/Create';
 /** Identity accepts 1 to 100 rows a page. */
 export const USERS_PAGE_SIZE = 25;
 const FIRST_PAGE = 1;
@@ -73,6 +74,16 @@ export class UsersStore {
 
   reinstate(user: UserAccount, intent: IntentKey): Promise<ApiResult<unknown>> {
     return this.write(this.api.put(reinstatePath, { id: user.id }, intent));
+  }
+
+  /** A new account with one role and no password: Identity mails the invitation (CreateUserAccountCommand). */
+  create(account: NewAccount, intent: IntentKey): Promise<ApiResult<unknown>> {
+    const body = {
+      displayName: account.displayName,
+      email: account.email,
+      roleIds: [account.roleId],
+    };
+    return this.write(this.api.post(createPath, body, intent));
   }
 
   /** A write that succeeded changes the list; read it again. The outcome goes back to the screen as it is. */

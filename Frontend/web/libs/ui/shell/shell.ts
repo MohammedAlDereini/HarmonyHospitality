@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -27,6 +28,7 @@ import { BrandLockup } from './brand-lockup';
 import { crumbsOf } from './crumbs';
 import { LookStore } from './look-store';
 import { NavItem, NavPanel } from './nav-panel';
+import { PageActions } from './page-actions';
 import { PopAt } from './pop-at.directive';
 
 /** The navigation that brought the shell itself to life; focus moves only on the ones after it. */
@@ -37,12 +39,22 @@ const FOCUSABLE_BY_SCRIPT_ONLY = -1;
 /**
  * The frame every signed-in screen lives in, as the prototype home(8) drew it (architecture 8.3, 10, 14): the 44 px
  * global bar with the menu, the lockup, the operating scope, the search and the account; the dock of workspaces; the
- * 40 px context bar with the breadcrumb; the strips for a gone session, a BFF that does not answer and an unexpected
- * failure; the skip link and the main landmark. Menus are native popovers placed under their buttons.
+ * 40 px context bar with the breadcrumb and the page's own actions; the strips for a gone session, a BFF that does
+ * not answer and an unexpected failure; the skip link and the main landmark. Menus are native popovers placed under
+ * their buttons.
  */
 @Component({
   selector: 'hr-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, BrandLockup, Icon, NavPanel, PopAt],
+  imports: [
+    NgTemplateOutlet,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    BrandLockup,
+    Icon,
+    NavPanel,
+    PopAt,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './shell.html',
   styleUrl: './shell.css',
@@ -53,6 +65,7 @@ export class Shell {
   protected readonly properties = inject(MyProperties);
   protected readonly current = inject(CurrentProperty);
   protected readonly look = inject(LookStore);
+  protected readonly actions = inject(PageActions);
   private readonly access = inject(AccessStore);
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);

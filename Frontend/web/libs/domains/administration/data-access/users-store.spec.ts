@@ -3,7 +3,14 @@ import { TestBed } from '@angular/core/testing';
 import { AccountState, UserAccount } from '@harmony/administration/domain';
 import { PropertyScope } from '@harmony/platform/context';
 import { API_RETRY_DELAYS, newIntentKey, provideHarmonyHttp } from '@harmony/platform/http';
-import { USERS_PAGE_SIZE, UsersStore, reinstatePath, suspendPath, usersPath } from './users-store';
+import {
+  USERS_PAGE_SIZE,
+  UsersStore,
+  createPath,
+  reinstatePath,
+  suspendPath,
+  usersPath,
+} from './users-store';
 
 const SERVICE_UNAVAILABLE = 503;
 const ACCEPTED = 202;
@@ -124,5 +131,27 @@ describe('UsersStore', () => {
     expect(await refused).toEqual({ kind: 'refused', status: ACCEPTED, codes: ['00076'] });
     await settle();
     http.expectNone(usersPath);
+  });
+
+  it('create posts the name, the email and the one role with the intent key, no password; then reads the list again', async () => {
+    await settle();
+    http.expectOne(usersPath).flush({ data: { results: [ahmad], totalCount: 1 } });
+    const intent = newIntentKey();
+    const done = store.create(
+      { displayName: 'Rana Qasem', email: 'rana@ritz.test', roleId: 'r1' },
+      intent,
+    );
+    const request = http.expectOne(createPath);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({
+      displayName: 'Rana Qasem',
+      email: 'rana@ritz.test',
+      roleIds: ['r1'],
+    });
+    expect(request.request.headers.get('Idempotency-Key')).toBe(intent.value);
+    request.flush({ data: 'u9' });
+    expect((await done).kind).toBe('ok');
+    await settle();
+    http.expectOne(usersPath).flush({ data: { results: [ahmad], totalCount: 1 } });
   });
 });

@@ -1,3 +1,15 @@
+<ng-template hrPageActions>
+  <button
+    *hrIfAllowed="manageUsers"
+    type="button"
+    class="pbtn primary"
+    (click)="openCreator()"
+    [attr.aria-expanded]="creating()"
+  >
+    <hr-icon name="plus" size="13" />
+    <span i18n="@@administration.users.add">Add user</span>
+  </button>
+</ng-template>
 <div class="sec-h">
   <h1 i18n="@@administration.users.title">Users</h1>
   @if (!store.loading() && store.problem() === null) {
@@ -22,6 +34,9 @@
     <button type="submit" class="btn" i18n="@@administration.users.find">Find</button>
   </form>
 </div>
+@if (creating()) {
+  <hr-account-creator (done)="closeCreator()" (cancelled)="closeCreator()" />
+}
 @if (store.problem(); as problem) {
   <p class="empty" role="alert">
     {{ problem }}&ngsp;<button

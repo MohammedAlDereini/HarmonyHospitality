@@ -1,11 +1,22 @@
-import { signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AccessStore } from '@harmony/platform/access';
 import { CurrentProperty, MyProperties, PropertySummary } from '@harmony/platform/context';
 import { FailureNotice } from '@harmony/platform/errors';
 import { SessionState, SessionStore, SessionUser } from '@harmony/platform/session';
+import { PageActions } from './page-actions';
 import { Shell } from './shell';
+
+/** Stands for a page that offers one button to the context bar. */
+@Component({
+  selector: 'hr-offer',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `<ng-template #offer><button type="button" class="pbtn">Grid</button></ng-template>`,
+})
+class Offer {
+  readonly template = viewChild.required<TemplateRef<unknown>>('offer');
+}
 
 const ahmad: SessionUser = {
   sub: 'u1',
@@ -175,5 +186,18 @@ describe('Shell', () => {
   it('the skip link moves focus to the main landmark', () => {
     click('a.skip');
     expect(document.activeElement).toBe(page.querySelector('main'));
+  });
+
+  it("the context bar renders the page's actions next to the breadcrumb, and empties when the page releases them", async () => {
+    expect(page.querySelector('.pacts .pbtn')).toBeNull();
+    const offer = TestBed.createComponent(Offer);
+    offer.detectChanges();
+    const actions = TestBed.inject(PageActions);
+    actions.take(offer.componentInstance.template());
+    await render();
+    expect(text('.cbar .pacts .pbtn')).toBe('Grid');
+    actions.release(offer.componentInstance.template());
+    await render();
+    expect(page.querySelector('.pacts .pbtn')).toBeNull();
   });
 });

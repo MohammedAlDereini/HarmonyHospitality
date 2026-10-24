@@ -6,20 +6,23 @@ import { PropertyContext } from '@harmony/platform/context';
 import { messageOf } from '@harmony/platform/errors';
 import { newIntentKey } from '@harmony/platform/http';
 import { initialsOf } from '@harmony/shared/domain';
+import { Icon } from '@harmony/ui/icons';
 import { Tone } from '@harmony/ui/primitives';
+import { PageActionsTemplate } from '@harmony/ui/shell';
+import { AccountCreator } from './account-creator';
 import { AccountStateEditor } from './account-state-editor';
 
 const PAGE_STEP = 1;
 const dateOnly: Intl.DateTimeFormatOptions = { dateStyle: 'medium' };
 
 /**
- * The accounts of the customer: who may sign in, how they sign in, since when; and, with ManageUsers, the first
- * writes: suspend with a reason, reinstate (architecture 6, administration). The buttons are presentation: the API
- * refuses on its own.
+ * The accounts of the customer: who may sign in, how they sign in, since when; and, with ManageUsers, the writes:
+ * a new account from the context bar's action slot, suspend with a reason, reinstate (architecture 6,
+ * administration). The buttons are presentation: the API refuses on its own.
  */
 @Component({
   selector: 'hr-users-page',
-  imports: [IfAllowed, AccountStateEditor],
+  imports: [IfAllowed, Icon, PageActionsTemplate, AccountCreator, AccountStateEditor],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './users-page.html',
   styleUrl: './users-page.css',
@@ -37,6 +40,8 @@ export class UsersPage {
   protected readonly hasPrevious = computed(() => this.page() > PAGE_STEP);
   protected readonly hasNext = computed(() => this.to() < this.store.total());
 
+  /** True while the new-account form is open. */
+  protected readonly creating = signal(false);
   /** The account whose suspension is being written, if any. */
   protected readonly editing = signal<string | null>(null);
   /** The account being reinstated right now, if any. */
@@ -100,6 +105,15 @@ export class UsersPage {
 
   protected createdOn(user: UserAccount): string {
     return this.context.formatInstant(user.createdDate, dateOnly);
+  }
+
+  protected openCreator(): void {
+    this.actionProblem.set(null);
+    this.creating.set(true);
+  }
+
+  protected closeCreator(): void {
+    this.creating.set(false);
   }
 
   protected openSuspend(user: UserAccount): void {

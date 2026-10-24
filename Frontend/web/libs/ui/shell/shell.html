@@ -96,7 +96,11 @@
           <b aria-current="page">{{ page }}</b>
         }
       </nav>
-      <div class="pacts"></div>
+      <div class="pacts">
+        @if (actions.template(); as template) {
+          <ng-container *ngTemplateOutlet="template" />
+        }
+      </div>
     </div>
     @if (session.state() === 'expired') {
       <div class="strip strip-session" role="status">
