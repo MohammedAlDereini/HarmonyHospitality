@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { sessionReady, sessionRoutes } from '@harmony/platform/session';
+import { PropertyChooser } from '@harmony/platform/context';
 
 // The shape every screen follows (architecture 10): the session pages outside, everything else inside the shell.
 export const routes: Routes = [
@@ -9,7 +10,7 @@ export const routes: Routes = [
     canMatch: [sessionReady],
     loadComponent: async () => (await import('@harmony/ui/shell')).Shell,
     children: [
-      { path: '', loadComponent: async () => (await import('./home')).Home },
+      { path: '', pathMatch: 'full', component: PropertyChooser },
       { path: 'hello', loadComponent: async () => (await import('./hello')).Hello },
     ],
   },

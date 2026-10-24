@@ -9,18 +9,39 @@
           <context context-type="linenumber">6,9</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="harmony-web.home.title" datatype="html">
-        <source>Harmony</source>
+      <trans-unit id="platform.context.chooser.title" datatype="html">
+        <source>Choose a property</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">apps/harmony-web/src/app/home.ts</context>
-          <context context-type="linenumber">9,10</context>
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">1,2</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="harmony-web.home.hello-link" datatype="html">
-        <source>A deep link</source>
+      <trans-unit id="platform.context.chooser.loading" datatype="html">
+        <source>Loading your properties…</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">apps/harmony-web/src/app/home.ts</context>
-          <context context-type="linenumber">10,14</context>
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.unavailable" datatype="html">
+        <source>Your properties could not be loaded.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">6,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.try-again" datatype="html">
+        <source> Try again </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">8,11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.none" datatype="html">
+        <source>No property is assigned to you yet.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">12,15</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.000-06" datatype="html">
@@ -195,14 +216,14 @@
         <source> Reload </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">42,44</context>
+          <context context-type="linenumber">44,46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.dismiss" datatype="html">
         <source> Dismiss </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">50,54</context>
+          <context context-type="linenumber">52,56</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.leave-warning" datatype="html">

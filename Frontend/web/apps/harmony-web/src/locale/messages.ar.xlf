@@ -10,22 +10,6 @@
           <context context-type="linenumber">6,8</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="harmony-web.home.title" datatype="html">
-        <source>Harmony</source>
-        <target>هارموني</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">apps/harmony-web/src/app/home.ts</context>
-          <context context-type="linenumber">9,10</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="harmony-web.home.hello-link" datatype="html">
-        <source>A deep link</source>
-        <target>رابط عميق</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">apps/harmony-web/src/app/home.ts</context>
-          <context context-type="linenumber">10,13</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="platform.errors.code.000-06" datatype="html">
         <source>Still working… please wait a moment.</source>
         <target>لا يزال العمل جارياً… يرجى الانتظار لحظة.</target>
@@ -240,6 +224,46 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
           <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.title" datatype="html">
+        <source>Choose a property</source>
+        <target>اختر فندقاً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">1,2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.loading" datatype="html">
+        <source>Loading your properties…</source>
+        <target>جارٍ تحميل فنادقك…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.unavailable" datatype="html">
+        <source>Your properties could not be loaded.</source>
+        <target>تعذّر تحميل فنادقك.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">6,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.try-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">8,11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.none" datatype="html">
+        <source>No property is assigned to you yet.</source>
+        <target>لم يُسنَد إليك أي فندق بعد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">12,15</context>
         </context-group>
       </trans-unit>
     </body>

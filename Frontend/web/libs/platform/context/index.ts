@@ -1,0 +1,10 @@
+export type { PropertySummary } from './property-summary';
+export { propertyName } from './property-summary';
+export type { MyPropertiesStatus } from './my-properties';
+export { MyProperties } from './my-properties';
+export { PropertyScope } from './property-scope';
+export type { PropertyScopeKey } from './property-context';
+export { PropertyContext, propertyParameter } from './property-context';
+export { propertyAllowed } from './property-allowed.guard';
+export { PropertyChooser } from './property-chooser';
+export { providePropertyContext } from './provide';
