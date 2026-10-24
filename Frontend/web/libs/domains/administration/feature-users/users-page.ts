@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { USERS_PAGE_SIZE, UsersStore } from '@harmony/administration/data-access';
 import { AccountState, UserAccount } from '@harmony/administration/domain';
 import { PropertyContext } from '@harmony/platform/context';
+import { initialsOf } from '@harmony/shared/domain';
+import { Tone } from '@harmony/ui/primitives';
 
 const PAGE_STEP = 1;
 const dateOnly: Intl.DateTimeFormatOptions = { dateStyle: 'medium' };
@@ -31,6 +33,13 @@ export class UsersPage {
     [AccountState.terminated]: $localize`:@@administration.users.state.terminated:Terminated`,
   };
 
+  /** Text says the state; the tone only underlines it (status never by colour alone). */
+  private readonly stateTone: Readonly<Record<AccountState, Tone | null>> = {
+    [AccountState.active]: null,
+    [AccountState.suspended]: 'warn',
+    [AccountState.terminated]: 'stop',
+  };
+
   protected onSearch(event: Event, text: string): void {
     event.preventDefault();
     this.store.search(text);
@@ -44,8 +53,16 @@ export class UsersPage {
     this.store.goTo(this.page() + PAGE_STEP);
   }
 
+  protected initials(user: UserAccount): string {
+    return initialsOf(user.displayName);
+  }
+
   protected stateOf(user: UserAccount): string {
     return this.stateWording[user.state];
+  }
+
+  protected toneOf(user: UserAccount): Tone | null {
+    return this.stateTone[user.state];
   }
 
   protected twoStepOf(user: UserAccount): string {

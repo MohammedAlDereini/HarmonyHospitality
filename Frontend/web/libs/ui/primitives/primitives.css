@@ -1,0 +1,467 @@
+/* The prototype's controls, menus, section headers and rows (home(8)), copied rule by rule onto the tokens.
+   Fixed heights became min-heights where text may grow (rule 15); every colour is a token; direction is logical. */
+
+/* ── Buttons and links ─────────────────────────────────────────────── */
+.btn {
+  min-height: var(--control-md);
+  padding: 0 13px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+}
+.btn:hover {
+  border-color: var(--ink-3);
+}
+.btn.solid {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--canvas);
+}
+.btn.solid:hover {
+  opacity: 0.86;
+}
+.btn:disabled {
+  color: var(--ink-3);
+  cursor: default;
+}
+.btn:disabled:hover {
+  border-color: var(--rule-2);
+}
+.pbtn {
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.pbtn:hover,
+.pbtn[aria-expanded='true'] {
+  background: var(--sunk);
+  color: var(--ink);
+}
+.pbtn .car {
+  color: var(--ink-4);
+  font-size: 11px;
+}
+.pbtn.primary {
+  background: var(--ink);
+  color: var(--canvas);
+  margin-inline-start: 4px;
+}
+.pbtn.primary:hover {
+  background: var(--ink);
+  opacity: 0.86;
+}
+.pbtn.more {
+  width: 30px;
+  padding: 0;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+}
+.tlink {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  border-block-end: 1px solid var(--rule-2);
+  padding-block-end: 1px;
+  white-space: nowrap;
+}
+.tlink:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.seg {
+  display: flex;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+.seg button,
+.seg a {
+  min-height: 26px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.seg :is(button, a) + :is(button, a) {
+  border-inline-start: 1px solid var(--rule-2);
+}
+.seg button[aria-pressed='true'],
+.seg a[aria-current='true'] {
+  background: var(--ink);
+  color: var(--canvas);
+}
+.field {
+  min-height: 32px;
+  border: 1px solid var(--control-border);
+  border-radius: 4px;
+  padding: 0 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+}
+
+/* ── Section header, scroll region, empty state ───────────────────── */
+.sec-h {
+  flex: none;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding: 0 var(--s6);
+  border-block-end: 1px solid var(--rule);
+}
+.sec-h h1,
+.sec-h h2 {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+html[lang='ar'] .sec-h h1,
+html[lang='ar'] .sec-h h2 {
+  letter-spacing: 0.03em;
+}
+.sec-h .note {
+  font-size: 12px;
+  color: var(--ink-4);
+}
+.sec-h .r {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.empty {
+  padding: 14px var(--s6);
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* ── Menus (popovers) ─────────────────────────────────────────────── */
+.pop {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  z-index: 120;
+  min-width: 258px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-overlay);
+  padding: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.pop.wide {
+  width: 340px;
+}
+html[data-theme='dark'] :is(.pop, .navp) {
+  --surface: var(--elev);
+  background: var(--elev);
+}
+.pop-h {
+  padding: 8px 10px 4px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 700;
+}
+html[lang='ar'] .pop-h {
+  letter-spacing: 0.02em;
+}
+.pop-i {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 4px;
+  text-align: start;
+  font-size: 13px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.pop-i:hover {
+  background: var(--sunk);
+}
+.pop-i small {
+  display: block;
+  font-size: 11px;
+  color: var(--ink-4);
+  margin-block-start: 2px;
+}
+.pop-i b {
+  display: block;
+  unicode-bidi: plaintext;
+}
+.pop-i .ck {
+  margin-inline-start: auto;
+  color: var(--ink-2);
+  flex: none;
+}
+.pop-i:focus-visible {
+  outline-offset: -2px;
+}
+.pop-who {
+  display: grid;
+  gap: 2px;
+  padding: 4px 10px 10px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.pop-who b {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.pop-sec {
+  border-block-start: 1px solid var(--rule);
+  padding-block-start: 4px;
+}
+.pop-ctx {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.pop-ctx span {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pop-ctx em {
+  font-style: normal;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.pop-note {
+  padding: 8px 10px 2px;
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.45;
+}
+.pref {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.pop .seg button,
+.pop .seg a {
+  min-height: 26px;
+}
+.pcode {
+  font: 700 11px/1 var(--sans);
+  letter-spacing: 0.08em;
+  padding: 3px 5px 2px;
+  border: 1px solid var(--rule-2);
+  border-radius: 3px;
+  color: var(--ink-3);
+  flex: none;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* ── Rows: a row is a sentence about one thing; long content wraps and the row grows ── */
+.srow {
+  display: grid;
+  align-items: center;
+  gap: var(--s4);
+  width: 100%;
+  text-align: start;
+  padding: var(--rowpad) var(--s6);
+  border-block-end: 1px solid var(--rule);
+  min-height: var(--row);
+}
+.srow:hover {
+  background: var(--elev);
+}
+.srow[aria-current='true'] {
+  background: var(--brand-soft);
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+html[dir='rtl'] .srow[aria-current='true'] {
+  box-shadow: inset -3px 0 0 var(--brand);
+}
+.s-when {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.s-when small {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-block-start: 3px;
+}
+html[lang='ar'] .s-when small {
+  letter-spacing: 0;
+}
+.s-who {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  min-width: 0;
+}
+.ini {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font: 700 11px/1 var(--sans);
+  background: var(--info-bg);
+  color: var(--info);
+}
+.ini[data-vip='true'] {
+  background: var(--vip-bg);
+  color: var(--vip);
+}
+.s-nm {
+  min-width: 0;
+}
+.s-nm b {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  overflow-wrap: break-word;
+  unicode-bidi: plaintext;
+}
+html[dir='rtl'] .s-nm b {
+  text-align: end;
+}
+.s-nm span {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-block-start: 2px;
+  overflow-wrap: break-word;
+}
+.obj {
+  min-width: 0;
+}
+.obj b {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+}
+.obj span {
+  display: block;
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-block-start: 2px;
+}
+.obj[data-s='stop'] b {
+  color: var(--stop);
+}
+.obj[data-s='warn'] b {
+  color: var(--warn);
+}
+.obj[data-s='ok'] b {
+  color: var(--ok);
+}
+.act {
+  min-height: var(--control-md);
+  padding: 5px 10px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+.srow:hover .act {
+  border-color: var(--ink);
+}
+.act.hot {
+  background: var(--stop);
+  border-color: var(--stop);
+  color: var(--on-stop);
+}
+.srow:hover .act.hot {
+  border-color: var(--stop);
+}
+
+/* ── Navigation panel items ───────────────────────────────────────── */
+.ng-h {
+  padding: 12px 8px 4px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 700;
+}
+html[lang='ar'] .ng-h {
+  letter-spacing: 0.02em;
+}
+.ni {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 32px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--ink-2);
+  text-align: start;
+  text-decoration: none;
+}
+.ni:hover {
+  background: var(--sunk);
+  color: var(--ink);
+}
+.ni[aria-current='page'] {
+  background: var(--brand-soft);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Small text on selected or hovered rows takes the darker ink so it clears 4.5:1. */
+html:not([data-theme='dark']) :is(.srow[aria-current='true']),
+html:not([data-theme='dark']) :is(.srow, .pop-i, .ni):hover {
+  --ink-3: var(--ink-2);
+  --ink-4: var(--ink-2);
+}

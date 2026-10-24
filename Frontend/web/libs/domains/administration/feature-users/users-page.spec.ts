@@ -83,20 +83,19 @@ describe('UsersPage', () => {
     store.rows.set([ahmad, lina]);
     store.total.set(TOTAL);
     await render();
-    expect(text('tbody tr:first-child td')).toEqual([
+    expect(text('.urow:first-child .s-nm b, .urow:first-child .s-nm span')).toEqual([
       'Ahmad Saleh',
       'ahmad@ritz.test',
-      'On',
-      'Active',
-      'Oct 24, 2026',
     ]);
-    expect(text('tbody tr:last-child td')).toEqual([
+    expect(text('.urow:first-child .obj b')).toEqual(['On', 'Active']);
+    expect(text('.urow:first-child .s-when .num')).toEqual(['Oct 24, 2026']);
+    expect(text('.urow:first-child .ini')).toEqual(['AS']);
+    expect(text('.urow:last-child .s-nm b, .urow:last-child .s-nm span')).toEqual([
       'Lina Haddad',
       'lina@ritz.test',
-      'Exempt',
-      'Suspended',
-      'Oct 24, 2026',
     ]);
+    expect(text('.urow:last-child .obj b')).toEqual(['Exempt', 'Suspended']);
+    expect(page.querySelector('.urow:last-child .obj[data-s="warn"]')).not.toBeNull();
     expect(page.querySelector('.paging')?.textContent.replace(whitespace, ' ').trim()).toBe(
       'Previous 1–25 of 60 Next',
     );

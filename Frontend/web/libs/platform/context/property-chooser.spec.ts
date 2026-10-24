@@ -66,7 +66,8 @@ describe('PropertyChooser', () => {
     const page = await render();
     const link = page.querySelector('a');
     expect(link?.getAttribute('href')).toBe('/p/GRD');
-    expect(link?.textContent).toBe('Grand Riyadh');
+    expect(link?.textContent).toContain('Grand Riyadh');
+    expect(link?.textContent).toContain('GRD');
   });
 
   it('none assigned: says so', async () => {

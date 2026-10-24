@@ -1,9 +1,9 @@
-/* The frame, from the prototype home(8): .skip, .gbar, .brand, .gbtn, .gspace copied; fixed heights became
-   min-heights (text may grow, rule 15); every colour is a token. */
+/* The frame, from the prototype home(8): .skip, .gbar and its buttons, .frame, .dock, .work, .cbar copied; fixed
+   heights became min-heights where text sits (rule 15); every colour is a token; direction is logical. */
 :host {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
 }
 .skip {
   position: fixed;
@@ -21,6 +21,8 @@
 .skip:focus {
   inset-block-start: 8px;
 }
+
+/* ── Global bar · 44 px: who, where, command ───────────────────────── */
 .gbar {
   min-height: var(--bar);
   background: var(--shell);
@@ -32,18 +34,8 @@
   padding-inline-end: 8px;
   min-width: 0;
 }
-.brand {
-  display: flex;
-  align-items: center;
-  flex: none;
-  padding-inline: 6px 14px;
-}
-.gspace {
-  flex: 1;
-  min-width: 8px;
-}
 .gbtn {
-  min-height: var(--control-md);
+  min-height: 32px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -55,13 +47,199 @@
   min-width: 0;
   flex: none;
 }
-.gbtn:hover {
+.gbtn:hover,
+.gbtn[aria-expanded='true'] {
   background: var(--shell-2);
 }
-.gbtn .bdi {
+.navbtn {
+  width: 48px;
+  min-height: var(--bar);
+  padding: 0;
+  justify-content: center;
+  border-radius: 0;
+  color: var(--shell-ink-2);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  flex: none;
+  padding-inline: 6px 14px;
+}
+.gsep {
+  width: 1px;
+  height: 18px;
+  background: var(--shell-rule);
+  flex: none;
+  margin-inline: 4px;
+}
+/* The property gives way first when the bar is squeezed; its full name is in the menu. */
+.gbtn.gprop {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.gprop b {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+  min-width: min(9ch, max-content);
+}
+.gbtn .car {
   color: var(--shell-dim);
+}
+.gspace {
+  flex: 1;
+  min-width: 8px;
+}
+.cmd {
+  min-height: 30px;
+  width: 212px;
+  flex: none;
+  border: 1px solid var(--shell-field-rule);
+  border-radius: 4px;
+  background: var(--shell-field);
+  color: var(--shell-field-ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-block: 0;
+  padding-inline: 10px 7px;
+  font-size: 13px;
+  margin-inline-end: 4px;
+}
+.cmd:hover,
+.cmd[aria-expanded='true'] {
+  border-color: var(--shell-rule-2);
+  color: var(--shell-ink);
+}
+.cmd .lbl {
+  white-space: nowrap;
+  overflow: hidden;
+}
+.mebtn {
+  gap: 4px;
+  padding: 0 6px;
+}
+.av {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--avatar);
+  color: var(--avatar-ink);
+  display: grid;
+  place-items: center;
+  font: 700 11px/1 var(--sans);
   flex: none;
 }
+
+/* ── Frame: the dock and the work area ─────────────────────────────── */
+.frame {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.dock {
+  flex: none;
+  width: 48px;
+  background: var(--slate);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 7px 0;
+  border-inline-end: 1px solid var(--dock-rule);
+}
+.dock a,
+.dock button {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  color: var(--dock-ink);
+  margin-block-end: 3px;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.dock :is(a, button):hover {
+  background: var(--dock-hover);
+  color: var(--dock-hover-ink);
+}
+.dock a[aria-current='page'] {
+  background: var(--dock-current);
+  color: var(--dock-current-ink);
+}
+.dock .bottom {
+  margin-block-start: auto;
+}
+.dock .ic {
+  stroke-width: 1.35;
+}
+/* The dock says its name when a keyboard reaches it. */
+.dock :is(a, button):focus-visible::after {
+  content: attr(aria-label);
+  position: absolute;
+  inset-inline-start: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  background: var(--shell);
+  color: var(--shell-ink);
+  font: 600 12px/1 var(--sans);
+  padding: 6px 9px;
+  border-radius: 4px;
+  z-index: 5;
+  pointer-events: none;
+}
+html[lang='ar'] .dock :is(a, button):focus-visible::after {
+  font-family: var(--ar);
+}
+.work {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.work:focus {
+  outline: none;
+}
+
+/* ── Context bar · 40 px: where am I ──────────────────────────────── */
+.cbar {
+  min-height: 40px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: 0 var(--s6);
+  background: var(--surface);
+  border-block-end: 1px solid var(--rule);
+  min-width: 0;
+}
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-3);
+  white-space: nowrap;
+  min-width: 0;
+}
+.crumb .sl {
+  color: var(--rule-2);
+}
+.crumb b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.pacts {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+
+/* ── Strips: the session, the BFF, a failure ──────────────────────── */
 .strip {
   display: flex;
   align-items: center;
@@ -80,25 +258,39 @@
 .strip-failure {
   background: var(--stop-bg);
 }
-.btn {
-  min-height: var(--control-sm);
-  padding: 0 var(--s3);
-  border: 1px solid var(--control-border);
-  border-radius: var(--radius-control);
-  background: var(--surface);
-  color: var(--ink);
-  font-weight: 600;
-}
-.btn-quiet {
+.btn.quiet {
   border-color: transparent;
   background: none;
   font-weight: 400;
 }
-.work {
+
+/* The page scrolls as one (D32); its sections bring their own headers and padding. */
+.page {
   flex: 1;
-  min-width: 0;
-  padding: var(--s4);
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
-.work:focus {
-  outline: none;
+
+@media (max-width: 1280px) {
+  .cmd {
+    width: auto;
+  }
+  .cmd .lbl {
+    display: none;
+  }
+}
+@media (max-width: 1420px) {
+  .cbar {
+    padding-inline: var(--s5);
+  }
+}
+@media (max-width: 1100px) {
+  .cbar {
+    padding-inline: var(--s4);
+  }
+  .gprop b {
+    max-width: 150px;
+  }
 }

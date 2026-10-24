@@ -2,57 +2,267 @@
   >Skip to main content</a
 >
 <header class="gbar">
+  <button
+    type="button"
+    class="gbtn navbtn"
+    popovertarget="nav-panel"
+    aria-expanded="false"
+    i18n-aria-label="@@ui.shell.menu"
+    aria-label="Menu"
+  >
+    <hr-icon name="menu" size="18" />
+  </button>
   <div class="brand"><hr-brand-lockup /></div>
-  <div class="gspace"></div>
+  @if (session.user()) {
+    <button
+      type="button"
+      class="gbtn gprop"
+      popovertarget="prop-pop"
+      aria-expanded="false"
+      i18n-aria-label="@@ui.shell.scope"
+      aria-label="Operating scope"
+      #propButton
+    >
+      <b
+        ><bdi>{{ propertyLabel() }}</bdi></b
+      >
+      <hr-icon class="car" name="caret" size="10" />
+    </button>
+    <span class="gsep" aria-hidden="true"></span>
+  }
+  <span class="gspace"></span>
+  <button type="button" class="cmd" popovertarget="nav-panel" aria-expanded="false">
+    <hr-icon name="search" size="14" />
+    <span class="lbl" i18n="@@ui.shell.find">Find a place…</span>
+  </button>
   @if (session.user(); as person) {
-    <button type="button" class="gbtn" (click)="session.signOut()">
-      @if (person.name) {
-        <bdi>{{ person.name }}</bdi>
-        <span class="bdi" aria-hidden="true">·</span>
-      }
-      <span i18n="@@ui.shell.sign-out">Sign out</span>
+    <button
+      type="button"
+      class="gbtn mebtn"
+      popovertarget="me-pop"
+      aria-expanded="false"
+      i18n-aria-label="@@ui.shell.account"
+      aria-label="Account and preferences"
+      #meButton
+    >
+      <span class="av" aria-hidden="true">{{ initials() }}</span>
+      <bdi class="vh">{{ person.name }}</bdi>
+      <hr-icon class="car" name="caret" size="10" />
     </button>
   }
 </header>
-@if (session.state() === 'expired') {
-  <div class="strip strip-session" role="status">
-    <span i18n="@@ui.shell.session-ended"
-      >Your session has ended. Sign in again to continue; the work on this page is kept.</span
+<div class="frame">
+  <nav class="dock" i18n-aria-label="@@ui.shell.workspaces" aria-label="Workspaces">
+    <a
+      routerLink="/"
+      routerLinkActive
+      ariaCurrentWhenActive="page"
+      [routerLinkActiveOptions]="{ exact: true }"
+      i18n-aria-label="@@ui.shell.dock.home"
+      aria-label="Home"
     >
-    <button type="button" class="btn" (click)="signInAgain()" i18n="@@ui.shell.sign-in-again">
-      Sign in again
-    </button>
-  </div>
-}
-@if (session.state() === 'unavailable') {
-  <div class="strip strip-down" role="status">
-    <span i18n="@@ui.shell.not-responding">Harmony is not responding. Check your connection.</span>
-    <button type="button" class="btn" (click)="tryAgain()" i18n="@@ui.shell.try-again">
-      Try again
-    </button>
-  </div>
-}
-@if (notice.current(); as failure) {
-  <div class="strip strip-failure" role="alert">
-    <span
-      >{{ failure.message }} <span i18n="@@ui.shell.reference">Reference</span>&ngsp;<span
-        class="num"
-        >{{ failure.reference }}</span
-      ></span
-    >
-    <button type="button" class="btn" (click)="notice.reload()" i18n="@@ui.shell.reload">
-      Reload
-    </button>
+      <hr-icon name="home" size="18" />
+    </a>
+    @if (adminLink(); as link) {
+      <a
+        [routerLink]="link"
+        routerLinkActive
+        ariaCurrentWhenActive="page"
+        i18n-aria-label="@@ui.shell.dock.users"
+        aria-label="Users"
+      >
+        <hr-icon name="guest" size="18" />
+      </a>
+    }
     <button
       type="button"
-      class="btn btn-quiet"
-      (click)="notice.dismiss()"
-      i18n="@@ui.shell.dismiss"
+      class="bottom"
+      popovertarget="nav-panel"
+      aria-expanded="false"
+      i18n-aria-label="@@ui.shell.dock.all"
+      aria-label="All places"
     >
-      Dismiss
+      <hr-icon name="panel" size="18" [mirrored]="true" />
+    </button>
+  </nav>
+  <main class="work" id="main" tabindex="-1" #main>
+    <div class="cbar">
+      <nav class="crumb" i18n-aria-label="@@ui.shell.breadcrumb" aria-label="Breadcrumb">
+        @for (part of crumbs().trail; track $index) {
+          <span>{{ part }}</span
+          ><span class="sl" aria-hidden="true">/</span>
+        }
+        @if (crumbs().page; as page) {
+          <b aria-current="page">{{ page }}</b>
+        }
+      </nav>
+      <div class="pacts"></div>
+    </div>
+    @if (session.state() === 'expired') {
+      <div class="strip strip-session" role="status">
+        <span i18n="@@ui.shell.session-ended"
+          >Your session has ended. Sign in again to continue; the work on this page is kept.</span
+        >
+        <button type="button" class="btn" (click)="signInAgain()" i18n="@@ui.shell.sign-in-again">
+          Sign in again
+        </button>
+      </div>
+    }
+    @if (session.state() === 'unavailable') {
+      <div class="strip strip-down" role="status">
+        <span i18n="@@ui.shell.not-responding"
+          >Harmony is not responding. Check your connection.</span
+        >
+        <button type="button" class="btn" (click)="tryAgain()" i18n="@@ui.shell.try-again">
+          Try again
+        </button>
+      </div>
+    }
+    @if (notice.current(); as failure) {
+      <div class="strip strip-failure" role="alert">
+        <span
+          >{{ failure.message }} <span i18n="@@ui.shell.reference">Reference</span>&ngsp;<span
+            class="num"
+            >{{ failure.reference }}</span
+          ></span
+        >
+        <button type="button" class="btn" (click)="notice.reload()" i18n="@@ui.shell.reload">
+          Reload
+        </button>
+        <button
+          type="button"
+          class="btn quiet"
+          (click)="notice.dismiss()"
+          i18n="@@ui.shell.dismiss"
+        >
+          Dismiss
+        </button>
+      </div>
+    }
+    <div class="page">
+      <router-outlet />
+    </div>
+  </main>
+</div>
+
+<div
+  class="pop wide"
+  id="prop-pop"
+  popover
+  [hrPopAt]="propAnchor()"
+  i18n-aria-label="@@ui.shell.scope"
+  aria-label="Operating scope"
+>
+  <h3 class="pop-h" i18n="@@ui.shell.scope">Operating scope</h3>
+  @for (property of properties.list(); track property.code) {
+    <a
+      class="pop-i"
+      [routerLink]="['/p', property.code]"
+      [attr.aria-current]="property.code === current.code() ? 'true' : null"
+    >
+      <span class="pcode">{{ property.code }}</span>
+      <span
+        ><b
+          ><bdi>{{ name(property) }}</bdi></b
+        ><small>{{ property.timeZoneId }} · {{ property.currency }}</small></span
+      >
+      @if (property.code === current.code()) {
+        <hr-icon class="ck" name="check" size="14" />
+      }
+    </a>
+  } @empty {
+    <p class="pop-note" i18n="@@ui.shell.no-property">No property is assigned to you yet.</p>
+  }
+</div>
+
+<div
+  class="pop wide"
+  id="me-pop"
+  popover
+  [hrPopAt]="meAnchor()"
+  i18n-aria-label="@@ui.shell.account"
+  aria-label="Account and preferences"
+>
+  @if (session.user(); as person) {
+    <div class="pop-who">
+      <b
+        ><bdi>{{ person.name }}</bdi></b
+      >
+      <span i18n="@@ui.shell.signed-in">Signed in</span>
+    </div>
+  }
+  <div class="pop-sec">
+    <div class="pref">
+      <span i18n="@@ui.shell.theme">Theme</span>
+      <div class="seg" role="group" i18n-aria-label="@@ui.shell.theme" aria-label="Theme">
+        <button
+          type="button"
+          [attr.aria-pressed]="look.theme() === 'light'"
+          (click)="look.setTheme('light')"
+          i18n="@@ui.shell.theme.light"
+        >
+          Light
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="look.theme() === 'dark'"
+          (click)="look.setTheme('dark')"
+          i18n="@@ui.shell.theme.dark"
+        >
+          Dark
+        </button>
+      </div>
+    </div>
+    <div class="pref">
+      <span i18n="@@ui.shell.density">Density</span>
+      <div class="seg" role="group" i18n-aria-label="@@ui.shell.density" aria-label="Density">
+        <button
+          type="button"
+          [attr.aria-pressed]="look.density() === 'comfortable'"
+          (click)="look.setDensity('comfortable')"
+          i18n="@@ui.shell.density.comfortable"
+        >
+          Comfortable
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="look.density() === 'standard'"
+          (click)="look.setDensity('standard')"
+          i18n="@@ui.shell.density.standard"
+        >
+          Standard
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="look.density() === 'compact'"
+          (click)="look.setDensity('compact')"
+          i18n="@@ui.shell.density.compact"
+        >
+          Compact
+        </button>
+      </div>
+    </div>
+    <div class="pref">
+      <span i18n="@@ui.shell.language">Language</span>
+      <div class="seg" role="group" i18n-aria-label="@@ui.shell.language" aria-label="Language">
+        <a [href]="languageLink('en')" [attr.aria-current]="arabic ? null : 'true'">English</a>
+        <a [href]="languageLink('ar')" lang="ar" [attr.aria-current]="arabic ? 'true' : null"
+          >العربية</a
+        >
+      </div>
+    </div>
+  </div>
+  <div class="pop-sec">
+    <button type="button" class="pop-i" (click)="session.signOut()" i18n="@@ui.shell.sign-out">
+      Sign out
     </button>
   </div>
-}
-<main class="work" id="main" tabindex="-1" #main>
-  <router-outlet />
-</main>
+</div>
+
+<hr-nav-panel
+  id="nav-panel"
+  popover
+  [items]="navItems()"
+  i18n-aria-label="@@ui.shell.nav.label"
+  aria-label="All places"
+/>

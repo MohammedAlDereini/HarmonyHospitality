@@ -15,7 +15,12 @@ export const routes: Routes = [
     canMatch: [sessionReady],
     loadComponent: async () => (await import('@harmony/ui/shell')).Shell,
     children: [
-      { path: '', pathMatch: 'full', component: PropertyChooser },
+      {
+        path: '',
+        pathMatch: 'full',
+        component: PropertyChooser,
+        title: $localize`:@@platform.context.chooser.page-title:Properties`,
+      },
       { path: 'hello', loadComponent: async () => (await import('./hello')).Hello },
       {
         path: 'p/:property',
@@ -25,6 +30,7 @@ export const routes: Routes = [
           {
             path: 'admin',
             canMatch: [allowed(Permission.ViewUsers)],
+            data: { crumb: $localize`:@@administration.crumb:Administration` },
             loadChildren: async () =>
               (await import('@harmony/administration/feature-users')).routes,
           },

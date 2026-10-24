@@ -1,0 +1,34 @@
+<div class="navp-h">
+  <label class="vh" for="nav-search" i18n="@@ui.shell.nav.search">Search places</label>
+  <input
+    id="nav-search"
+    class="field"
+    type="search"
+    autocomplete="off"
+    spellcheck="false"
+    #searchBox
+    i18n-placeholder="@@ui.shell.nav.placeholder"
+    placeholder="Find a place…"
+    [value]="query()"
+    (input)="search($event)"
+  />
+</div>
+<nav class="navp-b" i18n-aria-label="@@ui.shell.nav.label" aria-label="All places">
+  @for (group of groups(); track group.name) {
+    <div class="ng-h">{{ group.name }}</div>
+    @for (item of group.items; track item.label) {
+      <a
+        class="ni"
+        [routerLink]="item.link"
+        routerLinkActive
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: item.exact === true }"
+      >
+        <hr-icon [name]="item.icon" />
+        {{ item.label }}
+      </a>
+    }
+  } @empty {
+    <p class="navp-empty" i18n="@@ui.shell.nav.empty">No place matches.</p>
+  }
+</nav>

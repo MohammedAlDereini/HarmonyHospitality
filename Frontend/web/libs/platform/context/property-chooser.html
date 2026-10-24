@@ -1,23 +1,41 @@
-<h1 i18n="@@platform.context.chooser.title">Choose a property</h1>
+<div class="sec-h">
+  <h1 i18n="@@platform.context.chooser.title">Choose a property</h1>
+  @if (properties.status() === 'ready') {
+    <span class="note"
+      ><span class="num">{{ properties.list().length }}</span
+      >&ngsp;<span i18n="@@platform.context.chooser.count">properties</span></span
+    >
+  }
+</div>
 @if (properties.status() === 'unknown' || properties.status() === 'loading') {
-  <p i18n="@@platform.context.chooser.loading">Loading your properties…</p>
+  <p class="empty" role="status" i18n="@@platform.context.chooser.loading">
+    Loading your properties…
+  </p>
 } @else if (properties.status() === 'unavailable') {
-  <p>
-    <span i18n="@@platform.context.chooser.unavailable">Your properties could not be loaded.</span>
-    <button type="button" (click)="tryAgain()" i18n="@@platform.context.chooser.try-again">
+  <p class="empty">
+    <span i18n="@@platform.context.chooser.unavailable">Your properties could not be loaded.</span
+    >&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="tryAgain()"
+      i18n="@@platform.context.chooser.try-again"
+    >
       Try again
     </button>
   </p>
 } @else if (properties.list().length === 0) {
-  <p i18n="@@platform.context.chooser.none">No property is assigned to you yet.</p>
+  <p class="empty" i18n="@@platform.context.chooser.none">No property is assigned to you yet.</p>
 } @else {
-  <ul>
+  <div class="list">
     @for (property of properties.list(); track property.code) {
-      <li>
-        <a [routerLink]="['/p', property.code]"
-          ><bdi>{{ name(property) }}</bdi></a
+      <a class="pop-i" [routerLink]="['/p', property.code]">
+        <span class="pcode">{{ property.code }}</span>
+        <span
+          ><b
+            ><bdi>{{ name(property) }}</bdi></b
+          ><small>{{ property.timeZoneId }} · {{ property.currency }}</small></span
         >
-      </li>
+      </a>
     }
-  </ul>
+  </div>
 }

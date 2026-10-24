@@ -3,11 +3,17 @@ import { RouterLink } from '@angular/router';
 import { MyProperties } from './my-properties';
 import { PropertySummary, propertyName } from './property-summary';
 
-/** The signed-in landing (architecture 10): the person's own hotels, one link each. */
+/** The signed-in landing (architecture 10): the person's own hotels, one row each, in the prototype's menu-row look. */
 @Component({
   selector: 'hr-property-chooser',
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: `
+    .list {
+      padding: 6px var(--s4);
+      max-width: 640px;
+    }
+  `,
   templateUrl: './property-chooser.html',
 })
 export class PropertyChooser {

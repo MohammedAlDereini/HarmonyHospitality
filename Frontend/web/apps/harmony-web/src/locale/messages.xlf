@@ -2,6 +2,20 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en" datatype="plaintext" original="ng2.template">
     <body>
+      <trans-unit id="platform.context.chooser.page-title" datatype="html">
+        <source>Properties</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-web/src/app/app.routes.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.crumb" datatype="html">
+        <source>Administration</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-web/src/app/app.routes.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="harmony-web.hello.title" datatype="html">
         <source>Hello from a deep link</source>
         <context-group purpose="location">
@@ -20,182 +34,189 @@
         <source>Users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">1,2</context>
+          <context context-type="linenumber">2,3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.accounts" datatype="html">
+        <source>accounts</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">6,9</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.search" datatype="html">
         <source>Search</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">3,6</context>
+          <context context-type="linenumber">10,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.search-placeholder" datatype="html">
+        <source>Name or email</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">19,22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.find" datatype="html">
         <source>Find</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">12,14</context>
+          <context context-type="linenumber">22,25</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.try-again" datatype="html">
         <source> Try again </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">23,26</context>
+          <context context-type="linenumber">33,36</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.loading" datatype="html">
         <source>Loading…</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">27,28</context>
+          <context context-type="linenumber">37,38</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.none" datatype="html">
         <source>No accounts match.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">29,32</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.users.column.name" datatype="html">
-        <source>Name</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">34,35</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.users.column.email" datatype="html">
-        <source>Email</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">35,36</context>
+          <context context-type="linenumber">39,41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.column.two-step" datatype="html">
         <source>Two-step</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">36,37</context>
+          <context context-type="linenumber">57,59</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.column.state" datatype="html">
         <source>State</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">37,38</context>
+          <context context-type="linenumber">61,63</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.column.created" datatype="html">
         <source>Created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">38,42</context>
+          <context context-type="linenumber">65,69</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.paging" datatype="html">
         <source>Pages</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">58,60</context>
+          <context context-type="linenumber">71,73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.previous" datatype="html">
         <source> Previous </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">65,68</context>
+          <context context-type="linenumber">78,81</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.of" datatype="html">
         <source>of</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">69,70</context>
+          <context context-type="linenumber">82,83</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.next" datatype="html">
         <source> Next </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">80,84</context>
+          <context context-type="linenumber">93,97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.state.active" datatype="html">
         <source>Active</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.state.suspended" datatype="html">
         <source>Suspended</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.state.terminated" datatype="html">
         <source>Terminated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.two-step.exempt" datatype="html">
         <source>Exempt</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">70</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.two-step.on" datatype="html">
         <source>On</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.two-step.off" datatype="html">
         <source>Not set</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.context.chooser.title" datatype="html">
         <source>Choose a property</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
-          <context context-type="linenumber">1,2</context>
+          <context context-type="linenumber">2,3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.count" datatype="html">
+        <source>properties</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">6,10</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.context.chooser.loading" datatype="html">
-        <source>Loading your properties…</source>
+        <source> Loading your properties… </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
-          <context context-type="linenumber">3,4</context>
+          <context context-type="linenumber">12,14</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.context.chooser.unavailable" datatype="html">
         <source>Your properties could not be loaded.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
-          <context context-type="linenumber">6,7</context>
+          <context context-type="linenumber">16,19</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.context.chooser.try-again" datatype="html">
         <source> Try again </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
-          <context context-type="linenumber">8,11</context>
+          <context context-type="linenumber">23,26</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.context.chooser.none" datatype="html">
         <source>No property is assigned to you yet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
-          <context context-type="linenumber">12,15</context>
+          <context context-type="linenumber">27,30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.000-06" datatype="html">
@@ -310,6 +331,38 @@
           <context context-type="linenumber">9</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="ui.shell.nav.search" datatype="html">
+        <source>Search places</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/nav-panel.html</context>
+          <context context-type="linenumber">2,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.placeholder" datatype="html">
+        <source>Find a place…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/nav-panel.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.label" datatype="html">
+        <source>All places</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/nav-panel.html</context>
+          <context context-type="linenumber">16,17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">267,269</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.empty" datatype="html">
+        <source>No place matches.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/nav-panel.html</context>
+          <context context-type="linenumber">32,35</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="ui.shell.not-found.title" datatype="html">
         <source>This page does not exist</source>
         <context-group purpose="location">
@@ -331,67 +384,259 @@
           <context context-type="linenumber">2,5</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="ui.shell.sign-out" datatype="html">
-        <source>Sign out</source>
+      <trans-unit id="ui.shell.menu" datatype="html">
+        <source>Menu</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">13,16</context>
+          <context context-type="linenumber">12,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.scope" datatype="html">
+        <source>Operating scope</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">23,26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">154,156</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">156,157</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.find" datatype="html">
+        <source>Find a place…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">36,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.account" datatype="html">
+        <source>Account and preferences</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">45,48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">184,186</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.workspaces" datatype="html">
+        <source>Workspaces</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">55,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.dock.home" datatype="html">
+        <source>Home</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">63,64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.dock.users" datatype="html">
+        <source>Users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">73,74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.dock.all" datatype="html">
+        <source>All places</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">83,85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.breadcrumb" datatype="html">
+        <source>Breadcrumb</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">90,91</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.session-ended" datatype="html">
         <source>Your session has ended. Sign in again to continue; the work on this page is kept.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">20,22</context>
+          <context context-type="linenumber">104,106</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.sign-in-again" datatype="html">
         <source> Sign in again </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">23,27</context>
+          <context context-type="linenumber">107,109</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.not-responding" datatype="html">
         <source>Harmony is not responding. Check your connection.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">29,30</context>
+          <context context-type="linenumber">114,116</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.try-again" datatype="html">
         <source> Try again </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">31,35</context>
+          <context context-type="linenumber">117,119</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.reference" datatype="html">
         <source>Reference</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">38,39</context>
+          <context context-type="linenumber">124,125</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.reload" datatype="html">
         <source> Reload </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">44,46</context>
+          <context context-type="linenumber">130,132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.dismiss" datatype="html">
         <source> Dismiss </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">52,56</context>
+          <context context-type="linenumber">138,140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.no-property" datatype="html">
+        <source>No property is assigned to you yet.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">174,179</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.signed-in" datatype="html">
+        <source>Signed in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">191,194</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.theme" datatype="html">
+        <source>Theme</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">196,197</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">198,199</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.theme.light" datatype="html">
+        <source> Light </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">204,206</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.theme.dark" datatype="html">
+        <source> Dark </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">212,214</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.density" datatype="html">
+        <source>Density</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">217,218</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">218,220</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.density.comfortable" datatype="html">
+        <source> Comfortable </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">225,227</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.density.standard" datatype="html">
+        <source> Standard </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">233,235</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.density.compact" datatype="html">
+        <source> Compact </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">241,243</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.language" datatype="html">
+        <source>Language</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">246,247</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">247,248</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.sign-out" datatype="html">
+        <source> Sign out </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">257,260</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.leave-warning" datatype="html">
         <source>The sign-in window could not open. Sign in on this page instead? Changes not saved will be lost.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.choose-property" datatype="html">
+        <source>Choose a property</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.group.workspaces" datatype="html">
+        <source>Workspaces</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.home" datatype="html">
+        <source>Home</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.users" datatype="html">
+        <source>Users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.group.administration" datatype="html">
+        <source>Administration</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">103</context>
         </context-group>
       </trans-unit>
     </body>

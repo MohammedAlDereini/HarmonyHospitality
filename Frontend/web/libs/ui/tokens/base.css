@@ -38,3 +38,34 @@ h3 {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
 }
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* Read by assistive technology, invisible to everyone else. */
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+/* One icon family: 16 grid, 1.5 stroke, round joins, drawn in currentColor. Direction icons mirror in RTL. */
+.ic {
+  display: block;
+  flex: none;
+}
+html[dir='rtl'] .ic-dir {
+  transform: scaleX(-1);
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--rule-2);
+  border-radius: 5px;
+  border: 3px solid var(--canvas);
+}

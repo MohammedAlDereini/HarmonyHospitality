@@ -1,0 +1,47 @@
+/* From the prototype's .navp: a panel on the start side, under the bar, as a native popover. */
+:host {
+  position: fixed;
+  inset: var(--bar) auto 0 auto;
+  inset-inline-start: 0;
+  margin: 0;
+  z-index: 98;
+  width: 288px;
+  max-width: 86vw;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-inline-end: 1px solid var(--rule-2);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-panel);
+  display: none;
+  flex-direction: column;
+}
+:host:popover-open {
+  display: flex;
+}
+:host::backdrop {
+  background: var(--scrim);
+}
+.navp-h {
+  flex: none;
+  padding: 12px;
+  border-block-end: 1px solid var(--rule);
+}
+.navp-h input {
+  width: 100%;
+}
+html[lang='ar'] .navp-h input {
+  font-family: var(--ar);
+}
+.navp-b {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 8px 14px;
+}
+.navp-empty {
+  padding: 14px 8px;
+  font-size: 13px;
+  color: var(--ink-3);
+}

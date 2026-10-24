@@ -322,22 +322,6 @@
           <context context-type="linenumber">29,32</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.users.column.name" datatype="html">
-        <source>Name</source>
-        <target>الاسم</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">34,35</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.users.column.email" datatype="html">
-        <source>Email</source>
-        <target>البريد الإلكتروني</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">35,36</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="administration.users.column.two-step" datatype="html">
         <source>Two-step</source>
         <target>التحقق بخطوتين</target>
@@ -448,6 +432,298 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/harmony-titles.ts</context>
           <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.page-title" datatype="html">
+        <source>Properties</source>
+        <target>الفنادق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-web/src/app/app.routes.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.crumb" datatype="html">
+        <source>Administration</source>
+        <target>الإدارة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-web/src/app/app.routes.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.accounts" datatype="html">
+        <source>accounts</source>
+        <target>حسابات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">6,9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.search-placeholder" datatype="html">
+        <source>Name or email</source>
+        <target>الاسم أو البريد الإلكتروني</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">19,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.context.chooser.count" datatype="html">
+        <source>properties</source>
+        <target>فنادق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/context/property-chooser.html</context>
+          <context context-type="linenumber">6,10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.search" datatype="html">
+        <source>Search places</source>
+        <target>ابحث في الأماكن</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/nav-panel.html</context>
+          <context context-type="linenumber">2,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.placeholder" datatype="html">
+        <source>Find a place…</source>
+        <target>ابحث عن مكان…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/nav-panel.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.label" datatype="html">
+        <source>All places</source>
+        <target>كل الأماكن</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/nav-panel.html</context>
+          <context context-type="linenumber">16,17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">267,269</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.empty" datatype="html">
+        <source>No place matches.</source>
+        <target>لا مكان مطابق.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/nav-panel.html</context>
+          <context context-type="linenumber">32,35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.menu" datatype="html">
+        <source>Menu</source>
+        <target>القائمة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">12,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.scope" datatype="html">
+        <source>Operating scope</source>
+        <target>النطاق التشغيلي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">23,26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">154,156</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">156,157</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.find" datatype="html">
+        <source>Find a place…</source>
+        <target>ابحث عن مكان…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">36,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.account" datatype="html">
+        <source>Account and preferences</source>
+        <target>الحساب والتفضيلات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">45,48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">184,186</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.workspaces" datatype="html">
+        <source>Workspaces</source>
+        <target>مساحات العمل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">55,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.dock.home" datatype="html">
+        <source>Home</source>
+        <target>الرئيسية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">63,64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.dock.users" datatype="html">
+        <source>Users</source>
+        <target>المستخدمون</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">73,74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.dock.all" datatype="html">
+        <source>All places</source>
+        <target>كل الأماكن</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">83,85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.breadcrumb" datatype="html">
+        <source>Breadcrumb</source>
+        <target>مسار التنقل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">90,91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.no-property" datatype="html">
+        <source>No property is assigned to you yet.</source>
+        <target>لم يُسنَد إليك أي فندق بعد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">174,179</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.signed-in" datatype="html">
+        <source>Signed in</source>
+        <target>مسجّل الدخول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">191,194</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.theme" datatype="html">
+        <source>Theme</source>
+        <target>المظهر</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">196,197</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">198,199</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.theme.light" datatype="html">
+        <source> Light </source>
+        <target>فاتح</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">204,206</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.theme.dark" datatype="html">
+        <source> Dark </source>
+        <target>داكن</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">212,214</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.density" datatype="html">
+        <source>Density</source>
+        <target>الكثافة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">217,218</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">218,220</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.density.comfortable" datatype="html">
+        <source> Comfortable </source>
+        <target>مريح</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">225,227</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.density.standard" datatype="html">
+        <source> Standard </source>
+        <target>عادي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">233,235</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.density.compact" datatype="html">
+        <source> Compact </source>
+        <target>مضغوط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">241,243</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.language" datatype="html">
+        <source>Language</source>
+        <target>اللغة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">246,247</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.html</context>
+          <context context-type="linenumber">247,248</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.choose-property" datatype="html">
+        <source>Choose a property</source>
+        <target>اختر فندقاً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.group.workspaces" datatype="html">
+        <source>Workspaces</source>
+        <target>مساحات العمل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.home" datatype="html">
+        <source>Home</source>
+        <target>الرئيسية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.users" datatype="html">
+        <source>Users</source>
+        <target>المستخدمون</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.group.administration" datatype="html">
+        <source>Administration</source>
+        <target>الإدارة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
+          <context context-type="linenumber">103</context>
         </context-group>
       </trans-unit>
     </body>

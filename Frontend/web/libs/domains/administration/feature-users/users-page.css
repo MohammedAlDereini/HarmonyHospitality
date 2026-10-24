@@ -1,52 +1,25 @@
-/* The first list screen: tokens only, logical properties only, rows that may grow (rule 15). */
-.toolbar {
-  display: flex;
-  align-items: center;
+/* The accounts as prototype rows: who, two-step, state, since when. Tokens only; the row grows with its text. */
+.sec-h form {
   gap: var(--s2);
-  margin-block: var(--s4);
 }
-.toolbar input {
-  min-height: var(--control-md);
-  padding: 0 var(--s3);
-  border: 1px solid var(--control-border);
-  border-radius: var(--radius-control);
-  background: var(--surface);
-  color: var(--ink);
-  min-width: 18rem;
+.sec-h .field {
+  min-width: 16rem;
 }
-.btn {
-  min-height: var(--control-sm);
-  padding: 0 var(--s3);
-  border: 1px solid var(--control-border);
-  border-radius: var(--radius-control);
-  background: var(--surface);
-  color: var(--ink);
-  font-weight: 600;
-}
-.btn:disabled {
-  color: var(--ink-3);
-  cursor: default;
-}
-.list {
-  width: 100%;
-  border-collapse: collapse;
-}
-.list th,
-.list td {
-  text-align: start;
-  padding: var(--s2) var(--s3);
-  border-block-end: 1px solid var(--rule);
-}
-.list th {
-  color: var(--ink-3);
-  font-weight: 600;
-}
-.list tbody tr {
-  min-height: var(--row);
+.urow {
+  grid-template-columns: minmax(240px, 1.4fr) 150px 150px 160px;
 }
 .paging {
   display: flex;
   align-items: center;
   gap: var(--s3);
-  margin-block-start: var(--s4);
+  padding: var(--s3) var(--s6);
+}
+@media (max-width: 900px) {
+  .urow {
+    grid-template-columns: minmax(0, 1fr) 120px 120px;
+    row-gap: 6px;
+  }
+  .urow .s-when {
+    grid-column: 1 / -1;
+  }
 }

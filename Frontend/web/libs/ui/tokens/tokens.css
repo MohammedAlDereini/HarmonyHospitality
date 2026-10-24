@@ -59,6 +59,28 @@
   --elev: #fafbfc;
   --focus: #4c89aa;
   --slate: #1c2834;
+
+  /* The shell's own inks, rules and marks: the prototype's bar, dock, search field and avatar literals, named here. */
+  --shell-ink-2: #c6d0d7;
+  --shell-rule: #34404b;
+  --shell-rule-2: #52616c;
+  --shell-field: #151f28;
+  --shell-field-ink: #aebbc4;
+  --shell-field-rule: #4a5863;
+  --dock-rule: #101820;
+  --dock-ink: #9fadb8;
+  --dock-hover: #2a3945;
+  --dock-hover-ink: #ffffff;
+  --dock-current: #f3f6f7;
+  --dock-current-ink: #1b303c;
+  --dot-ok: #62bd88;
+  --dot-warn: #edbc6e;
+  --dot-stop: #e48a80;
+  --avatar: #cbd7dd;
+  --avatar-ink: #1a2832;
+  --on-stop: #ffffff; /* text on a --stop fill */
+  --scrim: rgba(8, 13, 18, 0.44);
+  --shadow-panel: 18px 0 50px rgba(10, 18, 25, 0.14);
 }
 
 html[data-theme='dark'] {
@@ -92,6 +114,8 @@ html[data-theme='dark'] {
   --vip: #c4a7df;
   --vip-bg: #31283c;
   --elev: #1b232b;
+  --on-stop: #10161c;
+  --shadow-overlay: 0 18px 55px rgba(8, 13, 18, 0.44);
 }
 
 /* Density: an attribute on <html>, nothing else. */
