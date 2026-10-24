@@ -6,6 +6,14 @@ const byCode: Readonly<Record<string, string>> = {
   '000.06': $localize`:@@platform.errors.code.000-06:Still working… please wait a moment.`,
   '000.07': $localize`:@@platform.errors.code.000-07:This request was already used. Reload the page and try again.`,
   unreachable: $localize`:@@platform.errors.code.unreachable:Connection lost. Check your network and try again.`,
+  // Identity, accounts
+  '00036': $localize`:@@platform.errors.code.00036:That account no longer exists.`,
+  '00041': $localize`:@@platform.errors.code.00041:That account is terminated; nothing more can be done to it.`,
+  '00076': $localize`:@@platform.errors.code.00076:That account stands above your own rank.`,
+  '00078': $localize`:@@platform.errors.code.00078:Your own account cannot be changed here. Ask another administrator.`,
+  '00079': $localize`:@@platform.errors.code.00079:This is the last administrator; the tenant would be left with nobody in charge.`,
+  '10303': $localize`:@@platform.errors.code.10303:Give a reason.`,
+  '10304': $localize`:@@platform.errors.code.10304:The reason is too long: 500 characters at most.`,
 };
 
 /** Wording per kind, used when no code has its own (the "Person sees" column of architecture 14). */

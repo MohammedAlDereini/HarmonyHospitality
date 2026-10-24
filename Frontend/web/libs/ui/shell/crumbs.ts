@@ -6,8 +6,9 @@ export interface Crumbs {
   readonly page: string | null;
 }
 
+/** The crumb a route declares itself: `snapshot.data` is inherited by empty-path children and would repeat it. */
 const crumbOf = (snapshot: ActivatedRouteSnapshot): string | null => {
-  const crumb: unknown = snapshot.data['crumb'];
+  const crumb: unknown = snapshot.routeConfig?.data?.['crumb'];
   return typeof crumb === 'string' ? crumb : null;
 };
 

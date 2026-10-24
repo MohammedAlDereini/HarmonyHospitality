@@ -3,10 +3,13 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { AccountState, UserAccount, UserFilters } from '@harmony/administration/domain';
 import { PropertyScope } from '@harmony/platform/context';
 import { messageOf } from '@harmony/platform/errors';
-import { Envelope, fromError } from '@harmony/platform/http';
+import { ApiClient, ApiResult, Envelope, IntentKey, fromError } from '@harmony/platform/http';
+import { Observable, firstValueFrom } from 'rxjs';
 import { PageRequest, Paged } from '@harmony/shared/domain';
 
 export const usersPath = '/api/UserAccount/get-all';
+export const suspendPath = '/api/UserAccount/Suspend';
+export const reinstatePath = '/api/UserAccount/Reinstate';
 /** Identity accepts 1 to 100 rows a page. */
 export const USERS_PAGE_SIZE = 25;
 const FIRST_PAGE = 1;
@@ -23,6 +26,7 @@ interface UsersRequest extends PageRequest {
  */
 @Injectable({ providedIn: 'root' })
 export class UsersStore {
+  private readonly api = inject(ApiClient);
   readonly filters = signal<UserFilters>(noFilters);
 
   private readonly page = httpResource<Envelope<Paged<UserAccount>>>(() => {
@@ -60,6 +64,22 @@ export class UsersStore {
 
   reload(): void {
     this.page.reload();
+  }
+
+  /** Suspends an account with a reason; the intent key is the press's own, reused only for its retries (11.5). */
+  suspend(user: UserAccount, reason: string, intent: IntentKey): Promise<ApiResult<unknown>> {
+    return this.write(this.api.put(suspendPath, { id: user.id, reason }, intent));
+  }
+
+  reinstate(user: UserAccount, intent: IntentKey): Promise<ApiResult<unknown>> {
+    return this.write(this.api.put(reinstatePath, { id: user.id }, intent));
+  }
+
+  /** A write that succeeded changes the list; read it again. The outcome goes back to the screen as it is. */
+  private async write(call: Observable<ApiResult<unknown>>): Promise<ApiResult<unknown>> {
+    const result = await firstValueFrom(call);
+    if (result.kind === 'ok') this.page.reload();
+    return result;
   }
 }
 

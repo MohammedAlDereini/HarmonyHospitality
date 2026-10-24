@@ -1,16 +1,25 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { USERS_PAGE_SIZE, UsersStore } from '@harmony/administration/data-access';
 import { AccountState, UserAccount } from '@harmony/administration/domain';
+import { IfAllowed, Permission } from '@harmony/platform/access';
 import { PropertyContext } from '@harmony/platform/context';
+import { messageOf } from '@harmony/platform/errors';
+import { newIntentKey } from '@harmony/platform/http';
 import { initialsOf } from '@harmony/shared/domain';
 import { Tone } from '@harmony/ui/primitives';
+import { AccountStateEditor } from './account-state-editor';
 
 const PAGE_STEP = 1;
 const dateOnly: Intl.DateTimeFormatOptions = { dateStyle: 'medium' };
 
-/** The accounts of the customer: who may sign in, how they sign in, since when (architecture 6, administration). */
+/**
+ * The accounts of the customer: who may sign in, how they sign in, since when; and, with ManageUsers, the first
+ * writes: suspend with a reason, reinstate (architecture 6, administration). The buttons are presentation: the API
+ * refuses on its own.
+ */
 @Component({
   selector: 'hr-users-page',
+  imports: [IfAllowed, AccountStateEditor],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './users-page.html',
   styleUrl: './users-page.css',
@@ -19,6 +28,7 @@ export class UsersPage {
   protected readonly store = inject(UsersStore);
   private readonly context = inject(PropertyContext);
 
+  protected readonly manageUsers = Permission.ManageUsers;
   protected readonly page = computed(() => this.store.filters().page);
   protected readonly from = computed(() => (this.page() - PAGE_STEP) * USERS_PAGE_SIZE + PAGE_STEP);
   protected readonly to = computed(() =>
@@ -26,6 +36,13 @@ export class UsersPage {
   );
   protected readonly hasPrevious = computed(() => this.page() > PAGE_STEP);
   protected readonly hasNext = computed(() => this.to() < this.store.total());
+
+  /** The account whose suspension is being written, if any. */
+  protected readonly editing = signal<string | null>(null);
+  /** The account being reinstated right now, if any. */
+  protected readonly reinstating = signal<string | null>(null);
+  /** One sentence when a reinstatement was refused; null while all is well. */
+  protected readonly actionProblem = signal<string | null>(null);
 
   private readonly stateWording: Readonly<Record<AccountState, string>> = {
     [AccountState.active]: $localize`:@@administration.users.state.active:Active`,
@@ -65,6 +82,14 @@ export class UsersPage {
     return this.stateTone[user.state];
   }
 
+  protected canSuspend(user: UserAccount): boolean {
+    return user.state === AccountState.active;
+  }
+
+  protected canReinstate(user: UserAccount): boolean {
+    return user.state === AccountState.suspended;
+  }
+
   protected twoStepOf(user: UserAccount): string {
     if (user.twoStepExemptReason !== null)
       return $localize`:@@administration.users.two-step.exempt:Exempt`;
@@ -75,5 +100,27 @@ export class UsersPage {
 
   protected createdOn(user: UserAccount): string {
     return this.context.formatInstant(user.createdDate, dateOnly);
+  }
+
+  protected openSuspend(user: UserAccount): void {
+    this.actionProblem.set(null);
+    this.editing.set(user.id);
+  }
+
+  protected closeEditor(): void {
+    this.editing.set(null);
+  }
+
+  protected reinstate(user: UserAccount): void {
+    void this.reinstateNow(user);
+  }
+
+  /** One intent key per press; the store reloads the list on success; a refusal is worded once. */
+  private async reinstateNow(user: UserAccount): Promise<void> {
+    this.actionProblem.set(null);
+    this.reinstating.set(user.id);
+    const result = await this.store.reinstate(user, newIntentKey());
+    this.reinstating.set(null);
+    if (result.kind !== 'ok') this.actionProblem.set(messageOf(result));
   }
 }

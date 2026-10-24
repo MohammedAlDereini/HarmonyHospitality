@@ -86,60 +86,109 @@
           <context context-type="linenumber">8</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="platform.errors.code.00036" datatype="html">
+        <source>That account no longer exists.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00041" datatype="html">
+        <source>That account is terminated; nothing more can be done to it.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00076" datatype="html">
+        <source>That account stands above your own rank.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00078" datatype="html">
+        <source>Your own account cannot be changed here. Ask another administrator.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00079" datatype="html">
+        <source>This is the last administrator; the tenant would be left with nobody in charge.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10303" datatype="html">
+        <source>Give a reason.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10304" datatype="html">
+        <source>The reason is too long: 500 characters at most.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="platform.errors.kind.refused" datatype="html">
         <source>Harmony did not allow this action.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.invalid" datatype="html">
         <source>Some fields need attention.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.unauthenticated" datatype="html">
         <source>Sign in again to continue.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.forbidden" datatype="html">
         <source>Your role cannot do this.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.busy" datatype="html">
         <source>Still working… please wait a moment.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.conflict" datatype="html">
         <source>Changed by someone else. Reload to see the latest.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.unavailable" datatype="html">
         <source>Harmony is not responding. Try again in a moment.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.unexpected" datatype="html">
         <source>Something went wrong.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.session.signed-in" datatype="html">

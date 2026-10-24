@@ -1,0 +1,39 @@
+<form class="editor" (submit)="onSubmit($event)" novalidate>
+  <label class="vh" for="suspend-reason" i18n="@@administration.users.suspend.reason"
+    >Reason for the suspension</label
+  >
+  <input
+    id="suspend-reason"
+    #reasonBox
+    class="field"
+    type="text"
+    autocomplete="off"
+    dir="auto"
+    [formField]="form.reason"
+    i18n-placeholder="@@administration.users.suspend.placeholder"
+    placeholder="Why this account is being suspended"
+    [attr.aria-invalid]="form.reason().touched() && form.reason().invalid() ? 'true' : null"
+    [attr.aria-describedby]="form.reason().errors().length > 0 ? 'suspend-reason-error' : null"
+  />
+  <button
+    type="submit"
+    class="btn solid"
+    [disabled]="form().submitting()"
+    i18n="@@administration.users.suspend.go"
+  >
+    Suspend account
+  </button>
+  <button type="button" class="btn" (click)="cancel()" i18n="@@administration.users.suspend.cancel">
+    Cancel
+  </button>
+  @if (form.reason().touched() && form.reason().errors().length > 0) {
+    <p id="suspend-reason-error" class="field-error" role="alert">
+      @for (error of form.reason().errors(); track error.kind) {
+        <span>{{ error.message }}</span>
+      }
+    </p>
+  }
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
+</form>

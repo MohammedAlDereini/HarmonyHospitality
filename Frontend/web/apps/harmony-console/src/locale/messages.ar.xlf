@@ -550,6 +550,62 @@
           <context context-type="linenumber">103</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="platform.errors.code.00036" datatype="html">
+        <source>That account no longer exists.</source>
+        <target>هذا الحساب لم يعد موجوداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00041" datatype="html">
+        <source>That account is terminated; nothing more can be done to it.</source>
+        <target>هذا الحساب منتهٍ؛ لا يمكن فعل شيء آخر به.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00076" datatype="html">
+        <source>That account stands above your own rank.</source>
+        <target>هذا الحساب أعلى رتبةً منك.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00078" datatype="html">
+        <source>Your own account cannot be changed here. Ask another administrator.</source>
+        <target>لا يمكن تغيير حسابك أنت من هنا. اطلب من مدير آخر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00079" datatype="html">
+        <source>This is the last administrator; the tenant would be left with nobody in charge.</source>
+        <target>هذا آخر مدير؛ سيُترك المستأجر بلا أحد مسؤول.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10303" datatype="html">
+        <source>Give a reason.</source>
+        <target>اذكر سبباً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10304" datatype="html">
+        <source>The reason is too long: 500 characters at most.</source>
+        <target>السبب طويل جداً: 500 حرف على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

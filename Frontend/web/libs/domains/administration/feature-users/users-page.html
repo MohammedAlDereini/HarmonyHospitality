@@ -38,32 +38,69 @@
 } @else if (store.rows().length === 0) {
   <p class="empty" i18n="@@administration.users.none">No accounts match.</p>
 } @else {
+  @if (actionProblem(); as text) {
+    <p class="empty" role="alert">{{ text }}</p>
+  }
   <div class="rows" role="list">
     @for (user of store.rows(); track user.id) {
-      <div class="srow urow" role="listitem">
-        <div class="s-who">
-          <span class="ini" aria-hidden="true">{{ initials(user) }}</span>
-          <div class="s-nm">
-            <b
-              ><bdi>{{ user.displayName }}</bdi></b
-            >
-            <span dir="ltr"
-              ><bdi>{{ user.email ?? user.userName }}</bdi></span
-            >
+      <div role="listitem">
+        <div class="srow urow">
+          <div class="s-who">
+            <span class="ini" aria-hidden="true">{{ initials(user) }}</span>
+            <div class="s-nm">
+              <b
+                ><bdi>{{ user.displayName }}</bdi></b
+              >
+              <span dir="ltr"
+                ><bdi>{{ user.email ?? user.userName }}</bdi></span
+              >
+            </div>
+          </div>
+          <div class="obj">
+            <b>{{ twoStepOf(user) }}</b>
+            <span i18n="@@administration.users.column.two-step">Two-step</span>
+          </div>
+          <div class="obj" [attr.data-s]="toneOf(user)">
+            <b>{{ stateOf(user) }}</b>
+            <span i18n="@@administration.users.column.state">State</span>
+          </div>
+          <div class="s-when">
+            <span class="num">{{ createdOn(user) }}</span>
+            <small i18n="@@administration.users.column.created">Created</small>
+          </div>
+          <div class="row-act">
+            @if (canSuspend(user)) {
+              <button
+                *hrIfAllowed="manageUsers"
+                type="button"
+                class="act"
+                (click)="openSuspend(user)"
+                [attr.aria-expanded]="editing() === user.id"
+                i18n="@@administration.users.suspend"
+              >
+                Suspend
+              </button>
+            } @else if (canReinstate(user)) {
+              <button
+                *hrIfAllowed="manageUsers"
+                type="button"
+                class="act"
+                (click)="reinstate(user)"
+                [disabled]="reinstating() === user.id"
+                i18n="@@administration.users.reinstate"
+              >
+                Reinstate
+              </button>
+            }
           </div>
         </div>
-        <div class="obj">
-          <b>{{ twoStepOf(user) }}</b>
-          <span i18n="@@administration.users.column.two-step">Two-step</span>
-        </div>
-        <div class="obj" [attr.data-s]="toneOf(user)">
-          <b>{{ stateOf(user) }}</b>
-          <span i18n="@@administration.users.column.state">State</span>
-        </div>
-        <div class="s-when">
-          <span class="num">{{ createdOn(user) }}</span>
-          <small i18n="@@administration.users.column.created">Created</small>
-        </div>
+        @if (editing() === user.id) {
+          <hr-account-state-editor
+            [user]="user"
+            (done)="closeEditor()"
+            (cancelled)="closeEditor()"
+          />
+        }
       </div>
     }
   </div>

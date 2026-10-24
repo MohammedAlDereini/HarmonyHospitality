@@ -2,9 +2,12 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UsersStore } from '@harmony/administration/data-access';
 import { AccountState, UserAccount, UserFilters } from '@harmony/administration/domain';
+import { AccessStore } from '@harmony/platform/access';
 import { PropertyContext } from '@harmony/platform/context';
+import { ApiResult, IntentKey } from '@harmony/platform/http';
 import { UsersPage } from './users-page';
 
+const OK = 200;
 const TOTAL = 60;
 const SECOND_PAGE = 2;
 const LAST_PAGE = 3;
@@ -43,6 +46,7 @@ class FakeStore {
   searched: string[] = [];
   pages: number[] = [];
   reloads = 0;
+  reinstated: { id: string; key: IntentKey }[] = [];
   search(text: string): void {
     this.searched.push(text);
   }
@@ -52,12 +56,17 @@ class FakeStore {
   reload(): void {
     this.reloads += 1;
   }
+  reinstate(user: UserAccount, key: IntentKey): Promise<ApiResult<unknown>> {
+    this.reinstated.push({ id: user.id, key });
+    return Promise.resolve({ kind: 'ok', status: OK, data: undefined });
+  }
 }
 
 describe('UsersPage', () => {
   let store: FakeStore;
   let fixture: ComponentFixture<UsersPage>;
   let page: HTMLElement;
+  let mayManage = true;
 
   const render = async (): Promise<void> => {
     fixture.detectChanges();
@@ -72,6 +81,7 @@ describe('UsersPage', () => {
       providers: [
         { provide: UsersStore, useValue: store },
         { provide: PropertyContext, useValue: { formatInstant: () => 'Oct 24, 2026' } },
+        { provide: AccessStore, useValue: { can: () => mayManage } },
       ],
     });
     fixture = TestBed.createComponent(UsersPage);
@@ -83,19 +93,18 @@ describe('UsersPage', () => {
     store.rows.set([ahmad, lina]);
     store.total.set(TOTAL);
     await render();
-    expect(text('.urow:first-child .s-nm b, .urow:first-child .s-nm span')).toEqual([
+    const first = '[role="listitem"]:first-child';
+    const last = '[role="listitem"]:last-child';
+    expect(text(`${first} .s-nm b, ${first} .s-nm span`)).toEqual([
       'Ahmad Saleh',
       'ahmad@ritz.test',
     ]);
-    expect(text('.urow:first-child .obj b')).toEqual(['On', 'Active']);
-    expect(text('.urow:first-child .s-when .num')).toEqual(['Oct 24, 2026']);
-    expect(text('.urow:first-child .ini')).toEqual(['AS']);
-    expect(text('.urow:last-child .s-nm b, .urow:last-child .s-nm span')).toEqual([
-      'Lina Haddad',
-      'lina@ritz.test',
-    ]);
-    expect(text('.urow:last-child .obj b')).toEqual(['Exempt', 'Suspended']);
-    expect(page.querySelector('.urow:last-child .obj[data-s="warn"]')).not.toBeNull();
+    expect(text(`${first} .obj b`)).toEqual(['On', 'Active']);
+    expect(text(`${first} .s-when .num`)).toEqual(['Oct 24, 2026']);
+    expect(text(`${first} .ini`)).toEqual(['AS']);
+    expect(text(`${last} .s-nm b, ${last} .s-nm span`)).toEqual(['Lina Haddad', 'lina@ritz.test']);
+    expect(text(`${last} .obj b`)).toEqual(['Exempt', 'Suspended']);
+    expect(page.querySelector(`${last} .obj[data-s="warn"]`)).not.toBeNull();
     expect(page.querySelector('.paging')?.textContent.replace(whitespace, ' ').trim()).toBe(
       'Previous 1–25 of 60 Next',
     );
@@ -130,5 +139,30 @@ describe('UsersPage', () => {
     expect(page.querySelector('[role="alert"]')?.textContent).toContain('not responding');
     page.querySelector<HTMLButtonElement>('[role="alert"] button')?.click();
     expect(store.reloads).toBe(1);
+  });
+
+  it('with ManageUsers: Suspend opens the editor on that row; Reinstate asks the store with a fresh key', async () => {
+    store.rows.set([ahmad, lina]);
+    store.total.set(TOTAL);
+    await render();
+    expect(text('.act')).toEqual(['Suspend', 'Reinstate']);
+    page.querySelector<HTMLButtonElement>('[role="listitem"]:first-child .act')?.click();
+    await render();
+    expect(
+      page.querySelector('[role="listitem"]:first-child hr-account-state-editor'),
+    ).not.toBeNull();
+    expect(page.querySelector('[role="listitem"]:last-child hr-account-state-editor')).toBeNull();
+    page.querySelector<HTMLButtonElement>('[role="listitem"]:last-child .act')?.click();
+    await render();
+    expect(store.reinstated.map((call) => call.id)).toEqual(['u2']);
+    expect(store.reinstated[0]?.key.value).not.toBe('');
+  });
+
+  it('without ManageUsers: no action buttons at all', async () => {
+    mayManage = false;
+    store.rows.set([ahmad, lina]);
+    await render();
+    expect(page.querySelector('.act')).toBeNull();
+    mayManage = true;
   });
 });

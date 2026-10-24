@@ -23,6 +23,56 @@
           <context context-type="linenumber">6,9</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="administration.users.suspend.reason" datatype="html">
+        <source>Reason for the suspension</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.html</context>
+          <context context-type="linenumber">3,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.suspend.placeholder" datatype="html">
+        <source>Why this account is being suspended</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.html</context>
+          <context context-type="linenumber">14,15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.suspend.go" datatype="html">
+        <source> Suspend account </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.html</context>
+          <context context-type="linenumber">24,26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.suspend.cancel" datatype="html">
+        <source> Cancel </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.html</context>
+          <context context-type="linenumber">27,29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10303" datatype="html">
+        <source>Give a reason.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10304" datatype="html">
+        <source>The reason is too long: 500 characters at most.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="administration.users.page-title" datatype="html">
         <source>Users</source>
         <context-group purpose="location">
@@ -90,91 +140,105 @@
         <source>Two-step</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">57,59</context>
+          <context context-type="linenumber">61,63</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.column.state" datatype="html">
         <source>State</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">61,63</context>
+          <context context-type="linenumber">65,67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.column.created" datatype="html">
         <source>Created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">65,69</context>
+          <context context-type="linenumber">69,71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.suspend" datatype="html">
+        <source> Suspend </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">81,83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.reinstate" datatype="html">
+        <source> Reinstate </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">92,94</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.paging" datatype="html">
         <source>Pages</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">71,73</context>
+          <context context-type="linenumber">108,110</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.previous" datatype="html">
         <source> Previous </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">78,81</context>
+          <context context-type="linenumber">115,118</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.of" datatype="html">
         <source>of</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">82,83</context>
+          <context context-type="linenumber">119,120</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.next" datatype="html">
         <source> Next </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">93,97</context>
+          <context context-type="linenumber">130,134</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.state.active" datatype="html">
         <source>Active</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">48</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.state.suspended" datatype="html">
         <source>Suspended</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.state.terminated" datatype="html">
         <source>Terminated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.two-step.exempt" datatype="html">
         <source>Exempt</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.two-step.on" datatype="html">
         <source>On</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.two-step.off" datatype="html">
         <source>Not set</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.context.chooser.title" datatype="html">
@@ -240,60 +304,95 @@
           <context context-type="linenumber">8</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="platform.errors.code.00036" datatype="html">
+        <source>That account no longer exists.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00041" datatype="html">
+        <source>That account is terminated; nothing more can be done to it.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00076" datatype="html">
+        <source>That account stands above your own rank.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00078" datatype="html">
+        <source>Your own account cannot be changed here. Ask another administrator.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00079" datatype="html">
+        <source>This is the last administrator; the tenant would be left with nobody in charge.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="platform.errors.kind.refused" datatype="html">
         <source>Harmony did not allow this action.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.invalid" datatype="html">
         <source>Some fields need attention.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.unauthenticated" datatype="html">
         <source>Sign in again to continue.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.forbidden" datatype="html">
         <source>Your role cannot do this.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.busy" datatype="html">
         <source>Still working… please wait a moment.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.conflict" datatype="html">
         <source>Changed by someone else. Reload to see the latest.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.unavailable" datatype="html">
         <source>Harmony is not responding. Try again in a moment.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.unexpected" datatype="html">
         <source>Something went wrong.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.session.signed-in" datatype="html">
