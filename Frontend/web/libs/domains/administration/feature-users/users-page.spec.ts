@@ -13,6 +13,8 @@ const OK = 200;
 const TOTAL = 60;
 const SECOND_PAGE = 2;
 const LAST_PAGE = 3;
+const TWO_STEP_CELL = 1;
+const CREATED_CELL = 3;
 // Runs of whitespace (spaces, newlines) collapse to one space: matches "a \n b" (→ "a b"); rejects "ab" (nothing to do).
 // Tester: https://regex101.com/?regex=%5Cs%2B&flags=g&testString=a%20%0A%20b
 const whitespace = /\s+/g;
@@ -106,20 +108,17 @@ describe('UsersPage', () => {
     store.rows.set([ahmad, lina]);
     store.total.set(TOTAL);
     await render();
-    const first = '[role="listitem"]:first-child';
-    const last = '[role="listitem"]:last-child';
-    expect(text(`${first} .s-nm b, ${first} .s-nm span`)).toEqual([
-      'Ahmad Saleh',
-      'ahmad@ritz.test',
-    ]);
-    expect(text(`${first} .obj b`)).toEqual(['On', 'Active']);
-    expect(text(`${first} .s-when .num`)).toEqual(['Oct 24, 2026']);
-    expect(text(`${first} .ini`)).toEqual(['AS']);
-    expect(text(`${last} .s-nm b, ${last} .s-nm span`)).toEqual(['Lina Haddad', 'lina@ritz.test']);
-    expect(text(`${last} .obj b`)).toEqual(['Exempt', 'Suspended']);
-    expect(page.querySelector(`${last} .obj[data-s="warn"]`)).not.toBeNull();
-    expect(page.querySelector('.paging')?.textContent.replace(whitespace, ' ').trim()).toBe(
-      'Previous 1–25 of 60 Next',
+    const first = 'tr.urow:first-child';
+    const last = 'tr.urow:last-child';
+    expect(text('thead th')).toEqual(['Name', 'Two-step', 'State', 'Created', 'Actions']);
+    expect(text(`${first} a.nm-link, ${first} .sub`)).toEqual(['Ahmad Saleh', 'ahmad@ritz.test']);
+    expect(text(`${first} td`).slice(TWO_STEP_CELL, CREATED_CELL)).toEqual(['On', 'Active']);
+    expect(text(`${first} td.num`)).toEqual(['Oct 24, 2026']);
+    expect(text(`${last} a.nm-link, ${last} .sub`)).toEqual(['Lina Haddad', 'lina@ritz.test']);
+    expect(text(`${last} td`).slice(TWO_STEP_CELL, CREATED_CELL)).toEqual(['Exempt', 'Suspended']);
+    expect(page.querySelector(`${last} .pill[data-s="warn"]`)).not.toBeNull();
+    expect(page.querySelector('hr-pager')?.textContent.replace(whitespace, ' ').trim()).toBe(
+      '60 rows Previous Page 1 of 3 Next',
     );
   });
 
@@ -127,14 +126,14 @@ describe('UsersPage', () => {
     store.rows.set([ahmad]);
     store.total.set(TOTAL);
     await render();
-    const [previous, next] = [...page.querySelectorAll<HTMLButtonElement>('.paging button')];
+    const [previous, next] = [...page.querySelectorAll<HTMLButtonElement>('hr-pager .btn')];
     expect(previous?.disabled).toBe(true);
     expect(next?.disabled).toBe(false);
     next?.click();
     expect(store.pages).toEqual([SECOND_PAGE]);
     store.filters.set({ search: '', page: LAST_PAGE });
     await render();
-    expect(page.querySelector<HTMLButtonElement>('.paging button:last-child')?.disabled).toBe(true);
+    expect(page.querySelectorAll<HTMLButtonElement>('hr-pager .btn')[1]?.disabled).toBe(true);
   });
 
   it('a search is sent as typed; nothing matching says so', () => {
@@ -154,37 +153,37 @@ describe('UsersPage', () => {
     expect(store.reloads).toBe(1);
   });
 
-  it('with ManageUsers: Suspend opens the editor on that row; Reinstate asks the store with a fresh key', async () => {
+  it('with ManageUsers: Suspend opens the reason drawer for that row; Reinstate asks the store with a fresh key', async () => {
     store.rows.set([ahmad, lina]);
     store.total.set(TOTAL);
     await render();
-    expect(text('.act')).toEqual(['Suspend', 'Terminate', 'Reinstate', 'Terminate']);
-    page
-      .querySelector<HTMLButtonElement>('[role="listitem"]:first-child [data-act="suspend"]')
-      ?.click();
+    expect(text('.tlink')).toEqual(['Suspend', 'Terminate', 'Reinstate', 'Terminate']);
+    page.querySelector<HTMLButtonElement>('tr.urow:first-child [data-act="suspend"]')?.click();
     await render();
-    expect(
-      page.querySelector('[role="listitem"]:first-child hr-account-state-editor'),
-    ).not.toBeNull();
-    expect(page.querySelector('[role="listitem"]:last-child hr-account-state-editor')).toBeNull();
-    page
-      .querySelector<HTMLButtonElement>('[role="listitem"]:last-child [data-act="reinstate"]')
-      ?.click();
+    const stateDrawer = page.querySelectorAll<HTMLDialogElement>('dialog.drawer')[1];
+    expect(stateDrawer?.hasAttribute('open')).toBe(true);
+    expect(stateDrawer?.querySelector('.drawer-h h2')?.textContent).toBe('Suspend account');
+    expect(stateDrawer?.querySelector('hr-account-state-editor')).not.toBeNull();
+    stateDrawer?.querySelector<HTMLButtonElement>('.drawer-x')?.click();
+    await render();
+    expect(page.querySelector('hr-account-state-editor')).toBeNull();
+    page.querySelector<HTMLButtonElement>('tr.urow:last-child [data-act="reinstate"]')?.click();
     await render();
     expect(store.reinstated.map((call) => call.id)).toEqual(['u2']);
     expect(store.reinstated[0]?.key.value).not.toBe('');
   });
 
-  it('Terminate opens the editor in its final mode; a terminated account offers nothing', async () => {
+  it('Terminate opens the drawer in its final mode; a terminated account offers nothing', async () => {
     const gone: UserAccount = { ...lina, id: 'u3', state: AccountState.terminated };
     store.rows.set([ahmad, gone]);
     await render();
-    expect(text('[role="listitem"]:last-child .act')).toEqual([]);
-    page
-      .querySelector<HTMLButtonElement>('[role="listitem"]:first-child [data-act="terminate"]')
-      ?.click();
+    expect(text('tr.urow:last-child .tlink')).toEqual([]);
+    page.querySelector<HTMLButtonElement>('tr.urow:first-child [data-act="terminate"]')?.click();
     await render();
-    const editor = page.querySelector('[role="listitem"]:first-child hr-account-state-editor');
+    expect(
+      page.querySelectorAll('dialog.drawer')[1]?.querySelector('.drawer-h h2')?.textContent,
+    ).toBe('Terminate account');
+    const editor = page.querySelector('dialog.drawer hr-account-state-editor');
     expect(editor?.querySelector('.warning')?.textContent).toContain('cannot be undone');
     expect(editor?.querySelector('button[type="submit"]')?.textContent.trim()).toBe(
       'Terminate account',
@@ -195,7 +194,7 @@ describe('UsersPage', () => {
     mayManage = false;
     store.rows.set([ahmad, lina]);
     await render();
-    expect(page.querySelector('.act')).toBeNull();
+    expect(page.querySelector('.tlink')).toBeNull();
     mayManage = true;
   });
 

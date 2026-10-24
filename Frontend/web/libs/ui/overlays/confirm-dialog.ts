@@ -55,18 +55,16 @@ export class ConfirmDialog {
     });
   }
 
+  /** A button: closes and settles at once (the native close event is not waited for, see Drawer). */
   protected answer(value: boolean): void {
     this.outcome = value;
     const dialog = this.box().nativeElement;
-    if (typeof dialog.close === 'function') {
-      dialog.close();
-      return;
-    }
-    dialog.removeAttribute('open');
+    if (typeof dialog.close === 'function') dialog.close();
+    else dialog.removeAttribute('open');
     this.onClose();
   }
 
-  /** The dialog closed, by a button, by Escape or by the browser: the waiting caller gets the answer. */
+  /** The dialog closed, by a button, by Escape or by the browser: the waiting caller gets the answer, once. */
   protected onClose(): void {
     const settle = this.settle;
     this.settle = null;

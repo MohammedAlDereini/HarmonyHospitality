@@ -10,18 +10,18 @@
     <span i18n="@@platform-admin.properties.add">Add property</span>
   </button>
 </ng-template>
-<div class="sec-h">
-  <h1 i18n="@@platform-admin.properties.title">Properties</h1>
-  @if (!store.loading() && store.problem() === null) {
-    <span class="note"
-      ><span class="num">{{ store.total() }}</span
-      >&ngsp;<span i18n="@@platform-admin.properties.count">properties</span></span
-    >
-  }
-  <form class="r" (submit)="onSearch($event, search.value)">
-    <label class="vh" for="properties-search" i18n="@@platform-admin.properties.search"
-      >Search</label
-    >
+<header class="page-head">
+  <div>
+    <h1 i18n="@@platform-admin.properties.title">Properties</h1>
+    <p class="lead" i18n="@@platform-admin.properties.lead">
+      Every hotel on the platform: its code, where it stands, its rooms, currency and language, and
+      whether it is open for business.
+    </p>
+  </div>
+</header>
+<form class="toolbar" (submit)="onSearch($event, search.value)">
+  <div class="tf wide">
+    <label for="properties-search" i18n="@@platform-admin.properties.search">Search</label>
     <input
       id="properties-search"
       #search
@@ -33,16 +33,11 @@
       placeholder="Code or name"
       [value]="store.filters().search"
     />
+  </div>
+  <div class="tacts">
     <button type="submit" class="btn" i18n="@@platform-admin.properties.find">Find</button>
-  </form>
-</div>
-@if (creating()) {
-  <hr-property-editor
-    [tenantId]="tenantId()"
-    (done)="closeCreator()"
-    (cancelled)="closeCreator()"
-  />
-}
+  </div>
+</form>
 @if (store.problem(); as problem) {
   <p class="empty" role="alert">
     {{ problem }}&ngsp;<button
@@ -59,65 +54,62 @@
 } @else if (store.rows().length === 0) {
   <p class="empty" i18n="@@platform-admin.properties.none">No properties match.</p>
 } @else {
-  <div class="rows" role="list">
-    @for (property of store.rows(); track property.id) {
-      <div class="srow prow" role="listitem">
-        <div class="s-who">
-          <span class="code num" dir="ltr">{{ property.code }}</span>
-          <div class="s-nm">
-            <b
-              ><a class="nm-link" [routerLink]="[property.id]"
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th scope="col" i18n="@@platform-admin.properties.column.code">Code</th>
+          <th scope="col" i18n="@@platform-admin.properties.column.name">Name</th>
+          <th scope="col" class="num" i18n="@@platform-admin.properties.column.rooms">Rooms</th>
+          <th scope="col" i18n="@@platform-admin.properties.column.currency-language">
+            Currency · language
+          </th>
+          <th scope="col" i18n="@@platform-admin.properties.column.state">State</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (property of store.rows(); track property.id) {
+          <tr class="prow">
+            <td class="key" dir="ltr">{{ property.code }}</td>
+            <td>
+              <a class="nm-link" [routerLink]="[property.id]"
                 ><bdi>{{ name(property) }}</bdi></a
-              ></b
-            >
-            <span dir="ltr">{{ property.countryCode }} · {{ property.timeZoneId }}</span>
-          </div>
-        </div>
-        <div class="obj">
-          <b class="num">{{ property.totalRooms }}</b>
-          <span i18n="@@platform-admin.properties.column.rooms">Rooms</span>
-        </div>
-        <div class="obj">
-          <b dir="ltr">{{ property.defaultCurrency }} · {{ property.defaultLanguageCode }}</b>
-          <span i18n="@@platform-admin.properties.column.currency-language"
-            >Currency · language</span
-          >
-        </div>
-        <div class="obj" [attr.data-s]="property.isActive ? null : 'warn'">
-          @if (property.isActive) {
-            <b i18n="@@platform-admin.properties.active">Active</b>
-          } @else {
-            <b i18n="@@platform-admin.properties.inactive">Inactive</b>
-          }
-          <span i18n="@@platform-admin.properties.column.state">State</span>
-        </div>
-      </div>
-    }
+              >
+              <span class="sub" dir="ltr"
+                >{{ property.countryCode }} · {{ property.timeZoneId }}</span
+              >
+            </td>
+            <td class="num">{{ property.totalRooms }}</td>
+            <td dir="ltr">{{ property.defaultCurrency }} · {{ property.defaultLanguageCode }}</td>
+            <td>
+              @if (property.isActive) {
+                <span class="pill on" i18n="@@platform-admin.properties.active">Active</span>
+              } @else {
+                <span class="pill warn" data-s="warn" i18n="@@platform-admin.properties.inactive"
+                  >Inactive</span
+                >
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
   </div>
-  <nav class="paging" i18n-aria-label="@@platform-admin.properties.paging" aria-label="Pages">
-    <button
-      type="button"
-      class="btn"
-      (click)="previous()"
-      [disabled]="!hasPrevious()"
-      i18n="@@platform-admin.properties.previous"
-    >
-      Previous
-    </button>
-    <span
-      ><span class="num">{{ from() }}–{{ to() }}</span
-      >&ngsp;<span i18n="@@platform-admin.properties.of">of</span>&ngsp;<span class="num">{{
-        store.total()
-      }}</span></span
-    >
-    <button
-      type="button"
-      class="btn"
-      (click)="next()"
-      [disabled]="!hasNext()"
-      i18n="@@platform-admin.properties.next"
-    >
-      Next
-    </button>
-  </nav>
+  <hr-pager
+    [page]="page()"
+    [pageSize]="pageSize"
+    [total]="store.total()"
+    [loading]="store.loading()"
+    (pageChange)="store.goTo($event)"
+  />
 }
+<hr-drawer
+  #drawer
+  i18n-heading="@@platform-admin.properties.new.title"
+  heading="New property"
+  (closed)="creating.set(false)"
+>
+  @if (creating()) {
+    <hr-property-editor [tenantId]="tenantId()" (done)="saved()" (cancelled)="drawer.close()" />
+  }
+</hr-drawer>

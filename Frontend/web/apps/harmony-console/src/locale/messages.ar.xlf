@@ -950,14 +950,6 @@
           <context context-type="linenumber">95,97</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.roles.permissions.of" datatype="html">
-        <source>Permissions of</source>
-        <target>صلاحيات الدور</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
-          <context context-type="linenumber">3,6</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="administration.roles.loading" datatype="html">
         <source>Loading…</source>
         <target>جارٍ التحميل…</target>
@@ -1084,14 +1076,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
           <context context-type="linenumber">14,15</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.roles.count" datatype="html">
-        <source>roles</source>
-        <target>أدوار</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">18,22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.try-again" datatype="html">
@@ -1842,14 +1826,6 @@
           <context context-type="linenumber">14,15</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.users.accounts" datatype="html">
-        <source>accounts</source>
-        <target>حسابات</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">18,21</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="administration.users.search" datatype="html">
         <source>Search</source>
         <target>بحث</target>
@@ -1946,38 +1922,6 @@
           <context context-type="linenumber">121,123</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.users.paging" datatype="html">
-        <source>Pages</source>
-        <target>الصفحات</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">138,140</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.users.previous" datatype="html">
-        <source> Previous </source>
-        <target>السابق</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">145,148</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.users.of" datatype="html">
-        <source>of</source>
-        <target>من</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">149,150</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.users.next" datatype="html">
-        <source> Next </source>
-        <target>التالي</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">160,164</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="platform-admin.properties.add" datatype="html">
         <source>Add property</source>
         <target>إضافة عقار</target>
@@ -1992,14 +1936,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.html</context>
           <context context-type="linenumber">14,15</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.properties.count" datatype="html">
-        <source>properties</source>
-        <target>عقارات</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.html</context>
-          <context context-type="linenumber">18,21</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.properties.search" datatype="html">
@@ -2088,38 +2024,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.html</context>
           <context context-type="linenumber">92,97</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.properties.paging" datatype="html">
-        <source>Pages</source>
-        <target>الصفحات</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.html</context>
-          <context context-type="linenumber">98,100</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.properties.previous" datatype="html">
-        <source> Previous </source>
-        <target>السابق</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.html</context>
-          <context context-type="linenumber">105,108</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.properties.of" datatype="html">
-        <source>of</source>
-        <target>من</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.html</context>
-          <context context-type="linenumber">109,110</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.properties.next" datatype="html">
-        <source> Next </source>
-        <target>التالي</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.html</context>
-          <context context-type="linenumber">120,124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.properties.new.title" datatype="html">
@@ -2658,22 +2562,6 @@
           <context context-type="linenumber">12,14</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="platform-admin.reference.add" datatype="html">
-        <source>Add row</source>
-        <target>إضافة صف</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
-          <context context-type="linenumber">11,14</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.count" datatype="html">
-        <source>rows</source>
-        <target>صفوف</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
-          <context context-type="linenumber">21,25</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="platform-admin.reference.field.category" datatype="html">
         <source>Category</source>
         <target>الفئة</target>
@@ -2710,22 +2598,6 @@
           <context context-type="linenumber">59,62</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="platform-admin.reference.loading" datatype="html">
-        <source>Loading…</source>
-        <target>جارٍ التحميل…</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
-          <context context-type="linenumber">63,64</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.none" datatype="html">
-        <source>No rows yet.</source>
-        <target>لا صفوف بعد.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
-          <context context-type="linenumber">65,67</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="platform-admin.reference.edit" datatype="html">
         <source> Edit </source>
         <target>تعديل</target>
@@ -2740,14 +2612,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
           <context context-type="linenumber">103,104</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.delete.ask" datatype="html">
-        <source> Delete this row? This cannot be undone. </source>
-        <target>حذف هذا الصف؟ لا يمكن التراجع عن هذا.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
-          <context context-type="linenumber">120,122</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.delete.go" datatype="html">
@@ -2778,22 +2642,6 @@
           <context context-type="linenumber">149,152</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="platform-admin.reference.yes" datatype="html">
-        <source>Yes</source>
-        <target>نعم</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
-          <context context-type="linenumber">92</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.no" datatype="html">
-        <source>No</source>
-        <target>لا</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
-          <context context-type="linenumber">93</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="platform-admin.reference.page-title" datatype="html">
         <source>Reference data</source>
         <target>البيانات المرجعية</target>
@@ -2818,44 +2666,12 @@
           <context context-type="linenumber">16</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="platform-admin.reference.new.title" datatype="html">
-        <source>New row</source>
-        <target>صف جديد</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/row-editor.html</context>
-          <context context-type="linenumber">3,5</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.edit.title" datatype="html">
-        <source>Edit row</source>
-        <target>تعديل الصف</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/row-editor.html</context>
-          <context context-type="linenumber">5,8</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="platform-admin.reference.field.choose" datatype="html">
         <source>Choose</source>
         <target>اختر</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/row-editor.html</context>
           <context context-type="linenumber">30,31</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.new.go" datatype="html">
-        <source> Create row </source>
-        <target>إنشاء الصف</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/row-editor.html</context>
-          <context context-type="linenumber">73,76</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.edit.go" datatype="html">
-        <source> Save </source>
-        <target>حفظ</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/row-editor.html</context>
-          <context context-type="linenumber">82,85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.name-en" datatype="html">
@@ -2894,14 +2710,6 @@
           <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="platform-admin.reference.field.code" datatype="html">
-        <source>Code</source>
-        <target>الرمز</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">61</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="platform-admin.reference.field.description" datatype="html">
         <source>Description</source>
         <target>الوصف</target>
@@ -2920,7 +2728,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.global" datatype="html">
         <source>Global (every tenant sees it)</source>
-        <target>عام (يراه كل مستأجر)</target>
+        <target>عام: كل مستأجر يراه</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">78</context>
@@ -2944,7 +2752,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.alpha3" datatype="html">
         <source>Three-letter code</source>
-        <target>الرمز الثلاثي</target>
+        <target>رمز الدولة، 3 أحرف</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">102</context>
@@ -2952,7 +2760,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.dial-code" datatype="html">
         <source>Dialling code</source>
-        <target>رمز الاتصال</target>
+        <target>رمز الاتصال الهاتفي</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">114</context>
@@ -2996,7 +2804,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.subdivision" datatype="html">
         <source>Subdivision code</source>
-        <target>رمز التقسيم</target>
+        <target>التقسيم الإداري</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">160</context>
@@ -3036,7 +2844,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.name-native" datatype="html">
         <source>Name in the language itself</source>
-        <target>الاسم باللغة نفسها</target>
+        <target>الاسم الأصلي</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">199</context>
@@ -3044,7 +2852,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.rtl" datatype="html">
         <source>Written right to left</source>
-        <target>تُكتب من اليمين إلى اليسار</target>
+        <target>تُكتب من اليمين إلى اليسار (العربية، العبرية، الأردية): الشاشات تعكس تخطيطها</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">206</context>
@@ -3076,7 +2884,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.exclusive" datatype="html">
         <source>Exclusive (a property joins one group of this type)</source>
-        <target>حصري (ينضم العقار إلى مجموعة واحدة من هذا النوع)</target>
+        <target>حصري: العقار ينتمي إلى مجموعة واحدة فقط من هذا النوع (علامة واحدة لكل فندق)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">244</context>
@@ -3084,7 +2892,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.system" datatype="html">
         <source>System (ships with the platform)</source>
-        <target>نظامي (يأتي مع المنصة)</target>
+        <target>صف نظامي: يعتمد عليه كود هارموني؛ يمكن إعادة تسميته لاحقاً لكن حصريته مقفلة</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">249</context>
@@ -3100,7 +2908,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.legal" datatype="html">
         <source>Legal</source>
-        <target>قانونية</target>
+        <target>قانوني (قانون الشركات، الترخيص)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">270</context>
@@ -3108,7 +2916,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.tax" datatype="html">
         <source>Tax</source>
-        <target>ضريبية</target>
+        <target>ضريبي (ضريبة القيمة المضافة، ضريبة المبيعات، رسم السياحة)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">271</context>
@@ -3116,7 +2924,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.accounting" datatype="html">
         <source>Accounting</source>
-        <target>محاسبية</target>
+        <target>محاسبي (IFRS، المعايير المحلية)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">274</context>
@@ -3124,7 +2932,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.accommodation" datatype="html">
         <source>Accommodation</source>
-        <target>إيواء</target>
+        <target>إيواء (قواعد السياحة والفنادق)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">278</context>
@@ -3176,7 +2984,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.level.property" datatype="html">
         <source>Property</source>
-        <target>عقار</target>
+        <target>عقار (فندق واحد؛ بند الاشتراك يسمي الفندق وغرفه)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">338</context>
@@ -3184,7 +2992,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.level.tenant" datatype="html">
         <source>Tenant</source>
-        <target>مستأجر</target>
+        <target>مستأجر (مرة واحدة للعميل كله، مثل الولاء أو تعدد العقارات)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">340</context>
@@ -3192,7 +3000,7 @@
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.has-limit" datatype="html">
         <source>Has a limit (rooms or terminals)</source>
-        <target>لها حد (غرف أو أجهزة طرفية)</target>
+        <target>له حد: بند الاشتراك يحمل رقماً (غرف، أجهزة)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
           <context context-type="linenumber">345</context>
@@ -3364,14 +3172,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-editor.html</context>
           <context context-type="linenumber">5,9</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.tenants.edit.title" datatype="html">
-        <source>Edit tenant</source>
-        <target>تعديل المستأجر</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-editor.html</context>
-          <context context-type="linenumber">9,12</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.tenants.field.code" datatype="html">
@@ -3838,14 +3638,6 @@
           <context context-type="linenumber">14,15</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="platform-admin.tenants.count" datatype="html">
-        <source>tenants</source>
-        <target>مستأجرون</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.html</context>
-          <context context-type="linenumber">18,22</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="platform-admin.tenants.filter" datatype="html">
         <source>Status</source>
         <target>الحالة</target>
@@ -3932,38 +3724,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.html</context>
           <context context-type="linenumber">102,107</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.tenants.paging" datatype="html">
-        <source>Pages</source>
-        <target>الصفحات</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.html</context>
-          <context context-type="linenumber">108,110</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.tenants.previous" datatype="html">
-        <source> Previous </source>
-        <target>السابق</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.html</context>
-          <context context-type="linenumber">115,118</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.tenants.of" datatype="html">
-        <source>of</source>
-        <target>من</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.html</context>
-          <context context-type="linenumber">119,120</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.tenants.next" datatype="html">
-        <source> Next </source>
-        <target>التالي</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.html</context>
-          <context context-type="linenumber">130,134</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.tenants.filter.all" datatype="html">
@@ -4732,6 +4492,1578 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
           <context context-type="linenumber">310,312</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.shell.nav.group.reference" datatype="html">
+        <source>Reference data</source>
+        <target>البيانات المرجعية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-console/src/app/places.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.index.lead" datatype="html">
+        <source> The lists every hotel in Harmony shares: countries, cities, currencies, time zones, languages, property types and the regimes they live under. Kept here by the platform team; a hotel only reads them. </source>
+        <target>القوائم التي تشترك فيها كل فنادق هارموني: الدول والمدن والعملات والمناطق الزمنية واللغات وأنواع العقارات والأنظمة التي تعيش تحتها. يحتفظ بها فريق المنصة هنا؛ والفندق يقرأها فقط.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-index-page.ts</context>
+          <context context-type="linenumber">26,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.index.fresh" datatype="html">
+        <source> Every table is empty: this is a fresh installation. Start with currencies and time zones, then countries, then the rest; each table checks that the rows it points at already exist. </source>
+        <target>كل الجداول فارغة: هذا تثبيت جديد. ابدأ بالعملات والمناطق الزمنية، ثم الدول، ثم الباقي؛ كل جدول يتحقق من وجود الصفوف التي يشير إليها.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-index-page.ts</context>
+          <context context-type="linenumber">35,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.index.still-empty" datatype="html">
+        <source>Still empty:</source>
+        <target>ما زال فارغاً:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-index-page.ts</context>
+          <context context-type="linenumber">40,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.index.tables" datatype="html">
+        <source>tables</source>
+        <target>جداول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-index-page.ts</context>
+          <context context-type="linenumber">43,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.index.counting" datatype="html">
+        <source>…</source>
+        <target>…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-index-page.ts</context>
+          <context context-type="linenumber">53,55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.index.no-access" datatype="html">
+        <source>No access</source>
+        <target>لا صلاحية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-index-page.ts</context>
+          <context context-type="linenumber">57,60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.filter.all" datatype="html">
+        <source>All</source>
+        <target>الكل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">68,70</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">154</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">633</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.filter.apply" datatype="html">
+        <source> Apply </source>
+        <target>تطبيق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">79,82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.filter.clear" datatype="html">
+        <source> Clear </source>
+        <target>مسح</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">88,92</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.actions" datatype="html">
+        <source>Actions</source>
+        <target>إجراءات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">135,138</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.cell.active" datatype="html">
+        <source>Active</source>
+        <target>نشط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">156,158</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">155</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.cell.inactive" datatype="html">
+        <source>Inactive</source>
+        <target>موقوف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">160,162</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">156</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.cell.yes" datatype="html">
+        <source>Yes</source>
+        <target>نعم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">172,174</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.cell.no" datatype="html">
+        <source>No</source>
+        <target>لا</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">175,177</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.cell.system" datatype="html">
+        <source>System</source>
+        <target>نظامي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">181,183</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.empty.filtered" datatype="html">
+        <source> Nothing matches these filters. </source>
+        <target>لا شيء يطابق هذه المرشحات.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">225,228</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.empty.first" datatype="html">
+        <source> No rows yet. Add the first one. </source>
+        <target>لا صفوف بعد. أضف الصف الأول.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.html</context>
+          <context context-type="linenumber">229,232</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.add-one" datatype="html">
+        <source>Add <x id="SINGULAR" equiv-text="description.singular"/></source>
+        <target>إضافة {$SINGULAR}</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.edit-one" datatype="html">
+        <source>Edit <x id="SINGULAR" equiv-text="description.singular"/></source>
+        <target>تعديل {$SINGULAR}</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.key-note.new" datatype="html">
+        <source>The code or key is chosen once and then fixed.</source>
+        <target>الرمز أو المفتاح يُختار مرة واحدة ثم يثبت.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
+          <context context-type="linenumber">115</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.key-note.edit" datatype="html">
+        <source>The identity of the row (its code or key) cannot change: other rows point at it.</source>
+        <target>هوية الصف (رمزه أو مفتاحه) لا تتغير: صفوف أخرى تشير إليه.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.delete.heading" datatype="html">
+        <source>Delete this <x id="SINGULAR" equiv-text="description.singular"/>?</source>
+        <target>حذف هذه {$SINGULAR}؟</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.delete.message" datatype="html">
+        <source>This cannot be undone.</source>
+        <target>لا يمكن التراجع عن هذا.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.toast.added" datatype="html">
+        <source><x id="NAME" equiv-text="name"/> added.</source>
+        <target>تمت إضافة {$NAME}.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
+          <context context-type="linenumber">245</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.toast.saved" datatype="html">
+        <source><x id="NAME" equiv-text="name"/> saved.</source>
+        <target>تم حفظ {$NAME}.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
+          <context context-type="linenumber">246</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.toast.deleted" datatype="html">
+        <source><x id="NAME" equiv-text="name"/> deleted.</source>
+        <target>تم حذف {$NAME}.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/reference-table-page.ts</context>
+          <context context-type="linenumber">267</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.editor.optional" datatype="html">
+        <source>(optional)</source>
+        <target>(اختياري)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/row-editor.html</context>
+          <context context-type="linenumber">19,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.editor.none" datatype="html">
+        <source>None</source>
+        <target>لا شيء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/row-editor.html</context>
+          <context context-type="linenumber">36,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.editor.add" datatype="html">
+        <source> Add </source>
+        <target>إضافة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/row-editor.html</context>
+          <context context-type="linenumber">87,90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.editor.save" datatype="html">
+        <source> Save </source>
+        <target>حفظ</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/row-editor.html</context>
+          <context context-type="linenumber">96,99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.editor.choose-first" datatype="html">
+        <source>Choose <x id="LABEL" equiv-text="sibling.label"/> first</source>
+        <target>اختر {$LABEL} أولاً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/row-editor.ts</context>
+          <context context-type="linenumber">185</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.active" datatype="html">
+        <source>Untick to retire the row: it stays, because other rows point at it, but is offered to nobody new.</source>
+        <target>ألغِ التحديد لإيقاف الصف: يبقى لأن صفوفاً أخرى تشير إليه، لكنه لا يُعرض على أحد جديد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.description" datatype="html">
+        <source>A sentence for the next administrator: what the rows are used for.</source>
+        <target>جملة للمدير التالي: فيمَ تُستخدم هذه الصفوف.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.global" datatype="html">
+        <source>Chosen once: a global row belongs to the platform and shows in every hotel; a tenant row stays with its tenant.</source>
+        <target>يُختار مرة واحدة: الصف العام يخص المنصة ويظهر في كل فندق؛ صف المستأجر يبقى عنده.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.code" datatype="html">
+        <source>Code</source>
+        <target>الرمز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.name-en" datatype="html">
+        <source>English name</source>
+        <target>الاسم بالإنجليزية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.name-ar" datatype="html">
+        <source>Arabic name</source>
+        <target>الاسم بالعربية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.state" datatype="html">
+        <source>State</source>
+        <target>الحالة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.name" datatype="html">
+        <source>Name</source>
+        <target>الاسم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.country" datatype="html">
+        <source>Country</source>
+        <target>الدولة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.kind" datatype="html">
+        <source>Kind</source>
+        <target>النوع</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.owner-service" datatype="html">
+        <source>Owner service</source>
+        <target>الخدمة المالكة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.filter.search" datatype="html">
+        <source>Search</source>
+        <target>بحث</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">145</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.filter.search-placeholder" datatype="html">
+        <source>code or name, 2+ characters</source>
+        <target>الرمز أو الاسم، حرفان على الأقل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">147</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.currencies.singular" datatype="html">
+        <source>currency</source>
+        <target>عملة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">172</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.currencies.description" datatype="html">
+        <source>The currencies a hotel can price, invoice and pay in. Minor units (2 or 3 decimals) come from the money registry, never typed, so money rounds the same everywhere.</source>
+        <target>العملات التي يستطيع الفندق التسعير والفوترة والدفع بها. الكسور (منزلتان أو ثلاث) تأتي من سجل العملات ولا تُكتب يدوياً، فتُقرَّب المبالغ بالطريقة نفسها في كل مكان.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">173</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.field.currency-code" datatype="html">
+        <source>Currency code</source>
+        <target>رمز العملة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">177</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.currency-code" datatype="html">
+        <source>3 letters from the ISO 4217 list, like JOD, SAR or AED. Must be a currency Harmony can price in. Fixed once saved.</source>
+        <target>3 أحرف من قائمة ISO 4217، مثل JOD أو SAR أو AED. يجب أن تكون عملة يستطيع هارموني التسعير بها. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">179</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.currency-name" datatype="html">
+        <source>As printed on invoices, like Jordanian dinar.</source>
+        <target>كما يُطبع على الفواتير، مثل Jordanian dinar.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">183</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.decimals" datatype="html">
+        <source>Decimals</source>
+        <target>الكسور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">194</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.time-zones.singular" datatype="html">
+        <source>time zone</source>
+        <target>منطقة زمنية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">207</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.time-zones.description" datatype="html">
+        <source>The clocks hotels run on: business date, night audit, check-in time. A city points at one, so a hotel in Jordan can never be saved with a Riyadh clock.</source>
+        <target>الساعات التي تعمل بها الفنادق: تاريخ العمل، التدقيق الليلي، وقت تسجيل الوصول. المدينة تشير إلى واحدة، فلا يمكن حفظ فندق في الأردن بساعة الرياض.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">208</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.time-zone-id" datatype="html">
+        <source>The IANA zone id, Region/City, like Asia/Amman or Asia/Riyadh. One per real zone (Dubai and Muscat share Asia/Dubai). The server must recognise it. Fixed once saved.</source>
+        <target>معرّف IANA بصيغة المنطقة/المدينة، مثل Asia/Amman أو Asia/Riyadh. واحد لكل منطقة حقيقية (دبي ومسقط تشتركان في Asia/Dubai). يجب أن يعرفه الخادم. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">219</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.time-zone-name" datatype="html">
+        <source>What people read in the dropdown, like Amman (Jordan).</source>
+        <target>ما يقرأه الناس في القائمة المنسدلة، مثل Amman (Jordan).</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">222</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.zone" datatype="html">
+        <source>Zone</source>
+        <target>المنطقة الزمنية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">228</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.languages.singular" datatype="html">
+        <source>language</source>
+        <target>لغة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">240</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.languages.description" datatype="html">
+        <source>The languages guests and staff use: confirmation mails, registration cards and screens come out in them.</source>
+        <target>اللغات التي يستخدمها النزلاء والموظفون: رسائل التأكيد وبطاقات التسجيل والشاشات تخرج بها.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">241</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.field.language-code" datatype="html">
+        <source>Language code</source>
+        <target>رمز اللغة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">245</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.language-code" datatype="html">
+        <source>2 letters from the ISO 639-1 list, like ar, en or fr. Stored lower-case. Fixed once saved.</source>
+        <target>حرفان من قائمة ISO 639-1، مثل ar أو en أو fr. يُحفظ بأحرف صغيرة. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">247</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.language-name" datatype="html">
+        <source>The name an administrator reads, like Arabic.</source>
+        <target>الاسم الذي يقرأه المدير، مثل Arabic.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">251</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.language-native" datatype="html">
+        <source>The name in the language itself, what a speaker reads when choosing it: العربية, Français, 日本語.</source>
+        <target>الاسم باللغة نفسها، ما يقرأه المتحدث بها عند اختيارها: العربية، Français، 日本語.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">260</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.native-name" datatype="html">
+        <source>Native name</source>
+        <target>الاسم الأصلي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">274</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.rtl" datatype="html">
+        <source>Right to left</source>
+        <target>من اليمين إلى اليسار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">279</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.countries.singular" datatype="html">
+        <source>country</source>
+        <target>دولة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">292</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.countries.description" datatype="html">
+        <source>Where hotels, companies and guests are from. From the country Harmony knows the currency to propose, the regions and cities to offer, the dial code, and later the tax and legal regimes.</source>
+        <target>من أين الفنادق والشركات والنزلاء. من الدولة يعرف هارموني العملة المقترحة، والمناطق والمدن المتاحة، ورمز الاتصال، ولاحقاً الأنظمة الضريبية والقانونية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">293</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.field.country-code" datatype="html">
+        <source>Country code</source>
+        <target>رمز الدولة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">297</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.country-code" datatype="html">
+        <source>2 letters from the ISO 3166-1 list, like JO, SA or AE. Addresses, nationalities and tax rules key on it. Fixed once saved.</source>
+        <target>حرفان من قائمة ISO 3166-1، مثل JO أو SA أو AE. العناوين والجنسيات وقواعد الضرائب تعتمد عليه. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">299</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.country-alpha3" datatype="html">
+        <source>The same country in its 3-letter ISO form, like JOR, SAU or ARE: passports, bank files and e-invoicing use this one. Not the currency.</source>
+        <target>الدولة نفسها بصيغة ISO من 3 أحرف، مثل JOR أو SAU أو ARE: جوازات السفر وملفات البنوك والفوترة الإلكترونية تستخدم هذه. ليست العملة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">312</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.country-name" datatype="html">
+        <source>Like Jordan or Saudi Arabia.</source>
+        <target>مثل Jordan أو Saudi Arabia.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">314</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.country-dial" datatype="html">
+        <source>A plus sign and the country digits, like +962 or +966. Phone numbers are stored against it.</source>
+        <target>علامة زائد ثم أرقام الدولة، مثل ‎+962 أو ‎+966. أرقام الهواتف تُحفظ مقابله.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">325</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.country-currency" datatype="html">
+        <source>What a hotel in this country prices in unless told otherwise. Add the currency first if it is not in the list.</source>
+        <target>ما يسعّر به فندق في هذه الدولة ما لم يُحدَّد غيره. أضف العملة أولاً إن لم تكن في القائمة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">333</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.alpha3" datatype="html">
+        <source>3-letter code</source>
+        <target>رمز من 3 أحرف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">341</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.dial-code" datatype="html">
+        <source>Dial code</source>
+        <target>رمز الاتصال</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">346</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.currency" datatype="html">
+        <source>Currency</source>
+        <target>العملة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">349</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.subdivisions.singular" datatype="html">
+        <source>subdivision</source>
+        <target>تقسيم إداري</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">361</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.subdivisions.description" datatype="html">
+        <source>Governorates, regions, emirates, states: the level between a country and its cities. Addresses and reports group by them.</source>
+        <target>المحافظات والمناطق والإمارات والولايات: المستوى بين الدولة ومدنها. العناوين والتقارير تُجمَّع بها.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">362</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.subdivision-country" datatype="html">
+        <source>The country this subdivision belongs to. Fixed once saved.</source>
+        <target>الدولة التي يتبعها هذا التقسيم. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">366</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.field.subdivision-code" datatype="html">
+        <source>Subdivision code</source>
+        <target>رمز التقسيم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">369</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.subdivision-code" datatype="html">
+        <source>From the ISO 3166-2 list: the country code, a hyphen, then 1 to 3 letters or digits, like JO-AM (Amman) or SA-01 (Riyadh). Fixed once saved.</source>
+        <target>من قائمة ISO 3166-2: رمز الدولة، ثم شرطة، ثم 1 إلى 3 أحرف أو أرقام، مثل JO-AM (عمّان) أو SA-01 (الرياض). ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">371</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.subdivision-name" datatype="html">
+        <source>Like Amman or Riyadh.</source>
+        <target>مثل Amman أو Riyadh.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">374</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.subdivision-kind" datatype="html">
+        <source>What this level is called in that country: Governorate, Region, Emirate, State, Province.</source>
+        <target>ما يُسمى به هذا المستوى في تلك الدولة: محافظة، منطقة، إمارة، ولاية، مقاطعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">382</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.cities.singular" datatype="html">
+        <source>city</source>
+        <target>مدينة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">399</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.cities.description" datatype="html">
+        <source>Where a hotel stands. A city carries its country, subdivision and time zone, so choosing it fills all three for the hotel.</source>
+        <target>حيث يقع الفندق. المدينة تحمل دولتها وتقسيمها ومنطقتها الزمنية، فاختيارها يملأ الثلاثة للفندق.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">400</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.city-country" datatype="html">
+        <source>Fixed once saved: the city id is derived from the country and the English name.</source>
+        <target>ثابت بعد الحفظ: معرّف المدينة مشتق من الدولة والاسم الإنجليزي.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">404</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.city-subdivision" datatype="html">
+        <source>The governorate or region the city is in, from that country&apos;s list.</source>
+        <target>المحافظة أو المنطقة التي تقع فيها المدينة، من قائمة تلك الدولة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">417</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.city-name" datatype="html">
+        <source>Like Amman or Riyadh. One name per country.</source>
+        <target>مثل Amman أو Riyadh. اسم واحد لكل دولة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">420</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.city-time-zone" datatype="html">
+        <source>The clock a hotel in this city runs on.</source>
+        <target>الساعة التي يعمل بها فندق في هذه المدينة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">429</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.city-latitude" datatype="html">
+        <source>Decimal degrees, -90 to 90 (Amman 31.95). For maps and distances.</source>
+        <target>درجات عشرية، من ‎-90 إلى 90 (عمّان 31.95). للخرائط والمسافات.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">438</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.city-longitude" datatype="html">
+        <source>Decimal degrees, -180 to 180 (Amman 35.91).</source>
+        <target>درجات عشرية، من ‎-180 إلى 180 (عمّان 35.91).</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">447</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.subdivision" datatype="html">
+        <source>Subdivision</source>
+        <target>التقسيم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">457</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.time-zone" datatype="html">
+        <source>Time zone</source>
+        <target>المنطقة الزمنية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">462</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.property-types.singular" datatype="html">
+        <source>property type</source>
+        <target>نوع عقار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">474</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.property-types.description" datatype="html">
+        <source>What kind of place a property is: hotel, hostel, resort, serviced apartments. A row, so a new type needs no release.</source>
+        <target>أي نوع من الأماكن هو العقار: فندق، نُزل، منتجع، شقق مخدومة. صف واحد، فالنوع الجديد لا يحتاج إصداراً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">475</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.field.type-code" datatype="html">
+        <source>Type code</source>
+        <target>رمز النوع</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">479</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.type-code" datatype="html">
+        <source>A short fixed code, like Hotel, Hostel or Resort: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.</source>
+        <target>رمز قصير ثابت، مثل Hotel أو Hostel أو Resort: من 2 إلى 32 حرفاً أو رقماً أو نقطة أو شرطة أو شرطة سفلية. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">481</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.type-name" datatype="html">
+        <source>Like Hotel or Serviced apartments.</source>
+        <target>مثل Hotel أو Serviced apartments.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">485</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.display-order" datatype="html">
+        <source>Position in lists: 1 shows first. Zero or more.</source>
+        <target>الموضع في القوائم: 1 يظهر أولاً. صفر أو أكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">494</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.order" datatype="html">
+        <source>Order</source>
+        <target>الترتيب</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">501</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.property-group-types.singular" datatype="html">
+        <source>group type</source>
+        <target>نوع مجموعة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">517</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.property-group-types.description" datatype="html">
+        <source>The ways hotels are grouped: by brand, by region, by owner. An exclusive type allows one group per property (one brand per hotel). A system row is one Harmony&apos;s own code relies on.</source>
+        <target>طرق تجميع الفنادق: بالعلامة التجارية، بالمنطقة، بالمالك. النوع الحصري يسمح بمجموعة واحدة لكل عقار (علامة واحدة لكل فندق). الصف النظامي يعتمد عليه كود هارموني نفسه.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">518</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.field.group-type-code" datatype="html">
+        <source>Group type code</source>
+        <target>رمز نوع المجموعة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">522</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.group-type-code" datatype="html">
+        <source>A short fixed code, like Brand, Region or Owner: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.</source>
+        <target>رمز قصير ثابت، مثل Brand أو Region أو Owner: من 2 إلى 32 حرفاً أو رقماً أو نقطة أو شرطة أو شرطة سفلية. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">524</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.group-type-name" datatype="html">
+        <source>Like Brand or Region.</source>
+        <target>مثل Brand أو Region.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">527</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.exclusive" datatype="html">
+        <source>Exclusive</source>
+        <target>حصري</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">547</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.system" datatype="html">
+        <source>System</source>
+        <target>نظامي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">553</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.modules.singular" datatype="html">
+        <source>module</source>
+        <target>وحدة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">565</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.modules.description" datatype="html">
+        <source>What a customer subscribes to: per hotel (reservations, POS) or once for the whole customer (loyalty, multi-property). Each service checks subscription lines against these codes, so a code never changes.</source>
+        <target>ما يشترك فيه العميل: لكل فندق (الحجوزات، نقاط البيع) أو مرة واحدة للعميل كله (الولاء، تعدد العقارات). كل خدمة تتحقق من بنود الاشتراك بهذه الرموز، لذا لا يتغير الرمز أبداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">566</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.field.module-code" datatype="html">
+        <source>Module code</source>
+        <target>رمز الوحدة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">570</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.module-code" datatype="html">
+        <source>What the owning service checks, like pms.core or multi.property: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.</source>
+        <target>ما تتحقق منه الخدمة المالكة، مثل pms.core أو multi.property: من 2 إلى 32 حرفاً أو رقماً أو نقطة أو شرطة أو شرطة سفلية. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">572</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.module-name" datatype="html">
+        <source>What a salesperson reads, like PMS core or Multiple properties.</source>
+        <target>ما يقرأه مندوب المبيعات، مثل PMS core أو Multiple properties.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">576</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.module-owner" datatype="html">
+        <source>The service that enforces it, like Identity, Fiscal or Guest.</source>
+        <target>الخدمة التي تفرضها، مثل Identity أو Fiscal أو Guest.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">579</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.module-level" datatype="html">
+        <source>Hotel modules are sold per property; chain-wide modules to the company.</source>
+        <target>وحدات الفندق تُباع لكل عقار؛ ووحدات السلسلة للشركة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">597</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.sold-per" datatype="html">
+        <source>Sold per</source>
+        <target>يُباع لكل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">611</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">630</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.has-limit" datatype="html">
+        <source>Has a limit</source>
+        <target>له حد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">616</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.level.property.short" datatype="html">
+        <source>Property</source>
+        <target>عقار</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">636</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.level.tenant.short" datatype="html">
+        <source>Tenant</source>
+        <target>مستأجر</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">640</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.regulatory-environments.singular" datatype="html">
+        <source>regulatory environment</source>
+        <target>بيئة تنظيمية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">652</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.regulatory-environments.description" datatype="html">
+        <source>The legal, tax, accounting and accommodation regimes a hotel lives under, one row per country and regime. A hotel in Jordan is under JO-GST; the Fiscal service knows what that means.</source>
+        <target>الأنظمة القانونية والضريبية والمحاسبية وأنظمة الإيواء التي يعيش الفندق تحتها، صف لكل دولة ونظام. فندق في الأردن تحت JO-GST؛ وخدمة المالية تعرف معنى ذلك.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">653</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.field.regime-code" datatype="html">
+        <source>Regime code</source>
+        <target>رمز النظام</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">657</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.regime-code" datatype="html">
+        <source>A short fixed code, usually country and regime, like JO-GST, SA-VAT or JO-LEGAL: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.</source>
+        <target>رمز قصير ثابت، عادة الدولة والنظام، مثل JO-GST أو SA-VAT أو JO-LEGAL: من 2 إلى 32 حرفاً أو رقماً أو نقطة أو شرطة أو شرطة سفلية. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">659</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.field.regime-kind" datatype="html">
+        <source>Kind of regime</source>
+        <target>نوع النظام</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">664</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.regime-kind" datatype="html">
+        <source>Fixed once saved.</source>
+        <target>ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">686</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.regime-country" datatype="html">
+        <source>The country whose regime this is. Fixed once saved.</source>
+        <target>الدولة التي يخصها هذا النظام. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">689</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.regime-name" datatype="html">
+        <source>Like Jordan general sales tax or Saudi VAT.</source>
+        <target>مثل Jordan general sales tax أو Saudi VAT.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">692</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.regime-owner" datatype="html">
+        <source>The service whose rules this regime stands for: Fiscal for tax and accounting, Identity for legal, Guest for accommodation.</source>
+        <target>الخدمة التي يمثل هذا النظام قواعدها: Fiscal للضرائب والمحاسبة، Identity للقانوني، Guest للإيواء.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">696</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.filter.all-kinds" datatype="html">
+        <source>All kinds</source>
+        <target>كل الأنواع</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">715</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.kind.legal.short" datatype="html">
+        <source>Legal</source>
+        <target>قانوني</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">716</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.kind.tax.short" datatype="html">
+        <source>Tax</source>
+        <target>ضريبي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">717</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.kind.accounting.short" datatype="html">
+        <source>Accounting</source>
+        <target>محاسبي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">720</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.kind.accommodation.short" datatype="html">
+        <source>Accommodation</source>
+        <target>إيواء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">724</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.lookup-categories.singular" datatype="html">
+        <source>lookup category</source>
+        <target>فئة قائمة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">736</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.lookup-categories.description" datatype="html">
+        <source>The named lists screens choose from (guest titles, room features, payment reasons): a category is the list, its values are the choices. Global ones show in every hotel.</source>
+        <target>القوائم المسماة التي تختار منها الشاشات (ألقاب النزلاء، مزايا الغرف، أسباب الدفع): الفئة هي القائمة، وقيمها هي الخيارات. العامة تظهر في كل فندق.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">737</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.category-name" datatype="html">
+        <source>What the list is called where a screen offers it, like Guest title or Room feature.</source>
+        <target>اسم القائمة حيث تعرضها الشاشة، مثل لقب النزيل أو ميزة الغرفة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">741</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.description" datatype="html">
+        <source>Description</source>
+        <target>الوصف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">750</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">797</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.column.global" datatype="html">
+        <source>Global</source>
+        <target>عام</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">754</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">802</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.lookup-values.singular" datatype="html">
+        <source>lookup value</source>
+        <target>قيمة قائمة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">768</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.lookup-values.description" datatype="html">
+        <source>The choices inside one category, in the order and words a screen shows them. Choose the category first; retire a value rather than delete it once it has been used.</source>
+        <target>الخيارات داخل فئة واحدة، بالترتيب والكلمات التي تعرضها الشاشة. اختر الفئة أولاً؛ أوقف القيمة بدل حذفها متى استُخدمت.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">769</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.value-category" datatype="html">
+        <source>The list this value belongs to. Fixed once saved.</source>
+        <target>القائمة التي تتبعها هذه القيمة. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">779</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.value-name" datatype="html">
+        <source>The words the screen shows, like Mr, Mrs or Sea view.</source>
+        <target>الكلمات التي تعرضها الشاشة، مثل السيد أو السيدة أو إطلالة بحرية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">782</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.hint.value-active" datatype="html">
+        <source>Untick to retire the value: what was chosen before keeps it; new choices do not see it.</source>
+        <target>ألغِ التحديد لإيقاف القيمة: ما اختير من قبل يبقى؛ والاختيارات الجديدة لا تراها.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
+          <context context-type="linenumber">789</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.loading" datatype="html">
+        <source>Loading…</source>
+        <target>جارٍ التحميل…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">17,19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.rows" datatype="html">
+        <source>rows</source>
+        <target>صفوف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">20,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.previous" datatype="html">
+        <source> Previous </source>
+        <target>السابق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">31,33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.page" datatype="html">
+        <source>Page</source>
+        <target>صفحة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.of" datatype="html">
+        <source>of</source>
+        <target>من</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.next" datatype="html">
+        <source> Next </source>
+        <target>التالي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">48,52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.overlays.drawer.close" datatype="html">
+        <source>Close</source>
+        <target>إغلاق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/overlays/drawer.html</context>
+          <context context-type="linenumber">14,17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.lead" datatype="html">
+        <source> What each kind of person may do here. A role carries a privilege level and a set of permissions; system roles ship with the platform and never change. </source>
+        <target>ما يستطيع كل نوع من الأشخاص فعله هنا. الدور يحمل مستوى صلاحية ومجموعة أذونات؛ أدوار النظام تأتي مع المنصة ولا تتغير.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">17,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.column.code" datatype="html">
+        <source>Code</source>
+        <target>الرمز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">45,46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.column.name" datatype="html">
+        <source>Name</source>
+        <target>الاسم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">46,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.column.actions" datatype="html">
+        <source>Actions</source>
+        <target>إجراءات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">50,53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.delete.heading" datatype="html">
+        <source>Delete this role?</source>
+        <target>حذف هذا الدور؟</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">142,143</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.permissions.title" datatype="html">
+        <source>Permissions of <x id="ROLE" equiv-text="this.name(open.role)"/></source>
+        <target>أذونات {$ROLE}</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.toast.saved" datatype="html">
+        <source>Role saved.</source>
+        <target>تم حفظ الدور.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">148</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.toast.added" datatype="html">
+        <source>Role added.</source>
+        <target>تمت إضافة الدور.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">149</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.toast.permissions" datatype="html">
+        <source>Permissions saved.</source>
+        <target>تم حفظ الأذونات.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">155</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.toast.deleted" datatype="html">
+        <source>Role deleted.</source>
+        <target>تم حذف الدور.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">171</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.lead" datatype="html">
+        <source> Who may sign in here, how they sign in, and since when. A suspended account can come back; a terminated one cannot. </source>
+        <target>من يستطيع تسجيل الدخول هنا، وكيف يسجل، ومنذ متى. الحساب الموقوف يمكن أن يعود؛ أما المُنهى فلا.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">17,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.column.name" datatype="html">
+        <source>Name</source>
+        <target>الاسم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">64,65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.column.actions" datatype="html">
+        <source>Actions</source>
+        <target>إجراءات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">70,73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.drawer.suspend" datatype="html">
+        <source>Suspend account</source>
+        <target>إيقاف الحساب</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.drawer.terminate" datatype="html">
+        <source>Terminate account</source>
+        <target>إنهاء الحساب</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.drawer.exempt" datatype="html">
+        <source>Exempt from two-step</source>
+        <target>إعفاء من التحقق بخطوتين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.toast.suspended" datatype="html">
+        <source>Account suspended.</source>
+        <target>تم إيقاف الحساب.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.toast.terminated" datatype="html">
+        <source>Account terminated.</source>
+        <target>تم إنهاء الحساب.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.toast.exempted" datatype="html">
+        <source>Exempted from two-step.</source>
+        <target>تم الإعفاء من التحقق بخطوتين.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.toast.added" datatype="html">
+        <source>Account added. The invitation is on its way.</source>
+        <target>تمت إضافة الحساب. الدعوة في طريقها.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.toast.reinstated" datatype="html">
+        <source>Account reinstated.</source>
+        <target>تمت إعادة الحساب.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">168</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.properties.lead" datatype="html">
+        <source> Every hotel on the platform: its code, where it stands, its rooms, currency and language, and whether it is open for business. </source>
+        <target>كل فندق على المنصة: رمزه، وموقعه، وغرفه، وعملته ولغته، وهل هو مفتوح للعمل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.html</context>
+          <context context-type="linenumber">17,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.properties.column.code" datatype="html">
+        <source>Code</source>
+        <target>الرمز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.html</context>
+          <context context-type="linenumber">61,62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.properties.column.name" datatype="html">
+        <source>Name</source>
+        <target>الاسم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.html</context>
+          <context context-type="linenumber">62,63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.properties.toast.added" datatype="html">
+        <source>Property added.</source>
+        <target>تمت إضافة العقار.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/properties-page.ts</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenants.lead" datatype="html">
+        <source> The platform&apos;s customers: who runs hotels on Harmony, their tier and status. Each tenant has its own administrator, roles and properties. </source>
+        <target>عملاء المنصة: من يدير فنادق على هارموني، وفئتهم وحالتهم. لكل مستأجر مديره وأدواره وعقاراته.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.html</context>
+          <context context-type="linenumber">17,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenants.column.code" datatype="html">
+        <source>Code</source>
+        <target>الرمز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.html</context>
+          <context context-type="linenumber">75,76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenants.column.name" datatype="html">
+        <source>Name</source>
+        <target>الاسم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.html</context>
+          <context context-type="linenumber">76,77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenants.column.country-currency" datatype="html">
+        <source> Country · currency </source>
+        <target>الدولة · العملة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.html</context>
+          <context context-type="linenumber">78,80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenants.toast.added" datatype="html">
+        <source>Tenant added.</source>
+        <target>تمت إضافة المستأجر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenants-page.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.property.line.module" datatype="html">
+        <source>Module</source>
+        <target>الوحدة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/property-page.html</context>
+          <context context-type="linenumber">74,75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.property.line.scope" datatype="html">
+        <source>Scope</source>
+        <target>النطاق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/property-page.html</context>
+          <context context-type="linenumber">75,76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.property.contact.name" datatype="html">
+        <source>Name</source>
+        <target>الاسم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/property-page.html</context>
+          <context context-type="linenumber">122,123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.property.toast.saved" datatype="html">
+        <source>Property saved.</source>
+        <target>تم حفظ العقار.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-properties/property-page.ts</context>
+          <context context-type="linenumber">175</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.subscriptions.column.module" datatype="html">
+        <source>Module</source>
+        <target>الوحدة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.html</context>
+          <context context-type="linenumber">115,116</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.subscriptions.column.scope" datatype="html">
+        <source>Scope</source>
+        <target>النطاق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.html</context>
+          <context context-type="linenumber">116,117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.subscriptions.column.actions" datatype="html">
+        <source>Actions</source>
+        <target>إجراءات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.html</context>
+          <context context-type="linenumber">121,124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenants.edit.title" datatype="html">
+        <source>Edit tenant</source>
+        <target>تعديل المستأجر</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenant.suspend.title" datatype="html">
+        <source>Suspend tenant</source>
+        <target>إيقاف المستأجر</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.subscriptions.end.title" datatype="html">
+        <source>End subscription</source>
+        <target>إنهاء الاشتراك</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenant.toast.subscribed" datatype="html">
+        <source>Module added.</source>
+        <target>تمت إضافة الوحدة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.ts</context>
+          <context context-type="linenumber">170</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenant.toast.saved" datatype="html">
+        <source>Tenant saved.</source>
+        <target>تم حفظ المستأجر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.ts</context>
+          <context context-type="linenumber">171</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenant.toast.suspended" datatype="html">
+        <source>Tenant suspended.</source>
+        <target>تم إيقاف المستأجر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.ts</context>
+          <context context-type="linenumber">186</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenant.toast.reinstated" datatype="html">
+        <source>Tenant reinstated.</source>
+        <target>تمت إعادة المستأجر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.ts</context>
+          <context context-type="linenumber">193</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.tenant.toast.unsubscribed" datatype="html">
+        <source>Subscription ended.</source>
+        <target>تم إنهاء الاشتراك.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/tenant-page.ts</context>
+          <context context-type="linenumber">199</context>
         </context-group>
       </trans-unit>
     </body>

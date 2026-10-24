@@ -7,24 +7,26 @@ import {
   input,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PROPERTIES_PAGE_SIZE, PropertiesStore } from '@harmony/platform-admin/data-access';
 import { Property, propertyTitle } from '@harmony/platform-admin/domain';
 import { IfAllowed, Permission } from '@harmony/platform/access';
+import { Pager } from '@harmony/ui/data';
 import { Icon } from '@harmony/ui/icons';
+import { Drawer, Toasts } from '@harmony/ui/overlays';
 import { PageActionsTemplate } from '@harmony/ui/shell';
 import { PropertyEditor } from './property-editor';
 
-const PAGE_STEP = 1;
-
 /**
- * Every customer's properties, or one tenant's when the URL says ?tenant=: code, name, where, rooms, active; a new
- * property from the context bar's action slot (architecture 6, platform-admin).
+ * Every customer's properties, or one tenant's when the URL says ?tenant=, the way the platform app listed things:
+ * a lead, the search in a toolbar, a real table, a pager; a new property in the drawer from the context bar's
+ * action slot (architecture 6, platform-admin).
  */
 @Component({
   selector: 'hr-properties-page',
-  imports: [RouterLink, IfAllowed, Icon, PageActionsTemplate, PropertyEditor],
+  imports: [RouterLink, IfAllowed, Icon, PageActionsTemplate, PropertyEditor, Pager, Drawer],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './properties-page.html',
   styleUrl: './properties-page.css',
@@ -34,19 +36,14 @@ export class PropertiesPage {
   readonly tenant = input<string | undefined>();
 
   protected readonly store = inject(PropertiesStore);
+  private readonly toasts = inject(Toasts);
+  private readonly drawer = viewChild.required(Drawer);
   private readonly locale = $localize.locale ?? 'en';
 
   protected readonly manageTenants = Permission.ManageTenants;
+  protected readonly pageSize = PROPERTIES_PAGE_SIZE;
   protected readonly creating = signal(false);
   protected readonly page = computed(() => this.store.filters().page);
-  protected readonly from = computed(
-    () => (this.page() - PAGE_STEP) * PROPERTIES_PAGE_SIZE + PAGE_STEP,
-  );
-  protected readonly to = computed(() =>
-    Math.min(this.page() * PROPERTIES_PAGE_SIZE, this.store.total()),
-  );
-  protected readonly hasPrevious = computed(() => this.page() > PAGE_STEP);
-  protected readonly hasNext = computed(() => this.to() < this.store.total());
   protected readonly tenantId = computed(() => this.tenant() ?? null);
 
   constructor() {
@@ -67,19 +64,13 @@ export class PropertiesPage {
     this.store.search(text);
   }
 
-  protected previous(): void {
-    this.store.goTo(this.page() - PAGE_STEP);
-  }
-
-  protected next(): void {
-    this.store.goTo(this.page() + PAGE_STEP);
-  }
-
   protected openCreator(): void {
     this.creating.set(true);
+    this.drawer().open();
   }
 
-  protected closeCreator(): void {
-    this.creating.set(false);
+  protected saved(): void {
+    this.toasts.show($localize`:@@platform-admin.properties.toast.added:Property added.`);
+    this.drawer().close();
   }
 }

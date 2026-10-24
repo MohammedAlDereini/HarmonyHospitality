@@ -10,16 +10,18 @@
     <span i18n="@@administration.users.add">Add user</span>
   </button>
 </ng-template>
-<div class="sec-h">
-  <h1 i18n="@@administration.users.title">Users</h1>
-  @if (!store.loading() && store.problem() === null) {
-    <span class="note"
-      ><span class="num">{{ store.total() }}</span
-      >&ngsp;<span i18n="@@administration.users.accounts">accounts</span></span
-    >
-  }
-  <form class="r" (submit)="onSearch($event, search.value)">
-    <label class="vh" for="users-search" i18n="@@administration.users.search">Search</label>
+<header class="page-head">
+  <div>
+    <h1 i18n="@@administration.users.title">Users</h1>
+    <p class="lead" i18n="@@administration.users.lead">
+      Who may sign in here, how they sign in, and since when. A suspended account can come back; a
+      terminated one cannot.
+    </p>
+  </div>
+</header>
+<form class="toolbar" (submit)="onSearch($event, search.value)">
+  <div class="tf wide">
+    <label for="users-search" i18n="@@administration.users.search">Search</label>
     <input
       id="users-search"
       #search
@@ -31,12 +33,11 @@
       placeholder="Name or email"
       [value]="store.filters().search"
     />
+  </div>
+  <div class="tacts">
     <button type="submit" class="btn" i18n="@@administration.users.find">Find</button>
-  </form>
-</div>
-@if (creating()) {
-  <hr-account-creator (done)="closeCreator()" (cancelled)="closeCreator()" />
-}
+  </div>
+</form>
 @if (store.problem(); as problem) {
   <p class="empty" role="alert">
     {{ problem }}&ngsp;<button
@@ -56,108 +57,114 @@
   @if (actionProblem(); as text) {
     <p class="empty" role="alert">{{ text }}</p>
   }
-  <div class="rows" role="list">
-    @for (user of store.rows(); track user.id) {
-      <div role="listitem">
-        <div class="srow urow">
-          <div class="s-who">
-            <span class="ini" aria-hidden="true">{{ initials(user) }}</span>
-            <div class="s-nm">
-              <b
-                ><a class="nm-link" [routerLink]="['account', user.id]"
-                  ><bdi>{{ user.displayName }}</bdi></a
-                ></b
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th scope="col" i18n="@@administration.users.column.name">Name</th>
+          <th scope="col" i18n="@@administration.users.column.two-step">Two-step</th>
+          <th scope="col" i18n="@@administration.users.column.state">State</th>
+          <th scope="col" i18n="@@administration.users.column.created">Created</th>
+          @if (mayManage()) {
+            <th scope="col" class="acts">
+              <span class="vh" i18n="@@administration.users.column.actions">Actions</span>
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of store.rows(); track user.id) {
+          <tr class="urow">
+            <td>
+              <a class="nm-link" [routerLink]="['account', user.id]"
+                ><bdi>{{ user.displayName }}</bdi></a
               >
-              <span dir="ltr"
+              <span class="sub" dir="ltr"
                 ><bdi>{{ user.email ?? user.userName }}</bdi></span
               >
-            </div>
-          </div>
-          <div class="obj">
-            <b>{{ twoStepOf(user) }}</b>
-            <span i18n="@@administration.users.column.two-step">Two-step</span>
-          </div>
-          <div class="obj" [attr.data-s]="toneOf(user)">
-            <b>{{ stateOf(user) }}</b>
-            <span i18n="@@administration.users.column.state">State</span>
-          </div>
-          <div class="s-when">
-            <span class="num">{{ createdOn(user) }}</span>
-            <small i18n="@@administration.users.column.created">Created</small>
-          </div>
-          <div class="row-act" *hrIfAllowed="manageUsers">
-            @if (canSuspend(user)) {
-              <button
-                type="button"
-                class="act"
-                data-act="suspend"
-                (click)="openSuspend(user)"
-                [attr.aria-expanded]="editorFor(user) === 'suspend'"
-                i18n="@@administration.users.suspend"
+            </td>
+            <td>{{ twoStepOf(user) }}</td>
+            <td>
+              <span
+                class="pill"
+                [class.on]="toneOf(user) === 'ok'"
+                [class.warn]="toneOf(user) === 'warn'"
+                [class.stop]="toneOf(user) === 'stop'"
+                [class.off]="toneOf(user) === null"
+                [attr.data-s]="toneOf(user)"
+                >{{ stateOf(user) }}</span
               >
-                Suspend
-              </button>
-            } @else if (canReinstate(user)) {
-              <button
-                type="button"
-                class="act"
-                data-act="reinstate"
-                (click)="reinstate(user)"
-                [disabled]="reinstating() === user.id"
-                i18n="@@administration.users.reinstate"
-              >
-                Reinstate
-              </button>
+            </td>
+            <td class="num">{{ createdOn(user) }}</td>
+            @if (mayManage()) {
+              <td class="acts">
+                @if (canSuspend(user)) {
+                  <button
+                    type="button"
+                    class="tlink"
+                    data-act="suspend"
+                    (click)="openState(user, 'suspend')"
+                    [attr.aria-expanded]="editorFor(user) === 'suspend'"
+                    i18n="@@administration.users.suspend"
+                  >
+                    Suspend
+                  </button>
+                } @else if (canReinstate(user)) {
+                  <button
+                    type="button"
+                    class="tlink"
+                    data-act="reinstate"
+                    (click)="reinstate(user)"
+                    [disabled]="reinstating() === user.id"
+                    i18n="@@administration.users.reinstate"
+                  >
+                    Reinstate
+                  </button>
+                }
+                @if (canTerminate(user)) {
+                  <button
+                    type="button"
+                    class="tlink"
+                    data-act="terminate"
+                    (click)="openState(user, 'terminate')"
+                    [attr.aria-expanded]="editorFor(user) === 'terminate'"
+                    i18n="@@administration.users.terminate"
+                  >
+                    Terminate
+                  </button>
+                }
+              </td>
             }
-            @if (canTerminate(user)) {
-              <button
-                type="button"
-                class="act"
-                data-act="terminate"
-                (click)="openTerminate(user)"
-                [attr.aria-expanded]="editorFor(user) === 'terminate'"
-                i18n="@@administration.users.terminate"
-              >
-                Terminate
-              </button>
-            }
-          </div>
-        </div>
-        @if (editorFor(user); as mode) {
-          <hr-account-state-editor
-            [user]="user"
-            [mode]="mode"
-            (done)="closeEditor()"
-            (cancelled)="closeEditor()"
-          />
+          </tr>
         }
-      </div>
-    }
+      </tbody>
+    </table>
   </div>
-  <nav class="paging" i18n-aria-label="@@administration.users.paging" aria-label="Pages">
-    <button
-      type="button"
-      class="btn"
-      (click)="previous()"
-      [disabled]="!hasPrevious()"
-      i18n="@@administration.users.previous"
-    >
-      Previous
-    </button>
-    <span
-      ><span class="num">{{ from() }}–{{ to() }}</span
-      >&ngsp;<span i18n="@@administration.users.of">of</span>&ngsp;<span class="num">{{
-        store.total()
-      }}</span></span
-    >
-    <button
-      type="button"
-      class="btn"
-      (click)="next()"
-      [disabled]="!hasNext()"
-      i18n="@@administration.users.next"
-    >
-      Next
-    </button>
-  </nav>
+  <hr-pager
+    [page]="page()"
+    [pageSize]="pageSize"
+    [total]="store.total()"
+    [loading]="store.loading()"
+    (pageChange)="store.goTo($event)"
+  />
 }
+<hr-drawer
+  #creator
+  i18n-heading="@@administration.users.new.title"
+  heading="New account"
+  (closed)="creating.set(false)"
+>
+  @if (creating()) {
+    <hr-account-creator (done)="created()" (cancelled)="creator.close()" />
+  }
+</hr-drawer>
+<hr-drawer #stateDrawer [heading]="stateHeading()" (closed)="editing.set(null)">
+  @if (editing(); as editing) {
+    <hr-account-state-editor
+      [user]="editing.user"
+      [mode]="editing.mode"
+      (done)="stateDone()"
+      (cancelled)="stateDrawer.close()"
+    />
+  }
+</hr-drawer>

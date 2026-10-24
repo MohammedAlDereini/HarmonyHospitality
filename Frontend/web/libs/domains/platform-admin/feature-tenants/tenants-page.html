@@ -10,32 +10,18 @@
     <span i18n="@@platform-admin.tenants.add">Add tenant</span>
   </button>
 </ng-template>
-<div class="sec-h">
-  <h1 i18n="@@platform-admin.tenants.title">Tenants</h1>
-  @if (!store.loading() && store.problem() === null) {
-    <span class="note"
-      ><span class="num">{{ store.total() }}</span
-      >&ngsp;<span i18n="@@platform-admin.tenants.count">tenants</span></span
-    >
-  }
-  <div
-    class="seg"
-    role="group"
-    i18n-aria-label="@@platform-admin.tenants.filter"
-    aria-label="Status"
-  >
-    @for (choice of choices; track choice.label) {
-      <button
-        type="button"
-        [attr.aria-pressed]="store.filters().status === choice.status"
-        (click)="store.showStatus(choice.status)"
-      >
-        {{ choice.label }}
-      </button>
-    }
+<header class="page-head">
+  <div>
+    <h1 i18n="@@platform-admin.tenants.title">Tenants</h1>
+    <p class="lead" i18n="@@platform-admin.tenants.lead">
+      The platform's customers: who runs hotels on Harmony, their tier and status. Each tenant has
+      its own administrator, roles and properties.
+    </p>
   </div>
-  <form class="r" (submit)="onSearch($event, search.value)">
-    <label class="vh" for="tenants-search" i18n="@@platform-admin.tenants.search">Search</label>
+</header>
+<form class="toolbar" (submit)="onSearch($event, search.value)">
+  <div class="tf wide">
+    <label for="tenants-search" i18n="@@platform-admin.tenants.search">Search</label>
     <input
       id="tenants-search"
       #search
@@ -47,12 +33,25 @@
       placeholder="Code or name"
       [value]="store.filters().search"
     />
+  </div>
+  <div class="tf">
+    <label for="tenants-status" i18n="@@platform-admin.tenants.filter">Status</label>
+    <select
+      id="tenants-status"
+      #statusBox
+      class="field"
+      [value]="statusValue()"
+      (change)="onStatus(statusBox.value)"
+    >
+      @for (choice of choices; track choice.value) {
+        <option [value]="choice.value">{{ choice.label }}</option>
+      }
+    </select>
+  </div>
+  <div class="tacts">
     <button type="submit" class="btn" i18n="@@platform-admin.tenants.find">Find</button>
-  </form>
-</div>
-@if (creating()) {
-  <hr-tenant-editor (done)="closeCreator()" (cancelled)="closeCreator()" />
-}
+  </div>
+</form>
 @if (store.problem(); as problem) {
   <p class="empty" role="alert">
     {{ problem }}&ngsp;<button
@@ -69,65 +68,68 @@
 } @else if (store.rows().length === 0) {
   <p class="empty" i18n="@@platform-admin.tenants.none">No tenants match.</p>
 } @else {
-  <div class="rows" role="list">
-    @for (tenant of store.rows(); track tenant.id) {
-      <div class="srow trow" role="listitem">
-        <div class="s-who">
-          <span class="code num" dir="ltr">{{ tenant.code }}</span>
-          <div class="s-nm">
-            <b
-              ><a class="nm-link" [routerLink]="[tenant.id]"
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th scope="col" i18n="@@platform-admin.tenants.column.code">Code</th>
+          <th scope="col" i18n="@@platform-admin.tenants.column.name">Name</th>
+          <th scope="col" i18n="@@platform-admin.tenants.column.country-currency">
+            Country · currency
+          </th>
+          <th scope="col" class="num" i18n="@@platform-admin.tenants.column.tier">Tier</th>
+          <th scope="col" i18n="@@platform-admin.tenants.column.status">Status</th>
+          <th scope="col" i18n="@@platform-admin.tenants.column.onboarded">Onboarded</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tenant of store.rows(); track tenant.id) {
+          <tr class="trow">
+            <td class="key" dir="ltr">{{ tenant.code }}</td>
+            <td>
+              <a class="nm-link" [routerLink]="[tenant.id]"
                 ><bdi>{{ name(tenant) }}</bdi></a
-              ></b
-            >
-            @if (tenant.isPlatform) {
-              <span i18n="@@platform-admin.tenants.platform">The platform itself</span>
-            } @else {
-              <span dir="ltr"
-                >{{ tenant.countryCode ?? '' }} · {{ tenant.defaultCurrency ?? '' }}</span
               >
-            }
-          </div>
-        </div>
-        <div class="obj">
-          <b class="num">{{ tenant.tier }}</b>
-          <span i18n="@@platform-admin.tenants.column.tier">Tier</span>
-        </div>
-        <div class="obj" [attr.data-s]="tone(tenant)">
-          <b>{{ status(tenant) }}</b>
-          <span i18n="@@platform-admin.tenants.column.status">Status</span>
-        </div>
-        <div class="s-when">
-          <span class="num">{{ tenant.onboardedOn }}</span>
-          <small i18n="@@platform-admin.tenants.column.onboarded">Onboarded</small>
-        </div>
-      </div>
-    }
+              @if (tenant.isPlatform) {
+                <span class="sub" i18n="@@platform-admin.tenants.platform"
+                  >The platform itself</span
+                >
+              }
+            </td>
+            <td dir="ltr">{{ tenant.countryCode ?? '' }} · {{ tenant.defaultCurrency ?? '' }}</td>
+            <td class="num">{{ tenant.tier }}</td>
+            <td>
+              <span
+                class="pill"
+                [class.on]="tone(tenant) === 'ok'"
+                [class.warn]="tone(tenant) === 'warn'"
+                [class.stop]="tone(tenant) === 'stop'"
+                [class.off]="tone(tenant) === null"
+                [attr.data-s]="tone(tenant)"
+                >{{ status(tenant) }}</span
+              >
+            </td>
+            <td class="num">{{ tenant.onboardedOn }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
   </div>
-  <nav class="paging" i18n-aria-label="@@platform-admin.tenants.paging" aria-label="Pages">
-    <button
-      type="button"
-      class="btn"
-      (click)="previous()"
-      [disabled]="!hasPrevious()"
-      i18n="@@platform-admin.tenants.previous"
-    >
-      Previous
-    </button>
-    <span
-      ><span class="num">{{ from() }}–{{ to() }}</span
-      >&ngsp;<span i18n="@@platform-admin.tenants.of">of</span>&ngsp;<span class="num">{{
-        store.total()
-      }}</span></span
-    >
-    <button
-      type="button"
-      class="btn"
-      (click)="next()"
-      [disabled]="!hasNext()"
-      i18n="@@platform-admin.tenants.next"
-    >
-      Next
-    </button>
-  </nav>
+  <hr-pager
+    [page]="page()"
+    [pageSize]="pageSize"
+    [total]="store.total()"
+    [loading]="store.loading()"
+    (pageChange)="store.goTo($event)"
+  />
 }
+<hr-drawer
+  #drawer
+  i18n-heading="@@platform-admin.tenants.new.title"
+  heading="New tenant"
+  (closed)="creating.set(false)"
+>
+  @if (creating()) {
+    <hr-tenant-editor (done)="saved()" (cancelled)="drawer.close()" />
+  }
+</hr-drawer>

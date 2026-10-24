@@ -1,3 +1,4 @@
-export type { PageRequest, Paged } from './paged';
+export type { PageRequest, Paged, SortDirection, SortOrder } from './paged';
+export { ASCENDING, DESCENDING } from './paged';
 export { initialsOf } from './initials';
 export { APP_VERSION, compareVersions } from './version';

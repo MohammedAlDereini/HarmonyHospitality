@@ -99,7 +99,6 @@ describe('hr-role-editor', () => {
   it('a new role: an empty submit names the missing code and name and sends nothing', async () => {
     answer = { kind: 'ok', status: OK, data: undefined };
     const editor = await render();
-    expect(editor.page.querySelector('h2')?.textContent).toBe('New role');
     await editor.send();
     expect(created).toEqual([]);
     expect(editor.page.querySelector('#role-code-error')?.textContent).toContain('code');
@@ -142,7 +141,6 @@ describe('hr-role-editor', () => {
   it('editing: the fields start from the role, no checklist; Save updates with the key', async () => {
     answer = { kind: 'ok', status: OK, data: undefined };
     const editor = await render(frontDesk);
-    expect(editor.page.querySelector('h2')?.textContent).toBe('Edit role');
     expect(editor.page.querySelector<HTMLInputElement>('#role-code')?.value).toBe('FRONT-DESK');
     expect(editor.page.querySelector<HTMLInputElement>('#role-name-ar')?.value).toBe('الاستقبال');
     expect(editor.page.querySelector<HTMLSelectElement>('#role-level')?.value).toBe('Supervisor');

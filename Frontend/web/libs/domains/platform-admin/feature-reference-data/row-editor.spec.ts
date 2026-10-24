@@ -16,12 +16,21 @@ const must = (table: ReferenceTable | null): ReferenceTable => {
 };
 const currencies = must(tableByKey('currencies'));
 const countries = must(tableByKey('countries'));
+const cities = must(tableByKey('cities'));
 const dinar: ReferenceRow = {
   code: 'JOD',
   nameEn: 'Jordanian dinar',
   nameAr: 'دينار أردني',
   minorUnits: MINOR_UNITS,
   isActive: true,
+};
+const amman: ReferenceRow = { code: 'JO-AM', countryCode: 'JO', nameEn: 'Amman', nameAr: 'عمّان' };
+const jordan: ReferenceRow = { code: 'JO', nameEn: 'Jordan' };
+/** What each other table answers when a select asks for its rows. */
+const choiceRows: Readonly<Record<string, readonly ReferenceRow[]>> = {
+  Currency: [dinar],
+  Country: [jordan],
+  CountrySubdivision: [amman],
 };
 
 @Component({
@@ -40,22 +49,24 @@ describe('hr-row-editor', () => {
   const created: { controller: string; body: Readonly<Record<string, unknown>>; key: IntentKey }[] =
     [];
   const updated: { controller: string; body: Readonly<Record<string, unknown>> }[] = [];
+  const loads: { controller: string; scope: Readonly<Record<string, unknown>> | undefined }[] = [];
   let answer: ApiResult<unknown>;
 
   const render = async (table: ReferenceTable, row: ReferenceRow | null = null) => {
     created.length = 0;
     updated.length = 0;
+    loads.length = 0;
     TestBed.configureTestingModule({
       providers: [
         {
           provide: ReferenceStore,
           useValue: {
-            table: () => ({
-              rows: signal([dinar]),
+            choices: (controller: string) => ({
+              rows: signal(choiceRows[controller] ?? []),
               loading: signal(false),
-              problem: signal(null),
-              scope: signal({}),
-              load: () => undefined,
+              load: (scope?: Readonly<Record<string, unknown>>) => {
+                loads.push({ controller, scope });
+              },
             }),
             create: (
               controller: string,
@@ -99,10 +110,14 @@ describe('hr-row-editor', () => {
     return { fixture, page, type, send, settle };
   };
 
-  it('a new currency: the code and both names are required; a three-letter code is sent upper as typed, with the key', async () => {
+  it('a new currency: the hint and the example under the code, both names required; a three-letter code is sent as typed, with the key', async () => {
     answer = { kind: 'ok', status: OK, data: undefined };
     const editor = await render(currencies);
     expect(editor.page.querySelector('[data-field="isActive"]')).toBeNull();
+    expect(editor.page.querySelector('#row-code-hint')?.textContent).toContain('ISO 4217');
+    expect(editor.page.querySelector<HTMLInputElement>('[data-field="code"]')?.placeholder).toBe(
+      'JOD',
+    );
     await editor.send();
     expect(created).toEqual([]);
     expect(editor.page.querySelector('#row-code-error')?.textContent).toContain('code');
@@ -117,7 +132,7 @@ describe('hr-row-editor', () => {
     expect(editor.fixture.componentInstance.closed()).toBe(1);
   });
 
-  it('editing a currency: the code is read-only, the active flag appears, Save sends the whole row with its key', async () => {
+  it('editing a currency: the code is read-only, the active flag appears with its hint, Save sends the whole row with its key', async () => {
     answer = { kind: 'ok', status: OK, data: undefined };
     const editor = await render(currencies, dinar);
     const code = editor.page.querySelector<HTMLInputElement>('[data-field="code"]');
@@ -126,6 +141,7 @@ describe('hr-row-editor', () => {
     expect(editor.page.querySelector<HTMLInputElement>('[data-field="isActive"]')?.checked).toBe(
       true,
     );
+    expect(editor.page.textContent).toContain('Untick to retire the row');
     await editor.type('nameEn', 'Jordanian dinar (JOD)');
     await editor.send();
     expect(updated).toHaveLength(1);
@@ -137,13 +153,13 @@ describe('hr-row-editor', () => {
     });
   });
 
-  it('a select takes its choices from another table; a server field code lands under its field', async () => {
+  it('a select takes its choices from another table, code and name; a server field code lands under its field', async () => {
     answer = { kind: 'invalid', status: BAD_REQUEST, codes: ['10415'] };
     const editor = await render(countries);
     const options = [...editor.page.querySelectorAll('[data-field="defaultCurrency"] option')].map(
       (option) => option.textContent,
     );
-    expect(options).toEqual(['Choose', 'Jordanian dinar']);
+    expect(options).toEqual(['Choose', 'JOD · Jordanian dinar']);
     await editor.type('code', 'jo');
     await editor.type('alpha3', 'jor');
     await editor.type('nameEn', 'Jordan');
@@ -154,5 +170,28 @@ describe('hr-row-editor', () => {
     expect(created).toHaveLength(1);
     expect(editor.page.querySelector('#row-dialCode-error')?.textContent).toContain('plus sign');
     expect(editor.fixture.componentInstance.closed()).toBe(0);
+  });
+
+  it('a city: the subdivision waits for the country, then reads that country’s subdivisions; optional fields say so', async () => {
+    answer = { kind: 'ok', status: OK, data: undefined };
+    const editor = await render(cities);
+    const subdivision = editor.page.querySelector<HTMLSelectElement>(
+      '[data-field="subdivisionCode"]',
+    );
+    expect(subdivision?.disabled).toBe(true);
+    expect(subdivision?.options[0]?.textContent).toBe('Choose Country first');
+    expect(editor.page.querySelector('label[for="row-latitude"]')?.textContent).toContain(
+      '(optional)',
+    );
+    expect(loads.filter((load) => load.controller === 'CountrySubdivision')).toEqual([]);
+    await editor.type('countryCode', 'JO');
+    expect(loads.filter((load) => load.controller === 'CountrySubdivision')).toEqual([
+      { controller: 'CountrySubdivision', scope: { countryCode: 'JO' } },
+    ]);
+    expect(subdivision?.disabled).toBe(false);
+    expect([...(subdivision?.options ?? [])].map((option) => option.textContent)).toEqual([
+      'None',
+      'JO-AM · Amman',
+    ]);
   });
 });

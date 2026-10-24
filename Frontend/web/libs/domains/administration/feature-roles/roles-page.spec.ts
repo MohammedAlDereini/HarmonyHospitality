@@ -9,6 +9,8 @@ import { RolesPage } from './roles-page';
 
 const OK = 200;
 const ACCEPTED = 202;
+const LEVEL_CELL = 2;
+const ACTIONS_CELL = 4;
 
 const frontDesk: Role = {
   id: 'r1',
@@ -98,17 +100,19 @@ describe('RolesPage', () => {
     expect(store.loads).toBe(1);
     store.roles.set([frontDesk, administrator]);
     await render();
-    const first = '[role="listitem"]:first-child';
-    const last = '[role="listitem"]:last-child';
-    expect(text(`${first} .code`)).toEqual(['FRONT-DESK']);
-    expect(text(`${first} .s-nm b, ${first} .s-nm span`)).toEqual(['Front desk', 'الاستقبال']);
-    expect(text(`${first} .obj b`)).toEqual(['Standard', 'Custom']);
-    expect(text(`${first} .act`)).toEqual(['Edit', 'Permissions', 'Delete']);
-    expect(text(`${last} .obj b`)).toEqual(['Administrator', 'System']);
-    expect(text(`${last} .act`)).toEqual([]);
+    const first = 'tr.rrow:first-child';
+    const last = 'tr.rrow:last-child';
+    expect(text('thead th')).toEqual(['Code', 'Name', 'Privilege level', 'Kind', 'Actions']);
+    expect(text(`${first} td.key`)).toEqual(['FRONT-DESK']);
+    expect(text(`${first} .nm, ${first} .sub`)).toEqual(['Front desk', 'الاستقبال']);
+    expect(text(`${first} td`).slice(LEVEL_CELL, ACTIONS_CELL)).toEqual(['Standard', 'Custom']);
+    expect(text(`${first} .tlink`)).toEqual(['Edit', 'Permissions', 'Delete']);
+    expect(text(`${last} td`).slice(LEVEL_CELL, ACTIONS_CELL)).toEqual(['Administrator', 'System']);
+    expect(page.querySelector(`${last} .pill.sys`)).not.toBeNull();
+    expect(text(`${last} .tlink`)).toEqual([]);
   });
 
-  it('the page offers Add role to the context bar; pressing it opens the editor above the rows', async () => {
+  it('the page offers Add role to the context bar; pressing it opens the editor in the drawer', async () => {
     store.roles.set([frontDesk]);
     await render();
     const offered = TestBed.inject(PageActions).template();
@@ -121,19 +125,32 @@ describe('RolesPage', () => {
     expect(button?.textContent.trim()).toBe('Add role');
     button?.click();
     await render();
-    expect(page.querySelector('hr-role-editor')).not.toBeNull();
+    const editorDrawer = page.querySelector<HTMLDialogElement>('dialog.drawer');
+    expect(editorDrawer?.hasAttribute('open')).toBe(true);
+    expect(editorDrawer?.querySelector('.drawer-h h2')?.textContent).toBe('New role');
+    expect(editorDrawer?.querySelector('hr-role-editor')).not.toBeNull();
     view.destroy();
   });
 
-  it('Edit and Permissions open their editors under the row', async () => {
+  it('Edit and Permissions open their drawers; one takes over from the other', async () => {
     store.roles.set([frontDesk]);
     await render();
     click('[data-act="edit"]');
     await render();
+    const [editorDrawer, permissionsDrawer] = [
+      ...page.querySelectorAll<HTMLDialogElement>('dialog.drawer'),
+    ];
+    expect(editorDrawer?.hasAttribute('open')).toBe(true);
+    expect(editorDrawer?.querySelector('.drawer-h h2')?.textContent).toBe('Edit role');
     expect(page.querySelector('hr-role-editor')).not.toBeNull();
     click('[data-act="permissions"]');
     await render();
+    expect(editorDrawer?.hasAttribute('open')).toBe(false);
     expect(page.querySelector('hr-role-editor')).toBeNull();
+    expect(permissionsDrawer?.hasAttribute('open')).toBe(true);
+    expect(permissionsDrawer?.querySelector('.drawer-h h2')?.textContent).toBe(
+      'Permissions of Front desk',
+    );
     expect(page.querySelector('hr-permissions-editor')).not.toBeNull();
   });
 
@@ -142,17 +159,19 @@ describe('RolesPage', () => {
     await render();
     click('[data-act="delete"]');
     await render();
-    expect(page.querySelector('.confirm .warning')?.textContent).toContain('cannot be undone');
+    const confirm = page.querySelector<HTMLDialogElement>('dialog.dlg');
+    expect(confirm?.hasAttribute('open')).toBe(true);
+    expect(page.querySelector('.dlg-m')?.textContent).toContain('cannot be undone');
     expect(store.removed).toEqual([]);
-    click('[data-act="delete-confirm"]');
+    click('.dlg-a .solid');
     await settle();
     expect(store.removed.map((call) => call.id)).toEqual(['r1']);
     expect(store.removed[0]?.key.value).not.toBe('');
-    expect(page.querySelector('.confirm')).toBeNull();
+    expect(confirm?.hasAttribute('open')).toBe(false);
     store.removeAnswer = { kind: 'refused', status: ACCEPTED, codes: ['00013'] };
     click('[data-act="delete"]');
     await render();
-    click('[data-act="delete-confirm"]');
+    click('.dlg-a .solid');
     await settle();
     expect(page.querySelector('[role="alert"]')?.textContent).toContain('cannot be deleted');
   });
@@ -161,7 +180,7 @@ describe('RolesPage', () => {
     mayManage = false;
     store.roles.set([frontDesk]);
     await render();
-    expect(page.querySelector('.act')).toBeNull();
+    expect(page.querySelector('.tlink')).toBeNull();
     mayManage = true;
   });
 });

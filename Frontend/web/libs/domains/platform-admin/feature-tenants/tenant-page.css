@@ -1,4 +1,4 @@
-/* One tenant: the header row, the actions, the subscription lines as prototype rows. Tokens only. */
+/* One tenant: the header row, the actions, the subscription lines as a table (ui/data), the writes in the drawer. */
 .head h1 {
   text-transform: none;
   letter-spacing: 0;
@@ -30,46 +30,6 @@
   gap: var(--s2);
   padding: var(--s2) var(--s6);
 }
-.editor {
-  padding: var(--s3) var(--s6);
-  background: var(--sunk);
-  border-block-end: 1px solid var(--rule);
-}
-.editor h2 {
-  margin: 0 0 var(--s1);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ink);
-}
-.note {
-  margin: 0 0 var(--s3);
-  font-size: 12px;
-  color: var(--ink-3);
-}
-.fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s3);
-}
-.f {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s1);
-  min-width: 0;
-}
-.f label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-2);
-}
-.f .field {
-  width: 100%;
-  min-width: 0;
-}
-.editor .acts {
-  padding: 0;
-  margin-block-start: var(--s3);
-}
 .part {
   padding: var(--s3) 0 0;
   border-block-start: 1px solid var(--rule);
@@ -80,26 +40,36 @@
   font-weight: 700;
   color: var(--ink);
 }
-.lrow {
-  grid-template-columns: minmax(220px, 1.4fr) 140px 220px 140px 120px;
+table.data td .nm {
+  font-weight: 600;
 }
-.row-act {
+/* The invitation form inside the drawer, like every other editor. */
+.editor .fields {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: var(--s4);
+}
+.editor .f {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
   min-width: 0;
+}
+.editor .f label {
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+.editor .f .field {
+  width: 100%;
+  min-width: 0;
+}
+.editor .acts {
+  padding: var(--s4) 0 0;
+  margin-block-start: var(--s5);
+  border-block-start: 1px solid var(--rule);
 }
 .field-error {
   margin: 0;
   font-size: 12px;
   color: var(--stop);
-}
-@media (max-width: 900px) {
-  .lrow {
-    grid-template-columns: minmax(0, 1fr) 140px;
-    row-gap: 6px;
-  }
-  .lrow .s-when,
-  .lrow .row-act {
-    grid-column: 1 / -1;
-  }
 }

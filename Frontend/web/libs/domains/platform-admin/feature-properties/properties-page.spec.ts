@@ -60,6 +60,8 @@ class FakeStore {
   }
 }
 
+const ROOMS_CELL = 2;
+
 describe('PropertiesPage', () => {
   let store: FakeStore;
   let fixture: ComponentFixture<PropertiesPage>;
@@ -83,7 +85,7 @@ describe('PropertiesPage', () => {
         {
           provide: ReferenceStore,
           useValue: {
-            table: () => ({
+            choices: () => ({
               rows: signal([]),
               loading: signal(false),
               problem: signal(null),
@@ -102,10 +104,12 @@ describe('PropertiesPage', () => {
   it('lists every property when no tenant is named; a ?tenant= narrows the list', async () => {
     await settle();
     expect(store.tenants).toEqual([null]);
-    expect(text('.prow .code')).toEqual(['AMM']);
-    expect(text('.prow .s-nm b')).toEqual(['Ritz Amman']);
-    expect(text('.prow .s-nm span')).toEqual(['JO · Asia/Amman']);
-    expect(text('.prow .obj b')).toEqual(['120', 'JOD · en', 'Active']);
+    expect(text('thead th')).toEqual(['Code', 'Name', 'Rooms', 'Currency · language', 'State']);
+    expect(text('tr.prow td.key')).toEqual(['AMM']);
+    expect(text('tr.prow a.nm-link')).toEqual(['Ritz Amman']);
+    expect(text('tr.prow .sub')).toEqual(['JO · Asia/Amman']);
+    expect(text('tr.prow td').slice(ROOMS_CELL)).toEqual(['120', 'JOD · en', 'Active']);
+    expect(page.querySelector('tr.prow .pill.on')).not.toBeNull();
     expect(page.querySelector('.prow a.nm-link')?.getAttribute('href')).toBe('/p1');
     fixture.componentRef.setInput('tenant', 't1');
     await settle();
@@ -128,7 +132,9 @@ describe('PropertiesPage', () => {
     view.rootNodes.forEach((node: Node) => slot.appendChild(node));
     slot.querySelector<HTMLButtonElement>('.pbtn')?.click();
     await settle();
-    expect(page.querySelector('hr-property-editor')).not.toBeNull();
+    expect(page.querySelector('dialog.drawer')?.hasAttribute('open')).toBe(true);
+    expect(page.querySelector('.drawer-h h2')?.textContent).toBe('New property');
+    expect(page.querySelector('dialog.drawer hr-property-editor')).not.toBeNull();
     view.destroy();
   });
 });

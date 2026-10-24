@@ -1,23 +1,25 @@
-/* The editor sits in the row's own grid line: one field, two buttons, the messages under them. */
+/* The reason form inside the drawer: the warning, one field, the buttons at the end. */
 .editor {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s2);
-  padding: var(--s2) var(--s6) var(--s3);
-  background: var(--sunk);
-  border-block-end: 1px solid var(--rule);
+  flex-direction: column;
+  gap: var(--s3);
 }
 .editor .field {
-  flex: 1 1 24rem;
+  width: 100%;
   min-width: 0;
 }
 .warning {
-  flex-basis: 100%;
   margin: 0;
-  font-size: 12px;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--stop);
+}
+.acts {
+  display: flex;
+  gap: var(--s2);
+  margin-block-start: var(--s3);
+  padding-block-start: var(--s4);
+  border-block-start: 1px solid var(--rule);
 }
 .btn.solid.stop {
   background: var(--stop);
@@ -25,7 +27,6 @@
   color: var(--on-stop);
 }
 .field-error {
-  flex-basis: 100%;
   margin: 0;
   font-size: 12px;
   color: var(--stop);

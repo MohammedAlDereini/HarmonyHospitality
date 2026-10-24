@@ -24,7 +24,7 @@ import { FailureNotice } from '@harmony/platform/errors';
 import { SessionStore } from '@harmony/platform/session';
 import { initialsOf } from '@harmony/shared/domain';
 import { Icon } from '@harmony/ui/icons';
-import { ConfirmDialog } from '@harmony/ui/overlays';
+import { ConfirmDialog, ToastsHost } from '@harmony/ui/overlays';
 import { filter, map, skip, startWith } from 'rxjs';
 import { BrandLockup } from './brand-lockup';
 import { crumbsOf } from './crumbs';
@@ -58,6 +58,7 @@ const FOCUSABLE_BY_SCRIPT_ONLY = -1;
     NavPanel,
     PopAt,
     ConfirmDialog,
+    ToastsHost,
   ],
   // Ctrl K (Cmd K on a Mac) opens the places panel as the command palette (architecture 8.3).
   host: { '(document:keydown)': 'onKey($event)' },

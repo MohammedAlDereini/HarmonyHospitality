@@ -19,8 +19,15 @@ export {
   propertyPath,
   updatePropertyPath,
 } from './properties-store';
-export type { TableRows } from './reference-store';
+export type {
+  OptionRows,
+  ReferenceFilters,
+  ReferenceQuery,
+  TableCount,
+  TableRows,
+} from './reference-store';
 export {
+  REFERENCE_OPTIONS_SIZE,
   REFERENCE_PAGE_SIZE,
   ReferenceStore,
   createPath,

@@ -116,7 +116,7 @@ describe('TenantPage', () => {
         {
           provide: ReferenceStore,
           useValue: {
-            table: () => ({
+            choices: () => ({
               rows: signal([]),
               loading: signal(false),
               problem: signal(null),
@@ -139,8 +139,8 @@ describe('TenantPage', () => {
     expect(tenantsOfProperties).toEqual(['t1']);
     expect(page.querySelector('.head h1')?.textContent.trim()).toBe('Ritz Amman Hotels LLC');
     expect(page.querySelector('[data-status]')?.textContent).toBe('Active');
-    expect(page.querySelector('.lrow .code')?.textContent).toBe('FO');
-    expect(page.querySelector('.lrow .s-nm b')?.textContent).toBe('One property');
+    expect(page.querySelector('tr.lrow td.key')?.textContent).toBe('FO');
+    expect(page.querySelector('tr.lrow .nm')?.textContent).toBe('One property');
     expect(page.querySelector('[data-act="suspend"]')).not.toBeNull();
     expect(page.querySelector('[data-act="reinstate"]')).toBeNull();
   });

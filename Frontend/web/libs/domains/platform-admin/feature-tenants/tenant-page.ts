@@ -1,11 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   input,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormField, email, form, required, submit } from '@angular/forms/signals';
@@ -14,25 +16,34 @@ import { SubscriptionLine, Tenant, TenantStatus, tenantName } from '@harmony/pla
 import { IfAllowed, Permission } from '@harmony/platform/access';
 import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
+import { Drawer, Toasts } from '@harmony/ui/overlays';
 import { Tone } from '@harmony/ui/primitives';
 import { ReasonForm } from './reason-form';
 import { SubscriptionEditor } from './subscription-editor';
 import { TenantEditor } from './tenant-editor';
 import { statusLabel, statusToneOf } from './tenant-wording';
 
-/** What is open on the page: one thing at a time. */
+/** What the drawer holds: one thing at a time. */
 type Opened = 'edit' | 'suspend' | 'invite' | 'subscribe';
 
 const wording = (code: string): string => errorMessage(code) ?? kindMessage('invalid');
 
+const headings: Readonly<Record<Opened, string>> = {
+  edit: $localize`:@@platform-admin.tenants.edit.title:Edit tenant`,
+  suspend: $localize`:@@platform-admin.tenant.suspend.title:Suspend tenant`,
+  invite: $localize`:@@platform-admin.tenant.invite.title:Invite the administrator`,
+  subscribe: $localize`:@@platform-admin.subscriptions.new.title:New subscription`,
+};
+
 /**
  * One customer: who they are, their status with suspend and reinstate, the administrator's invitation, and the
- * subscription lines with subscribe and unsubscribe (architecture 6, platform-admin). Every write is one press
- * with its own intent key; the page reads the tenant again afterwards.
+ * subscription lines as a table with subscribe and unsubscribe (architecture 6, platform-admin). Every write
+ * happens in the drawer at the end of the page, one press with its own intent key; the page reads the tenant
+ * again afterwards and says what happened in a toast.
  */
 @Component({
   selector: 'hr-tenant-page',
-  imports: [RouterLink, FormField, IfAllowed, TenantEditor, ReasonForm, SubscriptionEditor],
+  imports: [RouterLink, FormField, IfAllowed, TenantEditor, ReasonForm, SubscriptionEditor, Drawer],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tenant-page.html',
   styleUrl: './tenant-page.css',
@@ -43,6 +54,8 @@ export class TenantPage {
 
   private readonly store = inject(TenantsStore);
   private readonly properties = inject(PropertiesStore);
+  private readonly toasts = inject(Toasts);
+  private readonly drawer = viewChild.required(Drawer);
   private readonly locale = $localize.locale ?? 'en';
 
   protected readonly manageTenants = Permission.ManageTenants;
@@ -57,6 +70,18 @@ export class TenantPage {
   protected readonly actionProblem = signal<string | null>(null);
   /** Said once after the invitation went out. */
   protected readonly invited = signal(false);
+  protected readonly drawerHeading = computed(() => {
+    const opened = this.opened();
+    if (opened !== null) return headings[opened];
+    return this.ending() === null
+      ? ''
+      : $localize`:@@platform-admin.subscriptions.end.title:End subscription`;
+  });
+  protected readonly drawerLead = computed(() =>
+    this.opened() === 'invite'
+      ? $localize`:@@platform-admin.tenant.invite.note:A new invitation goes to this person; leave both empty to send it again to the one already known.`
+      : '',
+  );
 
   private readonly inviteModel = signal({ administratorEmail: '', administratorDisplayName: '' });
   protected readonly inviteForm = form(this.inviteModel, (path) => {
@@ -115,6 +140,12 @@ export class TenantPage {
       : $localize`:@@platform-admin.subscriptions.state.disabled:Disabled`;
   }
 
+  /** The line whose End form is in the drawer, if any. */
+  protected endingLine(tenant: Tenant): SubscriptionLine | null {
+    const id = this.ending();
+    return id === null ? null : (tenant.subscriptions.find((line) => line.id === id) ?? null);
+  }
+
   protected reload(): void {
     void this.read(this.id());
   }
@@ -123,37 +154,50 @@ export class TenantPage {
     this.actionProblem.set(null);
     this.invited.set(false);
     this.ending.set(null);
-    this.opened.set(this.opened() === what ? null : what);
+    this.opened.set(what);
+    this.drawer().open();
   }
 
-  protected close(): void {
+  /** The drawer has closed, whatever closed it: nothing is open any more. */
+  protected drawerClosed(): void {
     this.opened.set(null);
+    this.ending.set(null);
   }
 
   protected changed(): void {
-    this.opened.set(null);
+    this.toasts.show(
+      this.opened() === 'subscribe'
+        ? $localize`:@@platform-admin.tenant.toast.subscribed:Module added.`
+        : $localize`:@@platform-admin.tenant.toast.saved:Tenant saved.`,
+    );
+    this.drawer().close();
     this.reload();
   }
 
   protected askEnd(line: SubscriptionLine): void {
     this.actionProblem.set(null);
     this.opened.set(null);
-    this.ending.set(this.ending() === line.id ? null : line.id);
+    this.ending.set(line.id);
+    this.drawer().open();
   }
 
   protected suspend(tenant: Tenant, reason: string): void {
     void this.press(this.store.suspend(tenant, reason, newIntentKey()), () => {
-      this.opened.set(null);
+      this.toasts.show($localize`:@@platform-admin.tenant.toast.suspended:Tenant suspended.`);
+      this.drawer().close();
     });
   }
 
   protected reinstate(tenant: Tenant): void {
-    void this.press(this.store.reinstate(tenant, newIntentKey()));
+    void this.press(this.store.reinstate(tenant, newIntentKey()), () => {
+      this.toasts.show($localize`:@@platform-admin.tenant.toast.reinstated:Tenant reinstated.`);
+    });
   }
 
   protected endLine(tenant: Tenant, line: SubscriptionLine, reason: string): void {
     void this.press(this.store.unsubscribe(tenant, line, reason, newIntentKey()), () => {
-      this.ending.set(null);
+      this.toasts.show($localize`:@@platform-admin.tenant.toast.unsubscribed:Subscription ended.`);
+      this.drawer().close();
     });
   }
 
@@ -169,7 +213,8 @@ export class TenantPage {
           newIntentKey(),
         ),
         () => {
-          this.opened.set(null);
+          this.toasts.show($localize`:@@platform-admin.tenant.invited:The invitation went out.`);
+          this.drawer().close();
           this.invited.set(true);
         },
       );

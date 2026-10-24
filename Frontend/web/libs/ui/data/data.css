@@ -1,0 +1,267 @@
+/* List pages the way the platform app had them: a page head with a lead, a filter toolbar, a real table with a
+   header row, sortable columns, key and number cells, status pills, a pager; tiles for an overview. Imported by each
+   app's styles.css after primitives.css. Colours come from the tokens only. */
+
+/* ── Page head: the title, what the table is for, the actions ─────── */
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s4);
+  flex-wrap: wrap;
+  padding: var(--s5) var(--s6) var(--s3);
+}
+.page-head h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.page-head .lead,
+.lead {
+  margin: var(--s1) 0 0;
+  max-width: 70ch;
+  color: var(--ink-3);
+  line-height: 1.45;
+}
+
+/* ── The filter toolbar above a table ─────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  padding: var(--s3) var(--s6);
+  border-block-end: 1px solid var(--rule);
+  background: var(--surface);
+}
+.toolbar .tf {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  min-width: 10rem;
+}
+.toolbar .tf.wide {
+  flex: 1;
+  min-width: 15rem;
+}
+.toolbar .tf label {
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+.toolbar .tf .field {
+  min-height: var(--control-md);
+}
+.toolbar .tacts {
+  display: flex;
+  gap: var(--s2);
+  margin-inline-start: auto;
+}
+
+/* ── The table ────────────────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+}
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+}
+table.data th,
+table.data td {
+  text-align: start;
+  padding: var(--s3) var(--s4);
+  border-block-end: 1px solid var(--rule);
+  vertical-align: top;
+}
+table.data th:first-child,
+table.data td:first-child {
+  padding-inline-start: var(--s6);
+}
+table.data th:last-child,
+table.data td:last-child {
+  padding-inline-end: var(--s6);
+}
+table.data th {
+  color: var(--ink-3);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: var(--elev);
+}
+html[lang='ar'] table.data th {
+  letter-spacing: 0;
+}
+table.data th .sort {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  min-height: 24px;
+}
+table.data th .sort:hover,
+table.data th .sort[aria-pressed='true'] {
+  color: var(--ink);
+}
+table.data tbody tr:hover {
+  background: var(--elev);
+}
+table.data td.key {
+  font-weight: 600;
+  white-space: nowrap;
+}
+table.data td.num {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+table.data td.acts {
+  text-align: end;
+  white-space: nowrap;
+}
+table.data td.acts .tlink + .tlink {
+  margin-inline-start: var(--s3);
+}
+table.data a.nm-link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+table.data a.nm-link:hover {
+  text-decoration: underline;
+}
+table.data td .sub {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-block-start: 2px;
+}
+
+/* ── Status pills: text and colour together, never colour alone ───── */
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.pill.on {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.pill.off {
+  background: var(--sunk);
+  color: var(--ink-3);
+}
+.pill.sys {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.pill.yes {
+  background: var(--info-bg);
+  color: var(--info);
+}
+.pill.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.pill.stop {
+  background: var(--stop-bg);
+  color: var(--stop);
+}
+
+/* ── The pager under a table ──────────────────────────────────────── */
+.pager {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  padding: var(--s3) var(--s6);
+  color: var(--ink-3);
+  font-size: 0.9rem;
+}
+.pager .spacer {
+  flex: 1;
+}
+.pager .where {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Tiles: one card per table on an overview ─────────────────────── */
+.tiles {
+  display: grid;
+  gap: var(--s4);
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  padding: var(--s3) var(--s6) var(--s6);
+}
+.tile {
+  display: block;
+  padding: var(--s4) var(--s5);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-surface);
+  background: var(--surface);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color var(--t),
+    translate var(--t);
+}
+.tile:hover {
+  border-color: var(--rule-2);
+  translate: 0 -1px;
+}
+.tile .n {
+  font-size: 1.7rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.tile .n.dim {
+  color: var(--ink-3);
+  font-size: 1rem;
+}
+.tile .t {
+  color: var(--ink-2);
+  margin-block-start: var(--s1);
+  font-weight: 500;
+}
+.tile .d {
+  color: var(--ink-3);
+  font-size: 0.85rem;
+  margin-block-start: var(--s1);
+}
+.tiles-note {
+  margin: 0 var(--s6);
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-surface);
+  background: var(--info-bg);
+  color: var(--info);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 720px) {
+  .page-head,
+  .toolbar,
+  .pager {
+    padding-inline: var(--s4);
+  }
+  table.data th:first-child,
+  table.data td:first-child {
+    padding-inline-start: var(--s4);
+  }
+  table.data th:last-child,
+  table.data td:last-child {
+    padding-inline-end: var(--s4);
+  }
+}

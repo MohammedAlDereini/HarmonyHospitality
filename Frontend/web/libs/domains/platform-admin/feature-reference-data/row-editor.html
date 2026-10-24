@@ -1,19 +1,24 @@
 <form class="editor" (submit)="onSubmit($event)" novalidate>
-  @if (creating()) {
-    <h2 i18n="@@platform-admin.reference.new.title">New row</h2>
-  } @else {
-    <h2 i18n="@@platform-admin.reference.edit.title">Edit row</h2>
-  }
   <div class="fields">
     @for (field of fields(); track field.key) {
       @if (field.kind === 'checkbox') {
-        <label class="perm">
-          <input type="checkbox" [attr.data-field]="field.key" [formField]="flag(field.key)" />
-          <span>{{ field.label }}</span>
-        </label>
+        <div class="f">
+          <label class="check">
+            <input type="checkbox" [attr.data-field]="field.key" [formField]="flag(field.key)" />
+            <span>{{ field.label }}</span>
+          </label>
+          @if (field.hint; as hint) {
+            <p class="hint">{{ hint }}</p>
+          }
+        </div>
       } @else {
         <div class="f">
-          <label [for]="'row-' + field.key">{{ field.label }}</label>
+          <label [for]="'row-' + field.key"
+            >{{ field.label }}
+            @if (field.optional) {
+              <span class="opt" i18n="@@platform-admin.reference.editor.optional">(optional)</span>
+            }
+          </label>
           @if (field.kind === 'select') {
             <select
               [id]="'row-' + field.key"
@@ -23,11 +28,15 @@
               [attr.aria-invalid]="
                 text(field.key)().touched() && text(field.key)().invalid() ? 'true' : null
               "
-              [attr.aria-describedby]="
-                text(field.key)().errors().length > 0 ? errorId(field) : null
-              "
+              [attr.aria-describedby]="describedBy(field)"
             >
-              <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+              @if (waitsFor(field); as sibling) {
+                <option value="">{{ chooseFirst(sibling) }}</option>
+              } @else if (field.optional) {
+                <option value="" i18n="@@platform-admin.reference.editor.none">None</option>
+              } @else {
+                <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+              }
               @for (option of options(field); track option.value) {
                 <option [value]="option.value">{{ option.label }}</option>
               }
@@ -42,14 +51,16 @@
               [attr.inputmode]="field.kind === 'number' ? 'decimal' : null"
               [attr.lang]="field.lang ?? null"
               [attr.dir]="field.dir ?? 'auto'"
+              [placeholder]="field.placeholder ?? ''"
               [formField]="text(field.key)"
               [attr.aria-invalid]="
                 text(field.key)().touched() && text(field.key)().invalid() ? 'true' : null
               "
-              [attr.aria-describedby]="
-                text(field.key)().errors().length > 0 ? errorId(field) : null
-              "
+              [attr.aria-describedby]="describedBy(field)"
             />
+          }
+          @if (field.hint; as hint) {
+            <p class="hint" [id]="hintId(field)">{{ hint }}</p>
           }
           @if (text(field.key)().touched() && text(field.key)().errors().length > 0) {
             <p [id]="errorId(field)" class="field-error" role="alert">
@@ -62,22 +73,25 @@
       }
     }
   </div>
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
   <div class="acts">
     @if (creating()) {
       <button
         type="submit"
         class="btn solid"
         [disabled]="form().submitting()"
-        i18n="@@platform-admin.reference.new.go"
+        i18n="@@platform-admin.reference.editor.add"
       >
-        Create row
+        Add
       </button>
     } @else {
       <button
         type="submit"
         class="btn solid"
         [disabled]="form().submitting()"
-        i18n="@@platform-admin.reference.edit.go"
+        i18n="@@platform-admin.reference.editor.save"
       >
         Save
       </button>
@@ -86,7 +100,4 @@
       Cancel
     </button>
   </div>
-  @if (problem(); as text) {
-    <p class="field-error" role="alert">{{ text }}</p>
-  }
 </form>

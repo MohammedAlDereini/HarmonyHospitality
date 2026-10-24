@@ -5,27 +5,27 @@
         type="button"
         class="pbtn primary"
         (click)="openCreator()"
-        [attr.aria-expanded]="creating()"
+        [attr.aria-expanded]="editing() !== null"
       >
         <hr-icon name="plus" size="13" />
-        <span i18n="@@platform-admin.reference.add">Add row</span>
+        <span>{{ addLabel() }}</span>
       </button>
     </ng-template>
   }
-  <div class="sec-h">
-    <h1>{{ description.title }}</h1>
-    @if (rows(); as rows) {
-      @if (!rows.loading() && rows.problem() === null) {
-        <span class="note"
-          ><span class="num">{{ rows.rows().length }}</span
-          >&ngsp;<span i18n="@@platform-admin.reference.count">rows</span></span
+  <header class="page-head">
+    <div>
+      <h1>{{ description.title }}</h1>
+      <p class="lead">{{ description.description }}</p>
+    </div>
+  </header>
+  <form class="toolbar" (submit)="applyFilters($event)">
+    @if (description.scopedBy) {
+      <div class="tf">
+        <label for="filter-category" i18n="@@platform-admin.reference.field.category"
+          >Category</label
         >
-      }
-    }
-    @if (description.scopedBy; as scopedBy) {
-      <label class="r">
-        <span class="vh" i18n="@@platform-admin.reference.field.category">Category</span>
         <select
+          id="filter-category"
           class="field"
           data-scope
           (change)="chooseCategory(categoryBox.value)"
@@ -35,16 +35,61 @@
           <option value="" i18n="@@platform-admin.reference.category.choose">
             Choose a category
           </option>
-          @for (row of categories.rows(); track cell(row, 'id')) {
-            <option [value]="cell(row, 'id')">{{ cell(row, 'name') }}</option>
+          @for (row of categories.rows(); track row['id']) {
+            <option [value]="row['id']">{{ name(row) }}</option>
           }
         </select>
-      </label>
+      </div>
     }
-  </div>
-  @if (creating()) {
-    <hr-row-editor [table]="description" (done)="closeCreator()" (cancelled)="closeCreator()" />
-  }
+    @for (filter of description.filters; track filter.key) {
+      <div class="tf" [class.wide]="filter.key === 'searchText'">
+        <label [for]="'filter-' + filter.key">{{ filter.label }}</label>
+        @if (filter.kind === 'text') {
+          <input
+            [id]="'filter-' + filter.key"
+            class="field"
+            type="search"
+            autocomplete="off"
+            dir="auto"
+            [attr.data-filter]="filter.key"
+            [placeholder]="filter.placeholder ?? ''"
+            [value]="draft()[filter.key] ?? ''"
+            (input)="draftChange(filter.key, $event)"
+          />
+        } @else {
+          <select
+            [id]="'filter-' + filter.key"
+            class="field"
+            [attr.data-filter]="filter.key"
+            [value]="draft()[filter.key] ?? ''"
+            (change)="draftChange(filter.key, $event)"
+          >
+            @if (filter.kind === 'lookup') {
+              <option value="" i18n="@@platform-admin.reference.filter.all">All</option>
+            }
+            @for (option of filterOptions(filter); track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        }
+      </div>
+    }
+    <div class="tacts">
+      <button type="submit" class="btn" i18n="@@platform-admin.reference.filter.apply">
+        Apply
+      </button>
+      @if (hasFilters()) {
+        <button
+          type="button"
+          class="btn quiet"
+          (click)="clearFilters()"
+          i18n="@@platform-admin.reference.filter.clear"
+        >
+          Clear
+        </button>
+      }
+    </div>
+  </form>
   @if (rows(); as rows) {
     @if (description.scopedBy !== undefined && category() === '') {
       <p class="empty" i18n="@@platform-admin.reference.category.first">Choose a category first.</p>
@@ -59,91 +104,159 @@
           Try again
         </button>
       </p>
-    } @else if (rows.loading()) {
-      <p class="empty" role="status" i18n="@@platform-admin.reference.loading">Loading…</p>
-    } @else if (rows.rows().length === 0) {
-      <p class="empty" i18n="@@platform-admin.reference.none">No rows yet.</p>
     } @else {
       @if (actionProblem(); as text) {
         <p class="empty" role="alert">{{ text }}</p>
       }
-      <div class="rows" role="list">
-        @for (row of rows.rows(); track idOf(row)) {
-          <div role="listitem">
-            <div class="srow xrow">
-              @for (column of description.columns; track column) {
-                <div class="obj">
-                  <b [attr.dir]="column === 'nameAr' ? 'rtl' : 'auto'">
-                    <bdi>{{ cell(row, column) }}</bdi>
-                  </b>
-                  <span>{{ columnLabel(column) }}</span>
-                </div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              @for (column of description.columns; track column.key) {
+                <th
+                  scope="col"
+                  [attr.aria-sort]="sortOf(column)"
+                  [class.num]="column.kind === 'number'"
+                >
+                  @if (column.sort; as member) {
+                    <hr-sort-button
+                      [member]="member"
+                      [current]="rows.sort()"
+                      (sorted)="sortBy($event)"
+                      >{{ column.label }}</hr-sort-button
+                    >
+                  } @else {
+                    {{ column.label }}
+                  }
+                </th>
               }
-              <div class="row-act">
-                @if (mayManage()) {
-                  <button
-                    type="button"
-                    class="act"
-                    data-act="edit"
-                    (click)="open(row, 'edit')"
-                    [attr.aria-expanded]="opened(row) === 'edit'"
-                    i18n="@@platform-admin.reference.edit"
+              @if (mayManage()) {
+                <th scope="col" class="acts">
+                  <span class="vh" i18n="@@platform-admin.reference.column.actions">Actions</span>
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows.rows(); track idOf(row)) {
+              <tr class="xrow">
+                @for (column of description.columns; track column.key) {
+                  <td
+                    [class.key]="column.key === keyColumn()"
+                    [class.num]="column.kind === 'number'"
                   >
-                    Edit
-                  </button>
-                  @if (description.canDelete) {
+                    @if (column.kind === 'onoff') {
+                      <span
+                        class="pill"
+                        [class.on]="flag(row, column)"
+                        [class.off]="!flag(row, column)"
+                      >
+                        @if (flag(row, column)) {
+                          <ng-container i18n="@@platform-admin.reference.cell.active"
+                            >Active</ng-container
+                          >
+                        } @else {
+                          <ng-container i18n="@@platform-admin.reference.cell.inactive"
+                            >Inactive</ng-container
+                          >
+                        }
+                      </span>
+                    } @else if (column.kind === 'bool') {
+                      <span
+                        class="pill"
+                        [class.yes]="flag(row, column)"
+                        [class.off]="!flag(row, column)"
+                      >
+                        @if (flag(row, column)) {
+                          <ng-container i18n="@@platform-admin.reference.cell.yes"
+                            >Yes</ng-container
+                          >
+                        } @else {
+                          <ng-container i18n="@@platform-admin.reference.cell.no">No</ng-container>
+                        }
+                      </span>
+                    } @else if (column.kind === 'system') {
+                      @if (flag(row, column)) {
+                        <span class="pill sys" i18n="@@platform-admin.reference.cell.system"
+                          >System</span
+                        >
+                      }
+                    } @else if (column.kind === 'rtl') {
+                      <span lang="ar" dir="rtl"
+                        ><bdi>{{ text(row, column) }}</bdi></span
+                      >
+                    } @else {
+                      <bdi>{{ text(row, column) }}</bdi>
+                    }
+                  </td>
+                }
+                @if (mayManage()) {
+                  <td class="acts">
                     <button
                       type="button"
-                      class="act"
-                      data-act="delete"
-                      (click)="open(row, 'delete')"
-                      [attr.aria-expanded]="opened(row) === 'delete'"
-                      i18n="@@platform-admin.reference.delete"
+                      class="tlink"
+                      data-act="edit"
+                      (click)="openEditor(row)"
+                      i18n="@@platform-admin.reference.edit"
                     >
-                      Delete
+                      Edit
                     </button>
-                  }
+                    @if (description.canDelete) {
+                      <button
+                        type="button"
+                        class="tlink"
+                        data-act="delete"
+                        (click)="askDelete(row)"
+                        [disabled]="removing() === idOf(row)"
+                        i18n="@@platform-admin.reference.delete"
+                      >
+                        Delete
+                      </button>
+                    }
+                  </td>
                 }
-              </div>
-            </div>
-            @if (opened(row) === 'edit') {
-              <hr-row-editor
-                [table]="description"
-                [row]="row"
-                (done)="close()"
-                (cancelled)="close()"
-              />
+              </tr>
             }
-            @if (opened(row) === 'delete') {
-              <div class="confirm" role="group">
-                <p class="warning" i18n="@@platform-admin.reference.delete.ask">
-                  Delete this row? This cannot be undone.
-                </p>
-                <button
-                  type="button"
-                  class="btn solid stop"
-                  data-act="delete-confirm"
-                  (click)="remove(row)"
-                  [disabled]="removing() === idOf(row)"
-                  i18n="@@platform-admin.reference.delete.go"
-                >
-                  Delete row
-                </button>
-                <button
-                  type="button"
-                  class="btn"
-                  (click)="close()"
-                  i18n="@@platform-admin.reference.cancel"
-                >
-                  Cancel
-                </button>
-              </div>
-            }
-          </div>
+          </tbody>
+        </table>
+        @if (!rows.loading() && rows.rows().length === 0) {
+          @if (hasFilters()) {
+            <p class="empty" i18n="@@platform-admin.reference.empty.filtered">
+              Nothing matches these filters.
+            </p>
+          } @else {
+            <p class="empty" i18n="@@platform-admin.reference.empty.first">
+              No rows yet. Add the first one.
+            </p>
+          }
         }
       </div>
+      <hr-pager
+        [page]="rows.page()"
+        [pageSize]="pageSize"
+        [total]="rows.total()"
+        [loading]="rows.loading()"
+        (pageChange)="goTo($event)"
+      />
     }
   }
+  <hr-drawer #drawer [heading]="drawerHeading()" [lead]="drawerLead()" (closed)="drawerClosed()">
+    @if (editing(); as editing) {
+      <hr-row-editor
+        [table]="description"
+        [row]="editing.row"
+        (done)="saved()"
+        (cancelled)="drawer.close()"
+      />
+    }
+  </hr-drawer>
+  <hr-confirm-dialog
+    tone="stop"
+    [heading]="deleteHeading()"
+    [message]="deleteMessage"
+    [go]="deleteGo"
+    [stay]="stay"
+  />
 } @else {
   <p class="empty" role="alert" i18n="@@platform-admin.reference.unknown">
     There is no such table.

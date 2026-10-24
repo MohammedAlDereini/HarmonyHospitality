@@ -89,7 +89,6 @@ describe('hr-permissions-editor', () => {
   it("the role's own permissions arrive ticked; a change is saved as the whole set with a key", async () => {
     answer = { kind: 'ok', status: OK, data: undefined };
     const editor = await render();
-    expect(editor.page.querySelector('h2')?.textContent).toContain('Front desk');
     expect(editor.box('ViewUsers')?.checked).toBe(true);
     expect(editor.box('ManageUsers')?.checked).toBe(false);
     editor.box('ManageUsers')?.click();

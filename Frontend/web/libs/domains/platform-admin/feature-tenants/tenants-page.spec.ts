@@ -57,6 +57,9 @@ class FakeStore {
   }
 }
 
+const COUNTRY_CELL = 2;
+const ONBOARDED_CELL = 5;
+
 describe('TenantsPage', () => {
   let store: FakeStore;
   let fixture: ComponentFixture<TenantsPage>;
@@ -78,7 +81,7 @@ describe('TenantsPage', () => {
         {
           provide: ReferenceStore,
           useValue: {
-            table: () => ({
+            choices: () => ({
               rows: signal([]),
               loading: signal(false),
               problem: signal(null),
@@ -99,21 +102,35 @@ describe('TenantsPage', () => {
     store.rows.set([ritz, platform]);
     store.total.set(TWO_ROWS);
     await render();
-    const first = '[role="listitem"]:first-child';
-    const last = '[role="listitem"]:last-child';
-    expect(text(`${first} .code`)).toEqual(['ritz']);
-    expect(text(`${first} .s-nm b`)).toEqual(['Ritz Amman Hotels LLC']);
-    expect(text(`${first} .s-nm span`)).toEqual(['JO · JOD']);
-    expect(text(`${first} .obj b`)).toEqual(['2', 'Suspended']);
-    expect(page.querySelector(`${first} .obj[data-s="warn"]`)).not.toBeNull();
+    const first = 'tr.trow:first-child';
+    const last = 'tr.trow:last-child';
+    expect(text('thead th')).toEqual([
+      'Code',
+      'Name',
+      'Country · currency',
+      'Tier',
+      'Status',
+      'Onboarded',
+    ]);
+    expect(text(`${first} td.key`)).toEqual(['ritz']);
+    expect(text(`${first} a.nm-link`)).toEqual(['Ritz Amman Hotels LLC']);
+    expect(text(`${first} td`).slice(COUNTRY_CELL, ONBOARDED_CELL)).toEqual([
+      'JO · JOD',
+      '2',
+      'Suspended',
+    ]);
+    expect(page.querySelector(`${first} .pill[data-s="warn"]`)).not.toBeNull();
     expect(page.querySelector(`${first} a.nm-link`)?.getAttribute('href')).toBe('/t1');
-    expect(text(`${last} .s-nm span`)).toEqual(['The platform itself']);
+    expect(text(`${last} .sub`)).toEqual(['The platform itself']);
   });
 
   it('the status filter and the search go to the store; Add tenant opens the editor', async () => {
     store.rows.set([ritz]);
     await render();
-    page.querySelectorAll<HTMLButtonElement>('.seg button')[1]?.click();
+    const status = page.querySelector<HTMLSelectElement>('#tenants-status');
+    if (status === null) throw new Error('no status filter');
+    status.value = TenantStatus.active;
+    status.dispatchEvent(new Event('change'));
     expect(store.statuses).toEqual([TenantStatus.active]);
     const input = page.querySelector<HTMLInputElement>('#tenants-search');
     if (input === null) throw new Error('no search field');
@@ -128,7 +145,9 @@ describe('TenantsPage', () => {
     view.rootNodes.forEach((node: Node) => slot.appendChild(node));
     slot.querySelector<HTMLButtonElement>('.pbtn')?.click();
     await render();
-    expect(page.querySelector('hr-tenant-editor')).not.toBeNull();
+    expect(page.querySelector('dialog.drawer')?.hasAttribute('open')).toBe(true);
+    expect(page.querySelector('.drawer-h h2')?.textContent).toBe('New tenant');
+    expect(page.querySelector('dialog.drawer hr-tenant-editor')).not.toBeNull();
     view.destroy();
   });
 });

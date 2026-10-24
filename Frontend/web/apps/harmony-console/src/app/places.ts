@@ -1,5 +1,6 @@
 import { Provider, computed, inject } from '@angular/core';
 import { AccessStore, Permission } from '@harmony/platform/access';
+import { referenceCatalogue } from '@harmony/platform-admin/domain';
 import { DockLink, NavItem, SHELL_PLACES, ShellPlaces } from '@harmony/ui/shell';
 
 /** One place of the platform console and the permission that shows it (presentation only; the API refuses on its own). */
@@ -12,6 +13,7 @@ const platformPlaces = (): ShellPlaces => {
   const access = inject(AccessStore);
   const platform = $localize`:@@ui.shell.nav.group.platform:Platform`;
   const administration = $localize`:@@ui.shell.nav.group.administration:Administration`;
+  const reference = $localize`:@@ui.shell.nav.group.reference:Reference data`;
   const home: DockLink = {
     label: $localize`:@@ui.shell.nav.home:Home`,
     link: ['/'],
@@ -60,9 +62,21 @@ const platformPlaces = (): ShellPlaces => {
   const allowed = (places: readonly PlatformPlace[]): DockLink[] =>
     places.filter((place) => access.can(place.permission)).map(asDock);
   const dock = computed<readonly DockLink[]>(() => [...allowed(platformOnes), ...allowed(ownOnes)]);
+  // Every reference table is one click away in the places panel, as the platform app's rail had them.
+  const referenceOnes = computed<readonly NavItem[]>(() =>
+    access.can(Permission.ViewTenants)
+      ? referenceCatalogue.map((table) => ({
+          label: table.title,
+          link: ['/reference', table.key],
+          icon: 'star' as const,
+          group: reference,
+        }))
+      : [],
+  );
   const items = computed<readonly NavItem[]>(() => [
     { ...home, group: platform },
     ...allowed(platformOnes).map((place) => ({ ...place, group: platform })),
+    ...referenceOnes(),
     ...allowed(ownOnes).map((place) => ({ ...place, group: administration })),
   ]);
   return { scope: 'platform', items, dock };

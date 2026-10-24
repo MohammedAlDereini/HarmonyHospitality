@@ -66,114 +66,93 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">95,97</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.roles.permissions.of" datatype="html">
-        <source>Permissions of</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
-          <context context-type="linenumber">3,6</context>
+          <context context-type="linenumber">98,100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.loading" datatype="html">
         <source>Loading…</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
-          <context context-type="linenumber">8,9</context>
+          <context context-type="linenumber">3,4</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">37,38</context>
+          <context context-type="linenumber">34,35</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.catalogue-again" datatype="html">
         <source> Try again </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
-          <context context-type="linenumber">17,21</context>
+          <context context-type="linenumber">12,16</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
-          <context context-type="linenumber">103,106</context>
+          <context context-type="linenumber">98,101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.permissions.save" datatype="html">
         <source> Save permissions </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
-          <context context-type="linenumber">36,38</context>
+          <context context-type="linenumber">31,33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.cancel" datatype="html">
         <source> Cancel </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/permissions-editor.html</context>
-          <context context-type="linenumber">39,42</context>
+          <context context-type="linenumber">34,37</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
-          <context context-type="linenumber">138,141</context>
+          <context context-type="linenumber">133,136</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">138,140</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.roles.new.title" datatype="html">
-        <source>New role</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
-          <context context-type="linenumber">3,5</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.roles.edit.title" datatype="html">
-        <source>Edit role</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
-          <context context-type="linenumber">5,8</context>
+          <context context-type="linenumber">149,150</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.field.code" datatype="html">
         <source>Code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
-          <context context-type="linenumber">9,12</context>
+          <context context-type="linenumber">4,7</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.field.name-en" datatype="html">
         <source>English name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
-          <context context-type="linenumber">30,33</context>
+          <context context-type="linenumber">25,28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.field.name-ar" datatype="html">
         <source>Arabic name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
-          <context context-type="linenumber">51,54</context>
+          <context context-type="linenumber">46,49</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.field.level" datatype="html">
         <source>Privilege level</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
-          <context context-type="linenumber">72,75</context>
+          <context context-type="linenumber">67,70</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.new.go" datatype="html">
         <source> Create role </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
-          <context context-type="linenumber">125,128</context>
+          <context context-type="linenumber">120,123</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.edit.go" datatype="html">
         <source> Save </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/role-editor.html</context>
-          <context context-type="linenumber">134,137</context>
+          <context context-type="linenumber">129,132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.add" datatype="html">
@@ -187,84 +166,161 @@
         <source>Roles</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">14,15</context>
+          <context context-type="linenumber">15,16</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.roles.count" datatype="html">
-        <source>roles</source>
+      <trans-unit id="administration.roles.lead" datatype="html">
+        <source> What each kind of person may do here. A role carries a privilege level and a set of permissions; system roles ship with the platform and never change. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">18,22</context>
+          <context context-type="linenumber">17,22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.try-again" datatype="html">
         <source> Try again </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">33,36</context>
+          <context context-type="linenumber">30,33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.none" datatype="html">
         <source>No roles yet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">39,41</context>
+          <context context-type="linenumber">36,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.column.code" datatype="html">
+        <source>Code</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">45,46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.column.name" datatype="html">
+        <source>Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">46,47</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.column.level" datatype="html">
         <source>Privilege level</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">63,65</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.roles.kind.system" datatype="html">
-        <source>System</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">67,69</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="administration.roles.kind.custom" datatype="html">
-        <source>Custom</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">69,71</context>
+          <context context-type="linenumber">47,48</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.column.kind" datatype="html">
         <source>Kind</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">48,50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.column.actions" datatype="html">
+        <source>Actions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">50,53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.kind.system" datatype="html">
+        <source>System</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
           <context context-type="linenumber">71,73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.kind.custom" datatype="html">
+        <source>Custom</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">73,76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.edit" datatype="html">
         <source> Edit </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">84,86</context>
+          <context context-type="linenumber">87,88</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.delete" datatype="html">
         <source> Delete </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">106,108</context>
+          <context context-type="linenumber">109,110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.delete.heading" datatype="html">
+        <source>Delete this role?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
+          <context context-type="linenumber">142,143</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.delete.ask" datatype="html">
-        <source> Delete this role? This cannot be undone. </source>
+        <source>Delete this role? This cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">120,122</context>
+          <context context-type="linenumber">144,145</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.delete.go" datatype="html">
-        <source> Delete role </source>
+        <source>Delete role</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.html</context>
-          <context context-type="linenumber">130,132</context>
+          <context context-type="linenumber">146,147</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.edit.title" datatype="html">
+        <source>Edit role</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.new.title" datatype="html">
+        <source>New role</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.permissions.title" datatype="html">
+        <source>Permissions of <x id="ROLE" equiv-text="this.name(open.role)"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.toast.saved" datatype="html">
+        <source>Role saved.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">148</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.toast.added" datatype="html">
+        <source>Role added.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">149</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.toast.permissions" datatype="html">
+        <source>Permissions saved.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">155</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.roles.toast.deleted" datatype="html">
+        <source>Role deleted.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/roles-page.ts</context>
+          <context context-type="linenumber">171</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.page-title" datatype="html">
@@ -400,74 +456,67 @@
           <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.users.new.title" datatype="html">
-        <source>New account</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
-          <context context-type="linenumber">2,3</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="administration.users.new.invitation" datatype="html">
         <source> The person gets an email with a link to choose a password; nobody types one here. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
-          <context context-type="linenumber">4,7</context>
+          <context context-type="linenumber">3,6</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.new.name" datatype="html">
         <source>Display name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
-          <context context-type="linenumber">8,11</context>
+          <context context-type="linenumber">7,10</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.new.email" datatype="html">
         <source>Email</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
-          <context context-type="linenumber">31,34</context>
+          <context context-type="linenumber">30,33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.new.role" datatype="html">
         <source>Role</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
-          <context context-type="linenumber">51,53</context>
+          <context context-type="linenumber">50,52</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.new.choose-role" datatype="html">
         <source>Choose a role</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
-          <context context-type="linenumber">59,60</context>
+          <context context-type="linenumber">58,59</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.new.roles-again" datatype="html">
         <source> Try again </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
-          <context context-type="linenumber">72,75</context>
+          <context context-type="linenumber">71,74</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.new.go" datatype="html">
         <source> Create account </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
-          <context context-type="linenumber">92,94</context>
+          <context context-type="linenumber">91,93</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.new.cancel" datatype="html">
         <source> Cancel </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/account-creator.html</context>
-          <context context-type="linenumber">95,98</context>
+          <context context-type="linenumber">94,97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.suspend.cancel" datatype="html">
         <source> Cancel </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/account-state-editor.html</context>
-          <context context-type="linenumber">22,24</context>
+          <context context-type="linenumber">28,31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.suspend.reason" datatype="html">
@@ -674,144 +723,166 @@
           <context context-type="linenumber">82,86</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="administration.users.drawer.exempt" datatype="html">
+        <source>Exempt from two-step</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">89,92</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="administration.person.devices" datatype="html">
         <source>Devices</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">97,98</context>
+          <context context-type="linenumber">104,105</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.devices.none" datatype="html">
         <source>No device has signed in yet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">104,106</context>
+          <context context-type="linenumber">111,113</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.devices.signed-in" datatype="html">
         <source>Signed in</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">119,121</context>
+          <context context-type="linenumber">126,128</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.devices.signed-out" datatype="html">
         <source>Signed out</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">121,123</context>
+          <context context-type="linenumber">128,130</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.devices.now" datatype="html">
         <source>Now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">123,125</context>
+          <context context-type="linenumber">130,132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.devices.last-seen" datatype="html">
         <source>Last seen</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">127,129</context>
+          <context context-type="linenumber">134,136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.devices.sign-out" datatype="html">
         <source> Sign out </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">140,142</context>
+          <context context-type="linenumber">147,149</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.passkeys" datatype="html">
         <source>Passkeys</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">151,152</context>
+          <context context-type="linenumber">158,159</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.passkeys.none" datatype="html">
         <source>No passkey yet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">158,160</context>
+          <context context-type="linenumber">165,167</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.passkeys.backed-up" datatype="html">
         <source>Backed up</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">169,172</context>
+          <context context-type="linenumber">176,179</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.passkeys.created" datatype="html">
         <source>Created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">175,177</context>
+          <context context-type="linenumber">182,184</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.passkeys.never" datatype="html">
         <source>Never</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">181,183</context>
+          <context context-type="linenumber">188,190</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.passkeys.last-used" datatype="html">
         <source>Last used</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">183,185</context>
+          <context context-type="linenumber">190,192</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.passkeys.remove" datatype="html">
         <source> Remove </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">195,197</context>
+          <context context-type="linenumber">202,204</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.trail" datatype="html">
         <source>Security trail</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">205,206</context>
+          <context context-type="linenumber">212,213</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.trail.none" datatype="html">
         <source>Nothing recorded yet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">212,214</context>
+          <context context-type="linenumber">219,221</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.trail.when" datatype="html">
         <source>When</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">229,231</context>
+          <context context-type="linenumber">236,238</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.trail.address" datatype="html">
         <source>Address</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">233,235</context>
+          <context context-type="linenumber">240,242</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.trail.device" datatype="html">
         <source>Device</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">239,242</context>
+          <context context-type="linenumber">246,249</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.loading" datatype="html">
         <source>Loading…</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">247,249</context>
+          <context context-type="linenumber">254,256</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.toast.exempted" datatype="html">
+        <source>Exempted from two-step.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.roles" datatype="html">
@@ -871,126 +942,161 @@
         <source>Users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">14,15</context>
+          <context context-type="linenumber">15,16</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.users.accounts" datatype="html">
-        <source>accounts</source>
+      <trans-unit id="administration.users.lead" datatype="html">
+        <source> Who may sign in here, how they sign in, and since when. A suspended account can come back; a terminated one cannot. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">18,21</context>
+          <context context-type="linenumber">17,22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.search" datatype="html">
         <source>Search</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">22,24</context>
+          <context context-type="linenumber">24,26</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.search-placeholder" datatype="html">
         <source>Name or email</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">31,34</context>
+          <context context-type="linenumber">33,36</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.find" datatype="html">
         <source>Find</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">34,37</context>
+          <context context-type="linenumber">38,41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.try-again" datatype="html">
         <source> Try again </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">48,51</context>
+          <context context-type="linenumber">49,52</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.loading" datatype="html">
         <source>Loading…</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">52,53</context>
+          <context context-type="linenumber">53,54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.none" datatype="html">
         <source>No accounts match.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">54,56</context>
+          <context context-type="linenumber">55,57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.column.name" datatype="html">
+        <source>Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">64,65</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.column.two-step" datatype="html">
         <source>Two-step</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">78,80</context>
+          <context context-type="linenumber">65,66</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.column.state" datatype="html">
         <source>State</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">82,84</context>
+          <context context-type="linenumber">66,67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.column.created" datatype="html">
         <source>Created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">86,88</context>
+          <context context-type="linenumber">67,69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.column.actions" datatype="html">
+        <source>Actions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">70,73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.suspend" datatype="html">
         <source> Suspend </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">98,100</context>
+          <context context-type="linenumber">110,111</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.reinstate" datatype="html">
         <source> Reinstate </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">109,111</context>
+          <context context-type="linenumber">121,122</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.terminate" datatype="html">
         <source> Terminate </source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">121,123</context>
+          <context context-type="linenumber">133,134</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.users.paging" datatype="html">
-        <source>Pages</source>
+      <trans-unit id="administration.users.new.title" datatype="html">
+        <source>New account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">138,140</context>
+          <context context-type="linenumber">154,157</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.users.previous" datatype="html">
-        <source> Previous </source>
+      <trans-unit id="administration.users.drawer.suspend" datatype="html">
+        <source>Suspend account</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">145,148</context>
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">34</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.users.of" datatype="html">
-        <source>of</source>
+      <trans-unit id="administration.users.drawer.terminate" datatype="html">
+        <source>Terminate account</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">149,150</context>
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="administration.users.next" datatype="html">
-        <source> Next </source>
+      <trans-unit id="administration.users.toast.suspended" datatype="html">
+        <source>Account suspended.</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
-          <context context-type="linenumber">160,164</context>
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.toast.terminated" datatype="html">
+        <source>Account terminated.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.toast.added" datatype="html">
+        <source>Account added. The invitation is on its way.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.toast.reinstated" datatype="html">
+        <source>Account reinstated.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
+          <context context-type="linenumber">168</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.context.chooser.title" datatype="html">
@@ -2050,6 +2156,55 @@
           <context context-type="linenumber">13,16</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="ui.data.pager.loading" datatype="html">
+        <source>Loading…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">17,19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.rows" datatype="html">
+        <source>rows</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">20,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.previous" datatype="html">
+        <source> Previous </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">31,33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.page" datatype="html">
+        <source>Page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.of" datatype="html">
+        <source>of</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.pager.next" datatype="html">
+        <source> Next </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/pager.ts</context>
+          <context context-type="linenumber">48,52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.overlays.drawer.close" datatype="html">
+        <source>Close</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/overlays/drawer.html</context>
+          <context context-type="linenumber">14,17</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="ui.shell.brand" datatype="html">
         <source>HARMONY</source>
         <context-group purpose="location">
@@ -2373,14 +2528,14 @@
         <source>Stay on this page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.html</context>
-          <context context-type="linenumber">310,312</context>
+          <context context-type="linenumber">310,313</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.choose-property" datatype="html">
         <source>Choose a property</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/shell/shell.ts</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
     </body>

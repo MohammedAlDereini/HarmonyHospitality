@@ -6,6 +6,7 @@ import {
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { PersonStore } from '@harmony/administration/data-access';
 import { Device, Passkey, UserAccount } from '@harmony/administration/domain';
@@ -13,6 +14,7 @@ import { IfAllowed, Permission } from '@harmony/platform/access';
 import { InstantFormatter } from '@harmony/platform/context';
 import { messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
+import { Drawer, Toasts } from '@harmony/ui/overlays';
 import { Tone } from '@harmony/ui/primitives';
 import { AccountStateEditor } from './account-state-editor';
 import { stateLabel, toneOf, twoStepLabel } from './account-wording';
@@ -27,7 +29,7 @@ const dateAndTime: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle
  */
 @Component({
   selector: 'hr-person-page',
-  imports: [IfAllowed, RoleAssignment, AccountStateEditor],
+  imports: [IfAllowed, RoleAssignment, AccountStateEditor, Drawer],
   providers: [PersonStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './person-page.html',
@@ -42,6 +44,8 @@ export class PersonPage {
 
   protected readonly manageUsers = Permission.ManageUsers;
   /** True while the exemption reason form is open. */
+  private readonly toasts = inject(Toasts);
+  private readonly exemptDrawer = viewChild.required(Drawer);
   protected readonly exempting = signal(false);
   /** True while a one-press write is in flight. */
   protected readonly busy = signal(false);
@@ -76,14 +80,12 @@ export class PersonPage {
   protected openExempt(): void {
     this.actionProblem.set(null);
     this.exempting.set(true);
-  }
-
-  protected closeExempt(): void {
-    this.exempting.set(false);
+    this.exemptDrawer().open();
   }
 
   protected onExempted(): void {
-    this.exempting.set(false);
+    this.toasts.show($localize`:@@administration.users.toast.exempted:Exempted from two-step.`);
+    this.exemptDrawer().close();
     this.store.reload();
   }
 

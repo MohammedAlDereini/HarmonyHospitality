@@ -117,12 +117,12 @@ export class PropertyEditor {
   protected readonly tenants = inject(TenantsStore);
   private readonly firstBox = viewChild.required<ElementRef<HTMLSelectElement>>('firstBox');
   private readonly locale = $localize.locale ?? 'en';
-  protected readonly types = this.reference.table('PropertyType');
-  protected readonly cities = this.reference.table('City');
-  protected readonly currencies = this.reference.table('Currency');
-  protected readonly languages = this.reference.table('Language');
-  protected readonly environments = this.reference.table('RegulatoryEnvironment');
-  protected readonly modules = this.reference.table('Module');
+  protected readonly types = this.reference.choices('PropertyType');
+  protected readonly cities = this.reference.choices('City');
+  protected readonly currencies = this.reference.choices('Currency');
+  protected readonly languages = this.reference.choices('Language');
+  protected readonly environments = this.reference.choices('RegulatoryEnvironment');
+  protected readonly modules = this.reference.choices('Module');
   protected readonly legal = computed(() => this.ofKind('Legal'));
   protected readonly tax = computed(() => this.ofKind('Tax'));
   protected readonly accounting = computed(() => this.ofKind('Accounting'));

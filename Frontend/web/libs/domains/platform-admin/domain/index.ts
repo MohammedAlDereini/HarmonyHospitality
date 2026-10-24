@@ -15,9 +15,13 @@ export type {
   PropertyUpdate,
 } from './property';
 export { propertyTitle } from './property';
+export type { ReferenceCatalogueEntry } from './reference-catalogue';
+export { referenceCatalogue, referenceTitle } from './reference-catalogue';
 export type {
   OptionsSource,
+  ReferenceColumn,
   ReferenceField,
+  ReferenceFilter,
   ReferenceOption,
   ReferenceRow,
   ReferenceTable,

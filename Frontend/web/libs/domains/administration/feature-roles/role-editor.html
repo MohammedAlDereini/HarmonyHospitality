@@ -1,9 +1,4 @@
 <form class="editor" (submit)="onSubmit($event)" novalidate>
-  @if (creating()) {
-    <h2 i18n="@@administration.roles.new.title">New role</h2>
-  } @else {
-    <h2 i18n="@@administration.roles.edit.title">Edit role</h2>
-  }
   <div class="fields">
     <div class="f">
       <label for="role-code" i18n="@@administration.roles.field.code">Code</label>

@@ -105,8 +105,8 @@ export class TenantEditor {
   private readonly store = inject(TenantsStore);
   private readonly reference = inject(ReferenceStore);
   private readonly firstBox = viewChild.required<ElementRef<HTMLInputElement>>('firstBox');
-  protected readonly countries = this.reference.table('Country');
-  protected readonly currencies = this.reference.table('Currency');
+  protected readonly countries = this.reference.choices('Country');
+  protected readonly currencies = this.reference.choices('Currency');
   protected readonly tiers = tiers;
   private readonly model = linkedSignal<TenantValues>(() => {
     const tenant = this.tenant();

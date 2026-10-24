@@ -1,4 +1,11 @@
-import { ReferenceField, ReferenceTable } from '@harmony/platform-admin/domain';
+import {
+  ReferenceColumn,
+  ReferenceField,
+  ReferenceFilter,
+  ReferenceTable,
+  referenceTitle,
+} from '@harmony/platform-admin/domain';
+import { ASCENDING, SortOrder } from '@harmony/shared/domain';
 
 const NAME_MAX_LENGTH = 128;
 const LOOKUP_NAME_MAX_LENGTH = 200;
@@ -16,7 +23,10 @@ const dialCode = /^\s*\+[0-9]{1,4}\s*$/;
 // Tester: https://regex101.com/?regex=%5E%5Cs*%5BA-Za-z0-9._-%5D%7B2%2C32%7D%5Cs*%24&testString=JO-Legal
 const shortCode = /^\s*[A-Za-z0-9._-]{2,32}\s*$/;
 
-const nameEn: ReferenceField = {
+const ascending = (memberName: string): SortOrder => ({ memberName, sortOrder: ASCENDING });
+
+/* ── Field makers: the wording the platform app had, label plus a hint with the standard and an example ── */
+const nameEn = (hint: string): ReferenceField => ({
   key: 'nameEn',
   label: $localize`:@@platform-admin.reference.field.name-en:Name (English)`,
   kind: 'text',
@@ -24,8 +34,9 @@ const nameEn: ReferenceField = {
   maxLength: NAME_MAX_LENGTH,
   lang: 'en',
   dir: 'ltr',
-};
-const nameAr: ReferenceField = {
+  hint,
+});
+const nameAr = (placeholder: string): ReferenceField => ({
   key: 'nameAr',
   label: $localize`:@@platform-admin.reference.field.name-ar:Name (Arabic)`,
   kind: 'text',
@@ -33,22 +44,31 @@ const nameAr: ReferenceField = {
   maxLength: NAME_MAX_LENGTH,
   lang: 'ar',
   dir: 'rtl',
-};
+  placeholder,
+});
 const isActive: ReferenceField = {
   key: 'isActive',
   label: $localize`:@@platform-admin.reference.field.active:Active`,
   kind: 'checkbox',
   editOnly: true,
+  hint: $localize`:@@platform-admin.reference.hint.active:Untick to retire the row: it stays, because other rows point at it, but is offered to nobody new.`,
 };
-const countryCode: ReferenceField = {
+const countryCode = (hint: string): ReferenceField => ({
   key: 'countryCode',
   label: $localize`:@@platform-admin.reference.field.country:Country`,
   kind: 'select',
   required: true,
   createOnly: true,
   optionsFrom: { table: 'Country', value: 'code', label: 'nameEn' },
-};
-const code = (label: string, patternOf: RegExp, patternCode = '10402'): ReferenceField => ({
+  hint,
+});
+const code = (
+  label: string,
+  patternOf: RegExp,
+  hint: string,
+  placeholder: string,
+  patternCode = '10402',
+): ReferenceField => ({
   key: 'code',
   label,
   kind: 'text',
@@ -57,66 +77,253 @@ const code = (label: string, patternOf: RegExp, patternCode = '10402'): Referenc
   pattern: patternOf,
   patternCode,
   dir: 'ltr',
+  hint,
+  placeholder,
 });
-const codeLabel = $localize`:@@platform-admin.reference.field.code:Code`;
+const ownerService = (hint: string, placeholder: string): ReferenceField => ({
+  key: 'ownerService',
+  label: $localize`:@@platform-admin.reference.field.owner-service:Owning service`,
+  kind: 'text',
+  required: true,
+  dir: 'ltr',
+  hint,
+  placeholder,
+});
 const descriptionField: ReferenceField = {
   key: 'description',
   label: $localize`:@@platform-admin.reference.field.description:Description`,
   kind: 'text',
   maxLength: DESCRIPTION_MAX_LENGTH,
   dir: 'auto' as 'ltr',
+  optional: true,
+  hint: $localize`:@@platform-admin.reference.hint.description:A sentence for the next administrator: what the rows are used for.`,
 };
-const lookupName: ReferenceField = {
+const lookupName = (hint: string): ReferenceField => ({
   key: 'name',
   label: $localize`:@@platform-admin.reference.field.name:Name`,
   kind: 'text',
   required: true,
   maxLength: LOOKUP_NAME_MAX_LENGTH,
-};
+  hint,
+});
 const isGlobal: ReferenceField = {
   key: 'isGlobal',
-  label: $localize`:@@platform-admin.reference.field.global:Global (every tenant sees it)`,
+  label: $localize`:@@platform-admin.reference.field.global:Global: every tenant sees it`,
   kind: 'checkbox',
   createOnly: true,
+  hint: $localize`:@@platform-admin.reference.hint.global:Chosen once: a global row belongs to the platform and shows in every hotel; a tenant row stays with its tenant.`,
 };
 
-/** The reference tables the console edits, in the order the index shows them. */
+/* ── Column labels, in words ───────────────────────────────────────── */
+const col = {
+  code: $localize`:@@platform-admin.reference.column.code:Code`,
+  nameEn: $localize`:@@platform-admin.reference.column.name-en:English name`,
+  nameAr: $localize`:@@platform-admin.reference.column.name-ar:Arabic name`,
+  state: $localize`:@@platform-admin.reference.column.state:State`,
+  name: $localize`:@@platform-admin.reference.column.name:Name`,
+  country: $localize`:@@platform-admin.reference.column.country:Country`,
+  kind: $localize`:@@platform-admin.reference.column.kind:Kind`,
+  ownerService: $localize`:@@platform-admin.reference.column.owner-service:Owner service`,
+};
+const codeColumn: ReferenceColumn = { key: 'code', label: col.code, sort: 'Code' };
+const nameEnColumn: ReferenceColumn = { key: 'nameEn', label: col.nameEn, sort: 'NameEn' };
+const nameArColumn: ReferenceColumn = {
+  key: 'nameAr',
+  label: col.nameAr,
+  kind: 'rtl',
+  sort: 'NameAr',
+};
+const stateColumn: ReferenceColumn = {
+  key: 'isActive',
+  label: col.state,
+  kind: 'onoff',
+  sort: 'IsActive',
+};
+
+/* ── Filters ───────────────────────────────────────────────────────── */
+const searchFilter: ReferenceFilter = {
+  key: 'searchText',
+  label: $localize`:@@platform-admin.reference.filter.search:Search`,
+  kind: 'text',
+  placeholder: $localize`:@@platform-admin.reference.filter.search-placeholder:code or name, 2+ characters`,
+};
+const stateFilter: ReferenceFilter = {
+  key: 'isActive',
+  label: col.state,
+  kind: 'select',
+  options: [
+    { value: '', label: $localize`:@@platform-admin.reference.filter.all:All` },
+    { value: 'true', label: $localize`:@@platform-admin.reference.cell.active:Active` },
+    { value: 'false', label: $localize`:@@platform-admin.reference.cell.inactive:Inactive` },
+  ],
+};
+const countryFilter: ReferenceFilter = {
+  key: 'countryCode',
+  label: col.country,
+  kind: 'lookup',
+  optionsFrom: { table: 'Country', value: 'code', label: 'nameEn' },
+};
+
+/* ── The tables ────────────────────────────────────────────────────── */
 export const tables: readonly ReferenceTable[] = [
   {
     key: 'currencies',
     controller: 'Currency',
-    title: $localize`:@@platform-admin.reference.currencies:Currencies`,
+    title: referenceTitle('currencies'),
+    singular: $localize`:@@platform-admin.reference.currencies.singular:currency`,
+    description: $localize`:@@platform-admin.reference.currencies.description:The currencies a hotel can price, invoice and pay in. Minor units (2 or 3 decimals) come from the money registry, never typed, so money rounds the same everywhere.`,
     idField: 'code',
-    fields: [code(codeLabel, threeLetters), nameEn, nameAr, isActive],
-    columns: ['code', 'nameEn', 'nameAr', 'minorUnits', 'isActive'],
+    fields: [
+      code(
+        $localize`:@@platform-admin.reference.field.currency-code:Currency code`,
+        threeLetters,
+        $localize`:@@platform-admin.reference.hint.currency-code:3 letters from the ISO 4217 list, like JOD, SAR or AED. Must be a currency Harmony can price in. Fixed once saved.`,
+        'JOD',
+      ),
+      nameEn(
+        $localize`:@@platform-admin.reference.hint.currency-name:As printed on invoices, like Jordanian dinar.`,
+      ),
+      nameAr('دينار أردني'),
+      isActive,
+    ],
+    columns: [
+      codeColumn,
+      nameEnColumn,
+      nameArColumn,
+      {
+        key: 'minorUnits',
+        label: $localize`:@@platform-admin.reference.column.decimals:Decimals`,
+        kind: 'number',
+        sort: 'MinorUnits',
+      },
+      stateColumn,
+    ],
+    filters: [searchFilter, stateFilter],
+    defaultSort: [ascending('Code')],
+  },
+  {
+    key: 'time-zones',
+    controller: 'TimeZone',
+    title: referenceTitle('time-zones'),
+    singular: $localize`:@@platform-admin.reference.time-zones.singular:time zone`,
+    description: $localize`:@@platform-admin.reference.time-zones.description:The clocks hotels run on: business date, night audit, check-in time. A city points at one, so a hotel in Jordan can never be saved with a Riyadh clock.`,
+    idField: 'id',
+    fields: [
+      {
+        key: 'id',
+        label: $localize`:@@platform-admin.reference.field.time-zone-id:Time zone`,
+        kind: 'text',
+        required: true,
+        isKey: true,
+        dir: 'ltr',
+        placeholder: 'Asia/Amman',
+        hint: $localize`:@@platform-admin.reference.hint.time-zone-id:The IANA zone id, Region/City, like Asia/Amman or Asia/Riyadh. One per real zone (Dubai and Muscat share Asia/Dubai). The server must recognise it. Fixed once saved.`,
+      },
+      nameEn(
+        $localize`:@@platform-admin.reference.hint.time-zone-name:What people read in the dropdown, like Amman (Jordan).`,
+      ),
+      nameAr('عمّان'),
+      isActive,
+    ],
+    columns: [
+      { key: 'id', label: $localize`:@@platform-admin.reference.column.zone:Zone`, sort: 'Id' },
+      nameEnColumn,
+      nameArColumn,
+      stateColumn,
+    ],
+    filters: [searchFilter, stateFilter],
+    defaultSort: [ascending('Id')],
+  },
+  {
+    key: 'languages',
+    controller: 'Language',
+    title: referenceTitle('languages'),
+    singular: $localize`:@@platform-admin.reference.languages.singular:language`,
+    description: $localize`:@@platform-admin.reference.languages.description:The languages guests and staff use: confirmation mails, registration cards and screens come out in them.`,
+    idField: 'code',
+    fields: [
+      code(
+        $localize`:@@platform-admin.reference.field.language-code:Language code`,
+        twoLetters,
+        $localize`:@@platform-admin.reference.hint.language-code:2 letters from the ISO 639-1 list, like ar, en or fr. Stored lower-case. Fixed once saved.`,
+        'ar',
+      ),
+      nameEn(
+        $localize`:@@platform-admin.reference.hint.language-name:The name an administrator reads, like Arabic.`,
+      ),
+      {
+        key: 'nameNative',
+        label: $localize`:@@platform-admin.reference.field.name-native:Native name`,
+        kind: 'text',
+        required: true,
+        maxLength: NAME_MAX_LENGTH,
+        placeholder: 'العربية',
+        hint: $localize`:@@platform-admin.reference.hint.language-native:The name in the language itself, what a speaker reads when choosing it: العربية, Français, 日本語.`,
+      },
+      {
+        key: 'isRightToLeft',
+        label: $localize`:@@platform-admin.reference.field.rtl:Written right to left (Arabic, Hebrew, Urdu): screens flip their layout`,
+        kind: 'checkbox',
+      },
+      isActive,
+    ],
+    columns: [
+      codeColumn,
+      nameEnColumn,
+      {
+        key: 'nameNative',
+        label: $localize`:@@platform-admin.reference.column.native-name:Native name`,
+        sort: 'NameNative',
+      },
+      {
+        key: 'isRightToLeft',
+        label: $localize`:@@platform-admin.reference.column.rtl:Right to left`,
+        kind: 'bool',
+        sort: 'IsRightToLeft',
+      },
+      stateColumn,
+    ],
+    filters: [searchFilter, stateFilter],
+    defaultSort: [ascending('Code')],
   },
   {
     key: 'countries',
     controller: 'Country',
-    title: $localize`:@@platform-admin.reference.countries:Countries`,
+    title: referenceTitle('countries'),
+    singular: $localize`:@@platform-admin.reference.countries.singular:country`,
+    description: $localize`:@@platform-admin.reference.countries.description:Where hotels, companies and guests are from. From the country Harmony knows the currency to propose, the regions and cities to offer, the dial code, and later the tax and legal regimes.`,
     idField: 'code',
     fields: [
-      code(codeLabel, twoLetters),
+      code(
+        $localize`:@@platform-admin.reference.field.country-code:Country code`,
+        twoLetters,
+        $localize`:@@platform-admin.reference.hint.country-code:2 letters from the ISO 3166-1 list, like JO, SA or AE. Addresses, nationalities and tax rules key on it. Fixed once saved.`,
+        'JO',
+      ),
       {
         key: 'alpha3',
-        label: $localize`:@@platform-admin.reference.field.alpha3:Three-letter code`,
+        label: $localize`:@@platform-admin.reference.field.alpha3:Country code, 3 letters`,
         kind: 'text',
         required: true,
         createOnly: true,
         pattern: threeLetters,
         patternCode: '10413',
         dir: 'ltr',
+        placeholder: 'JOR',
+        hint: $localize`:@@platform-admin.reference.hint.country-alpha3:The same country in its 3-letter ISO form, like JOR, SAU or ARE: passports, bank files and e-invoicing use this one. Not the currency.`,
       },
-      nameEn,
-      nameAr,
+      nameEn($localize`:@@platform-admin.reference.hint.country-name:Like Jordan or Saudi Arabia.`),
+      nameAr('الأردن'),
       {
         key: 'dialCode',
-        label: $localize`:@@platform-admin.reference.field.dial-code:Dialling code`,
+        label: $localize`:@@platform-admin.reference.field.dial-code:Phone dial code`,
         kind: 'text',
         required: true,
         pattern: dialCode,
         patternCode: '10415',
         dir: 'ltr',
+        placeholder: '+962',
+        hint: $localize`:@@platform-admin.reference.hint.country-dial:A plus sign and the country digits, like +962 or +966. Phone numbers are stored against it.`,
       },
       {
         key: 'defaultCurrency',
@@ -124,209 +331,255 @@ export const tables: readonly ReferenceTable[] = [
         kind: 'select',
         required: true,
         optionsFrom: { table: 'Currency', value: 'code', label: 'nameEn' },
+        hint: $localize`:@@platform-admin.reference.hint.country-currency:What a hotel in this country prices in unless told otherwise. Add the currency first if it is not in the list.`,
       },
       isActive,
     ],
-    columns: ['code', 'alpha3', 'nameEn', 'nameAr', 'dialCode', 'defaultCurrency', 'isActive'],
+    columns: [
+      codeColumn,
+      {
+        key: 'alpha3',
+        label: $localize`:@@platform-admin.reference.column.alpha3:3-letter code`,
+        sort: 'Alpha3',
+      },
+      nameEnColumn,
+      nameArColumn,
+      { key: 'dialCode', label: $localize`:@@platform-admin.reference.column.dial-code:Dial code` },
+      {
+        key: 'defaultCurrency',
+        label: $localize`:@@platform-admin.reference.column.currency:Currency`,
+        sort: 'DefaultCurrency',
+      },
+      stateColumn,
+    ],
+    filters: [searchFilter, stateFilter],
+    defaultSort: [ascending('Code')],
   },
   {
     key: 'subdivisions',
     controller: 'CountrySubdivision',
-    title: $localize`:@@platform-admin.reference.subdivisions:Country subdivisions`,
+    title: referenceTitle('subdivisions'),
+    singular: $localize`:@@platform-admin.reference.subdivisions.singular:subdivision`,
+    description: $localize`:@@platform-admin.reference.subdivisions.description:Governorates, regions, emirates, states: the level between a country and its cities. Addresses and reports group by them.`,
     idField: 'code',
     fields: [
-      countryCode,
-      code(codeLabel, shortCode),
-      nameEn,
-      nameAr,
+      countryCode(
+        $localize`:@@platform-admin.reference.hint.subdivision-country:The country this subdivision belongs to. Fixed once saved.`,
+      ),
+      code(
+        $localize`:@@platform-admin.reference.field.subdivision-code:Subdivision code`,
+        shortCode,
+        $localize`:@@platform-admin.reference.hint.subdivision-code:From the ISO 3166-2 list: the country code, a hyphen, then 1 to 3 letters or digits, like JO-AM (Amman) or SA-01 (Riyadh). Fixed once saved.`,
+        'JO-AM',
+      ),
+      nameEn($localize`:@@platform-admin.reference.hint.subdivision-name:Like Amman or Riyadh.`),
+      nameAr('محافظة العاصمة'),
       {
         key: 'kind',
         label: $localize`:@@platform-admin.reference.field.kind:Kind`,
         kind: 'text',
         required: true,
+        placeholder: 'Governorate',
+        hint: $localize`:@@platform-admin.reference.hint.subdivision-kind:What this level is called in that country: Governorate, Region, Emirate, State, Province.`,
       },
     ],
-    columns: ['countryCode', 'code', 'nameEn', 'nameAr', 'kind'],
+    columns: [
+      codeColumn,
+      { key: 'countryCode', label: col.country, sort: 'CountryCode' },
+      nameEnColumn,
+      nameArColumn,
+      { key: 'kind', label: col.kind, sort: 'Kind' },
+    ],
+    filters: [countryFilter, searchFilter],
+    defaultSort: [ascending('Code')],
   },
   {
     key: 'cities',
     controller: 'City',
-    title: $localize`:@@platform-admin.reference.cities:Cities`,
+    title: referenceTitle('cities'),
+    singular: $localize`:@@platform-admin.reference.cities.singular:city`,
+    description: $localize`:@@platform-admin.reference.cities.description:Where a hotel stands. A city carries its country, subdivision and time zone, so choosing it fills all three for the hotel.`,
     idField: 'id',
     fields: [
-      countryCode,
+      countryCode(
+        $localize`:@@platform-admin.reference.hint.city-country:Fixed once saved: the city id is derived from the country and the English name.`,
+      ),
       {
         key: 'subdivisionCode',
-        label: $localize`:@@platform-admin.reference.field.subdivision:Subdivision code`,
-        kind: 'text',
-        dir: 'ltr',
+        label: $localize`:@@platform-admin.reference.field.subdivision:Subdivision`,
+        kind: 'select',
+        optional: true,
+        optionsFrom: {
+          table: 'CountrySubdivision',
+          value: 'code',
+          label: 'nameEn',
+          narrowBy: 'countryCode',
+        },
+        hint: $localize`:@@platform-admin.reference.hint.city-subdivision:The governorate or region the city is in, from that country's list.`,
       },
-      nameEn,
-      nameAr,
+      nameEn(
+        $localize`:@@platform-admin.reference.hint.city-name:Like Amman or Riyadh. One name per country.`,
+      ),
+      nameAr('عمّان'),
       {
         key: 'timeZoneId',
         label: $localize`:@@platform-admin.reference.field.time-zone:Time zone`,
         kind: 'select',
         required: true,
         optionsFrom: { table: 'TimeZone', value: 'id', label: 'nameEn' },
+        hint: $localize`:@@platform-admin.reference.hint.city-time-zone:The clock a hotel in this city runs on.`,
       },
       {
         key: 'latitude',
         label: $localize`:@@platform-admin.reference.field.latitude:Latitude`,
         kind: 'number',
+        decimal: true,
+        optional: true,
         dir: 'ltr',
+        hint: $localize`:@@platform-admin.reference.hint.city-latitude:Decimal degrees, -90 to 90 (Amman 31.95). For maps and distances.`,
       },
       {
         key: 'longitude',
         label: $localize`:@@platform-admin.reference.field.longitude:Longitude`,
         kind: 'number',
+        decimal: true,
+        optional: true,
         dir: 'ltr',
+        hint: $localize`:@@platform-admin.reference.hint.city-longitude:Decimal degrees, -180 to 180 (Amman 35.91).`,
       },
       isActive,
     ],
-    columns: ['nameEn', 'nameAr', 'countryCode', 'timeZoneId', 'isActive'],
-  },
-  {
-    key: 'languages',
-    controller: 'Language',
-    title: $localize`:@@platform-admin.reference.languages:Languages`,
-    idField: 'code',
-    fields: [
-      code(codeLabel, twoLetters),
-      nameEn,
+    columns: [
+      nameEnColumn,
+      nameArColumn,
+      { key: 'countryCode', label: col.country, sort: 'CountryCode' },
       {
-        key: 'nameNative',
-        label: $localize`:@@platform-admin.reference.field.name-native:Name in the language itself`,
-        kind: 'text',
-        required: true,
-        maxLength: NAME_MAX_LENGTH,
+        key: 'subdivisionCode',
+        label: $localize`:@@platform-admin.reference.column.subdivision:Subdivision`,
+        sort: 'SubdivisionCode',
       },
       {
-        key: 'isRightToLeft',
-        label: $localize`:@@platform-admin.reference.field.rtl:Written right to left`,
-        kind: 'checkbox',
+        key: 'timeZoneId',
+        label: $localize`:@@platform-admin.reference.column.time-zone:Time zone`,
+        sort: 'TimeZoneId',
       },
-      isActive,
+      stateColumn,
     ],
-    columns: ['code', 'nameEn', 'nameNative', 'isRightToLeft', 'isActive'],
+    filters: [countryFilter, searchFilter, stateFilter],
+    defaultSort: [ascending('NameEn')],
   },
   {
     key: 'property-types',
     controller: 'PropertyType',
-    title: $localize`:@@platform-admin.reference.property-types:Property types`,
+    title: referenceTitle('property-types'),
+    singular: $localize`:@@platform-admin.reference.property-types.singular:property type`,
+    description: $localize`:@@platform-admin.reference.property-types.description:What kind of place a property is: hotel, hostel, resort, serviced apartments. A row, so a new type needs no release.`,
     idField: 'code',
     fields: [
-      code(codeLabel, shortCode),
-      nameEn,
-      nameAr,
+      code(
+        $localize`:@@platform-admin.reference.field.type-code:Type code`,
+        shortCode,
+        $localize`:@@platform-admin.reference.hint.type-code:A short fixed code, like Hotel, Hostel or Resort: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.`,
+        'Hotel',
+      ),
+      nameEn(
+        $localize`:@@platform-admin.reference.hint.type-name:Like Hotel or Serviced apartments.`,
+      ),
+      nameAr('فندق'),
       {
         key: 'displayOrder',
         label: $localize`:@@platform-admin.reference.field.display-order:Display order`,
         kind: 'number',
         required: true,
         dir: 'ltr',
+        hint: $localize`:@@platform-admin.reference.hint.display-order:Position in lists: 1 shows first. Zero or more.`,
       },
       isActive,
     ],
-    columns: ['code', 'nameEn', 'nameAr', 'displayOrder', 'isActive'],
+    columns: [
+      {
+        key: 'displayOrder',
+        label: $localize`:@@platform-admin.reference.column.order:Order`,
+        kind: 'number',
+        sort: 'DisplayOrder',
+      },
+      codeColumn,
+      nameEnColumn,
+      nameArColumn,
+      stateColumn,
+    ],
+    filters: [searchFilter, stateFilter],
+    defaultSort: [ascending('DisplayOrder'), ascending('Code')],
   },
   {
     key: 'property-group-types',
     controller: 'PropertyGroupType',
-    title: $localize`:@@platform-admin.reference.property-group-types:Property group types`,
+    title: referenceTitle('property-group-types'),
+    singular: $localize`:@@platform-admin.reference.property-group-types.singular:group type`,
+    description: $localize`:@@platform-admin.reference.property-group-types.description:The ways hotels are grouped: by brand, by region, by owner. An exclusive type allows one group per property (one brand per hotel). A system row is one Harmony's own code relies on.`,
     idField: 'code',
     fields: [
-      code(codeLabel, shortCode),
-      nameEn,
-      nameAr,
+      code(
+        $localize`:@@platform-admin.reference.field.group-type-code:Group type code`,
+        shortCode,
+        $localize`:@@platform-admin.reference.hint.group-type-code:A short fixed code, like Brand, Region or Owner: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.`,
+        'Brand',
+      ),
+      nameEn($localize`:@@platform-admin.reference.hint.group-type-name:Like Brand or Region.`),
+      nameAr('علامة تجارية'),
       {
         key: 'isExclusive',
-        label: $localize`:@@platform-admin.reference.field.exclusive:Exclusive (a property joins one group of this type)`,
+        label: $localize`:@@platform-admin.reference.field.exclusive:Exclusive: a property can belong to only one group of this type (one brand per hotel)`,
         kind: 'checkbox',
       },
       {
         key: 'isSystem',
-        label: $localize`:@@platform-admin.reference.field.system:System (ships with the platform)`,
+        label: $localize`:@@platform-admin.reference.field.system:System row: Harmony's code relies on it; it can be renamed later but its exclusivity is locked`,
         kind: 'checkbox',
         createOnly: true,
       },
     ],
-    columns: ['code', 'nameEn', 'nameAr', 'isExclusive', 'isSystem'],
-  },
-  {
-    key: 'regulatory-environments',
-    controller: 'RegulatoryEnvironment',
-    title: $localize`:@@platform-admin.reference.regulatory-environments:Regulatory environments`,
-    idField: 'code',
-    fields: [
-      code(codeLabel, shortCode),
+    columns: [
+      codeColumn,
+      nameEnColumn,
+      nameArColumn,
       {
-        key: 'kind',
-        label: $localize`:@@platform-admin.reference.field.kind:Kind`,
-        kind: 'select',
-        required: true,
-        createOnly: true,
-        options: [
-          { value: 'Legal', label: $localize`:@@platform-admin.reference.kind.legal:Legal` },
-          { value: 'Tax', label: $localize`:@@platform-admin.reference.kind.tax:Tax` },
-          {
-            value: 'Accounting',
-            label: $localize`:@@platform-admin.reference.kind.accounting:Accounting`,
-          },
-          {
-            value: 'Accommodation',
-            label: $localize`:@@platform-admin.reference.kind.accommodation:Accommodation`,
-          },
-        ],
+        key: 'isExclusive',
+        label: $localize`:@@platform-admin.reference.column.exclusive:Exclusive`,
+        kind: 'bool',
+        sort: 'IsExclusive',
       },
-      countryCode,
-      nameEn,
-      nameAr,
       {
-        key: 'ownerService',
-        label: $localize`:@@platform-admin.reference.field.owner-service:Owning service`,
-        kind: 'text',
-        required: true,
-        dir: 'ltr',
+        key: 'isSystem',
+        label: $localize`:@@platform-admin.reference.column.system:System`,
+        kind: 'system',
+        sort: 'IsSystem',
       },
     ],
-    columns: ['code', 'kind', 'countryCode', 'nameEn', 'nameAr', 'ownerService'],
-  },
-  {
-    key: 'time-zones',
-    controller: 'TimeZone',
-    title: $localize`:@@platform-admin.reference.time-zones:Time zones`,
-    idField: 'id',
-    fields: [
-      {
-        key: 'id',
-        label: $localize`:@@platform-admin.reference.field.time-zone-id:IANA name`,
-        kind: 'text',
-        required: true,
-        isKey: true,
-        dir: 'ltr',
-      },
-      nameEn,
-      nameAr,
-      isActive,
-    ],
-    columns: ['id', 'nameEn', 'nameAr', 'isActive'],
+    filters: [searchFilter],
+    defaultSort: [ascending('Code')],
   },
   {
     key: 'modules',
     controller: 'Module',
-    title: $localize`:@@platform-admin.reference.modules:Modules`,
+    title: referenceTitle('modules'),
+    singular: $localize`:@@platform-admin.reference.modules.singular:module`,
+    description: $localize`:@@platform-admin.reference.modules.description:What a customer subscribes to: per hotel (reservations, POS) or once for the whole customer (loyalty, multi-property). Each service checks subscription lines against these codes, so a code never changes.`,
     idField: 'code',
     fields: [
-      code(codeLabel, shortCode),
-      nameEn,
-      {
-        key: 'ownerService',
-        label: $localize`:@@platform-admin.reference.field.owner-service:Owning service`,
-        kind: 'text',
-        required: true,
-        dir: 'ltr',
-      },
+      code(
+        $localize`:@@platform-admin.reference.field.module-code:Module code`,
+        shortCode,
+        $localize`:@@platform-admin.reference.hint.module-code:What the owning service checks, like pms.core or multi.property: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.`,
+        'pms.core',
+      ),
+      nameEn(
+        $localize`:@@platform-admin.reference.hint.module-name:What a salesperson reads, like PMS core or Multiple properties.`,
+      ),
+      ownerService(
+        $localize`:@@platform-admin.reference.hint.module-owner:The service that enforces it, like Identity, Fiscal or Guest.`,
+        'Identity',
+      ),
       {
         key: 'level',
         label: $localize`:@@platform-admin.reference.field.level:Sold per`,
@@ -335,33 +588,186 @@ export const tables: readonly ReferenceTable[] = [
         options: [
           {
             value: 'Property',
-            label: $localize`:@@platform-admin.reference.level.property:Property`,
+            label: $localize`:@@platform-admin.reference.level.property:Property (one hotel; the subscription line names the hotel and its rooms)`,
           },
-          { value: 'Tenant', label: $localize`:@@platform-admin.reference.level.tenant:Tenant` },
+          {
+            value: 'Tenant',
+            label: $localize`:@@platform-admin.reference.level.tenant:Tenant (once for the whole customer, like loyalty or multi-property)`,
+          },
         ],
+        hint: $localize`:@@platform-admin.reference.hint.module-level:Hotel modules are sold per property; chain-wide modules to the company.`,
       },
       {
         key: 'hasLimit',
-        label: $localize`:@@platform-admin.reference.field.has-limit:Has a limit (rooms or terminals)`,
+        label: $localize`:@@platform-admin.reference.field.has-limit:Has a limit: a subscription line carries a number (rooms, terminals)`,
         kind: 'checkbox',
       },
     ],
-    columns: ['code', 'nameEn', 'ownerService', 'level', 'hasLimit'],
+    columns: [
+      codeColumn,
+      { key: 'nameEn', label: col.name, sort: 'NameEn' },
+      { key: 'ownerService', label: col.ownerService, sort: 'OwnerService' },
+      {
+        key: 'level',
+        label: $localize`:@@platform-admin.reference.column.sold-per:Sold per`,
+        sort: 'Level',
+      },
+      {
+        key: 'hasLimit',
+        label: $localize`:@@platform-admin.reference.column.has-limit:Has a limit`,
+        kind: 'bool',
+        sort: 'HasLimit',
+      },
+    ],
+    filters: [
+      {
+        key: 'ownerService',
+        label: col.ownerService,
+        kind: 'text',
+        placeholder: 'Identity',
+      },
+      {
+        key: 'level',
+        label: $localize`:@@platform-admin.reference.column.sold-per:Sold per`,
+        kind: 'select',
+        options: [
+          { value: '', label: $localize`:@@platform-admin.reference.filter.all:All` },
+          {
+            value: 'Property',
+            label: $localize`:@@platform-admin.reference.level.property.short:Property`,
+          },
+          {
+            value: 'Tenant',
+            label: $localize`:@@platform-admin.reference.level.tenant.short:Tenant`,
+          },
+        ],
+      },
+      searchFilter,
+    ],
+    defaultSort: [ascending('Code')],
+  },
+  {
+    key: 'regulatory-environments',
+    controller: 'RegulatoryEnvironment',
+    title: referenceTitle('regulatory-environments'),
+    singular: $localize`:@@platform-admin.reference.regulatory-environments.singular:regulatory environment`,
+    description: $localize`:@@platform-admin.reference.regulatory-environments.description:The legal, tax, accounting and accommodation regimes a hotel lives under, one row per country and regime. A hotel in Jordan is under JO-GST; the Fiscal service knows what that means.`,
+    idField: 'code',
+    fields: [
+      code(
+        $localize`:@@platform-admin.reference.field.regime-code:Regime code`,
+        shortCode,
+        $localize`:@@platform-admin.reference.hint.regime-code:A short fixed code, usually country and regime, like JO-GST, SA-VAT or JO-LEGAL: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.`,
+        'JO-GST',
+      ),
+      {
+        key: 'kind',
+        label: $localize`:@@platform-admin.reference.field.regime-kind:Kind of regime`,
+        kind: 'select',
+        required: true,
+        createOnly: true,
+        options: [
+          {
+            value: 'Legal',
+            label: $localize`:@@platform-admin.reference.kind.legal:Legal (companies law, licensing)`,
+          },
+          {
+            value: 'Tax',
+            label: $localize`:@@platform-admin.reference.kind.tax:Tax (VAT, sales tax, tourism levy)`,
+          },
+          {
+            value: 'Accounting',
+            label: $localize`:@@platform-admin.reference.kind.accounting:Accounting (IFRS, local GAAP)`,
+          },
+          {
+            value: 'Accommodation',
+            label: $localize`:@@platform-admin.reference.kind.accommodation:Accommodation (tourism and hotel rules)`,
+          },
+        ],
+        hint: $localize`:@@platform-admin.reference.hint.regime-kind:Fixed once saved.`,
+      },
+      countryCode(
+        $localize`:@@platform-admin.reference.hint.regime-country:The country whose regime this is. Fixed once saved.`,
+      ),
+      nameEn(
+        $localize`:@@platform-admin.reference.hint.regime-name:Like Jordan general sales tax or Saudi VAT.`,
+      ),
+      nameAr('ضريبة المبيعات العامة'),
+      ownerService(
+        $localize`:@@platform-admin.reference.hint.regime-owner:The service whose rules this regime stands for: Fiscal for tax and accounting, Identity for legal, Guest for accommodation.`,
+        'Fiscal',
+      ),
+    ],
+    columns: [
+      codeColumn,
+      { key: 'kind', label: col.kind, sort: 'Kind' },
+      { key: 'countryCode', label: col.country, sort: 'CountryCode' },
+      nameEnColumn,
+      nameArColumn,
+      { key: 'ownerService', label: col.ownerService },
+    ],
+    filters: [
+      countryFilter,
+      {
+        key: 'kind',
+        label: col.kind,
+        kind: 'select',
+        options: [
+          { value: '', label: $localize`:@@platform-admin.reference.filter.all-kinds:All kinds` },
+          { value: 'Legal', label: $localize`:@@platform-admin.reference.kind.legal.short:Legal` },
+          { value: 'Tax', label: $localize`:@@platform-admin.reference.kind.tax.short:Tax` },
+          {
+            value: 'Accounting',
+            label: $localize`:@@platform-admin.reference.kind.accounting.short:Accounting`,
+          },
+          {
+            value: 'Accommodation',
+            label: $localize`:@@platform-admin.reference.kind.accommodation.short:Accommodation`,
+          },
+        ],
+      },
+      searchFilter,
+    ],
+    defaultSort: [ascending('Code')],
   },
   {
     key: 'lookup-categories',
     controller: 'LookupCategory',
-    title: $localize`:@@platform-admin.reference.lookup-categories:Lookup categories`,
+    title: referenceTitle('lookup-categories'),
+    singular: $localize`:@@platform-admin.reference.lookup-categories.singular:lookup category`,
+    description: $localize`:@@platform-admin.reference.lookup-categories.description:The named lists screens choose from (guest titles, room features, payment reasons): a category is the list, its values are the choices. Global ones show in every hotel.`,
     idField: 'id',
-    fields: [lookupName, descriptionField, isGlobal],
-    columns: ['name', 'description', 'isGlobal'],
+    fields: [
+      lookupName(
+        $localize`:@@platform-admin.reference.hint.category-name:What the list is called where a screen offers it, like Guest title or Room feature.`,
+      ),
+      descriptionField,
+      isGlobal,
+    ],
+    columns: [
+      { key: 'name', label: col.name, sort: 'Name' },
+      {
+        key: 'description',
+        label: $localize`:@@platform-admin.reference.column.description:Description`,
+      },
+      {
+        key: 'isGlobal',
+        label: $localize`:@@platform-admin.reference.column.global:Global`,
+        kind: 'bool',
+        sort: 'IsGlobal',
+      },
+    ],
+    filters: [searchFilter],
+    defaultSort: [ascending('Name')],
     lookup: true,
     canDelete: true,
   },
   {
     key: 'lookup-values',
     controller: 'LookupValue',
-    title: $localize`:@@platform-admin.reference.lookup-values:Lookup values`,
+    title: referenceTitle('lookup-values'),
+    singular: $localize`:@@platform-admin.reference.lookup-values.singular:lookup value`,
+    description: $localize`:@@platform-admin.reference.lookup-values.description:The choices inside one category, in the order and words a screen shows them. Choose the category first; retire a value rather than delete it once it has been used.`,
     idField: 'id',
     fields: [
       {
@@ -371,17 +777,36 @@ export const tables: readonly ReferenceTable[] = [
         required: true,
         createOnly: true,
         optionsFrom: { table: 'LookupCategory', value: 'id', label: 'name' },
+        hint: $localize`:@@platform-admin.reference.hint.value-category:The list this value belongs to. Fixed once saved.`,
       },
-      lookupName,
+      lookupName(
+        $localize`:@@platform-admin.reference.hint.value-name:The words the screen shows, like Mr, Mrs or Sea view.`,
+      ),
       descriptionField,
       {
         key: 'isActive',
         label: $localize`:@@platform-admin.reference.field.active:Active`,
         kind: 'checkbox',
+        hint: $localize`:@@platform-admin.reference.hint.value-active:Untick to retire the value: what was chosen before keeps it; new choices do not see it.`,
       },
       isGlobal,
     ],
-    columns: ['name', 'description', 'isActive', 'isGlobal'],
+    columns: [
+      { key: 'name', label: col.name, sort: 'Name' },
+      {
+        key: 'description',
+        label: $localize`:@@platform-admin.reference.column.description:Description`,
+      },
+      stateColumn,
+      {
+        key: 'isGlobal',
+        label: $localize`:@@platform-admin.reference.column.global:Global`,
+        kind: 'bool',
+        sort: 'IsGlobal',
+      },
+    ],
+    filters: [searchFilter, stateFilter],
+    defaultSort: [ascending('Name')],
     lookup: true,
     canDelete: true,
     scopedBy: 'lookupCategoryId',

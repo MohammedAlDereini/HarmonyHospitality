@@ -4,24 +4,21 @@
     type="button"
     class="pbtn primary"
     (click)="openCreator()"
-    [attr.aria-expanded]="creating()"
+    [attr.aria-expanded]="drawer()?.kind === 'create'"
   >
     <hr-icon name="plus" size="13" />
     <span i18n="@@administration.roles.add">Add role</span>
   </button>
 </ng-template>
-<div class="sec-h">
-  <h1 i18n="@@administration.roles.title">Roles</h1>
-  @if (!store.loading() && store.problem() === null) {
-    <span class="note"
-      ><span class="num">{{ store.roles().length }}</span
-      >&ngsp;<span i18n="@@administration.roles.count">roles</span></span
-    >
-  }
-</div>
-@if (creating()) {
-  <hr-role-editor (done)="closeCreator()" (cancelled)="closeCreator()" />
-}
+<header class="page-head">
+  <div>
+    <h1 i18n="@@administration.roles.title">Roles</h1>
+    <p class="lead" i18n="@@administration.roles.lead">
+      What each kind of person may do here. A role carries a privilege level and a set of
+      permissions; system roles ship with the platform and never change.
+    </p>
+  </div>
+</header>
 @if (store.problem(); as problem) {
   <p class="empty" role="alert">
     {{ problem }}&ngsp;<button
@@ -41,105 +38,112 @@
   @if (actionProblem(); as text) {
     <p class="empty" role="alert">{{ text }}</p>
   }
-  <div class="rows" role="list">
-    @for (role of store.roles(); track role.id) {
-      <div role="listitem">
-        <div class="srow rrow">
-          <div class="s-who">
-            <span class="code num" dir="ltr">{{ role.code }}</span>
-            <div class="s-nm">
-              <b
-                ><bdi>{{ name(role) }}</bdi></b
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th scope="col" i18n="@@administration.roles.column.code">Code</th>
+          <th scope="col" i18n="@@administration.roles.column.name">Name</th>
+          <th scope="col" i18n="@@administration.roles.column.level">Privilege level</th>
+          <th scope="col" i18n="@@administration.roles.column.kind">Kind</th>
+          <th scope="col" class="acts">
+            <span class="vh" i18n="@@administration.roles.column.actions">Actions</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (role of store.roles(); track role.id) {
+          <tr class="rrow">
+            <td class="key" dir="ltr">{{ role.code }}</td>
+            <td>
+              <span class="nm"
+                ><bdi>{{ name(role) }}</bdi></span
               >
               @if (other(role); as other) {
-                <span [lang]="other.lang" [dir]="other.lang === 'ar' ? 'rtl' : 'ltr'"
+                <span class="sub" [lang]="other.lang" [dir]="other.lang === 'ar' ? 'rtl' : 'ltr'"
                   ><bdi>{{ other.text }}</bdi></span
                 >
               }
-            </div>
-          </div>
-          <div class="obj">
-            <b>{{ level(role) }}</b>
-            <span i18n="@@administration.roles.column.level">Privilege level</span>
-          </div>
-          <div class="obj">
-            @if (role.isSystemRole) {
-              <b i18n="@@administration.roles.kind.system">System</b>
-            } @else {
-              <b i18n="@@administration.roles.kind.custom">Custom</b>
-            }
-            <span i18n="@@administration.roles.column.kind">Kind</span>
-          </div>
-          <div class="row-act">
-            @if (canChange(role)) {
-              <button
-                *hrIfAllowed="editRole"
-                type="button"
-                class="act"
-                data-act="edit"
-                (click)="open(role, 'edit')"
-                [attr.aria-expanded]="opened(role) === 'edit'"
-                i18n="@@administration.roles.edit"
-              >
-                Edit
-              </button>
-              <button
-                *hrIfAllowed="managePermissions"
-                type="button"
-                class="act"
-                data-act="permissions"
-                (click)="open(role, 'permissions')"
-                [attr.aria-expanded]="opened(role) === 'permissions'"
-                i18n="@@administration.roles.permissions"
-              >
-                Permissions
-              </button>
-              <button
-                *hrIfAllowed="deleteRole"
-                type="button"
-                class="act"
-                data-act="delete"
-                (click)="open(role, 'delete')"
-                [attr.aria-expanded]="opened(role) === 'delete'"
-                i18n="@@administration.roles.delete"
-              >
-                Delete
-              </button>
-            }
-          </div>
-        </div>
-        @if (opened(role) === 'edit') {
-          <hr-role-editor [role]="role" (done)="close()" (cancelled)="close()" />
+            </td>
+            <td>{{ level(role) }}</td>
+            <td>
+              @if (role.isSystemRole) {
+                <span class="pill sys" i18n="@@administration.roles.kind.system">System</span>
+              } @else {
+                <span class="pill off" i18n="@@administration.roles.kind.custom">Custom</span>
+              }
+            </td>
+            <td class="acts">
+              @if (canChange(role)) {
+                <button
+                  *hrIfAllowed="editRole"
+                  type="button"
+                  class="tlink"
+                  data-act="edit"
+                  (click)="openEditor(role)"
+                  [attr.aria-expanded]="opened(role) === 'edit'"
+                  i18n="@@administration.roles.edit"
+                >
+                  Edit
+                </button>
+                <button
+                  *hrIfAllowed="managePermissions"
+                  type="button"
+                  class="tlink"
+                  data-act="permissions"
+                  (click)="openPermissions(role)"
+                  [attr.aria-expanded]="opened(role) === 'permissions'"
+                  i18n="@@administration.roles.permissions"
+                >
+                  Permissions
+                </button>
+                <button
+                  *hrIfAllowed="deleteRole"
+                  type="button"
+                  class="tlink"
+                  data-act="delete"
+                  (click)="askDelete(role)"
+                  [disabled]="removing() === role.id"
+                  i18n="@@administration.roles.delete"
+                >
+                  Delete
+                </button>
+              }
+            </td>
+          </tr>
         }
-        @if (opened(role) === 'permissions') {
-          <hr-permissions-editor [role]="role" (done)="close()" (cancelled)="close()" />
-        }
-        @if (opened(role) === 'delete') {
-          <div class="confirm" role="group">
-            <p class="warning" i18n="@@administration.roles.delete.ask">
-              Delete this role? This cannot be undone.
-            </p>
-            <button
-              type="button"
-              class="btn solid stop"
-              data-act="delete-confirm"
-              (click)="remove(role)"
-              [disabled]="removing() === role.id"
-              i18n="@@administration.roles.delete.go"
-            >
-              Delete role
-            </button>
-            <button
-              type="button"
-              class="btn"
-              (click)="close()"
-              i18n="@@administration.roles.cancel"
-            >
-              Cancel
-            </button>
-          </div>
-        }
-      </div>
-    }
+      </tbody>
+    </table>
   </div>
 }
+<hr-drawer #editorDrawer [heading]="editorHeading()" (closed)="editorClosed()">
+  @if (drawer(); as open) {
+    @if (open.kind === 'create') {
+      <hr-role-editor (done)="saved()" (cancelled)="editorDrawer.close()" />
+    } @else if (open.kind === 'edit') {
+      <hr-role-editor [role]="open.role" (done)="saved()" (cancelled)="editorDrawer.close()" />
+    }
+  }
+</hr-drawer>
+<hr-drawer #permissionsDrawer [heading]="permissionsHeading()" (closed)="permissionsClosed()">
+  @if (drawer(); as open) {
+    @if (open.kind === 'permissions') {
+      <hr-permissions-editor
+        [role]="open.role"
+        (done)="permissionsSaved()"
+        (cancelled)="permissionsDrawer.close()"
+      />
+    }
+  }
+</hr-drawer>
+<hr-confirm-dialog
+  tone="stop"
+  i18n-heading="@@administration.roles.delete.heading"
+  heading="Delete this role?"
+  i18n-message="@@administration.roles.delete.ask"
+  message="Delete this role? This cannot be undone."
+  i18n-go="@@administration.roles.delete.go"
+  go="Delete role"
+  i18n-stay="@@administration.roles.cancel"
+  stay="Cancel"
+/>

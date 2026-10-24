@@ -15,12 +15,19 @@
     [attr.aria-invalid]="form.reason().touched() && form.reason().invalid() ? 'true' : null"
     [attr.aria-describedby]="form.reason().errors().length > 0 ? 'state-reason-error' : null"
   />
-  <button type="submit" class="btn solid" [class.stop]="final()" [disabled]="form().submitting()">
-    {{ wording().go }}
-  </button>
-  <button type="button" class="btn" (click)="cancel()" i18n="@@administration.users.suspend.cancel">
-    Cancel
-  </button>
+  <div class="acts">
+    <button type="submit" class="btn solid" [class.stop]="final()" [disabled]="form().submitting()">
+      {{ wording().go }}
+    </button>
+    <button
+      type="button"
+      class="btn"
+      (click)="cancel()"
+      i18n="@@administration.users.suspend.cancel"
+    >
+      Cancel
+    </button>
+  </div>
   @if (form.reason().touched() && form.reason().errors().length > 0) {
     <p id="state-reason-error" class="field-error" role="alert">
       @for (error of form.reason().errors(); track error.kind) {

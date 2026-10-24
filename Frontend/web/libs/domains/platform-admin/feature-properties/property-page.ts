@@ -7,6 +7,7 @@ import {
   linkedSignal,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { FormField, form, pattern, required, submit } from '@angular/forms/signals';
 import { PropertiesStore } from '@harmony/platform-admin/data-access';
@@ -19,6 +20,7 @@ import {
 import { IfAllowed, Permission } from '@harmony/platform/access';
 import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
+import { Drawer, Toasts } from '@harmony/ui/overlays';
 
 // A whole number of rooms, 1 or more. Matches "120"; rejects "0" and "12a".
 // Tester: https://regex101.com/?regex=%5E%5Cs*%5B1-9%5D%5B0-9%5D*%5Cs*%24&testString=120
@@ -62,7 +64,7 @@ const empty: UpdateValues = {
  */
 @Component({
   selector: 'hr-property-page',
-  imports: [FormField, IfAllowed],
+  imports: [FormField, IfAllowed, Drawer],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './property-page.html',
   styleUrl: './property-page.css',
@@ -72,6 +74,8 @@ export class PropertyPage {
   readonly id = input.required<string>();
 
   private readonly store = inject(PropertiesStore);
+  private readonly toasts = inject(Toasts);
+  private readonly drawer = viewChild.required(Drawer);
   private readonly locale = $localize.locale ?? 'en';
 
   protected readonly manageProperties = Permission.ManageProperties;
@@ -128,11 +132,8 @@ export class PropertyPage {
 
   protected openEditor(): void {
     this.editProblem.set(null);
-    this.editing.update((open) => !open);
-  }
-
-  protected closeEditor(): void {
-    this.editing.set(false);
+    this.editing.set(true);
+    this.drawer().open();
   }
 
   protected onSave(event: Event, property: Property): void {
@@ -171,7 +172,8 @@ export class PropertyPage {
     field: typeof this.form,
   ): { kind: string; message: string; fieldTree: typeof field.nameEn }[] | undefined {
     if (result.kind === 'ok') {
-      this.editing.set(false);
+      this.toasts.show($localize`:@@platform-admin.property.toast.saved:Property saved.`);
+      this.drawer().close();
       this.reload();
       return undefined;
     }

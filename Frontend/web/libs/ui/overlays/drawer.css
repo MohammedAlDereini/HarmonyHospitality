@@ -1,0 +1,85 @@
+/* The drawer: the dialog covers the viewport (its backdrop is the scrim); the panel sits at the inline-end edge. */
+.drawer {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+.drawer::backdrop {
+  background: var(--scrim);
+}
+.drawer-panel {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  inline-size: min(480px, 100vw);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--surface);
+  border-inline-start: 1px solid var(--rule);
+  box-shadow: var(--shadow-overlay);
+}
+.drawer-h {
+  position: relative;
+  padding: var(--s5) var(--s6) var(--s3);
+  border-block-end: 1px solid var(--rule);
+}
+.drawer-h h2 {
+  margin: 0;
+  padding-inline-end: var(--s7);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.drawer-h .lead {
+  margin: var(--s1) 0 0;
+  padding-inline-end: var(--s7);
+  color: var(--ink-3);
+  line-height: 1.45;
+}
+.drawer-x {
+  position: absolute;
+  inset-block-start: var(--s3);
+  inset-inline-end: var(--s4);
+  min-width: 32px;
+  font-size: 20px;
+  line-height: 1;
+}
+.drawer-b {
+  overflow: auto;
+  padding: var(--s2) var(--s6) var(--s6);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .drawer[open] .drawer-panel {
+    animation: drawer-in var(--t) ease-out;
+  }
+}
+@keyframes drawer-in {
+  from {
+    translate: var(--s6) 0;
+    opacity: 0;
+  }
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+html[dir='rtl'] .drawer[open] .drawer-panel {
+  animation-name: drawer-in-rtl;
+}
+@keyframes drawer-in-rtl {
+  from {
+    translate: calc(-1 * var(--s6)) 0;
+    opacity: 0;
+  }
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}

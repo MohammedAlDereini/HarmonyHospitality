@@ -15,6 +15,7 @@ import {
 import {
   FieldTree,
   FormField,
+  disabled,
   form,
   maxLength,
   pattern,
@@ -22,7 +23,7 @@ import {
   required,
   submit,
 } from '@angular/forms/signals';
-import { ReferenceStore, TableRows } from '@harmony/platform-admin/data-access';
+import { OptionRows, ReferenceStore } from '@harmony/platform-admin/data-access';
 import {
   ReferenceField,
   ReferenceOption,
@@ -45,9 +46,10 @@ const asText = (value: string | number | boolean | null | undefined): string =>
   value === null || value === undefined ? '' : String(value);
 
 /**
- * One row of a reference table, new or changed: the fields come from the table's description, the choices from
- * other tables, the rules from Identity mirrored for speed. A Signal Form over an editable copy, one intent key per
- * press, Identity's codes back under their fields (architecture 7.9, 14).
+ * One row of a reference table, new or changed, inside the drawer: the fields come from the table's description with
+ * their hints, the choices from other tables (narrowed by a sibling where the table says so), the rules from Identity
+ * mirrored for speed. A Signal Form over an editable copy, one intent key per press, Identity's codes back under
+ * their fields (architecture 7.9, 14).
  */
 @Component({
   selector: 'hr-row-editor',
@@ -85,8 +87,8 @@ export class RowEditor implements OnInit {
   /** Built once the table is known (ngOnInit): the schema's fields are the table's, so the input must be there. */
   protected form!: FieldTree<RowValues>;
   protected readonly problem = signal<string | null>(null);
-  /** The other tables whose rows feed a select, read when the form opens. */
-  private readonly sources = signal<ReadonlyMap<string, TableRows>>(new Map());
+  /** The other tables whose rows feed a select, by field. */
+  private readonly sources = signal<ReadonlyMap<string, OptionRows>>(new Map());
 
   ngOnInit(): void {
     this.form = form(
@@ -103,6 +105,24 @@ export class RowEditor implements OnInit {
           if (field.pattern !== undefined)
             pattern(at, field.pattern, { message: wording(field.patternCode ?? '10402') });
           if (field.isKey === true) readonly(at, { when: () => !this.creating() });
+          // A select narrowed by a sibling waits, disabled, until that sibling has a value.
+          const narrowBy = field.optionsFrom?.narrowBy;
+          if (narrowBy !== undefined) {
+            disabled(at, { when: () => (this.model().texts[narrowBy] ?? '') === '' });
+          }
+        });
+      },
+      { injector: this.injector },
+    );
+    // A select narrowed by a sibling (the subdivisions of the chosen country) reads its choices for that value.
+    effect(
+      () => {
+        this.table().fields.forEach((field) => {
+          const from = field.optionsFrom;
+          if (from?.narrowBy === undefined) return;
+          const value = this.siblingValue(from.narrowBy);
+          const source = this.sources().get(field.key);
+          if (value !== '' && source !== undefined) source.load({ [from.narrowBy]: value });
         });
       },
       { injector: this.injector },
@@ -113,12 +133,12 @@ export class RowEditor implements OnInit {
     effect(() => {
       const table = this.table();
       untracked(() => {
-        const next = new Map<string, TableRows>();
+        const next = new Map<string, OptionRows>();
         table.fields.forEach((field) => {
           const from = field.optionsFrom;
           if (from === undefined) return;
-          const source = this.store.table(from.table);
-          source.load();
+          const source = this.store.choices(from.table);
+          if (from.narrowBy === undefined) source.load();
           next.set(field.key, source);
         });
         this.sources.set(next);
@@ -144,14 +164,40 @@ export class RowEditor implements OnInit {
     const from = field.optionsFrom;
     const source = this.sources().get(field.key);
     if (from === undefined || source === undefined) return [];
+    if (from.narrowBy !== undefined && this.siblingValue(from.narrowBy) === '') return [];
     return source.rows().map((row) => ({
       value: asText(row[from.value]),
-      label: asText(row[from.label]),
+      label:
+        from.value === 'id'
+          ? asText(row[from.label])
+          : `${asText(row[from.value])} · ${asText(row[from.label])}`,
     }));
+  }
+
+  /** The sibling a narrowed select waits for, while that sibling is still empty; null otherwise. */
+  protected waitsFor(field: ReferenceField): ReferenceField | null {
+    const narrowBy = field.optionsFrom?.narrowBy;
+    if (narrowBy === undefined || this.siblingValue(narrowBy) !== '') return null;
+    return this.table().fields.find((other) => other.key === narrowBy) ?? null;
+  }
+
+  protected chooseFirst(sibling: ReferenceField): string {
+    return $localize`:@@platform-admin.reference.editor.choose-first:Choose ${sibling.label}:LABEL: first`;
   }
 
   protected errorId(field: ReferenceField): string {
     return `row-${field.key}-error`;
+  }
+
+  protected hintId(field: ReferenceField): string {
+    return `row-${field.key}-hint`;
+  }
+
+  protected describedBy(field: ReferenceField): string | null {
+    const ids: string[] = [];
+    if (field.hint !== undefined) ids.push(this.hintId(field));
+    if (this.text(field.key)().errors().length > 0) ids.push(this.errorId(field));
+    return ids.length === 0 ? null : ids.join(' ');
   }
 
   protected onSubmit(event: Event): void {
@@ -170,6 +216,11 @@ export class RowEditor implements OnInit {
 
   protected cancel(): void {
     this.cancelled.emit();
+  }
+
+  private siblingValue(key: string): string {
+    const tree = this.form.texts[key];
+    return tree === undefined ? '' : tree().value();
   }
 
   /** Identity's command: texts trimmed, numbers as numbers, blanks as null, the flags, and the row's key when editing. */

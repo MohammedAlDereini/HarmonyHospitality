@@ -83,14 +83,21 @@
         </button>
       }
     </div>
-    @if (exempting()) {
-      <hr-account-state-editor
-        [user]="person"
-        mode="exempt"
-        (done)="onExempted()"
-        (cancelled)="closeExempt()"
-      />
-    }
+    <hr-drawer
+      #exemptDrawer
+      i18n-heading="@@administration.users.drawer.exempt"
+      heading="Exempt from two-step"
+      (closed)="exempting.set(false)"
+    >
+      @if (exempting()) {
+        <hr-account-state-editor
+          [user]="person"
+          mode="exempt"
+          (done)="onExempted()"
+          (cancelled)="exemptDrawer.close()"
+        />
+      }
+    </hr-drawer>
   </section>
   <section class="part" aria-labelledby="devices-heading">
     <h2 id="devices-heading">

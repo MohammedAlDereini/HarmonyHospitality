@@ -1,24 +1,16 @@
-/* Under its row: the checklist and the two buttons. */
-.editor {
-  padding: var(--s3) var(--s6);
-  background: var(--sunk);
-  border-block-end: 1px solid var(--rule);
-}
-.editor h2 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ink);
-}
+/* The permission checklist inside the drawer, the two buttons at the end. */
 .note {
-  margin: var(--s2) 0 0;
-  font-size: 12px;
+  margin: 0 0 var(--s3);
+  font-size: 0.85rem;
   color: var(--ink-3);
+  line-height: 1.4;
 }
 .acts {
   display: flex;
   gap: var(--s2);
-  margin-block-start: var(--s3);
+  margin-block-start: var(--s5);
+  padding-block-start: var(--s4);
+  border-block-start: 1px solid var(--rule);
 }
 .field-error {
   margin: var(--s2) 0 0;

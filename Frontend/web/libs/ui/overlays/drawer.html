@@ -1,0 +1,22 @@
+<dialog #box class="drawer" [attr.aria-labelledby]="headingId()" closedby="any" (close)="onClose()">
+  <div class="drawer-panel">
+    <header class="drawer-h">
+      <h2 [id]="headingId()">{{ heading() }}</h2>
+      @if (lead() !== '') {
+        <p class="lead">{{ lead() }}</p>
+      }
+      <button
+        type="button"
+        class="btn quiet drawer-x"
+        (click)="close()"
+        i18n-aria-label="@@ui.overlays.drawer.close"
+        aria-label="Close"
+      >
+        ×
+      </button>
+    </header>
+    <div class="drawer-b">
+      <ng-content />
+    </div>
+  </div>
+</dialog>

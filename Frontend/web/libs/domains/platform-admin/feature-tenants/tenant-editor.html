@@ -1,12 +1,9 @@
 <form class="editor" (submit)="onSubmit($event)" novalidate>
   @if (creating()) {
-    <h2 i18n="@@platform-admin.tenants.new.title">New tenant</h2>
     <p class="note" i18n="@@platform-admin.tenants.new.note">
       The first administrator gets an email with a link to choose a password; the tenant's own
       administrator role is made for them.
     </p>
-  } @else {
-    <h2 i18n="@@platform-admin.tenants.edit.title">Edit tenant</h2>
   }
   <div class="fields">
     <div class="f">

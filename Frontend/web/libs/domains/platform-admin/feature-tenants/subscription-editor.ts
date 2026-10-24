@@ -66,7 +66,7 @@ export class SubscriptionEditor {
   private readonly store = inject(TenantsStore);
   private readonly reference = inject(ReferenceStore);
   protected readonly properties = inject(PropertiesStore);
-  protected readonly modules = this.reference.table('Module');
+  protected readonly modules = this.reference.choices('Module');
   private readonly moduleBox = viewChild.required<ElementRef<HTMLSelectElement>>('moduleBox');
   private readonly locale = $localize.locale ?? 'en';
   private readonly model = signal<SubscriptionValues>(empty);

@@ -249,20 +249,16 @@ html[lang='ar'] .dock :is(a, button):focus-visible::after {
   min-height: var(--row);
   border-block-end: 1px solid var(--rule);
 }
-.strip-session {
+.strip-session,
+.strip-update {
   background: var(--warn-bg);
 }
-.strip-down {
+.strip-down,
+.strip-update-soft {
   background: var(--info-bg);
 }
 .strip-failure {
   background: var(--stop-bg);
-}
-.strip-update {
-  background: var(--warn-bg);
-}
-.strip-update-soft {
-  background: var(--info-bg);
 }
 .btn.quiet {
   border-color: transparent;

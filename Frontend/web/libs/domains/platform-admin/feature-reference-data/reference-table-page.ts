@@ -7,33 +7,51 @@ import {
   input,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
-import { ReferenceStore, TableRows } from '@harmony/platform-admin/data-access';
-import { ReferenceRow, ReferenceTable } from '@harmony/platform-admin/domain';
+import {
+  OptionRows,
+  REFERENCE_PAGE_SIZE,
+  ReferenceFilters,
+  ReferenceStore,
+  TableRows,
+} from '@harmony/platform-admin/data-access';
+import {
+  ReferenceColumn,
+  ReferenceFilter,
+  ReferenceOption,
+  ReferenceRow,
+  ReferenceTable,
+} from '@harmony/platform-admin/domain';
 import { AccessStore, Permission } from '@harmony/platform/access';
 import { messageOf } from '@harmony/platform/errors';
 import { newIntentKey } from '@harmony/platform/http';
+import { SortOrder } from '@harmony/shared/domain';
+import { AriaSort, Pager, SortButton, ariaSort } from '@harmony/ui/data';
 import { Icon } from '@harmony/ui/icons';
+import { ConfirmDialog, Drawer, Toasts } from '@harmony/ui/overlays';
 import { PageActionsTemplate } from '@harmony/ui/shell';
 import { RowEditor } from './row-editor';
 import { tableByKey } from './tables';
 
-/** What is open under a row. */
-type Opened = 'edit' | 'delete';
-
+/** What the drawer holds: a row being changed, or null for a new one. */
 interface Editing {
-  readonly id: string;
-  readonly kind: Opened;
+  readonly row: ReferenceRow | null;
 }
 
+const asText = (value: string | number | boolean | null | undefined): string =>
+  value === null || value === undefined ? '' : String(value);
+const capital = (text: string): string => text.charAt(0).toLocaleUpperCase() + text.slice(1);
+
 /**
- * One reference table as rows, from its description: the columns, a new row from the context bar's action slot,
- * edit under the row, delete with a confirmation where the table allows it (architecture 6, platform-admin). Lookup
- * values are read for one category at a time.
+ * One reference table the way the platform app showed it (architecture 6, platform-admin): the title and what the
+ * table is for, the filter toolbar, a real table with sortable columns, a pager, Add in the context bar; a row is
+ * added or changed in the drawer at the end of the page; a lookup row is deleted after a confirmation. Lookup values
+ * are read for one category at a time.
  */
 @Component({
   selector: 'hr-reference-table-page',
-  imports: [Icon, PageActionsTemplate, RowEditor],
+  imports: [Icon, PageActionsTemplate, RowEditor, Pager, SortButton, Drawer, ConfirmDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './reference-table-page.html',
   styleUrl: './reference-table-page.css',
@@ -44,14 +62,20 @@ export class ReferenceTablePage {
 
   private readonly store = inject(ReferenceStore);
   private readonly access = inject(AccessStore);
+  private readonly toasts = inject(Toasts);
+  private readonly drawer = viewChild.required(Drawer);
+  private readonly confirm = viewChild.required(ConfirmDialog);
 
+  protected readonly pageSize = REFERENCE_PAGE_SIZE;
   protected readonly description = computed<ReferenceTable | null>(() => tableByKey(this.table()));
   protected readonly rows = computed<TableRows | null>(() => {
     const description = this.description();
-    return description === null ? null : this.store.table(description.controller);
+    return description === null
+      ? null
+      : this.store.table(description.controller, description.defaultSort);
   });
   /** Lookup values: the categories to choose from. */
-  protected readonly categories = this.store.table('LookupCategory');
+  protected readonly categories = this.store.choices('LookupCategory');
   protected readonly category = signal('');
   protected readonly mayManage = computed(() => {
     const description = this.description();
@@ -60,19 +84,67 @@ export class ReferenceTablePage {
       description.lookup === true ? Permission.ManageLookups : Permission.ManageTenants,
     );
   });
-  protected readonly creating = signal(false);
   protected readonly editing = signal<Editing | null>(null);
   protected readonly removing = signal<string | null>(null);
   protected readonly actionProblem = signal<string | null>(null);
+  /** The filters as typed, until Apply. */
+  protected readonly draft = signal<ReferenceFilters>({});
+  protected readonly hasFilters = computed(() =>
+    Object.values(this.rows()?.filters() ?? {}).some((value) => value !== ''),
+  );
+  protected readonly keyColumn = computed(() => {
+    const description = this.description();
+    if (description === null) return '';
+    return description.fields.find((field) => field.isKey)?.key ?? description.idField;
+  });
+  protected readonly addLabel = computed(() => {
+    const description = this.description();
+    return description === null
+      ? ''
+      : $localize`:@@platform-admin.reference.add-one:Add ${description.singular}:SINGULAR:`;
+  });
+  protected readonly drawerHeading = computed(() => {
+    const description = this.description();
+    if (description === null) return '';
+    return this.editing()?.row === null || this.editing()?.row === undefined
+      ? this.addLabel()
+      : $localize`:@@platform-admin.reference.edit-one:Edit ${description.singular}:SINGULAR:`;
+  });
+  protected readonly drawerLead = computed(() =>
+    this.editing()?.row === null || this.editing()?.row === undefined
+      ? $localize`:@@platform-admin.reference.key-note.new:The code or key is chosen once and then fixed.`
+      : $localize`:@@platform-admin.reference.key-note.edit:The identity of the row (its code or key) cannot change: other rows point at it.`,
+  );
+  protected readonly deleteHeading = computed(() => {
+    const description = this.description();
+    return description === null
+      ? ''
+      : $localize`:@@platform-admin.reference.delete.heading:Delete this ${description.singular}:SINGULAR:?`;
+  });
+  protected readonly deleteMessage = $localize`:@@platform-admin.reference.delete.message:This cannot be undone.`;
+  protected readonly deleteGo = $localize`:@@platform-admin.reference.delete.go:Delete`;
+  protected readonly stay = $localize`:@@platform-admin.reference.cancel:Cancel`;
+  /** The other tables a filter chooses from, read when the screen opens. */
+  private readonly lookups = signal<ReadonlyMap<string, OptionRows>>(new Map());
 
   constructor() {
     effect(() => {
       const description = this.description();
       const rows = this.rows();
       untracked(() => {
-        this.creating.set(false);
         this.editing.set(null);
         this.category.set('');
+        this.actionProblem.set(null);
+        this.draft.set(rows?.filters() ?? {});
+        const lookups = new Map<string, OptionRows>();
+        description?.filters.forEach((filter) => {
+          const from = filter.optionsFrom;
+          if (from === undefined) return;
+          const source = this.store.choices(from.table);
+          source.load();
+          lookups.set(filter.key, source);
+        });
+        this.lookups.set(lookups);
         if (description?.scopedBy !== undefined) {
           this.categories.load();
           return;
@@ -84,19 +156,59 @@ export class ReferenceTablePage {
 
   protected idOf(row: ReferenceRow): string {
     const description = this.description();
-    return description === null ? '' : String(row[description.idField] ?? '');
+    return description === null ? '' : asText(row[description.idField]);
   }
 
-  protected cell(row: ReferenceRow, column: string): string {
-    const value = row[column];
-    if (value === true) return $localize`:@@platform-admin.reference.yes:Yes`;
-    if (value === false) return $localize`:@@platform-admin.reference.no:No`;
-    return value === null || value === undefined ? '' : String(value);
+  protected text(row: ReferenceRow, column: ReferenceColumn): string {
+    return asText(row[column.key]);
   }
 
-  protected columnLabel(column: string): string {
-    const description = this.description();
-    return description?.fields.find((field) => field.key === column)?.label ?? column;
+  protected flag(row: ReferenceRow, column: ReferenceColumn): boolean {
+    return row[column.key] === true;
+  }
+
+  protected name(row: ReferenceRow): string {
+    return asText(row['name'] ?? row['nameEn'] ?? row['id']);
+  }
+
+  protected sortOf(column: ReferenceColumn): AriaSort {
+    const rows = this.rows();
+    if (column.sort === undefined || rows === null) return null;
+    return ariaSort(column.sort, rows.sort());
+  }
+
+  protected sortBy(order: SortOrder): void {
+    this.rows()?.query({ sort: order });
+  }
+
+  protected goTo(page: number): void {
+    this.rows()?.query({ page });
+  }
+
+  protected draftChange(key: string, event: Event): void {
+    const value = (event.target as HTMLInputElement | HTMLSelectElement).value;
+    this.draft.update((draft) => ({ ...draft, [key]: value }));
+  }
+
+  protected applyFilters(event: Event): void {
+    event.preventDefault();
+    this.rows()?.query({ filters: this.draft() });
+  }
+
+  protected clearFilters(): void {
+    this.draft.set({});
+    this.rows()?.query({ filters: {} });
+  }
+
+  protected filterOptions(filter: ReferenceFilter): readonly ReferenceOption[] {
+    if (filter.options !== undefined) return filter.options;
+    const from = filter.optionsFrom;
+    const source = this.lookups().get(filter.key);
+    if (from === undefined || source === undefined) return [];
+    return source.rows().map((row) => ({
+      value: asText(row[from.value]),
+      label: `${asText(row[from.value])} · ${asText(row[from.label])}`,
+    }));
   }
 
   protected chooseCategory(id: string): void {
@@ -107,45 +219,52 @@ export class ReferenceTablePage {
     }
   }
 
-  protected opened(row: ReferenceRow): Opened | null {
-    const editing = this.editing();
-    return editing !== null && editing.id === this.idOf(row) ? editing.kind : null;
-  }
-
   protected openCreator(): void {
     this.actionProblem.set(null);
-    this.editing.set(null);
-    this.creating.set(true);
+    this.editing.set({ row: null });
+    this.drawer().open();
   }
 
-  protected closeCreator(): void {
-    this.creating.set(false);
-  }
-
-  protected open(row: ReferenceRow, kind: Opened): void {
+  protected openEditor(row: ReferenceRow): void {
     this.actionProblem.set(null);
-    this.creating.set(false);
-    this.editing.set({ id: this.idOf(row), kind });
+    this.editing.set({ row });
+    this.drawer().open();
   }
 
-  protected close(): void {
+  /** The drawer has closed, by Save, Cancel, Escape or the scrim: the form goes with it. */
+  protected drawerClosed(): void {
     this.editing.set(null);
   }
 
-  protected remove(row: ReferenceRow): void {
-    void this.removeNow(row);
+  protected saved(): void {
+    const description = this.description();
+    if (description !== null) {
+      const name = capital(description.singular);
+      this.toasts.show(
+        this.editing()?.row === null || this.editing()?.row === undefined
+          ? $localize`:@@platform-admin.reference.toast.added:${name}:NAME: added.`
+          : $localize`:@@platform-admin.reference.toast.saved:${name}:NAME: saved.`,
+      );
+    }
+    this.drawer().close();
   }
 
-  private async removeNow(row: ReferenceRow): Promise<void> {
+  protected askDelete(row: ReferenceRow): void {
+    void this.askDeleteNow(row);
+  }
+
+  private async askDeleteNow(row: ReferenceRow): Promise<void> {
     const description = this.description();
     if (description === null) return;
+    if (!(await this.confirm().ask())) return;
     const id = this.idOf(row);
     this.actionProblem.set(null);
     this.removing.set(id);
     const result = await this.store.remove(description.controller, id, newIntentKey());
     this.removing.set(null);
     if (result.kind === 'ok') {
-      this.close();
+      const name = capital(description.singular);
+      this.toasts.show($localize`:@@platform-admin.reference.toast.deleted:${name}:NAME: deleted.`);
       return;
     }
     this.actionProblem.set(messageOf(result));

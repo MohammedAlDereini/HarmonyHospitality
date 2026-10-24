@@ -72,7 +72,7 @@ describe('hr-tenant-editor', () => {
         {
           provide: ReferenceStore,
           useValue: {
-            table: (controller: string) =>
+            choices: (controller: string) =>
               controller === 'Country' ? table([jordan]) : table([dinar]),
           },
         },
