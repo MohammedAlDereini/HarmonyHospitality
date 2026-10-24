@@ -34,7 +34,7 @@ export function fromPlainResponse<T>(response: HttpResponse<T>): ApiResult<T> {
 }
 
 /** What each refusing status means; a status not listed here is "unavailable". */
-const outcomeByStatus: Record<number, (codes: string[]) => ApiResult<never>> = {
+const outcomeByStatus: Record<number, (codes: string[]) => ApiFailure> = {
   [HttpStatus.badRequest]: (codes) => ({ kind: 'invalid', status: HttpStatus.badRequest, codes }),
   [HttpStatus.unauthorized]: () => ({ kind: 'unauthenticated', status: HttpStatus.unauthorized }),
   [HttpStatus.forbidden]: (codes) => ({ kind: 'forbidden', status: HttpStatus.forbidden, codes }),
@@ -54,7 +54,10 @@ const outcomeByStatus: Record<number, (codes: string[]) => ApiResult<never>> = {
   }),
 };
 
-export function fromError<T>(error: unknown): ApiResult<T> {
+/** Every outcome but ok: what a thrown response becomes. */
+export type ApiFailure = Exclude<ApiResult<never>, { kind: 'ok' }>;
+
+export function fromError(error: unknown): ApiFailure {
   if (!(error instanceof HttpErrorResponse)) {
     return { kind: 'unavailable', status: HttpStatus.network, codes: [unreachable] };
   }

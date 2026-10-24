@@ -242,6 +242,14 @@
           <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="ui.shell.product" datatype="html">
+        <source>Harmony</source>
+        <target>هارموني</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/shell/harmony-titles.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

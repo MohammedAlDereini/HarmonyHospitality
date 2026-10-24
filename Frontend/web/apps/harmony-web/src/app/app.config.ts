@@ -3,6 +3,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { provideHarmonyErrors } from '@harmony/platform/errors';
 import { provideHarmonyHttp } from '@harmony/platform/http';
+import { provideHarmonyTitles } from '@harmony/ui/shell';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -15,6 +16,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHarmonyHttp(),
     provideHarmonyErrors(),
+    provideHarmonyTitles(),
     // No <base> element (the BFF page policy forbids it): the router learns the base here.
     { provide: APP_BASE_HREF, useValue: '/' },
   ],

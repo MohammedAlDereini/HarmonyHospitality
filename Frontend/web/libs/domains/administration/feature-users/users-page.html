@@ -1,0 +1,83 @@
+<h1 i18n="@@administration.users.title">Users</h1>
+<form class="toolbar" (submit)="onSearch($event, search.value)">
+  <label for="users-search" i18n="@@administration.users.search">Search</label>
+  <input
+    id="users-search"
+    #search
+    type="search"
+    autocomplete="off"
+    dir="auto"
+    [value]="store.filters().search"
+  />
+  <button type="submit" class="btn" i18n="@@administration.users.find">Find</button>
+</form>
+@if (store.problem(); as problem) {
+  <p role="alert">
+    {{ problem }}
+    <button
+      type="button"
+      class="btn"
+      (click)="store.reload()"
+      i18n="@@administration.users.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (store.loading()) {
+  <p role="status" i18n="@@administration.users.loading">Loading…</p>
+} @else if (store.rows().length === 0) {
+  <p i18n="@@administration.users.none">No accounts match.</p>
+} @else {
+  <table class="list">
+    <thead>
+      <tr>
+        <th scope="col" i18n="@@administration.users.column.name">Name</th>
+        <th scope="col" i18n="@@administration.users.column.email">Email</th>
+        <th scope="col" i18n="@@administration.users.column.two-step">Two-step</th>
+        <th scope="col" i18n="@@administration.users.column.state">State</th>
+        <th scope="col" i18n="@@administration.users.column.created">Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (user of store.rows(); track user.id) {
+        <tr>
+          <td>
+            <bdi>{{ user.displayName }}</bdi>
+          </td>
+          <td dir="ltr">
+            <bdi>{{ user.email ?? user.userName }}</bdi>
+          </td>
+          <td>{{ twoStepOf(user) }}</td>
+          <td>{{ stateOf(user) }}</td>
+          <td class="num">{{ createdOn(user) }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <nav class="paging" i18n-aria-label="@@administration.users.paging" aria-label="Pages">
+    <button
+      type="button"
+      class="btn"
+      (click)="previous()"
+      [disabled]="!hasPrevious()"
+      i18n="@@administration.users.previous"
+    >
+      Previous
+    </button>
+    <span
+      ><span class="num">{{ from() }}–{{ to() }}</span
+      >&ngsp;<span i18n="@@administration.users.of">of</span>&ngsp;<span class="num">{{
+        store.total()
+      }}</span></span
+    >
+    <button
+      type="button"
+      class="btn"
+      (click)="next()"
+      [disabled]="!hasNext()"
+      i18n="@@administration.users.next"
+    >
+      Next
+    </button>
+  </nav>
+}

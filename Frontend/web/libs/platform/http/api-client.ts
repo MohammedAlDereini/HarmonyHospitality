@@ -61,7 +61,7 @@ export class ApiClient {
             : throwError(() => error),
       }),
       map(toResult),
-      catchError((error: unknown) => of(fromError<T>(error))),
+      catchError((error: unknown) => of<ApiResult<T>>(fromError(error))),
     );
   }
 }

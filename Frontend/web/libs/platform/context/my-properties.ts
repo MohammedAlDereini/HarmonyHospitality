@@ -1,6 +1,7 @@
 import { Injectable, effect, inject, signal, untracked } from '@angular/core';
 import { ApiClient } from '@harmony/platform/http';
 import { SessionStore } from '@harmony/platform/session';
+import { Paged } from '@harmony/shared/domain';
 import { firstValueFrom } from 'rxjs';
 import { PropertyRow, PropertySummary, summaryOf } from './property-summary';
 
@@ -9,12 +10,6 @@ const PAGE_SIZE = 200;
 const FIRST_PAGE = 1;
 
 export const myPropertiesPath = '/api/Property/mine';
-
-/** The part of Identity's PagedResult the app reads. */
-interface Paged<T> {
-  readonly results: readonly T[];
-  readonly totalCount: number;
-}
 
 export type MyPropertiesStatus = 'unknown' | 'loading' | 'ready' | 'refused' | 'unavailable';
 

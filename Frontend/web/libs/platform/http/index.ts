@@ -1,6 +1,6 @@
 export type { ApiError, Envelope } from './envelope';
-export type { ApiResult } from './api-result';
-export { inFlight, keyReused, unreachable } from './api-result';
+export type { ApiFailure, ApiResult } from './api-result';
+export { fromError, inFlight, keyReused, unreachable } from './api-result';
 export type { IntentKey } from './intent-key';
 export { intentHeader, intentWindowMs, isFresh, newIntentKey } from './intent-key';
 export { ApiClient } from './api-client';
