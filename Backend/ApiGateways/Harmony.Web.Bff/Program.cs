@@ -444,10 +444,11 @@ app.MapGet("/bff/logout", async (string? sid, HttpContext http, IHttpClientFacto
         }
     }
 
-    // At sign-out the browser itself wipes what the person left on this site (cached pages, every cookie, local
-    // storage), so a shared front-desk PC hands the next shift nothing. "cookies" reaches the whole registrable domain,
-    // Identity's session cookie included: at sign-out, that is the point. The theme and language hints go too.
-    http.Response.Headers["Clear-Site-Data"] = "\"cache\", \"cookies\", \"storage\"";
+    // At sign-out the browser itself wipes what the person left on this site (cached pages, local storage), so a
+    // shared front-desk PC hands the next shift nothing. Never "cookies": that directive reaches the whole registrable
+    // domain and would sign the person out of the console too (architecture C-15); this host's own session cookie is
+    // removed by the sign-out below, and Identity ends its session through the end-session walk.
+    http.Response.Headers["Clear-Site-Data"] = "\"cache\", \"storage\"";
     await http.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     // Back on the app's own signed-out page (architecture 10), never on a page that would start a sign-in at once.
     await http.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/signed-out" });

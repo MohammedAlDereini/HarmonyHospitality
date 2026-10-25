@@ -15,14 +15,19 @@
 
 	<ItemGroup>
 		<PackageReference Include="Harmony.Core.Identity" Version="*" />
+		<!-- Pulled in transitively at a vulnerable version (GHSA-334f-vvp4-7g6p); named here to take the patched one. -->
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="10.0.13" />
 		<PackageReference Include="Harmony.Core.Localization" Version="*" />
 		<PackageReference Include="Harmony.Core.Logging" Version="*" />
 		<PackageReference Include="Harmony.Core.Notification" Version="*" />
-				<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.3" />
-		<PackageReference Include="Duende.IdentityServer" Version="8.0.9" />
-		<PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="8.0.9" />
-		<PackageReference Include="Duende.IdentityServer.EntityFramework" Version="8.0.9" />
-		<PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.12" />		
+				<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.13" />
+		<PackageReference Include="Duende.IdentityServer" Version="8.0.10" />
+		<PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="8.0.10" />
+		<PackageReference Include="Duende.IdentityServer.EntityFramework" Version="8.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.13" />
+		<!-- Pulled in transitively at vulnerable versions (GHSA-846f-f764-76mx, GHSA-qhrr-8q5h-9q3h); named here to take the patched ones. -->
+		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+		<PackageReference Include="MessagePack" Version="3.1.12" />		
 	</ItemGroup>
 
 	<ItemGroup>
