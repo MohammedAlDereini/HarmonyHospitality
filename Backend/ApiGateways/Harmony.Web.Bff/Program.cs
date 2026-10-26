@@ -188,6 +188,20 @@ builder.Services.AddReverseProxy()
         // session's, attached below. Without a session the call reaches the API with no token at all.
         transforms.AddRequestHeaderRemove("Authorization");
 
+        // Nothing under the services' server-owned prefix passes from a browser: the services clear these too, but the
+        // door that faces the internet drops them first. The hotel the page is about travels as X-Harmony-Property, as is.
+        transforms.AddRequestTransform(context =>
+        {
+            // The literal, not the framework constant (Harmony.Core.Constants.RequestHeaders.ServerOwnedPrefix): the BFF keeps
+            // no reference on the framework's release train for one string.
+            foreach (var name in context.ProxyRequest.Headers.Where(h => h.Key.StartsWith("Framework-", StringComparison.OrdinalIgnoreCase)).Select(h => h.Key).ToList())
+            {
+                context.ProxyRequest.Headers.Remove(name);
+            }
+
+            return ValueTask.CompletedTask;
+        });
+
         // The whole point of the BFF: the browser holds a cookie, the API receives a Bearer token — attached
         // only when a session exists, already refreshed by the cookie refresher on this very request.
         transforms.AddRequestTransform(async context =>
