@@ -87,6 +87,18 @@ public static class SecurityAuditActions
     /// <summary>A hotel's contact list was replaced by its people; the detail is "HOTEL:count".</summary>
     public const string PropertyContactsChanged = "property.contacts-changed";
 
+    /// <summary>The platform made a hotel group (brand, region, owner) for a customer; the detail is the group code.</summary>
+    public const string PropertyGroupCreated = "property-group.created";
+
+    /// <summary>The platform changed a hotel group; the detail is the group code.</summary>
+    public const string PropertyGroupUpdated = "property-group.updated";
+
+    /// <summary>A hotel joined a group; the detail is "GROUP:HOTEL".</summary>
+    public const string PropertyGroupMemberAdded = "property-group.member-added";
+
+    /// <summary>A hotel's membership was closed; the detail is "GROUP:HOTEL".</summary>
+    public const string PropertyGroupMemberEnded = "property-group.member-ended";
+
     /// <summary>A passkey answer of a known account that did not verify, or a passkey removed meanwhile.</summary>
     public const string SignInPasskeyRefused = "sign-in.passkey-refused";
 

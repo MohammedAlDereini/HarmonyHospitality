@@ -17,7 +17,7 @@ namespace Harmony.Identity.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -42,6 +42,66 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.HasKey("SeedTypeName", "SeedType", "SeedVersion");
 
                     b.ToTable("__SeedingHistory", (string)null);
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.GroupMembershipModule.PropertyGroupMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PropertyGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TypeCode")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("PropertyId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TypeCode");
+
+                    b.HasIndex("TenantId", "PropertyId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_PropertyGroupMembers_OneBrandPerHotel")
+                        .HasFilter("[ToUtc] IS NULL AND [TypeCode] = 'Brand'");
+
+                    b.HasIndex("TenantId", "PropertyGroupId", "TypeCode");
+
+                    b.ToTable("PropertyGroupMembers", (string)null);
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.LookupModule.LookupCategory", b =>
@@ -249,6 +309,138 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Permissions", (string)null);
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.BrandDetail", b =>
+                {
+                    b.Property<Guid>("PropertyGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly?>("AgreementEndsOn")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("AgreementStartsOn")
+                        .HasColumnType("date");
+
+                    b.Property<string>("FranchisorName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<Guid?>("LogoFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("RoyaltyPercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ThemeReference")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("TypeCode")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("WebsiteUrl")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.HasKey("PropertyGroupId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "PropertyGroupId", "TypeCode")
+                        .IsUnique();
+
+                    b.ToTable("BrandDetails", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_BrandDetails_TypeCode", "[TypeCode] = 'Brand'");
+                        });
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.PropertyGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ExternalIdentifier")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TypeCode")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("TenantId", "Id", "TypeCode")
+                        .HasName("AK_PropertyGroups_TenantId_Id_TypeCode");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TypeCode");
+
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("UX_PropertyGroups_TenantId_Code");
+
+                    b.ToTable("PropertyGroups", (string)null);
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", b =>
@@ -1705,6 +1897,58 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.ToTable("UserAccountTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.GroupMembershipModule.PropertyGroupMember", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Reference.PropertyGroupTypeRef", null)
+                        .WithMany()
+                        .HasForeignKey("TypeCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.PropertyGroup", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId", "PropertyGroupId", "TypeCode")
+                        .HasPrincipalKey("TenantId", "Id", "TypeCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Harmony.Identity.Domain.Entities.Aggregates.GroupMembershipModule.MembershipPeriod", "Period", b1 =>
+                        {
+                            b1.Property<Guid>("PropertyGroupMemberId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTimeOffset>("FromUtc")
+                                .HasColumnType("datetimeoffset")
+                                .HasColumnName("FromUtc");
+
+                            b1.Property<DateTimeOffset?>("ToUtc")
+                                .HasColumnType("datetimeoffset")
+                                .HasColumnName("ToUtc");
+
+                            b1.HasKey("PropertyGroupMemberId");
+
+                            b1.ToTable("PropertyGroupMembers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PropertyGroupMemberId");
+                        });
+
+                    b.Navigation("Period")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.LookupModule.LookupValue", b =>
                 {
                     b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.LookupModule.LookupCategory", "Category")
@@ -1714,6 +1958,57 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.BrandDetail", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.PropertyGroup", null)
+                        .WithOne("Brand")
+                        .HasForeignKey("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.BrandDetail", "TenantId", "PropertyGroupId", "TypeCode")
+                        .HasPrincipalKey("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.PropertyGroup", "TenantId", "Id", "TypeCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.PropertyGroup", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Reference.PropertyGroupTypeRef", null)
+                        .WithMany()
+                        .HasForeignKey("TypeCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.Precedence", "Precedence", b1 =>
+                        {
+                            b1.Property<Guid>("PropertyGroupId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Value")
+                                .HasColumnType("int")
+                                .HasColumnName("Precedence");
+
+                            b1.HasKey("PropertyGroupId");
+
+                            b1.ToTable("PropertyGroups");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PropertyGroupId");
+                        });
+
+                    b.Navigation("Precedence")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", b =>
@@ -2101,6 +2396,11 @@ namespace Harmony.Identity.Infrastructure.Migrations
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PermissionModule.Permission", b =>
                 {
                     b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.PropertyGroup", b =>
+                {
+                    b.Navigation("Brand");
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", b =>

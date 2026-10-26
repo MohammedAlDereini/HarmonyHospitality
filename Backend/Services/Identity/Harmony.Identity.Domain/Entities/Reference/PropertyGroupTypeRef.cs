@@ -7,6 +7,11 @@
 /// </summary>
 public sealed class PropertyGroupTypeRef : ReferenceEntity
 {
+    public const int CodeMaxLength = 32;
+
+    /// <summary>The one code the schema names: the BrandDetails CHECK and the one-brand-per-hotel index. Every other rule reads IsExclusive.</summary>
+    public const string BrandCode = "Brand";
+
     private PropertyGroupTypeRef()
     {
     }
@@ -25,7 +30,7 @@ public sealed class PropertyGroupTypeRef : ReferenceEntity
     {
         return new PropertyGroupTypeRef
         {
-            Code = ReferenceText.Key(code, 32, nameof(code)),
+            Code = ReferenceText.Key(code, CodeMaxLength, nameof(code)),
             NameEn = ReferenceText.Name(nameEn, 128, nameof(nameEn)),
             NameAr = ReferenceText.Name(nameAr, 128, nameof(nameAr)),
             IsExclusive = isExclusive,
