@@ -1,4 +1,6 @@
+using Harmony.Core.Abstractions;
 using Harmony.Core.Identity.Implementations.Platform;
+using Harmony.Identity.Domain.Repositories;
 using Harmony.Core.Identity.Permissions;
 using Microsoft.AspNetCore.Http;
 
@@ -14,11 +16,17 @@ public class GetMyPermissionsQueryHandler : IRequestHandler<GetMyPermissionsQuer
 {
     private readonly IHttpContextAccessor http;
     private readonly IPlatformPermissionResolver permissions;
+    private readonly ICallContext callContext;
+    private readonly IUserAccountRepository userAccounts;
+    private readonly TimeProvider clock;
 
-    public GetMyPermissionsQueryHandler(IHttpContextAccessor http, IPlatformPermissionResolver permissions)
+    public GetMyPermissionsQueryHandler(IHttpContextAccessor http, IPlatformPermissionResolver permissions, ICallContext callContext, IUserAccountRepository userAccounts, TimeProvider clock)
     {
         this.http = http;
         this.permissions = permissions;
+        this.callContext = callContext;
+        this.userAccounts = userAccounts;
+        this.clock = clock;
     }
 
     public async Task<CallResponse<List<int>>> Handle(GetMyPermissionsQuery request, CancellationToken cancellationToken)
@@ -40,6 +48,16 @@ public class GetMyPermissionsQueryHandler : IRequestHandler<GetMyPermissionsQuer
             foreach (var roleId in roleIds)
             {
                 effective.UnionWith(await this.permissions.GetPermissionsAsync(tenantId, roleId, cancellationToken));
+            }
+
+            // The hotel the call is about adds the roles that reach it: assignments and grants, direct or through a group.
+            if (Guid.TryParse(this.callContext.PropertyId(), out var propertyId) && propertyId != Guid.Empty
+                && Guid.TryParse(user.FindFirst(PlatformClaimTypes.Subject)?.Value, out var userId))
+            {
+                foreach (var roleId in await this.userAccounts.RoleIdsAtHotelAsync(userId, propertyId, this.clock.GetUtcNow(), cancellationToken))
+                {
+                    effective.UnionWith(await this.permissions.GetPermissionsAsync(tenantId, roleId, cancellationToken));
+                }
             }
         }
 

@@ -37,6 +37,12 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
 
     public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
 
+    /// <summary>Roles at one hotel or one group. Changed only through AssignRole / EndAssignment.</summary>
+    public ICollection<RoleAssignment> RoleAssignments { get; private set; } = new List<RoleAssignment>();
+
+    /// <summary>Temporary elevations. Changed only through Grant / RevokeGrant.</summary>
+    public ICollection<AccessGrant> AccessGrants { get; private set; } = new List<AccessGrant>();
+
     public bool CanSignIn => State == AdministrativeState.Active;
 
     public bool IsTwoStepExempt => TwoStepExemptReason is not null;
@@ -187,6 +193,44 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
         {
             BumpSecurityVersion();
         }
+    }
+
+    /// <summary>A role at a hotel or a group. One current assignment per role and scope: a second one is refused (00105 by the handler first).</summary>
+    public RoleAssignment AssignRole(Guid roleId, AssignmentScope scope, DateTimeOffset? endsAtUtc, DateTimeOffset utcNow)
+    {
+        AssertNotTerminated();
+        if (RoleAssignments.Any(a => a.RoleId == roleId && a.Scope == scope && a.IsCurrentAt(utcNow)))
+        {
+            throw new InvalidOperationException("The account already holds this role at this scope.");
+        }
+
+        var assignment = RoleAssignment.New(TenantId, roleId, scope, endsAtUtc);
+        RoleAssignments.Add(assignment);
+        return assignment;
+    }
+
+    /// <summary>Ends an assignment now. Null when the id is not this account's; the assignment itself refuses a second ending.</summary>
+    public RoleAssignment? EndAssignment(Guid assignmentId, DateTimeOffset utcNow)
+    {
+        var assignment = RoleAssignments.FirstOrDefault(a => a.Id == assignmentId);
+        assignment?.End(utcNow);
+        return assignment;
+    }
+
+    public AccessGrant Grant(Guid roleId, AssignmentScope scope, DateTimeOffset fromUtc, DateTimeOffset toUtc, Guid grantedById, string? reason)
+    {
+        AssertNotTerminated();
+        var grant = AccessGrant.New(TenantId, roleId, scope, fromUtc, toUtc, grantedById, reason);
+        AccessGrants.Add(grant);
+        return grant;
+    }
+
+    /// <summary>Revokes a grant now. Null when the id is not this account's; the grant itself refuses a second ending.</summary>
+    public AccessGrant? RevokeGrant(Guid grantId, DateTimeOffset utcNow)
+    {
+        var grant = AccessGrants.FirstOrDefault(g => g.Id == grantId);
+        grant?.Revoke(utcNow);
+        return grant;
     }
 
     // The one rule the revocation design rests on: it never goes down. Identity's own kill switch,

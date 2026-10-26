@@ -71,6 +71,9 @@ public partial class Program
         {
             // The clock the handlers compare contract dates on; a test replaces it with a fixed one.
             builder.Services.AddSingleton(TimeProvider.System);
+
+            // The hotel wall's question (framework PropertyAccessRequirement) is answered by Identity's grants.
+            builder.Services.AddScoped<Harmony.Core.Identity.Permissions.IPropertyAccessChecker, Harmony.Identity.Api.Access.PropertyAccessChecker>();
             builder.Services.AddApplicationService(builder.Configuration);
             builder.Services.AddInfrastructureService(builder.Configuration);
         }

@@ -45,6 +45,8 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<PropertyGroupMember> PropertyGroupMembers { get; set; }
     public DbSet<User> UserAccounts { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<RoleAssignment> RoleAssignments { get; set; }
+    public DbSet<AccessGrant> AccessGrants { get; set; }
     public DbSet<UserDevice> UserDevices { get; set; }
     public DbSet<UserPasskey> UserPasskeys { get; set; }
     public DbSet<SecurityAuditEvent> SecurityAuditEvents { get; set; }

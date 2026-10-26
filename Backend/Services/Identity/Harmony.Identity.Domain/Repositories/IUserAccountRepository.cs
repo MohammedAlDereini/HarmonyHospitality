@@ -11,6 +11,18 @@ public interface IUserAccountRepository : IRepository<User>
     /// <summary>The account with its roles, tracked, for a roles change.</summary>
     public Task<User?> GetWithRolesAsync(Guid id, CancellationToken cancellationToken);
 
+    /// <summary>The account with its roles, assignments and grants, tracked, for a change to any of them.</summary>
+    public Task<User?> GetWithAccessAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// The role ids that reach this hotel for this account right now: assignments and grants naming the hotel, or a group
+    /// the hotel is a current member of. The tenant filter walls the rows.
+    /// </summary>
+    public Task<IReadOnlyList<Guid>> RoleIdsAtHotelAsync(Guid userId, Guid propertyId, DateTimeOffset utcNow, CancellationToken cancellationToken);
+
+    /// <summary>Does the account hold any tenant-wide role (UserRoles): those act at every hotel of the customer.</summary>
+    public Task<bool> HoldsAnyTenantWideRoleAsync(Guid userId, CancellationToken cancellationToken);
+
     /// <summary>
     /// Every account with this normalised user name in ANY tenant, tracked. For the anonymous doors (forgot / reset password),
     /// where no tenant is known yet; the caller acts only when exactly one comes back.

@@ -992,6 +992,136 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.ToTable("TenantSubscriptions", (string)null);
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.AccessGrant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTimeOffset>("FromUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("GrantedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("RevokedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("ToUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("GrantedById");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("TenantId", "UserId", "ToUtc")
+                        .HasDatabaseName("IX_AccessGrants_Account_Window");
+
+                    b.ToTable("AccessGrants", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AccessGrants_OneScope", "([PropertyId] IS NULL AND [PropertyGroupId] IS NOT NULL) OR ([PropertyId] IS NOT NULL AND [PropertyGroupId] IS NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.RoleAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTimeOffset?>("EndsAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("TenantId", "UserId", "EndsAtUtc")
+                        .HasDatabaseName("IX_RoleAssignments_Account_Open");
+
+                    b.ToTable("RoleAssignments", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RoleAssignments_OneScope", "([PropertyId] IS NULL AND [PropertyGroupId] IS NOT NULL) OR ([PropertyId] IS NOT NULL AND [PropertyGroupId] IS NULL)");
+                        });
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2281,6 +2411,118 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.AccessGrant", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
+                        .WithMany()
+                        .HasForeignKey("GrantedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.RoleModule.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
+                        .WithMany("AccessGrants")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.AssignmentScope", "Scope", b1 =>
+                        {
+                            b1.Property<Guid>("AccessGrantId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<Guid?>("PropertyGroupId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("PropertyGroupId");
+
+                            b1.Property<Guid?>("PropertyId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("PropertyId");
+
+                            b1.HasKey("AccessGrantId");
+
+                            b1.HasIndex("PropertyGroupId");
+
+                            b1.HasIndex("PropertyId");
+
+                            b1.ToTable("AccessGrants");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AccessGrantId");
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.PropertyGroup", null)
+                                .WithMany()
+                                .HasForeignKey("PropertyGroupId")
+                                .OnDelete(DeleteBehavior.Restrict);
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", null)
+                                .WithMany()
+                                .HasForeignKey("PropertyId")
+                                .OnDelete(DeleteBehavior.Restrict);
+                        });
+
+                    b.Navigation("Scope")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.RoleAssignment", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.RoleModule.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
+                        .WithMany("RoleAssignments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.AssignmentScope", "Scope", b1 =>
+                        {
+                            b1.Property<Guid>("RoleAssignmentId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<Guid?>("PropertyGroupId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("PropertyGroupId");
+
+                            b1.Property<Guid?>("PropertyId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("PropertyId");
+
+                            b1.HasKey("RoleAssignmentId");
+
+                            b1.HasIndex("PropertyGroupId");
+
+                            b1.HasIndex("PropertyId");
+
+                            b1.ToTable("RoleAssignments");
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.PropertyGroup", null)
+                                .WithMany()
+                                .HasForeignKey("PropertyGroupId")
+                                .OnDelete(DeleteBehavior.Restrict);
+
+                            b1.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", null)
+                                .WithMany()
+                                .HasForeignKey("PropertyId")
+                                .OnDelete(DeleteBehavior.Restrict);
+
+                            b1.WithOwner()
+                                .HasForeignKey("RoleAssignmentId");
+                        });
+
+                    b.Navigation("Scope")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.UserDevice", b =>
                 {
                     b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
@@ -2422,6 +2664,10 @@ namespace Harmony.Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", b =>
                 {
+                    b.Navigation("AccessGrants");
+
+                    b.Navigation("RoleAssignments");
+
                     b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618

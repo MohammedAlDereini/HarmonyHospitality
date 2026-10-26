@@ -99,6 +99,17 @@ public static class SecurityAuditActions
     /// <summary>A hotel's membership was closed; the detail is "GROUP:HOTEL".</summary>
     public const string PropertyGroupMemberEnded = "property-group.member-ended";
 
+    /// <summary>A role was given at a hotel or a group; the detail is "ROLE@HOTEL" or "ROLE@GROUP".</summary>
+    public const string RoleAssigned = "account.role-assigned";
+    public const string RoleAssignmentEnded = "account.role-assignment-ended";
+
+    /// <summary>A temporary elevation; the detail is "ROLE@SCOPE until <ToUtc>".</summary>
+    public const string AccessGranted = "account.access-granted";
+    public const string AccessGrantRevoked = "account.access-grant-revoked";
+
+    /// <summary>A call named a hotel the person may not act at; the detail is the hotel id. Written on the person's own trail.</summary>
+    public const string PropertyAccessRefused = "access.property-refused";
+
     /// <summary>A passkey answer of a known account that did not verify, or a passkey removed meanwhile.</summary>
     public const string SignInPasskeyRefused = "sign-in.passkey-refused";
 

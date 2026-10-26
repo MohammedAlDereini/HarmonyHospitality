@@ -92,4 +92,34 @@ public class UserAccountRepository : BaseRepository<User>, IUserAccountRepositor
 
         return administrators.Count > 0 && administrators.All(a => a.RoleId == roleId);
     }
+
+    public Task<User?> GetWithAccessAsync(Guid id, CancellationToken cancellationToken)
+        => this.context.UserAccounts
+            .Include(u => u.UserRoles)
+            .Include(u => u.RoleAssignments)
+            .Include(u => u.AccessGrants)
+            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+
+    public async Task<IReadOnlyList<Guid>> RoleIdsAtHotelAsync(Guid userId, Guid propertyId, DateTimeOffset utcNow, CancellationToken cancellationToken)
+    {
+        // The groups the hotel is in today: one subquery, inside the wall.
+        var groupsOfHotel = this.context.PropertyGroupMembers
+            .Where(m => m.PropertyId == propertyId && m.Period.ToUtc == null)
+            .Select(m => m.PropertyGroupId);
+
+        var assigned = this.context.RoleAssignments
+            .Where(a => a.UserId == userId && (a.EndsAtUtc == null || a.EndsAtUtc > utcNow))
+            .Where(a => a.Scope.PropertyId == propertyId || (a.Scope.PropertyGroupId != null && groupsOfHotel.Contains(a.Scope.PropertyGroupId.Value)))
+            .Select(a => a.RoleId);
+
+        var granted = this.context.AccessGrants
+            .Where(g => g.UserId == userId && g.FromUtc <= utcNow && g.ToUtc > utcNow && (g.RevokedAtUtc == null || g.RevokedAtUtc > utcNow))
+            .Where(g => g.Scope.PropertyId == propertyId || (g.Scope.PropertyGroupId != null && groupsOfHotel.Contains(g.Scope.PropertyGroupId.Value)))
+            .Select(g => g.RoleId);
+
+        return await assigned.Union(granted).Distinct().ToListAsync(cancellationToken);
+    }
+
+    public Task<bool> HoldsAnyTenantWideRoleAsync(Guid userId, CancellationToken cancellationToken)
+        => this.context.UserRoles.AnyAsync(r => r.UserId == userId, cancellationToken);
 }

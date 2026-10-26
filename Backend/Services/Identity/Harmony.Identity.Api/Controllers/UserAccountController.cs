@@ -19,6 +19,10 @@ using Harmony.Identity.Handler.Queries.UserAccountModule.Passkeys;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Permissions;
 using Harmony.Identity.Handler.Queries.UserAccountModule.Security;
 
+using Harmony.Identity.Domain.Models.UserAccountModule;
+using Harmony.Identity.Handler.Commands.UserAccountModule.Access;
+using Harmony.Identity.Handler.Queries.UserAccountModule.Access;
+
 namespace Harmony.Identity.Api.Controllers;
 
 public class UserAccountController(IMediator mediator, ICallResponseManager callResponseManager) : BaseController(mediator, callResponseManager)
@@ -354,6 +358,56 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
     public async Task<IActionResult> UpdateRoles([FromBody] UpdateUserRolesCommand command)
     {
         var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>A role at one hotel or one group, open-ended or until a moment. 201 with the assignment id.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
+    [RequirePermission(PermissionEnum.AssignUsersToRole)]
+    public async Task<IActionResult> AssignRole([FromBody] AssignRoleCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>Ends an assignment now; the row stays with its end.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.AssignUsersToRole)]
+    public async Task<IActionResult> EndAssignment([FromBody] EndAssignmentCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>A temporary elevation at one hotel or group, for a reason, at most 30 days. 201 with the grant id.</summary>
+    [HttpPost("[action]")]
+    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
+    [RequirePermission(PermissionEnum.AssignUsersToRole)]
+    public async Task<IActionResult> GrantAccess([FromBody] GrantAccessCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>Revokes a grant now; the row stays with its revocation.</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.AssignUsersToRole)]
+    public async Task<IActionResult> RevokeGrant([FromBody] RevokeGrantCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>An account's assignments and grants, current first, with the role and the scope named.</summary>
+    [HttpGet("{id:guid}/access")]
+    [ProducesResponseType(typeof(AccountAccessModel), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewUsers)]
+    public async Task<IActionResult> GetAccess(Guid id)
+    {
+        var response = await this.Mediator.Send(new GetAccountAccessQuery { Id = id });
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 }
