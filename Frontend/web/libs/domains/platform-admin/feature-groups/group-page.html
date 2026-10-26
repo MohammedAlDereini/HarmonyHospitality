@@ -1,0 +1,493 @@
+@if (problem(); as problem) {
+  <p class="empty" role="alert">
+    {{ problem }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="reload()"
+      i18n="@@platform-admin.group.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (group(); as group) {
+  <div class="sec-h head">
+    <span class="code num" dir="ltr">{{ group.code }}</span>
+    <h1>
+      <bdi>{{ name(group) }}</bdi>
+    </h1>
+    <div class="obj">
+      <b dir="ltr">{{ group.typeCode }}</b>
+      <span i18n="@@platform-admin.group.type">Type</span>
+    </div>
+    <div class="obj">
+      <b class="num">{{ group.precedence }}</b>
+      <span i18n="@@platform-admin.group.precedence">Precedence</span>
+    </div>
+    <div class="obj">
+      <b class="num">{{ group.currentMembers }}</b>
+      <span i18n="@@platform-admin.group.hotels">Hotels</span>
+    </div>
+    <div class="obj" [attr.data-s]="group.isActive ? null : 'warn'">
+      @if (group.isActive) {
+        <b i18n="@@platform-admin.group.active">Active</b>
+      } @else {
+        <b i18n="@@platform-admin.group.inactive">Inactive</b>
+      }
+      <span i18n="@@platform-admin.group.state">State</span>
+    </div>
+  </div>
+  @if (group.description; as description) {
+    <p class="line">
+      <bdi>{{ description }}</bdi>
+    </p>
+  }
+  @if (group.brand; as brand) {
+    <section class="part" aria-labelledby="brand-heading">
+      <h2 id="brand-heading" i18n="@@platform-admin.group.brand">Brand</h2>
+      <dl class="facts">
+        <dt i18n="@@platform-admin.group.brand.franchisor">Franchisor</dt>
+        <dd>
+          <bdi>{{ brand.franchisorName ?? '—' }}</bdi>
+        </dd>
+        <dt i18n="@@platform-admin.group.brand.website">Website</dt>
+        <dd dir="ltr">{{ brand.websiteUrl ?? '—' }}</dd>
+        <dt i18n="@@platform-admin.group.brand.theme">Theme</dt>
+        <dd dir="ltr">{{ brand.themeReference ?? '—' }}</dd>
+        <dt i18n="@@platform-admin.group.brand.agreement">Agreement</dt>
+        <dd class="num">
+          {{ brand.agreementStartsOn ?? '—' }} – {{ brand.agreementEndsOn ?? '—' }}
+        </dd>
+        <dt i18n="@@platform-admin.group.brand.royalty">Royalty</dt>
+        <dd class="num">{{ brand.royaltyPercent ?? '—' }}</dd>
+      </dl>
+    </section>
+  }
+  <div class="acts" *hrIfAllowed="manageTenants">
+    <button
+      type="button"
+      class="btn"
+      data-act="edit"
+      (click)="openEditor()"
+      [attr.aria-expanded]="editing()"
+      i18n="@@platform-admin.group.edit"
+    >
+      Edit
+    </button>
+    <button
+      type="button"
+      class="btn"
+      data-act="join"
+      (click)="openJoin(group)"
+      [attr.aria-expanded]="joining()"
+      [disabled]="!group.isActive"
+      i18n="@@platform-admin.group.join"
+    >
+      Add hotel
+    </button>
+  </div>
+  <section class="part" aria-labelledby="members-heading">
+    <h2 id="members-heading">
+      <span i18n="@@platform-admin.group.members">Hotels</span>&ngsp;<span class="num">{{
+        group.currentMembers
+      }}</span>
+    </h2>
+    @if (group.members.length === 0) {
+      <p class="line" i18n="@@platform-admin.group.members.none">No hotel yet.</p>
+    } @else {
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th scope="col" i18n="@@platform-admin.group.member.code">Code</th>
+              <th scope="col" i18n="@@platform-admin.group.member.name">Hotel</th>
+              <th scope="col" i18n="@@platform-admin.group.member.from">From</th>
+              <th scope="col" i18n="@@platform-admin.group.member.to">To</th>
+              <th scope="col" i18n="@@platform-admin.group.member.state">State</th>
+              <th scope="col" class="acts" *hrIfAllowed="manageTenants"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (member of group.members; track member.id) {
+              <tr class="mrow" [attr.data-current]="member.isCurrent">
+                <td class="key" dir="ltr">{{ member.propertyCode }}</td>
+                <td>
+                  <bdi>{{ hotelName(member) }}</bdi>
+                </td>
+                <td class="num">{{ day(member.fromUtc) }}</td>
+                <td class="num">{{ member.toUtc === null ? '' : day(member.toUtc) }}</td>
+                <td>
+                  @if (member.isCurrent) {
+                    <span class="pill on" i18n="@@platform-admin.group.member.current"
+                      >Current</span
+                    >
+                  } @else {
+                    <span class="pill off" i18n="@@platform-admin.group.member.past">Past</span>
+                  }
+                </td>
+                <td class="acts" *hrIfAllowed="manageTenants">
+                  @if (member.isCurrent) {
+                    <button
+                      type="button"
+                      class="tlink"
+                      data-act="end"
+                      (click)="onEnd(member)"
+                      i18n="@@platform-admin.group.member.end"
+                    >
+                      End
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+  <hr-drawer
+    #editorDrawer
+    i18n-heading="@@platform-admin.group.edit.title"
+    heading="Edit group"
+    (closed)="editing.set(false)"
+  >
+    @if (editing()) {
+      <form class="editor" (submit)="onSave($event, group)" novalidate>
+        <div class="fields">
+          <div class="f">
+            <label for="edit-name-en" i18n="@@platform-admin.group.field.name-en"
+              >Name (English)</label
+            >
+            <input
+              id="edit-name-en"
+              class="field"
+              type="text"
+              autocomplete="off"
+              lang="en"
+              dir="ltr"
+              [formField]="form.nameEn"
+            />
+            @if (form.nameEn().touched() && form.nameEn().errors().length > 0) {
+              <p class="field-error" role="alert">
+                @for (error of form.nameEn().errors(); track error.kind) {
+                  <span>{{ error.message }}</span>
+                }
+              </p>
+            }
+          </div>
+          <div class="f">
+            <label for="edit-name-ar" i18n="@@platform-admin.group.field.name-ar"
+              >Name (Arabic)</label
+            >
+            <input
+              id="edit-name-ar"
+              class="field"
+              type="text"
+              autocomplete="off"
+              lang="ar"
+              dir="rtl"
+              [formField]="form.nameAr"
+            />
+            @if (form.nameAr().touched() && form.nameAr().errors().length > 0) {
+              <p class="field-error" role="alert">
+                @for (error of form.nameAr().errors(); track error.kind) {
+                  <span>{{ error.message }}</span>
+                }
+              </p>
+            }
+          </div>
+          <div class="f">
+            <label for="edit-description" i18n="@@platform-admin.group.field.description"
+              >Description (optional)</label
+            >
+            <input
+              id="edit-description"
+              class="field"
+              type="text"
+              autocomplete="off"
+              dir="auto"
+              [formField]="form.description"
+            />
+            @if (form.description().touched() && form.description().errors().length > 0) {
+              <p class="field-error" role="alert">
+                @for (error of form.description().errors(); track error.kind) {
+                  <span>{{ error.message }}</span>
+                }
+              </p>
+            }
+          </div>
+          <div class="f">
+            <label for="edit-precedence" i18n="@@platform-admin.group.field.precedence"
+              >Precedence</label
+            >
+            <input
+              id="edit-precedence"
+              class="field"
+              type="text"
+              inputmode="numeric"
+              dir="ltr"
+              [formField]="form.precedence"
+            />
+            <p
+              class="hint"
+              id="edit-precedence-hint"
+              i18n="@@platform-admin.group.field.precedence.hint"
+            >
+              0 to 1000; higher wins a standards tie.
+            </p>
+            @if (form.precedence().touched() && form.precedence().errors().length > 0) {
+              <p class="field-error" role="alert">
+                @for (error of form.precedence().errors(); track error.kind) {
+                  <span>{{ error.message }}</span>
+                }
+              </p>
+            }
+          </div>
+          <div class="f">
+            <label for="edit-order" i18n="@@platform-admin.group.field.display-order"
+              >Display order</label
+            >
+            <input
+              id="edit-order"
+              class="field"
+              type="text"
+              inputmode="numeric"
+              dir="ltr"
+              [formField]="form.displayOrder"
+            />
+            @if (form.displayOrder().touched() && form.displayOrder().errors().length > 0) {
+              <p class="field-error" role="alert">
+                @for (error of form.displayOrder().errors(); track error.kind) {
+                  <span>{{ error.message }}</span>
+                }
+              </p>
+            }
+          </div>
+          <div class="f">
+            <label for="edit-external" i18n="@@platform-admin.group.field.external"
+              >External identifier (optional)</label
+            >
+            <input
+              id="edit-external"
+              class="field"
+              type="text"
+              autocomplete="off"
+              dir="ltr"
+              [formField]="form.externalIdentifier"
+            />
+            @if (
+              form.externalIdentifier().touched() && form.externalIdentifier().errors().length > 0
+            ) {
+              <p class="field-error" role="alert">
+                @for (error of form.externalIdentifier().errors(); track error.kind) {
+                  <span>{{ error.message }}</span>
+                }
+              </p>
+            }
+          </div>
+          <label class="perm">
+            <input type="checkbox" [formField]="form.isActive" />
+            <span i18n="@@platform-admin.group.field.active">Active</span>
+          </label>
+          @if (isBrand()) {
+            <h3 class="part-title" i18n="@@platform-admin.group.brand.title">Brand</h3>
+            <div class="f">
+              <label for="edit-franchisor" i18n="@@platform-admin.group.field.franchisor"
+                >Franchisor</label
+              >
+              <input
+                id="edit-franchisor"
+                class="field"
+                type="text"
+                autocomplete="off"
+                dir="auto"
+                [formField]="form.franchisorName"
+              />
+              @if (form.franchisorName().touched() && form.franchisorName().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  @for (error of form.franchisorName().errors(); track error.kind) {
+                    <span>{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="edit-website" i18n="@@platform-admin.group.field.website">Website</label>
+              <input
+                id="edit-website"
+                class="field"
+                type="url"
+                autocomplete="off"
+                dir="ltr"
+                [formField]="form.websiteUrl"
+              />
+              @if (form.websiteUrl().touched() && form.websiteUrl().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  @for (error of form.websiteUrl().errors(); track error.kind) {
+                    <span>{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="edit-theme" i18n="@@platform-admin.group.field.theme"
+                >Theme reference</label
+              >
+              <input
+                id="edit-theme"
+                class="field"
+                type="text"
+                autocomplete="off"
+                dir="ltr"
+                [formField]="form.themeReference"
+              />
+              @if (form.themeReference().touched() && form.themeReference().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  @for (error of form.themeReference().errors(); track error.kind) {
+                    <span>{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label
+                for="edit-agreement-starts"
+                i18n="@@platform-admin.group.field.agreement-starts"
+                >Agreement starts on</label
+              >
+              <input
+                id="edit-agreement-starts"
+                class="field"
+                type="date"
+                [formField]="form.agreementStartsOn"
+              />
+            </div>
+            <div class="f">
+              <label for="edit-agreement-ends" i18n="@@platform-admin.group.field.agreement-ends"
+                >Agreement ends on</label
+              >
+              <input
+                id="edit-agreement-ends"
+                class="field"
+                type="date"
+                [formField]="form.agreementEndsOn"
+              />
+              @if (form.agreementEndsOn().touched() && form.agreementEndsOn().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  @for (error of form.agreementEndsOn().errors(); track error.kind) {
+                    <span>{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="edit-royalty" i18n="@@platform-admin.group.field.royalty"
+                >Royalty (percent)</label
+              >
+              <input
+                id="edit-royalty"
+                class="field"
+                type="text"
+                inputmode="decimal"
+                dir="ltr"
+                [formField]="form.royaltyPercent"
+              />
+              @if (form.royaltyPercent().touched() && form.royaltyPercent().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  @for (error of form.royaltyPercent().errors(); track error.kind) {
+                    <span>{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+          }
+        </div>
+        @if (editProblem(); as text) {
+          <p class="field-error" role="alert">{{ text }}</p>
+        }
+        <div class="acts">
+          <button
+            type="submit"
+            class="btn solid"
+            [disabled]="form().submitting()"
+            i18n="@@platform-admin.group.edit.go"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            class="btn"
+            (click)="editorDrawer.close()"
+            i18n="@@platform-admin.group.edit.cancel"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    }
+  </hr-drawer>
+  <hr-drawer
+    #memberDrawer
+    i18n-heading="@@platform-admin.group.join.title"
+    heading="Add hotel"
+    i18n-lead="@@platform-admin.group.join.lead"
+    lead="The hotel joins from now. A hotel carries one brand at a time."
+    (closed)="joining.set(false)"
+  >
+    @if (joining()) {
+      <form class="editor" (submit)="onJoin($event, group)" novalidate>
+        <div class="fields">
+          <div class="f">
+            <label for="join-hotel" i18n="@@platform-admin.group.join.hotel">Hotel</label>
+            <select
+              id="join-hotel"
+              #hotelBox
+              class="field"
+              [value]="chosenHotel()"
+              (change)="chosenHotel.set(hotelBox.value)"
+            >
+              <option value="" i18n="@@platform-admin.group.join.choose">Choose a hotel</option>
+              @for (hotel of joinable(); track hotel.id) {
+                <option [value]="hotel.id">{{ hotelLabel(hotel) }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        @if (joinProblem(); as text) {
+          <p class="field-error" role="alert">{{ text }}</p>
+        }
+        <div class="acts">
+          <button
+            type="submit"
+            class="btn solid"
+            [disabled]="chosenHotel() === ''"
+            i18n="@@platform-admin.group.join.go"
+          >
+            Add
+          </button>
+          <button
+            type="button"
+            class="btn"
+            (click)="memberDrawer.close()"
+            i18n="@@platform-admin.group.join.cancel"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    }
+  </hr-drawer>
+  <hr-confirm-dialog
+    #endAsk
+    tone="stop"
+    i18n-heading="@@platform-admin.group.end.title"
+    heading="End this membership?"
+    i18n-message="@@platform-admin.group.end.message"
+    message="The hotel leaves the group from now. The history stays."
+    i18n-go="@@platform-admin.group.end.go"
+    go="End membership"
+    i18n-stay="@@platform-admin.group.end.stay"
+    stay="Keep it"
+  />
+} @else {
+  <p class="empty" role="status" i18n="@@platform-admin.group.loading">Loading…</p>
+}

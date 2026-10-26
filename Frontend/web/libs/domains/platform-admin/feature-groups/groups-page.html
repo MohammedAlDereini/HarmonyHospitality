@@ -1,0 +1,136 @@
+<ng-template hrPageActions>
+  <button
+    *hrIfAllowed="manageTenants"
+    type="button"
+    class="pbtn primary"
+    (click)="openCreator()"
+    [attr.aria-expanded]="creating()"
+  >
+    <hr-icon name="plus" size="13" />
+    <span i18n="@@platform-admin.groups.add">Add group</span>
+  </button>
+</ng-template>
+<header class="page-head">
+  <div>
+    <h1 i18n="@@platform-admin.groups.title">Groups</h1>
+    <p class="lead" i18n="@@platform-admin.groups.lead">
+      A customer's brands, regions and owners: any named set of hotels. A hotel carries one brand at
+      a time; precedence decides who wins when two groups set the same standard.
+    </p>
+  </div>
+</header>
+<form class="toolbar" (submit)="onSearch($event, search.value)">
+  <div class="tf wide">
+    <label for="groups-search" i18n="@@platform-admin.groups.search">Search</label>
+    <input
+      id="groups-search"
+      #search
+      class="field"
+      type="search"
+      autocomplete="off"
+      dir="auto"
+      i18n-placeholder="@@platform-admin.groups.search-placeholder"
+      placeholder="Code or name"
+      [value]="store.filters().search"
+    />
+  </div>
+  <div class="tf">
+    <label for="groups-type" i18n="@@platform-admin.groups.filter.type">Type</label>
+    <select
+      id="groups-type"
+      #typeBox
+      class="field"
+      [value]="typeValue()"
+      (change)="onType(typeBox.value)"
+    >
+      <option value="" i18n="@@platform-admin.groups.filter.all">All</option>
+      @for (row of types.rows(); track typeCode(row)) {
+        <option [value]="typeCode(row)">{{ typeLabel(row) }}</option>
+      }
+    </select>
+  </div>
+  <div class="tacts">
+    <button type="submit" class="btn" i18n="@@platform-admin.groups.find">Find</button>
+  </div>
+</form>
+@if (store.problem(); as problem) {
+  <p class="empty" role="alert">
+    {{ problem }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="store.reload()"
+      i18n="@@platform-admin.groups.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (store.loading()) {
+  <p class="empty" role="status" i18n="@@platform-admin.groups.loading">Loading…</p>
+} @else if (store.rows().length === 0) {
+  <p class="empty" i18n="@@platform-admin.groups.none">No groups match.</p>
+} @else {
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th scope="col" i18n="@@platform-admin.groups.column.code">Code</th>
+          <th scope="col" i18n="@@platform-admin.groups.column.name">Name</th>
+          <th scope="col" i18n="@@platform-admin.groups.column.type">Type</th>
+          <th scope="col" class="num" i18n="@@platform-admin.groups.column.hotels">Hotels</th>
+          <th scope="col" class="num" i18n="@@platform-admin.groups.column.precedence">
+            Precedence
+          </th>
+          <th scope="col" i18n="@@platform-admin.groups.column.state">State</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (group of store.rows(); track group.id) {
+          <tr class="grow">
+            <td class="key" dir="ltr">{{ group.code }}</td>
+            <td>
+              <a class="nm-link" [routerLink]="[group.id]"
+                ><bdi>{{ name(group) }}</bdi></a
+              >
+              @if (group.externalIdentifier; as external) {
+                <span class="sub" dir="ltr">{{ external }}</span>
+              }
+            </td>
+            <td>
+              <span class="pill sys" dir="ltr">{{ group.typeCode }}</span>
+            </td>
+            <td class="num">{{ group.currentMembers }}</td>
+            <td class="num">{{ group.precedence }}</td>
+            <td>
+              @if (group.isActive) {
+                <span class="pill on" i18n="@@platform-admin.groups.active">Active</span>
+              } @else {
+                <span class="pill warn" data-s="warn" i18n="@@platform-admin.groups.inactive"
+                  >Inactive</span
+                >
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <hr-pager
+    [page]="page()"
+    [pageSize]="pageSize"
+    [total]="store.total()"
+    [loading]="store.loading()"
+    (pageChange)="store.goTo($event)"
+  />
+}
+<hr-drawer
+  #drawer
+  i18n-heading="@@platform-admin.groups.new.title"
+  heading="New group"
+  i18n-lead="@@platform-admin.groups.new.lead"
+  lead="The code and the type are fixed once saved."
+  (closed)="creating.set(false)"
+>
+  @if (creating()) {
+    <hr-group-editor [tenantId]="tenantId()" (done)="saved()" (cancelled)="drawer.close()" />
+  }
+</hr-drawer>

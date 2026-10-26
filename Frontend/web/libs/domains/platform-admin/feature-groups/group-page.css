@@ -1,0 +1,92 @@
+/* One property: the header row, the address, the lines and contacts as tables (ui/data), the edit in the drawer. */
+.head h1 {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 16px;
+}
+.head .obj {
+  margin-inline-start: var(--s4);
+}
+.code {
+  flex: none;
+  min-width: 2.5rem;
+  padding: 2px 8px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-control);
+  background: var(--sunk);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+.line {
+  margin: 0;
+  padding: var(--s2) var(--s6);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  padding: var(--s2) var(--s6);
+}
+.part {
+  padding: var(--s3) 0 0;
+  border-block-start: 1px solid var(--rule);
+}
+.part h2 {
+  margin: 0 var(--s6) var(--s2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+table.data td .nm {
+  font-weight: 600;
+}
+/* The edit form inside the drawer, like every other editor. */
+.editor .fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+.editor .f {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  min-width: 0;
+}
+.editor .f label {
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+.editor .f .field {
+  width: 100%;
+  min-width: 0;
+}
+.editor .acts {
+  padding: var(--s4) 0 0;
+  margin-block-start: var(--s5);
+  border-block-start: 1px solid var(--rule);
+}
+.field-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--stop);
+}
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--s1) var(--s4);
+  margin: 0;
+}
+.facts dt {
+  color: var(--ink-3);
+}
+.facts dd {
+  margin: 0;
+}
+.part-title {
+  margin: var(--s3) 0 0;
+  font-size: 0.95rem;
+  color: var(--ink-2);
+}

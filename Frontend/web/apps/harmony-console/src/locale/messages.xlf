@@ -6,11 +6,11 @@
         <source>Administration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/harmony-console/src/app/app.routes.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">41</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/harmony-console/src/app/app.routes.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">47</context>
         </context-group>
       </trans-unit>
       <trans-unit id="harmony-console.hello.title" datatype="html">
@@ -76,25 +76,32 @@
           <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="ui.shell.nav.groups" datatype="html">
+        <source>Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-console/src/app/places.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="ui.shell.nav.reference" datatype="html">
         <source>Reference data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/harmony-console/src/app/places.ts</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.nav.people" datatype="html">
         <source>People</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/harmony-console/src/app/places.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">51</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.nav.roles" datatype="html">
         <source>Roles</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/harmony-console/src/app/places.ts</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.permissions" datatype="html">
@@ -1138,6 +1145,825 @@
           <context context-type="linenumber">168</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="platform-admin.reference.currencies" datatype="html">
+        <source>Currencies</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.time-zones" datatype="html">
+        <source>Time zones</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.languages" datatype="html">
+        <source>Languages</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.countries" datatype="html">
+        <source>Countries</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.subdivisions" datatype="html">
+        <source>Subdivisions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.cities" datatype="html">
+        <source>Cities</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.property-types" datatype="html">
+        <source>Property types</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.property-group-types" datatype="html">
+        <source>Property group types</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.modules" datatype="html">
+        <source>Modules</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.regulatory-environments" datatype="html">
+        <source>Regulatory environments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.lookup-categories" datatype="html">
+        <source>Lookup categories</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.reference.lookup-values" datatype="html">
+        <source>Lookup values</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/domain/reference-catalogue.ts</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.tenant" datatype="html">
+        <source>Tenant</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">4,5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.tenant.choose" datatype="html">
+        <source>Choose a tenant</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">6,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.type" datatype="html">
+        <source>Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">20,21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.choose" datatype="html">
+        <source>Choose</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">22,23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.type.hint" datatype="html">
+        <source> Fixed once saved. A Brand group carries the brand&apos;s own columns below. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">28,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.code" datatype="html">
+        <source>Code</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">39,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.code.hint" datatype="html">
+        <source> 2 to 32 letters, digits, . - _ like RITZ-CARLTON. Fixed once saved. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">49,51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.name-en" datatype="html">
+        <source>Name (English)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">60,63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.name-ar" datatype="html">
+        <source>Name (Arabic)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">79,82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.description" datatype="html">
+        <source>Description (optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">99,102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.precedence" datatype="html">
+        <source>Precedence</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">118,121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.precedence.hint" datatype="html">
+        <source> 0 to 1000; higher wins a standards tie. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">128,130</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.display-order" datatype="html">
+        <source>Display order</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">140,144</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.external" datatype="html">
+        <source>External identifier (optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">160,163</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.brand.title" datatype="html">
+        <source>Brand</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">179,181</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.franchisor" datatype="html">
+        <source>Franchisor</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">182,185</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.website" datatype="html">
+        <source>Website</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">201,203</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.theme" datatype="html">
+        <source>Theme reference</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">219,221</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.agreement-starts" datatype="html">
+        <source>Agreement starts on</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">238,241</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.agreement-ends" datatype="html">
+        <source>Agreement ends on</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">249,252</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.royalty" datatype="html">
+        <source>Royalty (percent)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">267,270</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.new.go" datatype="html">
+        <source> Create group </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">294,296</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.cancel" datatype="html">
+        <source> Cancel </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">297,300</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.try-again" datatype="html">
+        <source> Try again </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.type" datatype="html">
+        <source>Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">20,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.precedence" datatype="html">
+        <source>Precedence</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">24,27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.hotels" datatype="html">
+        <source>Hotels</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">28,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.active" datatype="html">
+        <source>Active</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">32,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.inactive" datatype="html">
+        <source>Inactive</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">34,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.state" datatype="html">
+        <source>State</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">36,39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand" datatype="html">
+        <source>Brand</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">46,48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.franchisor" datatype="html">
+        <source>Franchisor</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">48,50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.website" datatype="html">
+        <source>Website</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">52,53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.theme" datatype="html">
+        <source>Theme</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">54,55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.agreement" datatype="html">
+        <source>Agreement</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">56,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.royalty" datatype="html">
+        <source>Royalty</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">60,61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.edit" datatype="html">
+        <source> Edit </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">74,77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join" datatype="html">
+        <source> Add hotel </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">85,88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.members" datatype="html">
+        <source>Hotels</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">90,91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.members.none" datatype="html">
+        <source>No hotel yet.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">95,97</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.code" datatype="html">
+        <source>Code</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">101,102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.name" datatype="html">
+        <source>Hotel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">102,103</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.from" datatype="html">
+        <source>From</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">103,104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.to" datatype="html">
+        <source>To</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">105</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.state" datatype="html">
+        <source>State</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">105,106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.current" datatype="html">
+        <source>Current</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">121,123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.past" datatype="html">
+        <source>Past</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">124,126</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.end" datatype="html">
+        <source> End </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">136,137</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.edit.title" datatype="html">
+        <source>Edit group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">150,153</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.name-en" datatype="html">
+        <source>Name (English)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">158,161</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.name-ar" datatype="html">
+        <source>Name (Arabic)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">179,182</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.description" datatype="html">
+        <source>Description (optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">200,203</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.precedence" datatype="html">
+        <source>Precedence</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">220,223</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.precedence.hint" datatype="html">
+        <source> 0 to 1000; higher wins a standards tie. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">235,237</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.display-order" datatype="html">
+        <source>Display order</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">247,250</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.external" datatype="html">
+        <source>External identifier (optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">267,270</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.active" datatype="html">
+        <source>Active</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">289,291</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.title" datatype="html">
+        <source>Brand</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">292,294</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.franchisor" datatype="html">
+        <source>Franchisor</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">295,298</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.website" datatype="html">
+        <source>Website</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">314,316</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.theme" datatype="html">
+        <source>Theme reference</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">333,336</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.agreement-starts" datatype="html">
+        <source>Agreement starts on</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">355,358</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.agreement-ends" datatype="html">
+        <source>Agreement ends on</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">366,369</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.royalty" datatype="html">
+        <source>Royalty (percent)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">384,387</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.edit.go" datatype="html">
+        <source> Save </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">414,416</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.edit.cancel" datatype="html">
+        <source> Cancel </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">422,425</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.title" datatype="html">
+        <source>Add hotel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">431,432</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.lead" datatype="html">
+        <source>The hotel joins from now. A hotel carries one brand at a time.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">433,436</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.hotel" datatype="html">
+        <source>Hotel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">440,442</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.choose" datatype="html">
+        <source>Choose a hotel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">448,449</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.go" datatype="html">
+        <source> Add </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">465,467</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.cancel" datatype="html">
+        <source> Cancel </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">473,476</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.end.title" datatype="html">
+        <source>End this membership?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">483,484</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.end.message" datatype="html">
+        <source>The hotel leaves the group from now. The history stays.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">485,487</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.end.go" datatype="html">
+        <source>End membership</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">487,488</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.end.stay" datatype="html">
+        <source>Keep it</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">490,492</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.loading" datatype="html">
+        <source>Loading…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">492,494</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.toast.joined" datatype="html">
+        <source>Hotel added to the group.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.ts</context>
+          <context context-type="linenumber">251</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.toast.ended" datatype="html">
+        <source>Membership ended.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.ts</context>
+          <context context-type="linenumber">263</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.toast.saved" datatype="html">
+        <source>Group saved.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.ts</context>
+          <context context-type="linenumber">287</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.add" datatype="html">
+        <source>Add group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">10,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.title" datatype="html">
+        <source>Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">15,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.lead" datatype="html">
+        <source> A customer&apos;s brands, regions and owners: any named set of hotels. A hotel carries one brand at a time; precedence decides who wins when two groups set the same standard. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">17,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.search" datatype="html">
+        <source>Search</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">24,26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.search-placeholder" datatype="html">
+        <source>Code or name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">33,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.filter.type" datatype="html">
+        <source>Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">38,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.filter.all" datatype="html">
+        <source>All</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">46,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.find" datatype="html">
+        <source>Find</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">53,56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.try-again" datatype="html">
+        <source> Try again </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">64,67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.loading" datatype="html">
+        <source>Loading…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">68,69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.none" datatype="html">
+        <source>No groups match.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">70,72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.code" datatype="html">
+        <source>Code</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">76,77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.name" datatype="html">
+        <source>Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">77,78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.type" datatype="html">
+        <source>Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">78,79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.hotels" datatype="html">
+        <source>Hotels</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">79,80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.precedence" datatype="html">
+        <source> Precedence </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">81,83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.state" datatype="html">
+        <source>State</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">83,87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.active" datatype="html">
+        <source>Active</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">105,107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.inactive" datatype="html">
+        <source>Inactive</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">108,111</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.new.title" datatype="html">
+        <source>New group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">128,129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.new.lead" datatype="html">
+        <source>The code and the type are fixed once saved.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">130,133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.toast.added" datatype="html">
+        <source>Group added.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.ts</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.page-title" datatype="html">
+        <source>Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/routes.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.page-title" datatype="html">
+        <source>Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/routes.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.crumb" datatype="html">
+        <source>Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/routes.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="platform-admin.properties.add" datatype="html">
         <source>Add property</source>
         <context-group purpose="location">
@@ -1808,7 +2634,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">774</context>
+          <context context-type="linenumber">775</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.category.choose" datatype="html">
@@ -1826,11 +2652,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">155</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">633</context>
+          <context context-type="linenumber">634</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.filter.apply" datatype="html">
@@ -1876,7 +2702,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">156</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.cell.inactive" datatype="html">
@@ -1887,7 +2713,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">156</context>
+          <context context-type="linenumber">157</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.cell.yes" datatype="html">
@@ -2094,1073 +2920,989 @@
         <source>Name (English)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.name-ar" datatype="html">
         <source>Name (Arabic)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.active" datatype="html">
         <source>Active</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">51</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">787</context>
+          <context context-type="linenumber">788</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.active" datatype="html">
         <source>Untick to retire the row: it stays, because other rows point at it, but is offered to nobody new.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.country" datatype="html">
         <source>Country</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">57</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.owner-service" datatype="html">
         <source>Owning service</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.description" datatype="html">
         <source>Description</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.description" datatype="html">
         <source>A sentence for the next administrator: what the rows are used for.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">99</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.name" datatype="html">
         <source>Name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">103</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.global" datatype="html">
         <source>Global: every tenant sees it</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.global" datatype="html">
         <source>Chosen once: a global row belongs to the platform and shows in every hotel; a tenant row stays with its tenant.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.code" datatype="html">
         <source>Code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">119</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.name-en" datatype="html">
         <source>English name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">120</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.name-ar" datatype="html">
         <source>Arabic name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">121</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.state" datatype="html">
         <source>State</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">121</context>
+          <context context-type="linenumber">122</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.name" datatype="html">
         <source>Name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.country" datatype="html">
         <source>Country</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.kind" datatype="html">
         <source>Kind</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">125</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.owner-service" datatype="html">
         <source>Owner service</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.filter.search" datatype="html">
         <source>Search</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">145</context>
+          <context context-type="linenumber">146</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.filter.search-placeholder" datatype="html">
         <source>code or name, 2+ characters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">147</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.currencies" datatype="html">
-        <source>Currencies</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">148</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.currencies.singular" datatype="html">
         <source>currency</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">173</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.currencies.description" datatype="html">
         <source>The currencies a hotel can price, invoice and pay in. Minor units (2 or 3 decimals) come from the money registry, never typed, so money rounds the same everywhere.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">173</context>
+          <context context-type="linenumber">174</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.currency-code" datatype="html">
         <source>Currency code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">178</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.currency-code" datatype="html">
         <source>3 letters from the ISO 4217 list, like JOD, SAR or AED. Must be a currency Harmony can price in. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">180</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.currency-name" datatype="html">
         <source>As printed on invoices, like Jordanian dinar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">184</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.decimals" datatype="html">
         <source>Decimals</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">194</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.time-zones" datatype="html">
-        <source>Time zones</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">195</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.time-zones.singular" datatype="html">
         <source>time zone</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">208</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.time-zones.description" datatype="html">
         <source>The clocks hotels run on: business date, night audit, check-in time. A city points at one, so a hotel in Jordan can never be saved with a Riyadh clock.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">209</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.time-zone-id" datatype="html">
         <source>Time zone</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">214</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.time-zone-id" datatype="html">
         <source>The IANA zone id, Region/City, like Asia/Amman or Asia/Riyadh. One per real zone (Dubai and Muscat share Asia/Dubai). The server must recognise it. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">220</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.time-zone-name" datatype="html">
         <source>What people read in the dropdown, like Amman (Jordan).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">223</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.zone" datatype="html">
         <source>Zone</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">228</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.languages" datatype="html">
-        <source>Languages</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">239</context>
+          <context context-type="linenumber">229</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.languages.singular" datatype="html">
         <source>language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">241</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.languages.description" datatype="html">
         <source>The languages guests and staff use: confirmation mails, registration cards and screens come out in them.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">241</context>
+          <context context-type="linenumber">242</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.language-code" datatype="html">
         <source>Language code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">245</context>
+          <context context-type="linenumber">246</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.language-code" datatype="html">
         <source>2 letters from the ISO 639-1 list, like ar, en or fr. Stored lower-case. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">247</context>
+          <context context-type="linenumber">248</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.language-name" datatype="html">
         <source>The name an administrator reads, like Arabic.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">251</context>
+          <context context-type="linenumber">252</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.name-native" datatype="html">
         <source>Native name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">256</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.language-native" datatype="html">
         <source>The name in the language itself, what a speaker reads when choosing it: العربية, Français, 日本語.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">260</context>
+          <context context-type="linenumber">261</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.rtl" datatype="html">
         <source>Written right to left (Arabic, Hebrew, Urdu): screens flip their layout</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">264</context>
+          <context context-type="linenumber">265</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.native-name" datatype="html">
         <source>Native name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">274</context>
+          <context context-type="linenumber">275</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.rtl" datatype="html">
         <source>Right to left</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">279</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.countries" datatype="html">
-        <source>Countries</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">291</context>
+          <context context-type="linenumber">280</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.countries.singular" datatype="html">
         <source>country</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">292</context>
+          <context context-type="linenumber">293</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.countries.description" datatype="html">
         <source>Where hotels, companies and guests are from. From the country Harmony knows the currency to propose, the regions and cities to offer, the dial code, and later the tax and legal regimes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">293</context>
+          <context context-type="linenumber">294</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.country-code" datatype="html">
         <source>Country code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">297</context>
+          <context context-type="linenumber">298</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.country-code" datatype="html">
         <source>2 letters from the ISO 3166-1 list, like JO, SA or AE. Addresses, nationalities and tax rules key on it. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">299</context>
+          <context context-type="linenumber">300</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.alpha3" datatype="html">
         <source>Country code, 3 letters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">304</context>
+          <context context-type="linenumber">305</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.country-alpha3" datatype="html">
         <source>The same country in its 3-letter ISO form, like JOR, SAU or ARE: passports, bank files and e-invoicing use this one. Not the currency.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">312</context>
+          <context context-type="linenumber">313</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.country-name" datatype="html">
         <source>Like Jordan or Saudi Arabia.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">314</context>
+          <context context-type="linenumber">315</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.dial-code" datatype="html">
         <source>Phone dial code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">318</context>
+          <context context-type="linenumber">319</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.country-dial" datatype="html">
         <source>A plus sign and the country digits, like +962 or +966. Phone numbers are stored against it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">325</context>
+          <context context-type="linenumber">326</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.default-currency" datatype="html">
         <source>Default currency</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">330</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.country-currency" datatype="html">
         <source>What a hotel in this country prices in unless told otherwise. Add the currency first if it is not in the list.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">333</context>
+          <context context-type="linenumber">334</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.alpha3" datatype="html">
         <source>3-letter code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">341</context>
+          <context context-type="linenumber">342</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.dial-code" datatype="html">
         <source>Dial code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">346</context>
+          <context context-type="linenumber">347</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.currency" datatype="html">
         <source>Currency</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">349</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.subdivisions" datatype="html">
-        <source>Subdivisions</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">360</context>
+          <context context-type="linenumber">350</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.subdivisions.singular" datatype="html">
         <source>subdivision</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">361</context>
+          <context context-type="linenumber">362</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.subdivisions.description" datatype="html">
         <source>Governorates, regions, emirates, states: the level between a country and its cities. Addresses and reports group by them.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">362</context>
+          <context context-type="linenumber">363</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.subdivision-country" datatype="html">
         <source>The country this subdivision belongs to. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">366</context>
+          <context context-type="linenumber">367</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.subdivision-code" datatype="html">
         <source>Subdivision code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">369</context>
+          <context context-type="linenumber">370</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.subdivision-code" datatype="html">
         <source>From the ISO 3166-2 list: the country code, a hyphen, then 1 to 3 letters or digits, like JO-AM (Amman) or SA-01 (Riyadh). Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">371</context>
+          <context context-type="linenumber">372</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.subdivision-name" datatype="html">
         <source>Like Amman or Riyadh.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">374</context>
+          <context context-type="linenumber">375</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.kind" datatype="html">
         <source>Kind</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">378</context>
+          <context context-type="linenumber">379</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.subdivision-kind" datatype="html">
         <source>What this level is called in that country: Governorate, Region, Emirate, State, Province.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">382</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.cities" datatype="html">
-        <source>Cities</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">398</context>
+          <context context-type="linenumber">383</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.cities.singular" datatype="html">
         <source>city</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">399</context>
+          <context context-type="linenumber">400</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.cities.description" datatype="html">
         <source>Where a hotel stands. A city carries its country, subdivision and time zone, so choosing it fills all three for the hotel.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">400</context>
+          <context context-type="linenumber">401</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.city-country" datatype="html">
         <source>Fixed once saved: the city id is derived from the country and the English name.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">404</context>
+          <context context-type="linenumber">405</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.subdivision" datatype="html">
         <source>Subdivision</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">408</context>
+          <context context-type="linenumber">409</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.city-subdivision" datatype="html">
         <source>The governorate or region the city is in, from that country&apos;s list.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">417</context>
+          <context context-type="linenumber">418</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.city-name" datatype="html">
         <source>Like Amman or Riyadh. One name per country.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">420</context>
+          <context context-type="linenumber">421</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.time-zone" datatype="html">
         <source>Time zone</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">425</context>
+          <context context-type="linenumber">426</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.city-time-zone" datatype="html">
         <source>The clock a hotel in this city runs on.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">429</context>
+          <context context-type="linenumber">430</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.latitude" datatype="html">
         <source>Latitude</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">433</context>
+          <context context-type="linenumber">434</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.city-latitude" datatype="html">
         <source>Decimal degrees, -90 to 90 (Amman 31.95). For maps and distances.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">438</context>
+          <context context-type="linenumber">439</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.longitude" datatype="html">
         <source>Longitude</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">442</context>
+          <context context-type="linenumber">443</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.city-longitude" datatype="html">
         <source>Decimal degrees, -180 to 180 (Amman 35.91).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">447</context>
+          <context context-type="linenumber">448</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.subdivision" datatype="html">
         <source>Subdivision</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">457</context>
+          <context context-type="linenumber">458</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.time-zone" datatype="html">
         <source>Time zone</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">462</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.property-types" datatype="html">
-        <source>Property types</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">473</context>
+          <context context-type="linenumber">463</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.property-types.singular" datatype="html">
         <source>property type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">474</context>
+          <context context-type="linenumber">475</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.property-types.description" datatype="html">
         <source>What kind of place a property is: hotel, hostel, resort, serviced apartments. A row, so a new type needs no release.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">475</context>
+          <context context-type="linenumber">476</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.type-code" datatype="html">
         <source>Type code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">479</context>
+          <context context-type="linenumber">480</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.type-code" datatype="html">
         <source>A short fixed code, like Hotel, Hostel or Resort: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">481</context>
+          <context context-type="linenumber">482</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.type-name" datatype="html">
         <source>Like Hotel or Serviced apartments.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">485</context>
+          <context context-type="linenumber">486</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.display-order" datatype="html">
         <source>Display order</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">490</context>
+          <context context-type="linenumber">491</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.display-order" datatype="html">
         <source>Position in lists: 1 shows first. Zero or more.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">494</context>
+          <context context-type="linenumber">495</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.order" datatype="html">
         <source>Order</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">501</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.property-group-types" datatype="html">
-        <source>Property group types</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">516</context>
+          <context context-type="linenumber">502</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.property-group-types.singular" datatype="html">
         <source>group type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">517</context>
+          <context context-type="linenumber">518</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.property-group-types.description" datatype="html">
         <source>The ways hotels are grouped: by brand, by region, by owner. An exclusive type allows one group per property (one brand per hotel). A system row is one Harmony&apos;s own code relies on.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">518</context>
+          <context context-type="linenumber">519</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.group-type-code" datatype="html">
         <source>Group type code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">522</context>
+          <context context-type="linenumber">523</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.group-type-code" datatype="html">
         <source>A short fixed code, like Brand, Region or Owner: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">524</context>
+          <context context-type="linenumber">525</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.group-type-name" datatype="html">
         <source>Like Brand or Region.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">527</context>
+          <context context-type="linenumber">528</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.exclusive" datatype="html">
         <source>Exclusive: a property can belong to only one group of this type (one brand per hotel)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">531</context>
+          <context context-type="linenumber">532</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.system" datatype="html">
         <source>System row: Harmony&apos;s code relies on it; it can be renamed later but its exclusivity is locked</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">536</context>
+          <context context-type="linenumber">537</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.exclusive" datatype="html">
         <source>Exclusive</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">547</context>
+          <context context-type="linenumber">548</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.system" datatype="html">
         <source>System</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">553</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.modules" datatype="html">
-        <source>Modules</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">564</context>
+          <context context-type="linenumber">554</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.modules.singular" datatype="html">
         <source>module</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">565</context>
+          <context context-type="linenumber">566</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.modules.description" datatype="html">
         <source>What a customer subscribes to: per hotel (reservations, POS) or once for the whole customer (loyalty, multi-property). Each service checks subscription lines against these codes, so a code never changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">566</context>
+          <context context-type="linenumber">567</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.module-code" datatype="html">
         <source>Module code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">570</context>
+          <context context-type="linenumber">571</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.module-code" datatype="html">
         <source>What the owning service checks, like pms.core or multi.property: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">572</context>
+          <context context-type="linenumber">573</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.module-name" datatype="html">
         <source>What a salesperson reads, like PMS core or Multiple properties.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">576</context>
+          <context context-type="linenumber">577</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.module-owner" datatype="html">
         <source>The service that enforces it, like Identity, Fiscal or Guest.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">579</context>
+          <context context-type="linenumber">580</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.level" datatype="html">
         <source>Sold per</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">584</context>
+          <context context-type="linenumber">585</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.level.property" datatype="html">
         <source>Property (one hotel; the subscription line names the hotel and its rooms)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">590</context>
+          <context context-type="linenumber">591</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.level.tenant" datatype="html">
         <source>Tenant (once for the whole customer, like loyalty or multi-property)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">594</context>
+          <context context-type="linenumber">595</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.module-level" datatype="html">
         <source>Hotel modules are sold per property; chain-wide modules to the company.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">597</context>
+          <context context-type="linenumber">598</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.has-limit" datatype="html">
         <source>Has a limit: a subscription line carries a number (rooms, terminals)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">601</context>
+          <context context-type="linenumber">602</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.sold-per" datatype="html">
         <source>Sold per</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">611</context>
+          <context context-type="linenumber">612</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">630</context>
+          <context context-type="linenumber">631</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.has-limit" datatype="html">
         <source>Has a limit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">616</context>
+          <context context-type="linenumber">617</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.level.property.short" datatype="html">
         <source>Property</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">636</context>
+          <context context-type="linenumber">637</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.level.tenant.short" datatype="html">
         <source>Tenant</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">640</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.regulatory-environments" datatype="html">
-        <source>Regulatory environments</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">651</context>
+          <context context-type="linenumber">641</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.regulatory-environments.singular" datatype="html">
         <source>regulatory environment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">652</context>
+          <context context-type="linenumber">653</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.regulatory-environments.description" datatype="html">
         <source>The legal, tax, accounting and accommodation regimes a hotel lives under, one row per country and regime. A hotel in Jordan is under JO-GST; the Fiscal service knows what that means.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">653</context>
+          <context context-type="linenumber">654</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.regime-code" datatype="html">
         <source>Regime code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">657</context>
+          <context context-type="linenumber">658</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.regime-code" datatype="html">
         <source>A short fixed code, usually country and regime, like JO-GST, SA-VAT or JO-LEGAL: 2 to 32 letters, digits, dots, dashes or underscores. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">659</context>
+          <context context-type="linenumber">660</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.field.regime-kind" datatype="html">
         <source>Kind of regime</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">664</context>
+          <context context-type="linenumber">665</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.legal" datatype="html">
         <source>Legal (companies law, licensing)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">671</context>
+          <context context-type="linenumber">672</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.tax" datatype="html">
         <source>Tax (VAT, sales tax, tourism levy)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">675</context>
+          <context context-type="linenumber">676</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.accounting" datatype="html">
         <source>Accounting (IFRS, local GAAP)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">679</context>
+          <context context-type="linenumber">680</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.accommodation" datatype="html">
         <source>Accommodation (tourism and hotel rules)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">683</context>
+          <context context-type="linenumber">684</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.regime-kind" datatype="html">
         <source>Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">686</context>
+          <context context-type="linenumber">687</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.regime-country" datatype="html">
         <source>The country whose regime this is. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">689</context>
+          <context context-type="linenumber">690</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.regime-name" datatype="html">
         <source>Like Jordan general sales tax or Saudi VAT.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">692</context>
+          <context context-type="linenumber">693</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.regime-owner" datatype="html">
         <source>The service whose rules this regime stands for: Fiscal for tax and accounting, Identity for legal, Guest for accommodation.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">696</context>
+          <context context-type="linenumber">697</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.filter.all-kinds" datatype="html">
         <source>All kinds</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">715</context>
+          <context context-type="linenumber">716</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.legal.short" datatype="html">
         <source>Legal</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">716</context>
+          <context context-type="linenumber">717</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.tax.short" datatype="html">
         <source>Tax</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">717</context>
+          <context context-type="linenumber">718</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.accounting.short" datatype="html">
         <source>Accounting</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">720</context>
+          <context context-type="linenumber">721</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.kind.accommodation.short" datatype="html">
         <source>Accommodation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">724</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.lookup-categories" datatype="html">
-        <source>Lookup categories</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">735</context>
+          <context context-type="linenumber">725</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.lookup-categories.singular" datatype="html">
         <source>lookup category</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">736</context>
+          <context context-type="linenumber">737</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.lookup-categories.description" datatype="html">
         <source>The named lists screens choose from (guest titles, room features, payment reasons): a category is the list, its values are the choices. Global ones show in every hotel.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">737</context>
+          <context context-type="linenumber">738</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.category-name" datatype="html">
         <source>What the list is called where a screen offers it, like Guest title or Room feature.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">741</context>
+          <context context-type="linenumber">742</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.description" datatype="html">
         <source>Description</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">750</context>
+          <context context-type="linenumber">751</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">797</context>
+          <context context-type="linenumber">798</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.column.global" datatype="html">
         <source>Global</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">754</context>
+          <context context-type="linenumber">755</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">802</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="platform-admin.reference.lookup-values" datatype="html">
-        <source>Lookup values</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">767</context>
+          <context context-type="linenumber">803</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.lookup-values.singular" datatype="html">
         <source>lookup value</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">768</context>
+          <context context-type="linenumber">769</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.lookup-values.description" datatype="html">
         <source>The choices inside one category, in the order and words a screen shows them. Choose the category first; retire a value rather than delete it once it has been used.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">769</context>
+          <context context-type="linenumber">770</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.value-category" datatype="html">
         <source>The list this value belongs to. Fixed once saved.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">779</context>
+          <context context-type="linenumber">780</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.value-name" datatype="html">
         <source>The words the screen shows, like Mr, Mrs or Sea view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">782</context>
+          <context context-type="linenumber">783</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reference.hint.value-active" datatype="html">
         <source>Untick to retire the value: what was chosen before keeps it; new choices do not see it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/platform-admin/feature-reference-data/tables.ts</context>
-          <context context-type="linenumber">789</context>
+          <context context-type="linenumber">790</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform-admin.reason.cancel" datatype="html">

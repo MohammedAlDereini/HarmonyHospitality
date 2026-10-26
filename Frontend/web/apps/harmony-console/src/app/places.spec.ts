@@ -4,7 +4,7 @@ import { AccessStore, Permission } from '@harmony/platform/access';
 import { SHELL_PLACES } from '@harmony/ui/shell';
 import { providePlatformPlaces } from './places';
 
-const PLATFORM_ITEMS = 4;
+const PLATFORM_ITEMS = 5;
 const REFERENCE_TABLES = 12;
 const OWN_ITEMS = 2;
 
@@ -36,6 +36,7 @@ describe('the platform places', () => {
     expect(places.dock().map((place) => place.link.join('/'))).toEqual([
       '/tenants',
       '/properties',
+      '/groups',
       '/reference',
       '/people',
       '/roles',
@@ -45,6 +46,7 @@ describe('the platform places', () => {
       'Platform:Home',
       'Platform:Tenants',
       'Platform:Properties',
+      'Platform:Groups',
       'Platform:Reference data',
     ]);
     // Every reference table is one place of its own, between the platform's things and its own people.

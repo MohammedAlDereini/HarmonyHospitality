@@ -15,6 +15,16 @@ export type {
   PropertyUpdate,
 } from './property';
 export { propertyTitle } from './property';
+export type {
+  BrandDetail,
+  BrandDraft,
+  GroupDraft,
+  GroupFilters,
+  GroupMember,
+  GroupUpdate,
+  PropertyGroup,
+} from './group';
+export { BRAND_TYPE_CODE, groupTitle, isBrandType } from './group';
 export type { ReferenceCatalogueEntry } from './reference-catalogue';
 export { referenceCatalogue, referenceTitle } from './reference-catalogue';
 export type {

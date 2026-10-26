@@ -19,6 +19,16 @@ export {
   propertyPath,
   updatePropertyPath,
 } from './properties-store';
+export {
+  GROUPS_PAGE_SIZE,
+  GroupsStore,
+  addMemberPath,
+  createGroupPath,
+  endMembershipPath,
+  groupPath,
+  groupsPath,
+  updateGroupPath,
+} from './groups-store';
 export type {
   OptionRows,
   ReferenceFilters,

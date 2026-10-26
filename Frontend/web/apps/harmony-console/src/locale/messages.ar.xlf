@@ -6066,6 +6066,854 @@
           <context context-type="linenumber">199</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="ui.shell.nav.groups" datatype="html">
+        <source>Groups</source>
+        <target>المجموعات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-console/src/app/places.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.tenant" datatype="html">
+        <source>Tenant</source>
+        <target>المستأجر</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">4,5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.tenant.choose" datatype="html">
+        <source>Choose a tenant</source>
+        <target>اختر مستأجراً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">6,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.type" datatype="html">
+        <source>Type</source>
+        <target>النوع</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">20,21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.choose" datatype="html">
+        <source>Choose</source>
+        <target>اختر</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">22,23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.type.hint" datatype="html">
+        <source> Fixed once saved. A Brand group carries the brand&apos;s own columns below. </source>
+        <target>ثابت بعد الحفظ. مجموعة من نوع «علامة» تحمل بيانات العلامة أدناه.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">28,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.code" datatype="html">
+        <source>Code</source>
+        <target>الرمز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">39,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.code.hint" datatype="html">
+        <source> 2 to 32 letters, digits, . - _ like RITZ-CARLTON. Fixed once saved. </source>
+        <target>من 2 إلى 32 حرفاً أو رقماً أو . - _ مثل RITZ-CARLTON. ثابت بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">49,51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.name-en" datatype="html">
+        <source>Name (English)</source>
+        <target>الاسم (بالإنجليزية)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">60,63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.name-ar" datatype="html">
+        <source>Name (Arabic)</source>
+        <target>الاسم (بالعربية)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">79,82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.description" datatype="html">
+        <source>Description (optional)</source>
+        <target>الوصف (اختياري)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">99,102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.precedence" datatype="html">
+        <source>Precedence</source>
+        <target>الأسبقية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">118,121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.precedence.hint" datatype="html">
+        <source> 0 to 1000; higher wins a standards tie. </source>
+        <target>من 0 إلى 1000؛ الأعلى يغلب عند تعادل المعايير.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">128,130</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.display-order" datatype="html">
+        <source>Display order</source>
+        <target>ترتيب العرض</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">140,144</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.external" datatype="html">
+        <source>External identifier (optional)</source>
+        <target>المعرّف الخارجي (اختياري)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">160,163</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.brand.title" datatype="html">
+        <source>Brand</source>
+        <target>العلامة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">179,181</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.franchisor" datatype="html">
+        <source>Franchisor</source>
+        <target>مانح الامتياز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">182,185</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.website" datatype="html">
+        <source>Website</source>
+        <target>الموقع الإلكتروني</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">201,203</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.theme" datatype="html">
+        <source>Theme reference</source>
+        <target>مرجع السمة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">219,221</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.agreement-starts" datatype="html">
+        <source>Agreement starts on</source>
+        <target>بداية الاتفاقية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">238,241</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.agreement-ends" datatype="html">
+        <source>Agreement ends on</source>
+        <target>نهاية الاتفاقية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">249,252</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.field.royalty" datatype="html">
+        <source>Royalty (percent)</source>
+        <target>الإتاوة (نسبة مئوية)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">267,270</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.new.go" datatype="html">
+        <source> Create group </source>
+        <target>إنشاء المجموعة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">294,296</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.cancel" datatype="html">
+        <source> Cancel </source>
+        <target>إلغاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-editor.html</context>
+          <context context-type="linenumber">297,300</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.try-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.type" datatype="html">
+        <source>Type</source>
+        <target>النوع</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">20,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.precedence" datatype="html">
+        <source>Precedence</source>
+        <target>الأسبقية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">24,27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.hotels" datatype="html">
+        <source>Hotels</source>
+        <target>الفنادق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">28,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.active" datatype="html">
+        <source>Active</source>
+        <target>نشط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">32,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.inactive" datatype="html">
+        <source>Inactive</source>
+        <target>غير نشط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">34,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.state" datatype="html">
+        <source>State</source>
+        <target>الحالة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">36,39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand" datatype="html">
+        <source>Brand</source>
+        <target>العلامة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">46,48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.franchisor" datatype="html">
+        <source>Franchisor</source>
+        <target>مانح الامتياز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">48,50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.website" datatype="html">
+        <source>Website</source>
+        <target>الموقع الإلكتروني</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">52,53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.theme" datatype="html">
+        <source>Theme</source>
+        <target>السمة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">54,55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.agreement" datatype="html">
+        <source>Agreement</source>
+        <target>الاتفاقية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">56,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.royalty" datatype="html">
+        <source>Royalty</source>
+        <target>الإتاوة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">60,61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.edit" datatype="html">
+        <source> Edit </source>
+        <target>تعديل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">74,77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join" datatype="html">
+        <source> Add hotel </source>
+        <target>إضافة فندق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">85,88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.members" datatype="html">
+        <source>Hotels</source>
+        <target>الفنادق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">90,91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.members.none" datatype="html">
+        <source>No hotel yet.</source>
+        <target>لا فنادق بعد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">95,97</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.code" datatype="html">
+        <source>Code</source>
+        <target>الرمز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">101,102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.name" datatype="html">
+        <source>Hotel</source>
+        <target>الفندق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">102,103</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.from" datatype="html">
+        <source>From</source>
+        <target>من</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">103,104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.to" datatype="html">
+        <source>To</source>
+        <target>إلى</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">105</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.state" datatype="html">
+        <source>State</source>
+        <target>الحالة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">105,106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.current" datatype="html">
+        <source>Current</source>
+        <target>حالي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">121,123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.past" datatype="html">
+        <source>Past</source>
+        <target>سابق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">124,126</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.member.end" datatype="html">
+        <source> End </source>
+        <target>إنهاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">136,137</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.edit.title" datatype="html">
+        <source>Edit group</source>
+        <target>تعديل المجموعة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">150,153</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.name-en" datatype="html">
+        <source>Name (English)</source>
+        <target>الاسم (بالإنجليزية)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">158,161</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.name-ar" datatype="html">
+        <source>Name (Arabic)</source>
+        <target>الاسم (بالعربية)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">179,182</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.description" datatype="html">
+        <source>Description (optional)</source>
+        <target>الوصف (اختياري)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">200,203</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.precedence" datatype="html">
+        <source>Precedence</source>
+        <target>الأسبقية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">220,223</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.precedence.hint" datatype="html">
+        <source> 0 to 1000; higher wins a standards tie. </source>
+        <target>من 0 إلى 1000؛ الأعلى يغلب عند تعادل المعايير.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">235,237</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.display-order" datatype="html">
+        <source>Display order</source>
+        <target>ترتيب العرض</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">247,250</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.external" datatype="html">
+        <source>External identifier (optional)</source>
+        <target>المعرّف الخارجي (اختياري)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">267,270</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.active" datatype="html">
+        <source>Active</source>
+        <target>نشط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">289,291</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.brand.title" datatype="html">
+        <source>Brand</source>
+        <target>العلامة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">292,294</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.franchisor" datatype="html">
+        <source>Franchisor</source>
+        <target>مانح الامتياز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">295,298</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.website" datatype="html">
+        <source>Website</source>
+        <target>الموقع الإلكتروني</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">314,316</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.theme" datatype="html">
+        <source>Theme reference</source>
+        <target>مرجع السمة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">333,336</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.agreement-starts" datatype="html">
+        <source>Agreement starts on</source>
+        <target>بداية الاتفاقية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">355,358</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.agreement-ends" datatype="html">
+        <source>Agreement ends on</source>
+        <target>نهاية الاتفاقية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">366,369</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.field.royalty" datatype="html">
+        <source>Royalty (percent)</source>
+        <target>الإتاوة (نسبة مئوية)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">384,387</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.edit.go" datatype="html">
+        <source> Save </source>
+        <target>حفظ</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">414,416</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.edit.cancel" datatype="html">
+        <source> Cancel </source>
+        <target>إلغاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">422,425</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.title" datatype="html">
+        <source>Add hotel</source>
+        <target>إضافة فندق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">431,432</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.lead" datatype="html">
+        <source>The hotel joins from now. A hotel carries one brand at a time.</source>
+        <target>ينضم الفندق من الآن. يحمل الفندق علامة واحدة في الوقت نفسه.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">433,436</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.hotel" datatype="html">
+        <source>Hotel</source>
+        <target>الفندق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">440,442</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.choose" datatype="html">
+        <source>Choose a hotel</source>
+        <target>اختر فندقاً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">448,449</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.go" datatype="html">
+        <source> Add </source>
+        <target>إضافة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">465,467</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.join.cancel" datatype="html">
+        <source> Cancel </source>
+        <target>إلغاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">473,476</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.end.title" datatype="html">
+        <source>End this membership?</source>
+        <target>إنهاء هذه العضوية؟</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">483,484</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.end.message" datatype="html">
+        <source>The hotel leaves the group from now. The history stays.</source>
+        <target>يغادر الفندق المجموعة من الآن. ويبقى السجل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">485,487</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.end.go" datatype="html">
+        <source>End membership</source>
+        <target>إنهاء العضوية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">487,488</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.end.stay" datatype="html">
+        <source>Keep it</source>
+        <target>إبقاؤها</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">490,492</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.loading" datatype="html">
+        <source>Loading…</source>
+        <target>جارٍ التحميل…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.html</context>
+          <context context-type="linenumber">492,494</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.toast.joined" datatype="html">
+        <source>Hotel added to the group.</source>
+        <target>تمت إضافة الفندق إلى المجموعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.ts</context>
+          <context context-type="linenumber">251</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.toast.ended" datatype="html">
+        <source>Membership ended.</source>
+        <target>انتهت العضوية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.ts</context>
+          <context context-type="linenumber">263</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.toast.saved" datatype="html">
+        <source>Group saved.</source>
+        <target>تم حفظ المجموعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/group-page.ts</context>
+          <context context-type="linenumber">287</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.add" datatype="html">
+        <source>Add group</source>
+        <target>إضافة مجموعة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">10,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.title" datatype="html">
+        <source>Groups</source>
+        <target>المجموعات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">15,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.lead" datatype="html">
+        <source> A customer&apos;s brands, regions and owners: any named set of hotels. A hotel carries one brand at a time; precedence decides who wins when two groups set the same standard. </source>
+        <target>علامات العميل ومناطقه ومالكوه: أي مجموعة مسماة من الفنادق. يحمل الفندق علامة واحدة في الوقت نفسه؛ والأسبقية تحدد من يغلب عندما تضع مجموعتان المعيار نفسه.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">17,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.search" datatype="html">
+        <source>Search</source>
+        <target>بحث</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">24,26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.search-placeholder" datatype="html">
+        <source>Code or name</source>
+        <target>الرمز أو الاسم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">33,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.filter.type" datatype="html">
+        <source>Type</source>
+        <target>النوع</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">38,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.filter.all" datatype="html">
+        <source>All</source>
+        <target>الكل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">46,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.find" datatype="html">
+        <source>Find</source>
+        <target>ابحث</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">53,56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.try-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">64,67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.loading" datatype="html">
+        <source>Loading…</source>
+        <target>جارٍ التحميل…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">68,69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.none" datatype="html">
+        <source>No groups match.</source>
+        <target>لا مجموعات مطابقة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">70,72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.code" datatype="html">
+        <source>Code</source>
+        <target>الرمز</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">76,77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.name" datatype="html">
+        <source>Name</source>
+        <target>الاسم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">77,78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.type" datatype="html">
+        <source>Type</source>
+        <target>النوع</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">78,79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.hotels" datatype="html">
+        <source>Hotels</source>
+        <target>الفنادق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">79,80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.precedence" datatype="html">
+        <source> Precedence </source>
+        <target>الأسبقية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">81,83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.column.state" datatype="html">
+        <source>State</source>
+        <target>الحالة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">83,87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.active" datatype="html">
+        <source>Active</source>
+        <target>نشط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">105,107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.inactive" datatype="html">
+        <source>Inactive</source>
+        <target>غير نشط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">108,111</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.new.title" datatype="html">
+        <source>New group</source>
+        <target>مجموعة جديدة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">128,129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.new.lead" datatype="html">
+        <source>The code and the type are fixed once saved.</source>
+        <target>الرمز والنوع ثابتان بعد الحفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.html</context>
+          <context context-type="linenumber">130,133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.toast.added" datatype="html">
+        <source>Group added.</source>
+        <target>تمت إضافة المجموعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/groups-page.ts</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.page-title" datatype="html">
+        <source>Groups</source>
+        <target>المجموعات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/routes.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.group.page-title" datatype="html">
+        <source>Group</source>
+        <target>مجموعة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/routes.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.groups.crumb" datatype="html">
+        <source>Groups</source>
+        <target>المجموعات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-groups/routes.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

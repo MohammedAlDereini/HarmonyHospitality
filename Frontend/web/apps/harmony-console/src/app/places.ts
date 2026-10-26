@@ -34,6 +34,12 @@ const platformPlaces = (): ShellPlaces => {
       permission: Permission.ViewTenants,
     },
     {
+      label: $localize`:@@ui.shell.nav.groups:Groups`,
+      link: ['/groups'],
+      icon: 'folio',
+      permission: Permission.ViewTenants,
+    },
+    {
       label: $localize`:@@ui.shell.nav.reference:Reference data`,
       link: ['/reference'],
       icon: 'star',

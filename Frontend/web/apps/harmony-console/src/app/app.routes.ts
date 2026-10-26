@@ -25,6 +25,11 @@ export const routes: Routes = [
           (await import('@harmony/platform-admin/feature-properties')).routes,
       },
       {
+        path: 'groups',
+        canMatch: [allowed(Permission.ViewTenants)],
+        loadChildren: async () => (await import('@harmony/platform-admin/feature-groups')).routes,
+      },
+      {
         path: 'reference',
         canMatch: [allowed(Permission.ViewTenants)],
         loadChildren: async () =>
