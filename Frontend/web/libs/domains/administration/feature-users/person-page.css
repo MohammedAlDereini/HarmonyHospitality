@@ -39,6 +39,22 @@
 .erow {
   grid-template-columns: minmax(220px, 1.6fr) 220px 160px 160px;
 }
+.arow {
+  grid-template-columns: minmax(200px, 1.4fr) 120px 220px 120px 120px;
+}
+.grow {
+  grid-template-columns: minmax(200px, 1.2fr) 220px 120px minmax(160px, 1fr) 120px;
+}
+.srow[data-current='false'] .s-nm b,
+.srow[data-active='false'] .s-nm b {
+  color: var(--ink-3);
+}
+.s-why {
+  min-width: 0;
+  font-size: 12px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
 .row-act {
   display: flex;
   justify-content: flex-end;
@@ -52,13 +68,18 @@
 @media (max-width: 900px) {
   .drow,
   .krow,
-  .erow {
+  .erow,
+  .arow,
+  .grow {
     grid-template-columns: minmax(0, 1fr) 140px;
     row-gap: 6px;
   }
   .drow .row-act,
   .krow .row-act,
-  .erow .obj {
+  .erow .obj,
+  .arow .row-act,
+  .grow .row-act,
+  .grow .s-why {
     grid-column: 1 / -1;
   }
 }

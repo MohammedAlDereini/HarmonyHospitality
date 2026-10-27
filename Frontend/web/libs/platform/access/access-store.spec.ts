@@ -1,6 +1,7 @@
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { CurrentProperty } from '@harmony/platform/context';
 import { API_RETRY_DELAYS, HttpStatusEvents, provideHarmonyHttp } from '@harmony/platform/http';
 import { SessionStore } from '@harmony/platform/session';
 import { myPermissionsPath } from './access-grants';
@@ -16,6 +17,7 @@ describe('AccessStore', () => {
   let http: HttpTestingController;
   let events: HttpStatusEvents;
   const resumed = signal(0);
+  const hotel = signal<string | null>(null);
 
   const settle = async (): Promise<void> => {
     TestBed.tick();
@@ -29,8 +31,10 @@ describe('AccessStore', () => {
         provideHttpClientTesting(),
         { provide: API_RETRY_DELAYS, useValue: [0, 0] },
         { provide: SessionStore, useValue: { resumed, user: signal(null) } },
+        { provide: CurrentProperty, useValue: { code: hotel } },
       ],
     });
+    hotel.set(null);
     access = TestBed.inject(AccessStore);
     http = TestBed.inject(HttpTestingController);
     events = TestBed.inject(HttpStatusEvents);
@@ -78,6 +82,25 @@ describe('AccessStore', () => {
     http.expectOne(myPermissionsPath).flush({ data: [] });
     await ready;
     expect(access.entitled('front-office', 'GRD')).toBe(false);
+  });
+
+  it('another hotel in the URL reads the grants again; the same hotel does not', async () => {
+    const ready = access.ready();
+    http.expectOne(myPermissionsPath).flush({ data: [] });
+    await ready;
+    hotel.set('GRD');
+    await settle();
+    http.expectOne(myPermissionsPath).flush({ data: [Permission.ViewUsers] });
+    await tick();
+    expect(access.can(Permission.ViewUsers)).toBe(true);
+    hotel.set('GRD');
+    await settle();
+    http.expectNone(myPermissionsPath);
+    hotel.set('NYH');
+    await settle();
+    http.expectOne(myPermissionsPath).flush({ data: [] });
+    await tick();
+    expect(access.can(Permission.ViewUsers)).toBe(false);
   });
 
   it('a 403 reads the grants once more; a second 403 soon after does not', async () => {

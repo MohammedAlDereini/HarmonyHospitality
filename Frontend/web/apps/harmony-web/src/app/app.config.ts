@@ -1,6 +1,7 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
+import { propertyInterceptor } from '@harmony/platform/context';
 import { provideHarmonyErrors } from '@harmony/platform/errors';
 import { provideHarmonyHttp } from '@harmony/platform/http';
 import { provideHarmonyTelemetry } from '@harmony/platform/telemetry';
@@ -16,7 +17,8 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
     ),
-    provideHarmonyHttp(),
+    // Every /api call made inside /p/:property names the property (X-Harmony-Property); Identity answers per hotel.
+    provideHarmonyHttp([propertyInterceptor]),
     provideHarmonyErrors(),
     // Failures and Core Web Vitals flow to /bff/telemetry as named events (D9).
     provideHarmonyTelemetry(),

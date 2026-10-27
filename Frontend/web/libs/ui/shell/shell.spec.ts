@@ -35,6 +35,7 @@ const ahmad: SessionUser = {
   logoutUrl: '/bff/logout?sid=1',
 };
 const grand: PropertySummary = {
+  id: 'p-grd',
   code: 'GRD',
   nameEn: 'Grand Riyadh',
   nameAr: 'غراند الرياض',

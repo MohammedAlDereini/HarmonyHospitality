@@ -5,7 +5,7 @@ export interface ReferenceCatalogueEntry {
   readonly title: string;
 }
 
-/** The twelve reference tables, in the order the index and the places panel show them. */
+/** The thirteen reference tables, in the order the index and the places panel show them. */
 export const referenceCatalogue: readonly ReferenceCatalogueEntry[] = [
   {
     key: 'currencies',
@@ -66,6 +66,11 @@ export const referenceCatalogue: readonly ReferenceCatalogueEntry[] = [
     key: 'lookup-values',
     controller: 'LookupValue',
     title: $localize`:@@platform-admin.reference.lookup-values:Lookup values`,
+  },
+  {
+    key: 'settings',
+    controller: 'ConfigSetting',
+    title: $localize`:@@platform-admin.reference.settings:Settings registry`,
   },
 ];
 

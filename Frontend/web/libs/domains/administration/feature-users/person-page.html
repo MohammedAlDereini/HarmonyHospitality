@@ -207,6 +207,213 @@
       </div>
     }
   </section>
+  <section class="part" aria-labelledby="hotel-roles-heading">
+    <h2 id="hotel-roles-heading">
+      <span i18n="@@administration.person.hotel-roles">Roles at a hotel or group</span>&ngsp;<span
+        class="num"
+        >{{ assignmentCount() }}</span
+      >
+    </h2>
+    <p class="line" i18n="@@administration.person.hotel-roles.lead">
+      Held at one hotel or one group only, on top of the roles above. A group's role reaches every
+      hotel in it.
+    </p>
+    @if (store.accessProblem(); as text) {
+      <p class="field-error" role="alert">{{ text }}</p>
+    } @else if (assignmentCount() === 0) {
+      <p class="line" i18n="@@administration.person.hotel-roles.none">None yet.</p>
+    } @else {
+      <div class="rows" role="list">
+        @for (assignment of store.assignmentRows(); track assignment.id) {
+          <div class="srow arow" role="listitem" [attr.data-current]="assignment.isCurrent">
+            <div class="s-who">
+              <div class="s-nm">
+                <b dir="ltr">{{ assignment.roleCode }}</b>
+                <span dir="ltr">{{ assignment.scopeCode }}</span>
+              </div>
+            </div>
+            <div class="obj">
+              @if (assignment.propertyId !== null) {
+                <b i18n="@@administration.person.hotel-roles.at-hotel">Hotel</b>
+              } @else {
+                <b i18n="@@administration.person.hotel-roles.at-group">Group</b>
+              }
+              <span i18n="@@administration.person.hotel-roles.where">Where</span>
+            </div>
+            <div class="s-when">
+              @if (assignment.endsAtUtc; as ends) {
+                <span class="num">{{ when(ends) }}</span>
+              } @else {
+                <span i18n="@@administration.person.hotel-roles.no-end">No end</span>
+              }
+              <small i18n="@@administration.person.hotel-roles.ends">Ends</small>
+            </div>
+            <div class="obj">
+              @if (assignment.isCurrent) {
+                <b i18n="@@administration.person.hotel-roles.current">Current</b>
+              } @else {
+                <b i18n="@@administration.person.hotel-roles.ended">Ended</b>
+              }
+              <span i18n="@@administration.person.hotel-roles.state">State</span>
+            </div>
+            <div class="row-act">
+              @if (assignment.isCurrent) {
+                <button
+                  *hrIfAllowed="assignRoles"
+                  type="button"
+                  class="act"
+                  data-act="end-assignment"
+                  (click)="endAssignment(person, assignment)"
+                  [disabled]="busy()"
+                  i18n="@@administration.person.hotel-roles.end"
+                >
+                  End
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+    <div class="acts" *hrIfAllowed="assignRoles">
+      <button
+        type="button"
+        class="btn"
+        data-act="assign-role"
+        (click)="openAssign()"
+        [attr.aria-expanded]="assigning()"
+        i18n="@@administration.person.hotel-roles.give"
+      >
+        Give a role at a hotel or group
+      </button>
+    </div>
+    <hr-drawer
+      #assignDrawer
+      i18n-heading="@@administration.person.drawer.assign"
+      heading="Give a role at a hotel or group"
+      (closed)="assigning.set(false)"
+    >
+      @if (assigning()) {
+        <hr-hotel-access-editor
+          [user]="person"
+          mode="assign"
+          (done)="onAssigned()"
+          (cancelled)="assignDrawer.close()"
+        />
+      }
+    </hr-drawer>
+    <hr-confirm-dialog
+      #endDialog
+      i18n-heading="@@administration.person.hotel-roles.end.heading"
+      heading="End this role here?"
+      i18n-message="@@administration.person.hotel-roles.end.ask"
+      message="The person loses the role at this hotel or group from their next call. The row stays as part of the record."
+      i18n-go="@@administration.person.hotel-roles.end.go"
+      go="End role"
+      i18n-stay="@@administration.person.hotel-roles.end.stay"
+      stay="Keep it"
+    />
+  </section>
+  <section class="part" aria-labelledby="grants-heading">
+    <h2 id="grants-heading">
+      <span i18n="@@administration.person.grants">Access for a while</span>&ngsp;<span
+        class="num"
+        >{{ grantCount() }}</span
+      >
+    </h2>
+    <p class="line" i18n="@@administration.person.grants.lead">
+      A role lent for hours or days, with a reason; it ends by itself, 30 days at the latest.
+    </p>
+    @if (store.accessProblem(); as text) {
+      <p class="field-error" role="alert">{{ text }}</p>
+    } @else if (grantCount() === 0) {
+      <p class="line" i18n="@@administration.person.grants.none">None yet.</p>
+    } @else {
+      <div class="rows" role="list">
+        @for (grant of store.grantRows(); track grant.id) {
+          <div class="srow grow" role="listitem" [attr.data-active]="grant.isActive">
+            <div class="s-who">
+              <div class="s-nm">
+                <b dir="ltr">{{ grant.roleCode }}</b>
+                <span dir="ltr">{{ grant.scopeCode }}</span>
+              </div>
+            </div>
+            <div class="s-when">
+              <span class="num">{{ when(grant.toUtc) }}</span>
+              <small i18n="@@administration.person.grants.until">Until</small>
+            </div>
+            <div class="obj">
+              @if (grant.isActive) {
+                <b i18n="@@administration.person.grants.active">Active</b>
+              } @else if (grant.revokedAtUtc !== null) {
+                <b i18n="@@administration.person.grants.revoked">Revoked</b>
+              } @else {
+                <b i18n="@@administration.person.grants.over">Over</b>
+              }
+              <span i18n="@@administration.person.grants.state">State</span>
+            </div>
+            <div class="s-why">
+              <bdi>{{ grant.reason }}</bdi>
+            </div>
+            <div class="row-act">
+              @if (grant.isActive) {
+                <button
+                  *hrIfAllowed="assignRoles"
+                  type="button"
+                  class="act"
+                  data-act="revoke-grant"
+                  (click)="revokeGrant(person, grant)"
+                  [disabled]="busy()"
+                  i18n="@@administration.person.grants.revoke"
+                >
+                  Revoke
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+    <div class="acts" *hrIfAllowed="assignRoles">
+      <button
+        type="button"
+        class="btn"
+        data-act="grant-access"
+        (click)="openGrant()"
+        [attr.aria-expanded]="granting()"
+        i18n="@@administration.person.grants.give"
+      >
+        Grant access for a while
+      </button>
+    </div>
+    <hr-drawer
+      #grantDrawer
+      i18n-heading="@@administration.person.drawer.grant"
+      heading="Grant access for a while"
+      (closed)="granting.set(false)"
+    >
+      @if (granting()) {
+        <hr-hotel-access-editor
+          [user]="person"
+          mode="grant"
+          (done)="onGranted()"
+          (cancelled)="grantDrawer.close()"
+        />
+      }
+    </hr-drawer>
+    <hr-confirm-dialog
+      #revokeDialog
+      tone="stop"
+      i18n-heading="@@administration.person.grants.revoke.heading"
+      heading="Revoke this access?"
+      i18n-message="@@administration.person.grants.revoke.ask"
+      message="The loan ends now; the person loses the role from their next call."
+      i18n-go="@@administration.person.grants.revoke.go"
+      go="Revoke"
+      i18n-stay="@@administration.person.grants.revoke.stay"
+      stay="Keep it"
+    />
+  </section>
   <section class="part" aria-labelledby="trail-heading">
     <h2 id="trail-heading">
       <span i18n="@@administration.person.trail">Security trail</span>&ngsp;<span class="num">{{

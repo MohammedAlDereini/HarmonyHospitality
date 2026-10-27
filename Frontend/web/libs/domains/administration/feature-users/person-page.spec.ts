@@ -4,6 +4,9 @@ import { PersonStore, RolesStore, UsersStore } from '@harmony/administration/dat
 import {
   AccountState,
   Device,
+  GroupChoice,
+  HotelAccessGrant,
+  HotelRoleAssignment,
   Passkey,
   PrivilegeLevel,
   Role,
@@ -11,7 +14,7 @@ import {
   UserAccount,
 } from '@harmony/administration/domain';
 import { AccessStore } from '@harmony/platform/access';
-import { InstantFormatter } from '@harmony/platform/context';
+import { InstantFormatter, MyProperties } from '@harmony/platform/context';
 import { ApiResult, IntentKey } from '@harmony/platform/http';
 import { PersonPage } from './person-page';
 
@@ -67,8 +70,46 @@ const created: SecurityEvent = {
   detail: 'an invitation link was sent',
 };
 
+const atAmman: HotelRoleAssignment = {
+  id: 'a1',
+  roleId: 'r1',
+  roleCode: 'FRONT-DESK',
+  propertyId: 'p-amman',
+  propertyGroupId: null,
+  scopeCode: 'AMMAN',
+  endsAtUtc: null,
+  isCurrent: true,
+};
+const atLevantEnded: HotelRoleAssignment = {
+  ...atAmman,
+  id: 'a2',
+  propertyId: null,
+  propertyGroupId: 'g-levant',
+  scopeCode: 'LEVANT',
+  endsAtUtc: '2026-10-25T08:00:00Z',
+  isCurrent: false,
+};
+const nightCover: HotelAccessGrant = {
+  id: 'g1',
+  roleId: 'r2',
+  roleCode: 'MANAGER',
+  propertyId: 'p-amman',
+  propertyGroupId: null,
+  scopeCode: 'AMMAN',
+  fromUtc: '2026-10-24T20:00:00Z',
+  toUtc: '2026-10-25T04:00:00Z',
+  revokedAtUtc: null,
+  grantedById: 'u2',
+  reason: 'Covering the night shift',
+  isActive: true,
+};
+
 class FakeStore {
   readonly person = signal<UserAccount | null>(rana);
+  readonly assignmentRows = signal<readonly HotelRoleAssignment[]>([atAmman, atLevantEnded]);
+  readonly grantRows = signal<readonly HotelAccessGrant[]>([nightCover]);
+  readonly accessProblem = signal<string | null>(null);
+  readonly groupRows = signal<readonly GroupChoice[]>([]);
   readonly loading = signal(false);
   readonly problem = signal<string | null>(null);
   readonly deviceRows = signal<readonly Device[]>([laptop]);
@@ -111,6 +152,21 @@ class FakeStore {
     this.calls.push(`remove-passkey:${passkey.id}`);
     return Promise.resolve(this.answer);
   }
+  loadChoices(): void {
+    this.calls.push('choices');
+  }
+  endAssignment(
+    _user: UserAccount,
+    assignment: HotelRoleAssignment,
+    k: IntentKey,
+  ): Promise<ApiResult<unknown>> {
+    this.calls.push(`end-assignment:${assignment.id}:${String(k.value.length)}`);
+    return Promise.resolve(this.answer);
+  }
+  revokeGrant(_user: UserAccount, grant: HotelAccessGrant): Promise<ApiResult<unknown>> {
+    this.calls.push(`revoke-grant:${grant.id}`);
+    return Promise.resolve(this.answer);
+  }
 }
 
 describe('PersonPage', () => {
@@ -145,6 +201,7 @@ describe('PersonPage', () => {
           },
         },
         { provide: UsersStore, useValue: {} },
+        { provide: MyProperties, useValue: { list: signal([]), ready: () => Promise.resolve() } },
       ],
     });
     // The page provides its own PersonStore; the fake takes that slot.
@@ -206,6 +263,30 @@ describe('PersonPage', () => {
     click('[data-act="reset-two-step"]');
     await settle();
     expect(store.calls).toEqual(['end-exemption', 'reset']);
+  });
+
+  it('hotel roles and grants: the rows with where and state; End and Revoke ask first; Give opens the form', async () => {
+    expect(text('.arow .s-nm b')).toBe('FRONT-DESK');
+    expect(
+      [...page.querySelectorAll('.arow')].map((row) => row.getAttribute('data-current')),
+    ).toEqual(['true', 'false']);
+    expect(page.querySelectorAll('[data-act="end-assignment"]')).toHaveLength(1);
+    expect(text('.grow .s-why')).toBe('Covering the night shift');
+    click('[data-act="end-assignment"]');
+    await settle();
+    expect(store.calls).toEqual([]);
+    click('dialog[open] .dlg-a .solid');
+    await settle();
+    expect(store.calls).toEqual(['end-assignment:a1:36']);
+    click('[data-act="revoke-grant"]');
+    await settle();
+    click('dialog[open] .dlg-a .btn:not(.solid)');
+    await settle();
+    expect(store.calls).toEqual(['end-assignment:a1:36']);
+    click('[data-act="assign-role"]');
+    await settle();
+    expect(page.querySelector('hr-hotel-access-editor #access-days')).not.toBeNull();
+    expect(store.calls).toEqual(['end-assignment:a1:36', 'choices']);
   });
 
   it('a device is signed out and a passkey removed with one press each', async () => {

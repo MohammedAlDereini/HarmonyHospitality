@@ -1,7 +1,9 @@
 import { SortOrder } from '@harmony/shared/domain';
 
-/** A reference row as Identity sends it: strings, numbers, flags, or nothing. */
-export type ReferenceRow = Readonly<Record<string, string | number | boolean | null>>;
+/** A reference row as Identity sends it: strings, numbers, flags, lists of codes, or nothing. */
+export type ReferenceRow = Readonly<
+  Record<string, string | number | boolean | readonly string[] | null>
+>;
 
 /** What a reference form holds: text for every field, a flag for a checkbox; numbers travel as text until sent. */
 export type ReferenceValues = Readonly<Record<string, string | boolean>>;
@@ -48,6 +50,8 @@ export interface ReferenceField {
   readonly optional?: true;
   /** A number with decimals (latitude), otherwise whole. */
   readonly decimal?: true;
+  /** Typed as codes separated by commas, sent as a list (empty: null), shown joined: the registry's property types. */
+  readonly list?: true;
 }
 
 /** One column of a reference table's list. */

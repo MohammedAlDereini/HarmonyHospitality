@@ -39,8 +39,12 @@ interface Editing {
   readonly row: ReferenceRow | null;
 }
 
-const asText = (value: string | number | boolean | null | undefined): string =>
-  value === null || value === undefined ? '' : String(value);
+const asText = (
+  value: string | number | boolean | readonly string[] | null | undefined,
+): string => {
+  if (value === null || value === undefined) return '';
+  return Array.isArray(value) ? value.join(', ') : String(value);
+};
 const capital = (text: string): string => text.charAt(0).toLocaleUpperCase() + text.slice(1);
 
 /**

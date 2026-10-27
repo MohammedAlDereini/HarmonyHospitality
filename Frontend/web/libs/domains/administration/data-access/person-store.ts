@@ -1,29 +1,51 @@
 import { httpResource } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Device, Passkey, SecurityEvent, UserAccount } from '@harmony/administration/domain';
+import {
+  AccessScope,
+  AccountAccess,
+  Device,
+  GroupChoice,
+  HotelAccessGrant,
+  HotelRoleAssignment,
+  Passkey,
+  SecurityEvent,
+  UserAccount,
+} from '@harmony/administration/domain';
 import { messageOf } from '@harmony/platform/errors';
 import { ApiClient, ApiResult, Envelope, IntentKey, fromError } from '@harmony/platform/http';
+import { Paged } from '@harmony/shared/domain';
 import { Observable, firstValueFrom } from 'rxjs';
 
 export const accountPath = (id: string): string => `/api/UserAccount/${id}`;
 export const devicesPath = (id: string): string => `${accountPath(id)}/devices`;
 export const passkeysPath = (id: string): string => `${accountPath(id)}/passkeys`;
 export const eventsPath = (id: string): string => `${accountPath(id)}/security-events`;
+export const accessPath = (id: string): string => `${accountPath(id)}/access`;
 export const updateRolesPath = '/api/UserAccount/UpdateRoles';
 export const resetTwoFactorPath = '/api/UserAccount/ResetTwoFactor';
 export const endExemptionPath = '/api/UserAccount/EndTwoStepExemption';
 export const signOutDevicePath = '/api/UserAccount/SignOutDevice';
 export const removePasskeyPath = '/api/UserAccount/RemovePasskey';
+export const assignRolePath = '/api/UserAccount/AssignRole';
+export const endAssignmentPath = '/api/UserAccount/EndAssignment';
+export const grantAccessPath = '/api/UserAccount/GrantAccess';
+export const revokeGrantPath = '/api/UserAccount/RevokeGrant';
+export const myGroupsPath = '/api/PropertyGroup/mine';
+/** Identity pages its answers, at most 100 a page; a customer's groups fit in one. */
+export const GROUPS_PAGE_SIZE = 100;
+const FIRST_PAGE = 1;
 
 /**
- * One person's page (architecture 7.8): the account, its devices, passkeys and security trail, each its own
- * resource keyed by the account id, each read again after the write that changes it. Provided by the page, so it
- * lives and dies with it.
+ * One person's page (architecture 7.8): the account, its devices, passkeys, security trail and what gives them
+ * access at one hotel or group (assignments, grants), each its own resource keyed by the account id, each read
+ * again after the write that changes it. Provided by the page, so it lives and dies with it.
  */
 @Injectable()
 export class PersonStore {
   private readonly api = inject(ApiClient);
   private readonly id = signal<string | null>(null);
+  /** The group choices are read only once an editor asks for them. */
+  private readonly choicesWanted = signal(false);
 
   private readonly account = httpResource<Envelope<UserAccount>>(() => {
     const id = this.id();
@@ -41,6 +63,19 @@ export class PersonStore {
     const id = this.id();
     return id === null ? undefined : { url: eventsPath(id) };
   });
+  private readonly access = httpResource<Envelope<AccountAccess>>(() => {
+    const id = this.id();
+    return id === null ? undefined : { url: accessPath(id) };
+  });
+  private readonly groups = httpResource<Envelope<Paged<GroupChoice>>>(() =>
+    this.choicesWanted()
+      ? {
+          url: myGroupsPath,
+          method: 'POST',
+          body: { pageNumber: FIRST_PAGE, pageSize: GROUPS_PAGE_SIZE },
+        }
+      : undefined,
+  );
 
   readonly person = computed<UserAccount | null>(() => this.account.value()?.data ?? null);
   readonly loading = this.account.isLoading;
@@ -51,10 +86,26 @@ export class PersonStore {
   readonly passkeysProblem = computed(() => this.sentence(this.passkeys.error()));
   readonly eventRows = computed<readonly SecurityEvent[]>(() => this.events.value()?.data ?? []);
   readonly eventsProblem = computed(() => this.sentence(this.events.error()));
+  readonly assignmentRows = computed<readonly HotelRoleAssignment[]>(
+    () => this.access.value()?.data?.assignments ?? [],
+  );
+  readonly grantRows = computed<readonly HotelAccessGrant[]>(
+    () => this.access.value()?.data?.grants ?? [],
+  );
+  readonly accessProblem = computed(() => this.sentence(this.access.error()));
+  /** The customer's groups a role may be given at; empty until loadChoices() and while Identity has none. */
+  readonly groupRows = computed<readonly GroupChoice[]>(
+    () => this.groups.value()?.data?.results ?? [],
+  );
 
-  /** The page names the account; a different id starts the four reads afresh. */
+  /** The page names the account; a different id starts the reads afresh. */
   open(id: string): void {
     this.id.set(id);
+  }
+
+  /** An editor opened: the group choices are wanted now. */
+  loadChoices(): void {
+    this.choicesWanted.set(true);
   }
 
   reload(): void {
@@ -107,6 +158,69 @@ export class PersonStore {
       this.api.put(removePasskeyPath, { id: user.id, passkeyId: passkey.id }, intent),
       () => {
         this.passkeys.reload();
+        this.events.reload();
+      },
+    );
+  }
+
+  /** A role at one hotel or one group, open-ended or until an instant (AssignRoleCommand). */
+  assignRole(
+    user: UserAccount,
+    roleId: string,
+    scope: AccessScope,
+    endsAtUtc: string | null,
+    intent: IntentKey,
+  ): Promise<ApiResult<unknown>> {
+    return this.write(
+      this.api.put(assignRolePath, { id: user.id, roleId, ...scope, endsAtUtc }, intent),
+      () => {
+        this.access.reload();
+        this.events.reload();
+      },
+    );
+  }
+
+  endAssignment(
+    user: UserAccount,
+    assignment: HotelRoleAssignment,
+    intent: IntentKey,
+  ): Promise<ApiResult<unknown>> {
+    return this.write(
+      this.api.put(endAssignmentPath, { id: user.id, assignmentId: assignment.id }, intent),
+      () => {
+        this.access.reload();
+        this.events.reload();
+      },
+    );
+  }
+
+  /** A role lent from now until an instant at most 30 days away, with the reason (GrantAccessCommand). */
+  grantAccess(
+    user: UserAccount,
+    roleId: string,
+    scope: AccessScope,
+    toUtc: string,
+    reason: string,
+    intent: IntentKey,
+  ): Promise<ApiResult<unknown>> {
+    return this.write(
+      this.api.post(grantAccessPath, { id: user.id, roleId, ...scope, toUtc, reason }, intent),
+      () => {
+        this.access.reload();
+        this.events.reload();
+      },
+    );
+  }
+
+  revokeGrant(
+    user: UserAccount,
+    grant: HotelAccessGrant,
+    intent: IntentKey,
+  ): Promise<ApiResult<unknown>> {
+    return this.write(
+      this.api.put(revokeGrantPath, { id: user.id, grantId: grant.id }, intent),
+      () => {
+        this.access.reload();
         this.events.reload();
       },
     );

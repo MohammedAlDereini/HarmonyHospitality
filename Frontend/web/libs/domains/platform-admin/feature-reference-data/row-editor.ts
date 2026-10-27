@@ -42,8 +42,21 @@ interface RowValues {
   readonly flags: Readonly<Record<string, boolean>>;
 }
 
-const asText = (value: string | number | boolean | null | undefined): string =>
-  value === null || value === undefined ? '' : String(value);
+const asText = (
+  value: string | number | boolean | readonly string[] | null | undefined,
+): string => {
+  if (value === null || value === undefined) return '';
+  return Array.isArray(value) ? value.join(', ') : String(value);
+};
+
+/** A list field's text as Identity's list: the codes between the commas, trimmed, none empty; nothing typed is null. */
+const asList = (text: string): string[] | null => {
+  const codes = text
+    .split(',')
+    .map((code) => code.trim())
+    .filter((code) => code !== '');
+  return codes.length === 0 ? null : codes;
+};
 
 /**
  * One row of a reference table, new or changed, inside the drawer: the fields come from the table's description with
@@ -234,6 +247,7 @@ export class RowEditor implements OnInit {
       }
       const text = (values.texts[field.key] ?? '').trim();
       if (field.kind === 'number') body[field.key] = text === '' ? null : Number(text);
+      else if (field.list === true) body[field.key] = asList(text);
       else body[field.key] = text === '' && field.required !== true ? null : text;
     });
     const row = this.row();

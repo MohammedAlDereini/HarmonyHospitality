@@ -1,0 +1,96 @@
+<header class="page-head">
+  <div>
+    <h1 i18n="@@administration.settings.title">Settings</h1>
+    <p class="lead" i18n="@@administration.settings.lead">
+      What each setting is at this hotel, and where the value comes from: this hotel, one of its
+      groups, the whole customer, or the default. A hotel's own value wins; then the group with the
+      highest precedence; then the customer; then the default.
+    </p>
+  </div>
+</header>
+@if (store.problem(); as problem) {
+  <p class="empty" role="alert">
+    {{ problem }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="store.reload()"
+      i18n="@@administration.settings.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (store.loading() && count() === 0) {
+  <p class="empty" role="status" i18n="@@administration.settings.loading">Loading…</p>
+} @else if (count() === 0) {
+  <p class="empty" i18n="@@administration.settings.none">No setting is registered yet.</p>
+} @else {
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th scope="col" i18n="@@administration.settings.column.key">Setting</th>
+          <th scope="col" i18n="@@administration.settings.column.owner">Service</th>
+          <th scope="col" i18n="@@administration.settings.column.value">Value here</th>
+          <th scope="col" i18n="@@administration.settings.column.from">From</th>
+          <th scope="col" class="acts">
+            <span class="vh" i18n="@@administration.settings.column.actions">Actions</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (setting of store.settings(); track setting.key) {
+          <tr
+            class="setting-row"
+            [attr.data-key]="setting.key"
+            [attr.data-outcome]="setting.outcome"
+          >
+            <td class="key" dir="ltr">{{ setting.key }}</td>
+            <td dir="ltr">{{ setting.ownerService }}</td>
+            <td class="value">
+              @if (outcome(setting); as text) {
+                <span class="pill" [class.warn]="setting.outcome === 'Conflict'">{{ text }}</span>
+              } @else {
+                <b dir="ltr"
+                  ><bdi>{{ setting.value }}</bdi></b
+                >
+              }
+            </td>
+            <td class="from">{{ source(setting) }}</td>
+            <td class="acts">
+              <button
+                type="button"
+                class="tlink"
+                data-act="open-setting"
+                (click)="openSetting(setting)"
+                [attr.aria-expanded]="openKey() === setting.key"
+              >
+                @if (mayManage()) {
+                  <ng-container i18n="@@administration.settings.change">Why / change</ng-container>
+                } @else {
+                  <ng-container i18n="@@administration.settings.why-only">Why</ng-container>
+                }
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+<hr-drawer
+  #settingDrawer
+  [heading]="open()?.key ?? ''"
+  i18n-lead="@@administration.settings.drawer.lead"
+  lead="Every place looked at, in order; the first that sets the key wins."
+  (closed)="openKey.set(null)"
+>
+  @if (open(); as setting) {
+    <hr-setting-detail
+      [setting]="setting"
+      [mayManage]="mayManage()"
+      (saved)="onSaved()"
+      (cleared)="onCleared()"
+      (cancelled)="settingDrawer.close()"
+    />
+  }
+</hr-drawer>

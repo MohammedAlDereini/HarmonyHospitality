@@ -10,3 +10,4 @@ export { CurrentProperty, propertyParameter } from './current-property';
 export { propertyAllowed } from './property-allowed.guard';
 export { PropertyChooser } from './property-chooser';
 export { providePlatformInstants, providePropertyContext } from './provide';
+export { propertyHeader, propertyInterceptor } from './property.interceptor';

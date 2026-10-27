@@ -1,0 +1,41 @@
+/* The hotel-access form inside the drawer: role, where, the length, the reason, the buttons at the end. */
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.f {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.f label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.f .field {
+  width: 100%;
+  min-width: 0;
+}
+.f .field.short {
+  max-width: 160px;
+}
+.hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.acts {
+  display: flex;
+  gap: var(--s2);
+  margin-block-start: var(--s3);
+  padding-block-start: var(--s4);
+  border-block-start: 1px solid var(--rule);
+}
+.field-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--stop);
+}

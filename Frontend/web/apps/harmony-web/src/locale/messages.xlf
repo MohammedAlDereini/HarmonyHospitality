@@ -44,18 +44,25 @@
           <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="ui.shell.nav.settings" datatype="html">
+        <source>Settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/harmony-web/src/app/places.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="ui.shell.nav.group.workspaces" datatype="html">
         <source>Workspaces</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/harmony-web/src/app/places.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ui.shell.nav.group.administration" datatype="html">
         <source>Administration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/harmony-web/src/app/places.ts</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">53</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.roles.permissions" datatype="html">
@@ -428,32 +435,396 @@
           <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="administration.permission.view-settings" datatype="html">
+        <source>View settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.permission.manage-settings" datatype="html">
+        <source>Manage settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="administration.level.standard" datatype="html">
         <source>Standard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.level.supervisor" datatype="html">
         <source>Supervisor</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.level.manager" datatype="html">
         <source>Manager</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.level.administrator" datatype="html">
         <source>Administrator</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-roles/wording.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.page-title" datatype="html">
+        <source>Settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/routes.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.why" datatype="html">
+        <source>Where the value comes from</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">2,3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.why.not-applicable" datatype="html">
+        <source> This setting is for other kinds of property: nothing is looked up here. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">5,9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.why.nothing" datatype="html">
+        <source>nothing set</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">17,19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.why.conflict" datatype="html">
+        <source> Two groups of the same precedence set this key, so neither wins. Set it for this hotel, or clear it in one of the groups. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">25,31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.field.place" datatype="html">
+        <source>Where</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">34,35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.field.place.hint" datatype="html">
+        <source> A group or the whole customer reaches every hotel that does not set its own value. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">41,45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.field.value" datatype="html">
+        <source>Value</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">45,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.field.value.choose" datatype="html">
+        <source>Choose</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">55,56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.field.value.yes" datatype="html">
+        <source>Yes (true)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">56,57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.field.value.no" datatype="html">
+        <source>No (false)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">57,60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.field.value.hint" datatype="html">
+        <source> A <x id="INTERPOLATION" equiv-text="{{ kind() }}"/> value. The service that owns the setting decides what it accepts. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">86,88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.save" datatype="html">
+        <source> Save </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">104,107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.clear" datatype="html">
+        <source> Clear here </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">114,116</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.cancel" datatype="html">
+        <source> Cancel </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/setting-detail.html</context>
+          <context context-type="linenumber">117,120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.title" datatype="html">
+        <source>Settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.lead" datatype="html">
+        <source> What each setting is at this hotel, and where the value comes from: this hotel, one of its groups, the whole customer, or the default. A hotel&apos;s own value wins; then the group with the highest precedence; then the customer; then the default. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">5,10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.try-again" datatype="html">
+        <source> Try again </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">19,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.loading" datatype="html">
+        <source>Loading…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">23,25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.none" datatype="html">
+        <source>No setting is registered yet.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">25,28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.column.key" datatype="html">
+        <source>Setting</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">31,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.column.owner" datatype="html">
+        <source>Service</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">32,33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.column.value" datatype="html">
+        <source>Value here</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">33,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.column.from" datatype="html">
+        <source>From</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">34,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.column.actions" datatype="html">
+        <source>Actions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">36,40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.change" datatype="html">
+        <source>Why / change</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">64,66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.why-only" datatype="html">
+        <source>Why</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">66,68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.drawer.lead" datatype="html">
+        <source>Every place looked at, in order; the first that sets the key wins.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.html</context>
+          <context context-type="linenumber">80,83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.toast.saved" datatype="html">
+        <source>Setting saved.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.toast.cleared" datatype="html">
+        <source>Value cleared; the next place down applies.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/settings-page.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.source.hotel" datatype="html">
+        <source>This hotel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.source.group" datatype="html">
+        <source>Group <x id="CODE" equiv-text="code"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.source.customer" datatype="html">
+        <source>Whole customer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.source.default" datatype="html">
+        <source>Default</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.outcome.unset" datatype="html">
+        <source>Not set</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.outcome.conflict" datatype="html">
+        <source>Two groups disagree</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.outcome.not-applicable" datatype="html">
+        <source>Not for this kind of property</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.step.hotel" datatype="html">
+        <source>This hotel (<x id="CODE" equiv-text="step.code ?? &apos;&apos;"/>)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.step.group" datatype="html">
+        <source>Group <x id="CODE" equiv-text="step.code ?? &apos;&apos;"/>, precedence <x id="PRECEDENCE" equiv-text="step.precedence ?? 0"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.step.customer" datatype="html">
+        <source>Whole customer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.step.default" datatype="html">
+        <source>Default</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.verdict.won" datatype="html">
+        <source>Wins</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.verdict.overridden" datatype="html">
+        <source>Overridden</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.verdict.not-set" datatype="html">
+        <source>Not set</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.verdict.tied" datatype="html">
+        <source>Tied</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.verdict.outranked" datatype="html">
+        <source>Outranked</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.verdict.inactive" datatype="html">
+        <source>Group switched off</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.place.hotel" datatype="html">
+        <source>This hotel (<x id="CODE" equiv-text="code"/>)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.place.group" datatype="html">
+        <source>Group <x id="CODE" equiv-text="code"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.settings.place.customer" datatype="html">
+        <source>Whole customer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-settings/wording.ts</context>
+          <context context-type="linenumber">59</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.new.invitation" datatype="html">
@@ -653,6 +1024,125 @@
           <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="administration.person.access.role" datatype="html">
+        <source>Role</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">3,6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.choose-role" datatype="html">
+        <source>Choose a role</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">12,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.roles-again" datatype="html">
+        <source> Try again </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">25,29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.where" datatype="html">
+        <source>Where</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">38,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.choose-where" datatype="html">
+        <source> Choose a hotel or a group </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">47,49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.hotels" datatype="html">
+        <source>Hotels</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.groups" datatype="html">
+        <source>Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.where.hint" datatype="html">
+        <source> At a group, the role reaches every hotel in it, today and later. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">65,67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.hours" datatype="html">
+        <source>For how long</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">77,80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.hours.hint" datatype="html">
+        <source> Hours from now, 720 (30 days) at most. The loan ends by itself. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">91,93</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.reason" datatype="html">
+        <source>Reason</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">102,105</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.reason.placeholder" datatype="html">
+        <source>Why this person needs the role for a while</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">111,112</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.days" datatype="html">
+        <source>Ends after</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">125,128</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.days.hint" datatype="html">
+        <source> Days from now; leave empty for a role that stays until someone ends it. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">139,141</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.grant.go" datatype="html">
+        <source>Grant for a while</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">154,157</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.assign.go" datatype="html">
+        <source>Give the role</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">157,161</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.cancel" datatype="html">
+        <source> Cancel </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">166,169</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="administration.person.try-again" datatype="html">
         <source> Try again </source>
         <context-group purpose="location">
@@ -832,57 +1322,302 @@
           <context context-type="linenumber">202,204</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="administration.person.hotel-roles" datatype="html">
+        <source>Roles at a hotel or group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">212,214</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.lead" datatype="html">
+        <source> Held at one hotel or one group only, on top of the roles above. A group&apos;s role reaches every hotel in it. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">218,221</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.none" datatype="html">
+        <source>None yet.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">224,226</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.at-hotel" datatype="html">
+        <source>Hotel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">237,239</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.at-group" datatype="html">
+        <source>Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">239,241</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.where" datatype="html">
+        <source>Where</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">241,243</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.no-end" datatype="html">
+        <source>No end</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">247,249</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.ends" datatype="html">
+        <source>Ends</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">249,251</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.current" datatype="html">
+        <source>Current</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">253,255</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.ended" datatype="html">
+        <source>Ended</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">255,257</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.state" datatype="html">
+        <source>State</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">257,259</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.end" datatype="html">
+        <source> End </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">270,272</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.give" datatype="html">
+        <source> Give a role at a hotel or group </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">287,291</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.drawer.assign" datatype="html">
+        <source>Give a role at a hotel or group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">293,296</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.end.heading" datatype="html">
+        <source>End this role here?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">308,309</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.end.ask" datatype="html">
+        <source>The person loses the role at this hotel or group from their next call. The row stays as part of the record.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">310,311</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.end.go" datatype="html">
+        <source>End role</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">312,313</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.hotel-roles.end.stay" datatype="html">
+        <source>Keep it</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">315,317</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants" datatype="html">
+        <source>Access for a while</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">319,321</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.lead" datatype="html">
+        <source> A role lent for hours or days, with a reason; it ends by itself, 30 days at the latest. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">325,327</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.none" datatype="html">
+        <source>None yet.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">330,332</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.until" datatype="html">
+        <source>Until</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">343,345</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.active" datatype="html">
+        <source>Active</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">347,348</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.revoked" datatype="html">
+        <source>Revoked</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">349,351</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.over" datatype="html">
+        <source>Over</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">352,353</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.state" datatype="html">
+        <source>State</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">353,355</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.revoke" datatype="html">
+        <source> Revoke </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">369,371</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.give" datatype="html">
+        <source> Grant access for a while </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">386,389</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.drawer.grant" datatype="html">
+        <source>Grant access for a while</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">392,395</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.revoke.heading" datatype="html">
+        <source>Revoke this access?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">408,409</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.revoke.ask" datatype="html">
+        <source>The loan ends now; the person loses the role from their next call.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">410,411</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.revoke.go" datatype="html">
+        <source>Revoke</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">413</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.grants.revoke.stay" datatype="html">
+        <source>Keep it</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">415,417</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="administration.person.trail" datatype="html">
         <source>Security trail</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">212,213</context>
+          <context context-type="linenumber">419,420</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.trail.none" datatype="html">
         <source>Nothing recorded yet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">219,221</context>
+          <context context-type="linenumber">426,428</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.trail.when" datatype="html">
         <source>When</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">236,238</context>
+          <context context-type="linenumber">443,445</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.trail.address" datatype="html">
         <source>Address</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">240,242</context>
+          <context context-type="linenumber">447,449</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.trail.device" datatype="html">
         <source>Device</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">246,249</context>
+          <context context-type="linenumber">453,456</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.loading" datatype="html">
         <source>Loading…</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
-          <context context-type="linenumber">254,256</context>
+          <context context-type="linenumber">461,463</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.users.toast.exempted" datatype="html">
         <source>Exempted from two-step.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">112</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.ts</context>
           <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.assigned" datatype="html">
+        <source>Role given.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.granted" datatype="html">
+        <source>Access granted for a while.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="administration.person.roles" datatype="html">
@@ -1463,676 +2198,914 @@
           <context context-type="linenumber">57</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="platform.errors.code.000-10" datatype="html">
+        <source>You may not act at this hotel.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.000-11" datatype="html">
+        <source>Choose a hotel first.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00105" datatype="html">
+        <source>That role is already given there.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00106" datatype="html">
+        <source>That assignment no longer exists.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00107" datatype="html">
+        <source>That grant no longer exists.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00108" datatype="html">
+        <source>That hotel or group belongs to another tenant.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00109" datatype="html">
+        <source>That access has already ended.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10327" datatype="html">
+        <source>Choose where: one hotel or one group.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10328" datatype="html">
+        <source>The end must be in the future.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10329" datatype="html">
+        <source>Give the grant a length: at least one hour.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10330" datatype="html">
+        <source>Give a reason.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10331" datatype="html">
+        <source>The reason is too long: 500 characters at most.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10332" datatype="html">
+        <source>Which assignment? Reload the page and try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10333" datatype="html">
+        <source>Which grant? Reload the page and try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10334" datatype="html">
+        <source>A grant lasts 30 days at most.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00110" datatype="html">
+        <source>That setting is not registered.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00111" datatype="html">
+        <source>A setting with that key is already registered.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00112" datatype="html">
+        <source>That setting is switched off: no value can be set for it.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00113" datatype="html">
+        <source>Nothing is set there.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00114" datatype="html">
+        <source>That hotel or group is not one of yours.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00115" datatype="html">
+        <source>That setting is not for this kind of property.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00116" datatype="html">
+        <source>Only someone who manages settings for the whole customer can set it there.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00117" datatype="html">
+        <source>One of the property types does not exist.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10801" datatype="html">
+        <source>Give the key.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10802" datatype="html">
+        <source>The key is the owning area, then dotted words, like frontoffice.checkInTime.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10803" datatype="html">
+        <source>Name the owning service.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10804" datatype="html">
+        <source>The service name is 2 to 64 letters or digits, like FrontOffice.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10805" datatype="html">
+        <source>Choose time, int, bool, decimal or string.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10806" datatype="html">
+        <source>The default is too long: 1000 characters at most.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10807" datatype="html">
+        <source>Property type codes: at most 10, each 2 to 32 characters.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10808" datatype="html">
+        <source>Choose where: the whole customer, a group or a hotel.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10809" datatype="html">
+        <source>Which hotel or group? Reload the page and try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10810" datatype="html">
+        <source>Give a value.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10811" datatype="html">
+        <source>The value is too long: 1000 characters at most.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="platform.errors.code.00070" datatype="html">
         <source>That tenant no longer exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00071" datatype="html">
         <source>That code is already used by another tenant.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">96</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00072" datatype="html">
         <source>That tenant is not active.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00073" datatype="html">
         <source>Only the platform may do this.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00085" datatype="html">
         <source>An account with this email already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">99</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00086" datatype="html">
         <source>The administrator already has an active account; no invitation is needed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00087" datatype="html">
         <source>No administrator is known for this tenant yet: give an email and a name.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00088" datatype="html">
         <source>That module does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00089" datatype="html">
         <source>That module is sold at the other level: for one property or for the whole tenant.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">103</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00094" datatype="html">
         <source>That subscription line no longer exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">104</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10501" datatype="html">
         <source>Which tenant? Reload the page and try again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">69</context>
+          <context context-type="linenumber">105</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10502" datatype="html">
         <source>Give the tenant a code.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10503" datatype="html">
         <source>The code is 2 to 32 letters, digits, dots, dashes or underscores.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10504" datatype="html">
         <source>Give the legal name in English.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">108</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10505" datatype="html">
         <source>The English legal name is too long.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">109</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10506" datatype="html">
         <source>Give the legal name in Arabic.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">110</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10507" datatype="html">
         <source>The Arabic legal name is too long.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10508" datatype="html">
         <source>Choose a country.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">112</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10509" datatype="html">
         <source>The country code is two letters.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">113</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10510" datatype="html">
         <source>Choose a currency.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10511" datatype="html">
         <source>The currency code is three letters.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">79</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10512" datatype="html">
         <source>The external identifier is too long.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">116</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10513" datatype="html">
         <source>Give a reason.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">117</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10514" datatype="html">
         <source>The reason is too long: 500 characters at most.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">82</context>
+          <context context-type="linenumber">118</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10515" datatype="html">
         <source>The tier is 1 to 5.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">119</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10516" datatype="html">
         <source>Give the administrator&apos;s email address.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">120</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10517" datatype="html">
         <source>That does not look like an email address.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">121</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10518" datatype="html">
         <source>The email is too long: 256 characters at most.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">122</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10519" datatype="html">
         <source>Give the administrator&apos;s name.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10520" datatype="html">
         <source>The name is too long: 128 characters at most.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00091" datatype="html">
         <source>That code is already used by another property of this tenant.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">90</context>
+          <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00092" datatype="html">
         <source>That property no longer exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">91</context>
+          <context context-type="linenumber">127</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00093" datatype="html">
         <source>One of the environments belongs to another country.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">128</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00095" datatype="html">
         <source>That contact no longer exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10601" datatype="html">
         <source>Give the property a code.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">130</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10602" datatype="html">
         <source>The code is 2 to 32 letters, digits, dots, dashes or underscores.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10603" datatype="html">
         <source>Give the name in English.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10604" datatype="html">
         <source>The English name is too long.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">133</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10605" datatype="html">
         <source>Give the name in Arabic.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">134</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10606" datatype="html">
         <source>The Arabic name is too long.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10607" datatype="html">
         <source>Choose a property type.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10608" datatype="html">
         <source>Choose a city.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">101</context>
+          <context context-type="linenumber">137</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10609" datatype="html">
         <source>The currency code is three letters.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">138</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10610" datatype="html">
         <source>The language code is two letters.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">139</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10611" datatype="html">
         <source>The number of rooms is out of range.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">140</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10612" datatype="html">
         <source>Choose every environment.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">141</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10613" datatype="html">
         <source>The address is too long.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">142</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10614" datatype="html">
         <source>The postal code is too long.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">143</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10615" datatype="html">
         <source>The external identifier is too long.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">144</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10616" datatype="html">
         <source>Choose at least one module.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">109</context>
+          <context context-type="linenumber">145</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10617" datatype="html">
         <source>A module is listed twice.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">146</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00055" datatype="html">
         <source>That row no longer exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">112</context>
+          <context context-type="linenumber">148</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00056" datatype="html">
         <source>That code is already used.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">149</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00057" datatype="html">
         <source>That name is already used.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">150</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00058" datatype="html">
         <source>That country does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">115</context>
+          <context context-type="linenumber">151</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00059" datatype="html">
         <source>That subdivision does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">152</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00060" datatype="html">
         <source>That time zone does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">117</context>
+          <context context-type="linenumber">153</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00061" datatype="html">
         <source>That currency does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">154</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00062" datatype="html">
         <source>That currency is not in the ISO registry.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">155</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10401" datatype="html">
         <source>Give a code.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">156</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10402" datatype="html">
         <source>The code is not in the expected format.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">121</context>
+          <context context-type="linenumber">157</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10403" datatype="html">
         <source>Choose a kind.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">158</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10404" datatype="html">
         <source>Choose a country.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">159</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10405" datatype="html">
         <source>The country code is two letters.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">160</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10406" datatype="html">
         <source>Give the name in English.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">161</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10407" datatype="html">
         <source>The English name is too long: 128 characters at most.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">162</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10408" datatype="html">
         <source>Give the name in Arabic.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">163</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10409" datatype="html">
         <source>The Arabic name is too long: 128 characters at most.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">164</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10410" datatype="html">
         <source>Name the owning service.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">165</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10411" datatype="html">
         <source>The owning service&apos;s name is too long.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">166</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10412" datatype="html">
         <source>Give the three-letter code.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">167</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10413" datatype="html">
         <source>The three-letter code is three letters.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">132</context>
+          <context context-type="linenumber">168</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10414" datatype="html">
         <source>Give the dialling code.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">169</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10415" datatype="html">
         <source>The dialling code is a plus sign and digits.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">170</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00001" datatype="html">
         <source>That category name is already used.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">171</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00002" datatype="html">
         <source>That category no longer exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">172</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00003" datatype="html">
         <source>That value name is already used in this category.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">173</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00004" datatype="html">
         <source>That value no longer exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">138</context>
+          <context context-type="linenumber">174</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.00005" datatype="html">
         <source>A global value cannot go into a tenant&apos;s category.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">175</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10101" datatype="html">
         <source>Which category? Reload the page and try again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">176</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10102" datatype="html">
         <source>Give the category a name.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">141</context>
+          <context context-type="linenumber">177</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10103" datatype="html">
         <source>The name is too long: 200 characters at most.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">142</context>
+          <context context-type="linenumber">178</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10104" datatype="html">
         <source>The description is too long: 500 characters at most.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">179</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10105" datatype="html">
         <source>Which value? Reload the page and try again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">180</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10106" datatype="html">
         <source>Choose a category.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">145</context>
+          <context context-type="linenumber">181</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10107" datatype="html">
         <source>Give the value a name.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">182</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10108" datatype="html">
         <source>The name is too long: 200 characters at most.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">183</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.code.10109" datatype="html">
         <source>The description is too long: 500 characters at most.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">184</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.refused" datatype="html">
         <source>Harmony did not allow this action.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">189</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.invalid" datatype="html">
         <source>Some fields need attention.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">190</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.unauthenticated" datatype="html">
         <source>Sign in again to continue.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">191</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.forbidden" datatype="html">
         <source>Your role cannot do this.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">156</context>
+          <context context-type="linenumber">192</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.busy" datatype="html">
         <source>Still working… please wait a moment.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">193</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.conflict" datatype="html">
         <source>Changed by someone else. Reload to see the latest.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">194</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.unavailable" datatype="html">
         <source>Harmony is not responding. Try again in a moment.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">195</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.errors.kind.unexpected" datatype="html">
         <source>Something went wrong.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">196</context>
         </context-group>
       </trans-unit>
       <trans-unit id="platform.session.signed-in" datatype="html">

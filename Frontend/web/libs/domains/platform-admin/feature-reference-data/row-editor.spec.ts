@@ -17,6 +17,7 @@ const must = (table: ReferenceTable | null): ReferenceTable => {
 const currencies = must(tableByKey('currencies'));
 const countries = must(tableByKey('countries'));
 const cities = must(tableByKey('cities'));
+const settings = must(tableByKey('settings'));
 const dinar: ReferenceRow = {
   code: 'JOD',
   nameEn: 'Jordanian dinar',
@@ -130,6 +131,50 @@ describe('hr-row-editor', () => {
     expect(created[0]?.body).toEqual({ code: 'usd', nameEn: 'US dollar', nameAr: 'دولار أمريكي' });
     expect(created[0]?.key.value).not.toBe('');
     expect(editor.fixture.componentInstance.closed()).toBe(1);
+  });
+
+  it('a new setting: the property types typed with commas travel as a list', async () => {
+    answer = { kind: 'ok', status: OK, data: undefined };
+    const editor = await render(settings);
+    await editor.type('key', 'frontoffice.checkInTime');
+    await editor.type('ownerService', 'FrontOffice');
+    await editor.type('dataType', 'time');
+    await editor.type('systemDefault', '15:00');
+    await editor.type('appliesToTypes', ' HOTEL, resort ,, ');
+    await editor.send();
+    expect(created[0]?.controller).toBe('ConfigSetting');
+    expect(created[0]?.body).toEqual({
+      key: 'frontoffice.checkInTime',
+      ownerService: 'FrontOffice',
+      dataType: 'time',
+      systemDefault: '15:00',
+      appliesToTypes: ['HOTEL', 'resort'],
+    });
+  });
+
+  it('editing a setting: the data type is fixed, the property types read joined and an emptied list is sent as null', async () => {
+    answer = { kind: 'ok', status: OK, data: undefined };
+    const again = await render(settings, {
+      key: 'frontoffice.lateFee',
+      ownerService: 'FrontOffice',
+      dataType: 'decimal',
+      systemDefault: null,
+      appliesToTypes: ['HOTEL', 'RESORT'],
+      isActive: true,
+    });
+    expect(again.page.querySelector('[data-field="dataType"]')).toBeNull();
+    expect(again.page.querySelector<HTMLInputElement>('[data-field="appliesToTypes"]')?.value).toBe(
+      'HOTEL, RESORT',
+    );
+    await again.type('appliesToTypes', '');
+    await again.send();
+    expect(updated[0]?.body).toEqual({
+      key: 'frontoffice.lateFee',
+      ownerService: 'FrontOffice',
+      systemDefault: null,
+      appliesToTypes: null,
+      isActive: true,
+    });
   });
 
   it('editing a currency: the code is read-only, the active flag appears with its hint, Save sends the whole row with its key', async () => {

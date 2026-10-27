@@ -1,0 +1,89 @@
+/* One key in the drawer: the trace as a short list, then the form. */
+.why h3 {
+  margin: 0 0 var(--s2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.trace {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tstep {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s2);
+  min-height: var(--control-sm);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.tstep .val {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+.tstep .val.none {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+.tstep[data-verdict='NotSet'],
+.tstep[data-verdict='Inactive'] {
+  color: var(--ink-3);
+}
+.line {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.warning {
+  margin: var(--s2) 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--warn);
+}
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  margin-block-start: var(--s4);
+  padding-block-start: var(--s4);
+  border-block-start: 1px solid var(--rule);
+}
+.f {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.f label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.f .field {
+  width: 100%;
+  min-width: 0;
+}
+.f .field.short {
+  max-width: 200px;
+}
+.hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.field-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--stop);
+}

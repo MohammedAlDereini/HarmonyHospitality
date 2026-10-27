@@ -19,6 +19,7 @@ const ahmad: SessionUser = {
 };
 
 const grand: PropertySummary = {
+  id: 'p-grd',
   code: 'GRD',
   nameEn: 'Grand Riyadh',
   nameAr: 'غراند الرياض',
@@ -26,6 +27,7 @@ const grand: PropertySummary = {
   currency: 'SAR',
 };
 const harbour: PropertySummary = {
+  id: 'p-nyh',
   code: 'NYH',
   nameEn: 'Harbour New York',
   nameAr: 'هاربر نيويورك',

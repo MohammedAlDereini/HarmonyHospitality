@@ -1,6 +1,6 @@
 /**
  * The platform permission catalogue, mirrored from the framework's PermissionEnum
- * (Harmony.Framework/Harmony.Core.Identity/Permissions/PermissionEnum.cs, 14 values on 24 October 2026).
+ * (Harmony.Framework/Harmony.Core.Identity/Permissions/PermissionEnum.cs, 16 values on 27 October 2026).
  * A number is the stored value: it never changes and is never reused; append only. A retired permission keeps its
  * number here as well. check-error-codes will one day compare this file with the enum (D25).
  */
@@ -18,6 +18,8 @@ const VIEW_TENANTS = 11;
 const MANAGE_TENANTS = 12;
 const VIEW_PROPERTIES = 13;
 const MANAGE_PROPERTIES = 14;
+const VIEW_SETTINGS = 15;
+const MANAGE_SETTINGS = 16;
 
 export const Permission = {
   // Lookups
@@ -39,6 +41,9 @@ export const Permission = {
   // Properties
   ViewProperties: VIEW_PROPERTIES,
   ManageProperties: MANAGE_PROPERTIES,
+  // Settings
+  ViewSettings: VIEW_SETTINGS,
+  ManageSettings: MANAGE_SETTINGS,
 } as const;
 
 export type Permission = (typeof Permission)[keyof typeof Permission];

@@ -1,6 +1,6 @@
 import { fieldForCode, tableByKey, tables } from './tables';
 
-const TABLE_COUNT = 12;
+const TABLE_COUNT = 13;
 // A URL segment: lower-case letters and dashes only. Matches "lookup-values"; rejects "LookupValues".
 // Tester: https://regex101.com/?regex=%5E%5Ba-z-%5D%2B%24&testString=lookup-values
 const segment = /^[a-z-]+$/;
@@ -9,7 +9,7 @@ const segment = /^[a-z-]+$/;
 const controllerName = /^[A-Z][A-Za-z]+$/;
 
 describe('the reference tables', () => {
-  it('names twelve tables, each with a key field or an id, a singular, a description, columns in words, filters and a default order', () => {
+  it('names thirteen tables, each with a key field or an id, a singular, a description, columns in words, filters and a default order', () => {
     expect(tables).toHaveLength(TABLE_COUNT);
     tables.forEach((table) => {
       expect(table.key).toMatch(segment);

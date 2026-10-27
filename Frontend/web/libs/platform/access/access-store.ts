@@ -1,4 +1,5 @@
 import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
+import { CurrentProperty } from '@harmony/platform/context';
 import { ApiClient, HttpStatusEvents } from '@harmony/platform/http';
 import { SessionStore } from '@harmony/platform/session';
 import { firstValueFrom } from 'rxjs';
@@ -13,13 +14,15 @@ export type AccessStatus = 'unknown' | 'loading' | 'ready' | 'unavailable';
 /**
  * Presents permissions and subscription lines; never authorises (architecture 4, row platform/access). Hiding is
  * courtesy: every call is refused by the API on its own. The list lives in this tab's memory only: never in
- * storage, never in a URL; it is read again at every boot, after a separate-window sign-in and once after a 403.
+ * storage, never in a URL; it is read again at every boot, after a separate-window sign-in, once after a 403 and
+ * whenever the URL moves to another hotel (a role held at one hotel says nothing about the next).
  */
 @Injectable({ providedIn: 'root' })
 export class AccessStore {
   private readonly api = inject(ApiClient);
   private readonly session = inject(SessionStore);
   private readonly events = inject(HttpStatusEvents);
+  private readonly property = inject(CurrentProperty);
   private readonly grantsSignal = signal<AccessGrants | null>(null);
   private readonly statusSignal = signal<AccessStatus>('unknown');
   private inFlight: Promise<void> | null = null;
@@ -40,6 +43,17 @@ export class AccessStore {
       untracked(() => {
         if (count > this.seenResumed) {
           this.seenResumed = count;
+          if (this.statusSignal() !== 'unknown') void this.reload();
+        }
+      });
+    });
+    // Another hotel in the URL: the answer is per hotel (X-Harmony-Property), so it is read again there.
+    let hotel = untracked(this.property.code);
+    effect(() => {
+      const code = this.property.code();
+      untracked(() => {
+        if (code !== hotel) {
+          hotel = code;
           if (this.statusSignal() !== 'unknown') void this.reload();
         }
       });
@@ -67,7 +81,7 @@ export class AccessStore {
     return this.ready();
   }
 
-  /** May the person do this? Roles are tenant-wide today; when a property narrows the answer, it becomes a parameter. */
+  /** May the person do this, here? The answer is for the hotel in the URL (tenant-wide roles plus the hotel's own). */
   can(permission: Permission): boolean {
     return this.grants()?.permissions.has(permission) ?? false;
   }

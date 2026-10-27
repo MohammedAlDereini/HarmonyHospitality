@@ -1,6 +1,6 @@
 // Keeps the frontend's error wording honest against the framework's code catalogue (architecture 11.2, D25): every
-// code worded in libs/platform/errors/error-messages.ts must exist in Harmony.Core/Errors/*.cs, so a typo or a
-// retired code never ships silently. Codes the framework has but the frontend does not word are listed with
+// code worded in libs/platform/errors/error-messages.ts must exist in Harmony.Core/Errors/*.cs or among the doors'
+// own codes in Harmony.Core.Identity/ErrorCodes.cs (000.x), so a typo or a retired code never ships silently. Codes the framework has but the frontend does not word are listed with
 // --verbose; they fall back to the kind's wording and are not a failure (not every code reaches a screen).
 // The framework lives beside the repository; HARMONY_FRAMEWORK_ERRORS points elsewhere when it does not.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -8,10 +8,14 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const catalogue = resolve(
-  process.env.HARMONY_FRAMEWORK_ERRORS ??
-    join(root, '..', '..', '..', 'Harmony.Framework', 'Harmony.Core', 'Errors'),
+const framework = resolve(
+  process.env.HARMONY_FRAMEWORK ?? join(root, '..', '..', '..', 'Harmony.Framework'),
 );
+const catalogue = resolve(
+  process.env.HARMONY_FRAMEWORK_ERRORS ?? join(framework, 'Harmony.Core', 'Errors'),
+);
+/** The codes the framework's doors answer with (000.4 forbidden route, 000.10 forbidden property, …). */
+const doorCodes = join(framework, 'Harmony.Core.Identity', 'ErrorCodes.cs');
 const wordingFile = join(root, 'libs', 'platform', 'errors', 'error-messages.ts');
 const verbose = process.argv.includes('--verbose');
 
@@ -26,8 +30,12 @@ if (!existsSync(catalogue)) {
 // Matches `public const string HigherRank = "00076";` and captures the name and the code; rejects other constants.
 const constant = /public const string (\w+) = "([0-9.]+)";/g;
 const known = new Map();
-for (const name of readdirSync(catalogue).filter((file) => file.endsWith('.cs'))) {
-  const text = readFileSync(join(catalogue, name), 'utf8');
+const files = readdirSync(catalogue)
+  .filter((file) => file.endsWith('.cs'))
+  .map((name) => ({ name, path: join(catalogue, name) }));
+if (existsSync(doorCodes)) files.push({ name: 'Core.Identity/ErrorCodes.cs', path: doorCodes });
+for (const { name, path } of files) {
+  const text = readFileSync(path, 'utf8');
   for (const match of text.matchAll(constant)) {
     const [, member, code] = match;
     if (known.has(code)) {

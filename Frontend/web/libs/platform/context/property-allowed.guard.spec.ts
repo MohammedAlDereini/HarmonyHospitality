@@ -7,6 +7,7 @@ import { propertyAllowed } from './property-allowed.guard';
 import { PropertySummary } from './property-summary';
 
 const grand: PropertySummary = {
+  id: 'p-grd',
   code: 'GRD',
   nameEn: 'Grand Riyadh',
   nameAr: 'غراند الرياض',

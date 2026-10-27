@@ -23,6 +23,15 @@ const dialCode = /^\s*\+[0-9]{1,4}\s*$/;
 // Tester: https://regex101.com/?regex=%5E%5Cs*%5BA-Za-z0-9._-%5D%7B2%2C32%7D%5Cs*%24&testString=JO-Legal
 const shortCode = /^\s*[A-Za-z0-9._-]{2,32}\s*$/;
 
+// A setting key: the owning area in lower case, then dotted words. Matches "frontoffice.checkInTime"; rejects
+// "FrontOffice.x" and "frontoffice". Tester: https://regex101.com/?regex=%5E%5Cs*%5Ba-z%5D%5Ba-z0-9%5D*(%5C.%5Ba-zA-Z%5D%5Ba-zA-Z0-9-%5D*)%2B%5Cs*%24&testString=frontoffice.checkInTime
+const settingKey = /^\s*[a-z][a-z0-9]*(\.[a-zA-Z][a-zA-Z0-9-]*)+\s*$/;
+// A service name: a letter, then 1 to 63 letters or digits. Matches "FrontOffice"; rejects "Front Office" and "2Pms".
+// Tester: https://regex101.com/?regex=%5E%5Cs*%5BA-Za-z%5D%5BA-Za-z0-9%5D%7B1%2C63%7D%5Cs*%24&testString=FrontOffice
+const serviceName = /^\s*[A-Za-z][A-Za-z0-9]{1,63}\s*$/;
+const KEY_MAX_LENGTH = 128;
+const DEFAULT_MAX_LENGTH = 1000;
+
 const ascending = (memberName: string): SortOrder => ({ memberName, sortOrder: ASCENDING });
 
 /* ── Field makers: the wording the platform app had, label plus a hint with the standard and an example ── */
@@ -810,6 +819,113 @@ export const tables: readonly ReferenceTable[] = [
     lookup: true,
     canDelete: true,
     scopedBy: 'lookupCategoryId',
+  },
+  {
+    key: 'settings',
+    controller: 'ConfigSetting',
+    title: referenceTitle('settings'),
+    singular: $localize`:@@platform-admin.reference.settings.singular:setting`,
+    description: $localize`:@@platform-admin.reference.settings.description:The settings other services own, registered once: every customer can then set them for the whole chain, a group or one hotel. Identity keeps the values as text and decides which one wins at a hotel; the owning service decides what a value means.`,
+    idField: 'key',
+    fields: [
+      {
+        key: 'key',
+        label: $localize`:@@platform-admin.reference.field.setting-key:Key`,
+        kind: 'text',
+        required: true,
+        isKey: true,
+        maxLength: KEY_MAX_LENGTH,
+        pattern: settingKey,
+        patternCode: '10802',
+        dir: 'ltr',
+        hint: $localize`:@@platform-admin.reference.hint.setting-key:The owning area in lower case, then dotted words, like frontoffice.checkInTime. Fixed once saved.`,
+        placeholder: 'frontoffice.checkInTime',
+      },
+      {
+        ...ownerService(
+          $localize`:@@platform-admin.reference.hint.setting-owner:The service that reads the value and decides what it means, like FrontOffice.`,
+          'FrontOffice',
+        ),
+        pattern: serviceName,
+        patternCode: '10804',
+      },
+      {
+        key: 'dataType',
+        label: $localize`:@@platform-admin.reference.field.data-type:Data type`,
+        kind: 'select',
+        required: true,
+        createOnly: true,
+        options: [
+          {
+            value: 'time',
+            label: $localize`:@@platform-admin.reference.data-type.time:Time (15:00)`,
+          },
+          {
+            value: 'int',
+            label: $localize`:@@platform-admin.reference.data-type.int:Whole number`,
+          },
+          {
+            value: 'decimal',
+            label: $localize`:@@platform-admin.reference.data-type.decimal:Number with decimals`,
+          },
+          { value: 'bool', label: $localize`:@@platform-admin.reference.data-type.bool:Yes or no` },
+          { value: 'string', label: $localize`:@@platform-admin.reference.data-type.string:Text` },
+        ],
+        hint: $localize`:@@platform-admin.reference.hint.data-type:A hint for the screens and the owner; Identity never checks a value against it. Fixed once saved.`,
+      },
+      {
+        key: 'systemDefault',
+        label: $localize`:@@platform-admin.reference.field.system-default:Default`,
+        kind: 'text',
+        maxLength: DEFAULT_MAX_LENGTH,
+        optional: true,
+        dir: 'ltr',
+        hint: $localize`:@@platform-admin.reference.hint.system-default:What wins when nobody set anything, like 15:00. Empty: no default.`,
+      },
+      {
+        key: 'appliesToTypes',
+        label: $localize`:@@platform-admin.reference.field.applies-to:For property types`,
+        kind: 'text',
+        list: true,
+        optional: true,
+        dir: 'ltr',
+        hint: $localize`:@@platform-admin.reference.hint.applies-to:Property type codes separated by commas, like HOTEL, RESORT. Empty: every type.`,
+      },
+      isActive,
+    ],
+    columns: [
+      {
+        key: 'key',
+        label: $localize`:@@platform-admin.reference.column.setting-key:Key`,
+        sort: 'Key',
+      },
+      { key: 'ownerService', label: col.ownerService, sort: 'OwnerService' },
+      {
+        key: 'dataType',
+        label: $localize`:@@platform-admin.reference.column.data-type:Data type`,
+        sort: 'DataType',
+      },
+      {
+        key: 'systemDefault',
+        label: $localize`:@@platform-admin.reference.column.default:Default`,
+      },
+      {
+        key: 'appliesToTypes',
+        label: $localize`:@@platform-admin.reference.column.applies-to:For types`,
+      },
+      { key: 'isActive', label: col.state, kind: 'onoff' },
+    ],
+    filters: [
+      {
+        key: 'ownerService',
+        label: col.ownerService,
+        kind: 'text',
+        placeholder: 'FrontOffice',
+      },
+      stateFilter,
+      searchFilter,
+    ],
+    defaultSort: [ascending('Key')],
   },
 ];
 

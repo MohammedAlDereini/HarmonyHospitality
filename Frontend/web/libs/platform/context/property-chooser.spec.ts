@@ -6,6 +6,7 @@ import { PropertyChooser } from './property-chooser';
 import { PropertySummary } from './property-summary';
 
 const grand: PropertySummary = {
+  id: 'p-grd',
   code: 'GRD',
   nameEn: 'Grand Riyadh',
   nameAr: 'غراند الرياض',

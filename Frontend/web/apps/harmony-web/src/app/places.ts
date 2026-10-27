@@ -35,7 +35,16 @@ const hotelPlaces = (): ShellPlaces => {
           },
         ]
       : [];
-    return [...users, ...roles];
+    const settings: DockLink[] = access.can(Permission.ViewSettings)
+      ? [
+          {
+            label: $localize`:@@ui.shell.nav.settings:Settings`,
+            link: ['/p', code, 'admin', 'settings'],
+            icon: 'star',
+          },
+        ]
+      : [];
+    return [...users, ...roles, ...settings];
   });
   const items = computed<readonly NavItem[]>(() => [
     { ...home, group: $localize`:@@ui.shell.nav.group.workspaces:Workspaces` },

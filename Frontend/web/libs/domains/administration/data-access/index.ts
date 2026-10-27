@@ -20,14 +20,22 @@ export {
   updateRolePath,
 } from './roles-store';
 export {
+  GROUPS_PAGE_SIZE,
   PersonStore,
+  accessPath,
   accountPath,
+  assignRolePath,
   devicesPath,
+  endAssignmentPath,
   endExemptionPath,
   eventsPath,
+  grantAccessPath,
+  myGroupsPath,
   passkeysPath,
   removePasskeyPath,
   resetTwoFactorPath,
+  revokeGrantPath,
   signOutDevicePath,
   updateRolesPath,
 } from './person-store';
+export { SettingsStore, clearValuePath, effectivePath, setValuePath } from './settings-store';

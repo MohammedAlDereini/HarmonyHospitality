@@ -43,6 +43,12 @@ export const routes: Routes = [
                 loadChildren: async () =>
                   (await import('@harmony/administration/feature-roles')).routes,
               },
+              {
+                path: 'settings',
+                canMatch: [allowed(Permission.ViewSettings)],
+                loadChildren: async () =>
+                  (await import('@harmony/administration/feature-settings')).routes,
+              },
             ],
           },
           { path: '', pathMatch: 'full', redirectTo: 'admin' },

@@ -13,6 +13,7 @@ const ROOMS_NOBODY_READS = 120;
 const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 1));
 
 const grandRow = {
+  id: 'p-grd',
   code: 'GRD',
   nameEn: 'Grand Riyadh',
   nameAr: 'غراند الرياض',
@@ -55,6 +56,7 @@ describe('MyProperties', () => {
     expect(properties.status()).toBe('ready');
     expect(properties.list()).toEqual([
       {
+        id: 'p-grd',
         code: 'GRD',
         nameEn: 'Grand Riyadh',
         nameAr: 'غراند الرياض',

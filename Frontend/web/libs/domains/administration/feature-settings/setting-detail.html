@@ -1,0 +1,136 @@
+<section class="why" aria-labelledby="setting-why-heading">
+  <h3 id="setting-why-heading" i18n="@@administration.settings.why">Where the value comes from</h3>
+  @if (setting().outcome === 'NotApplicable') {
+    <p class="line" i18n="@@administration.settings.why.not-applicable">
+      This setting is for other kinds of property: nothing is looked up here.
+    </p>
+  } @else {
+    <ol class="trace">
+      @for (step of setting().trace; track $index) {
+        <li class="tstep" [attr.data-verdict]="step.verdict">
+          <span class="where">{{ stepText(step) }}</span>
+          @if (step.value !== null) {
+            <b class="val" dir="ltr"
+              ><bdi>{{ step.value }}</bdi></b
+            >
+          } @else {
+            <span class="val none" i18n="@@administration.settings.why.nothing">nothing set</span>
+          }
+          <span class="pill" [class.on]="step.verdict === 'Won'">{{ verdictText(step) }}</span>
+        </li>
+      }
+    </ol>
+    @if (setting().outcome === 'Conflict') {
+      <p class="warning" role="note" i18n="@@administration.settings.why.conflict">
+        Two groups of the same precedence set this key, so neither wins. Set it for this hotel, or
+        clear it in one of the groups.
+      </p>
+    }
+  }
+</section>
+@if (mayManage() && setting().outcome !== 'NotApplicable') {
+  <form class="editor" (submit)="onSubmit($event)" novalidate>
+    <div class="f">
+      <label for="setting-place" i18n="@@administration.settings.field.place">Where</label>
+      <select id="setting-place" class="field" [formField]="form.place">
+        @for (place of places(); track $index) {
+          <option [value]="'' + $index">{{ placeText(place) }}</option>
+        }
+      </select>
+      <p class="hint" i18n="@@administration.settings.field.place.hint">
+        A group or the whole customer reaches every hotel that does not set its own value.
+      </p>
+    </div>
+    <div class="f">
+      <label for="setting-value" i18n="@@administration.settings.field.value">Value</label>
+      @switch (kind()) {
+        @case ('bool') {
+          <select
+            id="setting-value"
+            class="field short"
+            [formField]="form.value"
+            [attr.aria-invalid]="form.value().touched() && form.value().invalid() ? 'true' : null"
+            [attr.aria-describedby]="
+              form.value().errors().length > 0 ? 'setting-value-error' : null
+            "
+          >
+            <option value="" i18n="@@administration.settings.field.value.choose">Choose</option>
+            <option value="true" i18n="@@administration.settings.field.value.yes">
+              Yes (true)
+            </option>
+            <option value="false" i18n="@@administration.settings.field.value.no">
+              No (false)
+            </option>
+          </select>
+        }
+        @case ('time') {
+          <input
+            id="setting-value"
+            class="field short"
+            type="time"
+            dir="ltr"
+            [formField]="form.value"
+            [attr.aria-invalid]="form.value().touched() && form.value().invalid() ? 'true' : null"
+            [attr.aria-describedby]="
+              form.value().errors().length > 0 ? 'setting-value-error' : null
+            "
+          />
+        }
+        @default {
+          <input
+            id="setting-value"
+            class="field"
+            type="text"
+            autocomplete="off"
+            dir="auto"
+            [attr.inputmode]="
+              kind() === 'int' ? 'numeric' : kind() === 'decimal' ? 'decimal' : null
+            "
+            [formField]="form.value"
+            [attr.aria-invalid]="form.value().touched() && form.value().invalid() ? 'true' : null"
+            [attr.aria-describedby]="
+              form.value().errors().length > 0 ? 'setting-value-error' : null
+            "
+          />
+        }
+      }
+      <p class="hint" i18n="@@administration.settings.field.value.hint">
+        A {{ kind() }} value. The service that owns the setting decides what it accepts.
+      </p>
+      @if (form.value().touched() && form.value().errors().length > 0) {
+        <p id="setting-value-error" class="field-error" role="alert">
+          @for (error of form.value().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="acts">
+      <button
+        type="submit"
+        class="btn solid"
+        data-act="save-setting"
+        [disabled]="form().submitting()"
+        i18n="@@administration.settings.save"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn"
+        data-act="clear-setting"
+        (click)="clear()"
+        [disabled]="clearing() || chosen()?.value === null"
+        i18n="@@administration.settings.clear"
+      >
+        Clear here
+      </button>
+      <button type="button" class="btn" (click)="cancel()" i18n="@@administration.settings.cancel">
+        Cancel
+      </button>
+    </div>
+    @if (problem(); as text) {
+      <p class="field-error" role="alert">{{ text }}</p>
+    }
+  </form>
+}

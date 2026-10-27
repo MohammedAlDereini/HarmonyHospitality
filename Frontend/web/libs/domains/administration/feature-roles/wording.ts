@@ -16,6 +16,8 @@ const byPermission: Readonly<Record<string, string>> = {
   ManageTenants: $localize`:@@administration.permission.manage-tenants:Manage tenants`,
   ViewProperties: $localize`:@@administration.permission.view-properties:View properties`,
   ManageProperties: $localize`:@@administration.permission.manage-properties:Manage properties`,
+  ViewSettings: $localize`:@@administration.permission.view-settings:View settings`,
+  ManageSettings: $localize`:@@administration.permission.manage-settings:Manage settings`,
 };
 
 /** A permission's label; a member the frontend does not know yet shows the name Identity sent. */

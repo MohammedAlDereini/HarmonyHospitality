@@ -1,0 +1,4 @@
+/* The hotel's settings as a table (ui/data gives the key column and the pills); the winning value reads bold. */
+table.data td.value b {
+  font-weight: 600;
+}

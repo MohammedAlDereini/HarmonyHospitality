@@ -1,0 +1,172 @@
+<form class="editor" (submit)="onSubmit($event)" novalidate>
+  <div class="f">
+    <label for="access-role" i18n="@@administration.person.access.role">Role</label>
+    <select
+      id="access-role"
+      #roleBox
+      class="field"
+      [formField]="form.roleId"
+      [attr.aria-invalid]="form.roleId().touched() && form.roleId().invalid() ? 'true' : null"
+      [attr.aria-describedby]="form.roleId().errors().length > 0 ? 'access-role-error' : null"
+    >
+      <option value="" i18n="@@administration.person.access.choose-role">Choose a role</option>
+      @for (role of roles.roles(); track role.id) {
+        <option [value]="role.id">{{ roleLabel(role) }}</option>
+      }
+    </select>
+    @if (roles.problem(); as text) {
+      <p class="field-error" role="alert">
+        {{ text }}&ngsp;<button
+          type="button"
+          class="btn"
+          (click)="roles.load()"
+          i18n="@@administration.person.access.roles-again"
+        >
+          Try again
+        </button>
+      </p>
+    }
+    @if (form.roleId().touched() && form.roleId().errors().length > 0) {
+      <p id="access-role-error" class="field-error" role="alert">
+        @for (error of form.roleId().errors(); track error.kind) {
+          <span>{{ error.message }}</span>
+        }
+      </p>
+    }
+  </div>
+  <div class="f">
+    <label for="access-where" i18n="@@administration.person.access.where">Where</label>
+    <select
+      id="access-where"
+      class="field"
+      [formField]="form.where"
+      [attr.aria-invalid]="form.where().touched() && form.where().invalid() ? 'true' : null"
+      [attr.aria-describedby]="form.where().errors().length > 0 ? 'access-where-error' : null"
+    >
+      <option value="" i18n="@@administration.person.access.choose-where">
+        Choose a hotel or a group
+      </option>
+      @if (hotels.list().length > 0) {
+        <optgroup i18n-label="@@administration.person.access.hotels" label="Hotels">
+          @for (hotel of hotels.list(); track hotel.id) {
+            <option [value]="hotelChoice(hotel)">{{ hotelLabel(hotel) }}</option>
+          }
+        </optgroup>
+      }
+      @if (person.groupRows().length > 0) {
+        <optgroup i18n-label="@@administration.person.access.groups" label="Groups">
+          @for (group of person.groupRows(); track group.id) {
+            <option [value]="groupChoice(group)">{{ groupLabel(group) }}</option>
+          }
+        </optgroup>
+      }
+    </select>
+    <p class="hint" i18n="@@administration.person.access.where.hint">
+      At a group, the role reaches every hotel in it, today and later.
+    </p>
+    @if (form.where().touched() && form.where().errors().length > 0) {
+      <p id="access-where-error" class="field-error" role="alert">
+        @for (error of form.where().errors(); track error.kind) {
+          <span>{{ error.message }}</span>
+        }
+      </p>
+    }
+  </div>
+  @if (granting()) {
+    <div class="f">
+      <label for="access-hours" i18n="@@administration.person.access.hours">For how long</label>
+      <input
+        id="access-hours"
+        class="field short"
+        type="number"
+        inputmode="numeric"
+        dir="ltr"
+        [formField]="form.hours"
+        [attr.aria-invalid]="form.hours().touched() && form.hours().invalid() ? 'true' : null"
+        [attr.aria-describedby]="
+          form.hours().errors().length > 0 ? 'access-hours-error' : 'access-hours-hint'
+        "
+      />
+      <p class="hint" id="access-hours-hint" i18n="@@administration.person.access.hours.hint">
+        Hours from now, 720 (30 days) at most. The loan ends by itself.
+      </p>
+      @if (form.hours().touched() && form.hours().errors().length > 0) {
+        <p id="access-hours-error" class="field-error" role="alert">
+          @for (error of form.hours().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+    <div class="f">
+      <label for="access-reason" i18n="@@administration.person.access.reason">Reason</label>
+      <input
+        id="access-reason"
+        class="field"
+        type="text"
+        autocomplete="off"
+        dir="auto"
+        [formField]="form.reason"
+        i18n-placeholder="@@administration.person.access.reason.placeholder"
+        placeholder="Why this person needs the role for a while"
+        [attr.aria-invalid]="form.reason().touched() && form.reason().invalid() ? 'true' : null"
+        [attr.aria-describedby]="form.reason().errors().length > 0 ? 'access-reason-error' : null"
+      />
+      @if (form.reason().touched() && form.reason().errors().length > 0) {
+        <p id="access-reason-error" class="field-error" role="alert">
+          @for (error of form.reason().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+  } @else {
+    <div class="f">
+      <label for="access-days" i18n="@@administration.person.access.days">Ends after</label>
+      <input
+        id="access-days"
+        class="field short"
+        type="number"
+        inputmode="numeric"
+        dir="ltr"
+        [formField]="form.days"
+        [attr.aria-invalid]="form.days().touched() && form.days().invalid() ? 'true' : null"
+        [attr.aria-describedby]="
+          form.days().errors().length > 0 ? 'access-days-error' : 'access-days-hint'
+        "
+      />
+      <p class="hint" id="access-days-hint" i18n="@@administration.person.access.days.hint">
+        Days from now; leave empty for a role that stays until someone ends it.
+      </p>
+      @if (form.days().touched() && form.days().errors().length > 0) {
+        <p id="access-days-error" class="field-error" role="alert">
+          @for (error of form.days().errors(); track error.kind) {
+            <span>{{ error.message }}</span>
+          }
+        </p>
+      }
+    </div>
+  }
+  <div class="acts">
+    <button type="submit" class="btn solid" [disabled]="form().submitting()">
+      @if (granting()) {
+        <ng-container i18n="@@administration.person.access.grant.go"
+          >Grant for a while</ng-container
+        >
+      } @else {
+        <ng-container i18n="@@administration.person.access.assign.go">Give the role</ng-container>
+      }
+    </button>
+    <button
+      type="button"
+      class="btn"
+      (click)="cancel()"
+      i18n="@@administration.person.access.cancel"
+    >
+      Cancel
+    </button>
+  </div>
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
+</form>

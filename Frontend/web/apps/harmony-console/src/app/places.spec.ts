@@ -5,7 +5,7 @@ import { SHELL_PLACES } from '@harmony/ui/shell';
 import { providePlatformPlaces } from './places';
 
 const PLATFORM_ITEMS = 5;
-const REFERENCE_TABLES = 12;
+const REFERENCE_TABLES = 13;
 const OWN_ITEMS = 2;
 
 describe('the platform places', () => {
@@ -53,7 +53,7 @@ describe('the platform places', () => {
     const tables = items.filter((item) => item.startsWith('Reference data:'));
     expect(tables).toHaveLength(REFERENCE_TABLES);
     expect(tables[0]).toBe('Reference data:Currencies');
-    expect(tables.at(-1)).toBe('Reference data:Lookup values');
+    expect(tables.at(-1)).toBe('Reference data:Settings registry');
     expect(places.items().find((item) => item.label === 'Cities')?.link).toEqual([
       '/reference',
       'cities',
