@@ -33,8 +33,9 @@ public class CreateTenantCommandHandler : TenantAdministratorHandlerBase, IReque
         UserManager<User> userManager,
         IAccountMailer mailer,
         ICacheService cacheService,
+        IFederatedAuthorityRepository authorities,
         ILogger<CreateTenantCommandHandler> logger)
-        : base(tenants, userAccounts, auditEvents, securityEvents, callContext, platform, permissions, roles, userManager, mailer, cacheService, logger)
+        : base(tenants, userAccounts, auditEvents, securityEvents, callContext, platform, permissions, roles, userManager, mailer, cacheService, authorities, logger)
     {
         this.logger = logger;
     }

@@ -1,3 +1,4 @@
+using Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +56,34 @@ public class UserAccountConfiguration : IEntityTypeConfiguration<User>
         // The two-step exception list: the admin's reason, or null when the person is not on it. Same length as StateReason.
         builder.Property(e => e.TwoStepExemptReason)
             .HasMaxLength(500);
+
+        // The ERD's identity of the account: where it was made and its id there. Every account so far was made here.
+        builder.Property(e => e.Issuer)
+            .IsRequired()
+            .HasMaxLength(FederatedAuthority.IssuerMaxLength)
+            .HasDefaultValue(FederatedAuthority.LocalIssuer);
+
+        builder.Property(e => e.Subject)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        builder.HasIndex(e => new { e.Issuer, e.Subject })
+            .IsUnique()
+            .HasDatabaseName("UX_UserAccounts_Issuer_Subject");
+
+        builder.Property(e => e.IsServicePrincipal)
+            .IsRequired();
+
+        // Two-step set up, read straight from Identity's own column, so the two can never disagree.
+        builder.Property(e => e.IsMfaEnrolled)
+            .HasComputedColumnSql("[TwoFactorEnabled]", stored: true);
+
+        // The account this one was merged into (stage D). An account is never deleted while another names it.
+        builder.HasOne<User>().WithMany().HasForeignKey(e => e.SupersededByUserAccountId).OnDelete(DeleteBehavior.Restrict);
+
+        // The administrator's exception: this person keeps a Harmony password where the company login covers them.
+        builder.Property(e => e.PasswordSignIn)
+            .IsRequired();
 
         builder.Ignore(e => e.CanSignIn);
         builder.Ignore(e => e.IsTwoStepExempt);

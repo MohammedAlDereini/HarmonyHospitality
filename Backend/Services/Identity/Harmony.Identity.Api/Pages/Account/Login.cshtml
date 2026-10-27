@@ -5,13 +5,13 @@
 }
 
 <h1>Sign in</h1>
-<p class="lead">Your work e-mail and password.</p>
+<p class="lead">Your work e-mail and password. If your company signs you in with Microsoft or Google, your e-mail is enough.</p>
 <form method="post">
     <input type="hidden" asp-for="ReturnUrl" />
     <label asp-for="Email">E-mail</label>
     <input asp-for="Email" type="email" autocomplete="username" autofocus required />
     <label asp-for="Password">Password</label>
-    <input asp-for="Password" type="password" autocomplete="current-password" required />
+    <input asp-for="Password" type="password" autocomplete="current-password" />
     @if (Model.Error is not null)
     {
         <p class="error" role="alert">@Model.Error</p>

@@ -1,6 +1,8 @@
 ﻿using Harmony.Core.BuildingBlocks;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.ConfigModule;
+using Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule;
+using Harmony.Identity.Domain.Entities.Aggregates.IdentityLinkModule;
 using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
@@ -46,6 +48,10 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<PropertyGroupMember> PropertyGroupMembers { get; set; }
     public DbSet<ConfigSetting> ConfigSettings { get; set; }
     public DbSet<ConfigValue> ConfigValues { get; set; }
+    public DbSet<FederatedAuthority> FederatedAuthorities { get; set; }
+    public DbSet<FederatedAuthorityDomain> FederatedAuthorityDomains { get; set; }
+    public DbSet<ExternalIdentityLink> ExternalIdentityLinks { get; set; }
+    public DbSet<IdentityLinkPeriod> ExternalIdentityLinkPeriods { get; set; }
     public DbSet<User> UserAccounts { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<RoleAssignment> RoleAssignments { get; set; }

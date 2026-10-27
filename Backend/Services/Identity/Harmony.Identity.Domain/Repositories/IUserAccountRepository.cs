@@ -35,6 +35,12 @@ public interface IUserAccountRepository : IRepository<User>
     /// </summary>
     public Task<User?> FindByIdAcrossTenantsAsync(Guid id, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// The customer's active accounts holding its ADMINISTRATOR system role customer-wide, untracked: who could still get in
+    /// if the company login failed (the fallback administrator rule).
+    /// </summary>
+    public Task<IReadOnlyList<User>> ActiveAdministratorsAsync(Guid tenantId, CancellationToken cancellationToken);
+
     /// <summary>The first account holding a role inside a named tenant, whatever tenant the caller is in (a tenant's administrator).</summary>
     public Task<User?> FindWithRoleInTenantAsync(Guid tenantId, Guid roleId, CancellationToken cancellationToken);
 

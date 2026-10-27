@@ -173,6 +173,127 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule.FederatedAuthority", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Audience")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Issuer")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Scheme")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("Issuer")
+                        .IsUnique()
+                        .HasDatabaseName("UX_FederatedAuthorities_MicrosoftIssuer")
+                        .HasFilter("[Scheme] = N'Microsoft'");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "Scheme")
+                        .IsUnique()
+                        .HasDatabaseName("UX_FederatedAuthorities_Tenant_Scheme");
+
+                    b.ToTable("FederatedAuthorities", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_FederatedAuthorities_LocalIsOn", "[Scheme] <> N'Local' OR ([IsEnabled] = 1 AND [Issuer] = N'local')");
+
+                            t.HasCheckConstraint("CK_FederatedAuthorities_Scheme", "[Scheme] IN (N'Local', N'Microsoft', N'Google')");
+                        });
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule.FederatedAuthorityDomain", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Domain")
+                        .IsRequired()
+                        .HasMaxLength(253)
+                        .HasColumnType("nvarchar(253)");
+
+                    b.Property<Guid>("FederatedAuthorityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("Domain")
+                        .IsUnique()
+                        .HasDatabaseName("UX_FederatedAuthorityDomains_Domain");
+
+                    b.HasIndex("FederatedAuthorityId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("FederatedAuthorityDomains", (string)null);
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.GroupMembershipModule.PropertyGroupMember", b =>
                 {
                     b.Property<Guid>("Id")
@@ -231,6 +352,129 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.HasIndex("TenantId", "PropertyGroupId", "TypeCode");
 
                     b.ToTable("PropertyGroupMembers", (string)null);
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.IdentityLinkModule.ExternalIdentityLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("FederatedAuthorityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("LinkedBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProviderSubject")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UserAccountId");
+
+                    b.HasIndex("FederatedAuthorityId", "ProviderSubject")
+                        .IsUnique()
+                        .HasDatabaseName("UX_ExternalIdentityLinks_Authority_Subject");
+
+                    b.HasIndex("TenantId", "UserAccountId")
+                        .HasDatabaseName("IX_ExternalIdentityLinks_Account");
+
+                    b.ToTable("ExternalIdentityLinks", (string)null);
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.IdentityLinkModule.IdentityLinkPeriod", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTimeOffset>("FromUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("LinkId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ToUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("LinkId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_ExternalIdentityLinkPeriods_OneOpen")
+                        .HasFilter("[ToUtc] IS NULL");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UserAccountId");
+
+                    b.ToTable("ExternalIdentityLinkPeriods", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ExternalIdentityLinkPeriods_Order", "[ToUtc] IS NULL OR [ToUtc] >= [FromUtc]");
+                        });
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.LookupModule.LookupCategory", b =>
@@ -1284,6 +1528,21 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsMfaEnrolled")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bit")
+                        .HasComputedColumnSql("[TwoFactorEnabled]", true);
+
+                    b.Property<bool>("IsServicePrincipal")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Issuer")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasDefaultValue("local");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -1311,6 +1570,9 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("PasswordSignIn")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -1336,6 +1598,14 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.Property<string>("StateReason")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<Guid?>("SupersededByUserAccountId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
@@ -1367,7 +1637,13 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .HasDatabaseName("UX_UserAccounts_UserName")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("SupersededByUserAccountId");
+
                     b.HasIndex("TenantId");
+
+                    b.HasIndex("Issuer", "Subject")
+                        .IsUnique()
+                        .HasDatabaseName("UX_UserAccounts_Issuer_Subject");
 
                     b.HasIndex("TenantId", "NormalizedEmail")
                         .HasDatabaseName("IX_UserAccounts_Tenant_Email");
@@ -2171,6 +2447,30 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule.FederatedAuthority", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule.FederatedAuthorityDomain", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule.FederatedAuthority", null)
+                        .WithMany("Domains")
+                        .HasForeignKey("FederatedAuthorityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.GroupMembershipModule.PropertyGroupMember", b =>
                 {
                     b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", null)
@@ -2220,6 +2520,48 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         });
 
                     b.Navigation("Period")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.IdentityLinkModule.ExternalIdentityLink", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule.FederatedAuthority", null)
+                        .WithMany()
+                        .HasForeignKey("FederatedAuthorityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.IdentityLinkModule.IdentityLinkPeriod", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.IdentityLinkModule.ExternalIdentityLink", null)
+                        .WithMany("Periods")
+                        .HasForeignKey("LinkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -2667,6 +3009,14 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
+                        .WithMany()
+                        .HasForeignKey("SupersededByUserAccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.UserDevice", b =>
                 {
                     b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
@@ -2777,6 +3127,16 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule.FederatedAuthority", b =>
+                {
+                    b.Navigation("Domains");
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.IdentityLinkModule.ExternalIdentityLink", b =>
+                {
+                    b.Navigation("Periods");
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PermissionModule.Permission", b =>

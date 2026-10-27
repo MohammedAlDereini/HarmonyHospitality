@@ -4,10 +4,13 @@ using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Services;
 using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
+using Harmony.Identity.Handler.Queries.CompanyLoginModule;
+using Harmony.Identity.Infrastructure.CompanyLogin;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Harmony.Identity.Infrastructure.RateLimiting;
 using Harmony.Identity.Infrastructure.Tenants;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -24,6 +27,8 @@ namespace Harmony.Identity.Api.Pages.Account;
 /// The one exception is the two-step exception list (like Mews): there the password alone signs the person in.
 /// A passkey (item 6, like Mews) is the other way in: no password, no code; the key the person's device holds and the
 /// face, fingerprint or PIN that unlocks it are the two factors, so it is a complete sign-in on its own.
+/// Company login (stage A, the Mews way): an e-mail that a customer's switched-on company login covers goes to the
+/// company's Microsoft or Google sign-in instead, before any password is checked; CompanySignIn finishes it.
 /// </summary>
 [AllowAnonymous]
 [SignInPageHeaders]
@@ -31,6 +36,20 @@ namespace Harmony.Identity.Api.Pages.Account;
 public sealed class LoginModel : PageModel
 {
     public const string TimedOut = "timed-out";
+
+    /// <summary>The notices CompanySignIn and the company handlers send back here, and their words.</summary>
+    public static readonly IReadOnlyDictionary<string, string> CompanyNotices = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        ["company-failed"] = "Your company's sign-in did not finish. Try again.",
+        ["company-no-account"] = "Your company account is not set up in Harmony yet. Ask your administrator.",
+        ["company-refused"] = "This company account cannot sign in to Harmony. Ask your administrator.",
+        ["company-not-active"] = "This account cannot sign in. Contact an administrator.",
+        ["company-tenant"] = TenantNotActiveMessage,
+        ["company-platform-only"] = PlatformOnly.Message,
+    };
+
+    /// <summary>A company-login person tried a passkey: the company decides how they sign in.</summary>
+    private const string CompanyLoginMessage = "Your company signs you in with its own account. Enter your work e-mail and press Sign in.";
 
     /// <summary>The company is suspended or terminated: the account is fine, so the words say the company, not the person.</summary>
     private const string TenantNotActiveMessage = "Your company's access to Harmony is suspended, so this account cannot sign in. Contact Harmony.";
@@ -114,7 +133,9 @@ public sealed class LoginModel : PageModel
         SignInSession.EnsureDeviceKey(this.HttpContext);
 
         this.ForgotPasswordUrl = ForgotPasswordOf(request);
-        this.Error = notice == TimedOut ? "The sign-in step timed out. Start again." : null;
+        this.Error = notice == TimedOut
+            ? "The sign-in step timed out. Start again."
+            : notice is not null && CompanyNotices.TryGetValue(notice, out var words) ? words : null;
         return this.Page();
     }
 
@@ -124,6 +145,19 @@ public sealed class LoginModel : PageModel
         if (request is null)
         {
             return this.RedirectToPage("Error");
+        }
+
+        // Company login first: an e-mail a switched-on company login covers goes to the company, and no password is checked.
+        if (await this.mediator.Send(new GetCompanyRouteQuery { Email = this.Email }, this.HttpContext.RequestAborted) is { } route)
+        {
+            return this.Challenge(this.CompanyChallenge(route), route.AuthenticationScheme);
+        }
+
+        if (string.IsNullOrEmpty(this.Password))
+        {
+            this.ForgotPasswordUrl = ForgotPasswordOf(request);
+            this.Error = "Enter your password.";
+            return this.Page();
         }
 
         var result = await this.passwordCheck.CheckAsync(this.Email, this.Password, tenant: null, this.HttpContext.RequestAborted);
@@ -244,6 +278,18 @@ public sealed class LoginModel : PageModel
             await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = refusal }, this.HttpContext.RequestAborted);
         }
 
+        // The passkey verified, but the person's company signs them in: the company decides, not a key held here.
+        if (result.User is not null
+            && result.Status == PasskeySignInStatus.Accepted
+            && await this.mediator.Send(new GetCompanyRouteQuery { Email = result.User.Email }, this.HttpContext.RequestAborted) is not null)
+        {
+            await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = SecurityAuditActions.SignInCompanyRefused }, this.HttpContext.RequestAborted);
+            SignInSession.EnsureDeviceKey(this.HttpContext);
+            this.ForgotPasswordUrl = ForgotPasswordOf(request);
+            this.Error = CompanyLoginMessage;
+            return this.Page();
+        }
+
         // The passkey verified; is this client for this person? The same door as the password path.
         if (result.User is not null
             && result.Status == PasskeySignInStatus.Accepted
@@ -286,6 +332,17 @@ public sealed class LoginModel : PageModel
             _ => "The passkey was not accepted. Try again, or sign in with your password.",
         };
         return this.Page();
+    }
+
+    // The company's sign-in, with where to come back and the hints that spare the person typing their e-mail again.
+    private AuthenticationProperties CompanyChallenge(CompanyRoute route)
+    {
+        var properties = new AuthenticationProperties { RedirectUri = this.Url.Page("CompanySignIn", new { this.ReturnUrl }) };
+        properties.Items[CompanyLoginSchemes.ReturnUrlItem] = this.ReturnUrl;
+        properties.Items[CompanyLoginSchemes.SchemeItem] = route.AuthenticationScheme;
+        properties.Items[CompanyLoginSchemes.LoginHintItem] = this.Email!.Trim();
+        properties.Items[CompanyLoginSchemes.DomainHintItem] = route.Domain;
+        return properties;
     }
 
     // The trail action for a refused password step, or null when the step was not refused.

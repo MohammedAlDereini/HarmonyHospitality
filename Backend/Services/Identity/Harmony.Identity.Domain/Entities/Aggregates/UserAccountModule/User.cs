@@ -3,6 +3,7 @@ using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 using Harmony.Core.Exceptions;
 using Harmony.Core.Models;
 using Harmony.Identity.Domain.Common;
+using Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule;
 using Microsoft.AspNetCore.Identity;
 
 namespace Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
@@ -35,6 +36,29 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
     /// </summary>
     public string? TwoStepExemptReason { get; private set; }
 
+    /// <summary>
+    /// Where this account was made and its id there (the ERD's Issuer, Subject): "local" and the account's own id for
+    /// every account Harmony makes. A company sign-in is a link (ExternalIdentityLinks), never a change here.
+    /// </summary>
+    public string Issuer { get; private set; } = FederatedAuthority.LocalIssuer;
+
+    public string Subject { get; private set; } = null!;
+
+    /// <summary>A machine, not a person (the ERD's IsServicePrincipal). None exist yet; every account Harmony makes is a person.</summary>
+    public bool IsServicePrincipal { get; private set; }
+
+    /// <summary>Two-step is set up (the ERD's IsMfaEnrolled), computed by SQL from Identity's TwoFactorEnabled: never written here.</summary>
+    public bool IsMfaEnrolled { get; private set; }
+
+    /// <summary>The account this one was merged into (the ERD's SupersededByUserAccountId); null while it stands on its own. Set by stage D's merge.</summary>
+    public Guid? SupersededByUserAccountId { get; private set; }
+
+    /// <summary>
+    /// The administrator kept this person on a Harmony password even where the customer's company login covers their
+    /// e-mail domain (an exception, or the fallback administrator). False: the company login decides when it is on.
+    /// </summary>
+    public bool PasswordSignIn { get; private set; }
+
     public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
 
     /// <summary>Roles at one hotel or one group. Changed only through AssignRole / EndAssignment.</summary>
@@ -58,9 +82,11 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
     /// <summary>A person who may sign in. The password is set by Identity (UserManager) at creation, never here.</summary>
     public static User Create(string displayName, string userName, string email)
     {
+        var id = Guid.CreateVersion7();
         return new User
         {
-            Id = Guid.CreateVersion7(),
+            Id = id,
+            Subject = id.ToString("D"),
             UserName = userName,
             Email = email,
             DisplayName = IdentityText.DisplayName(displayName),
@@ -70,6 +96,12 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
             LockoutEnabled = true,
         };
     }
+
+    /// <summary>The administrator keeps this person on a Harmony password, whatever the company login covers.</summary>
+    public void KeepPasswordSignIn() => PasswordSignIn = true;
+
+    /// <summary>The person follows the customer's company login again (when it covers their e-mail and is on).</summary>
+    public void FollowCompanySignIn() => PasswordSignIn = false;
 
     /// <summary>The way the person chose to prove the second step. Our code passes the value, never a request, so an unknown one is a bug.</summary>
     public void UseTwoStepMethod(TwoStepMethod method)

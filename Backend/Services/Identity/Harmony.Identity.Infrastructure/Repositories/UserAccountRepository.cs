@@ -60,6 +60,20 @@ public class UserAccountRepository : BaseRepository<User>, IUserAccountRepositor
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<User>> ActiveAdministratorsAsync(Guid tenantId, CancellationToken cancellationToken)
+    {
+        var administratorRoles = this.context.Roles
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .Where(r => r.TenantId == tenantId && r.IsSystemRole && r.Code == SystemRoles.Administrator)
+            .Select(r => r.Id);
+
+        return await this.context.UserAccounts
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .AsNoTracking()
+            .Where(u => u.TenantId == tenantId && u.State == AdministrativeState.Active && u.UserRoles.Any(ur => administratorRoles.Contains(ur.RoleId)))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<bool> HoldsPrivilegedRoleAsync(Guid userId, CancellationToken cancellationToken)
     {
         // The level is stored as text, where "Standard" >= "Manager": ask for the privileged names, never ">=" in SQL.

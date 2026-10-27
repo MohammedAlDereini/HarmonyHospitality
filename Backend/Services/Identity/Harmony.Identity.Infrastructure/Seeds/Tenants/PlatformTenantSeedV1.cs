@@ -30,6 +30,9 @@ internal sealed class PlatformTenantSeedV1 : IDbSeed<IdentityDbContext>
         var row = Domain.Entities.Aggregates.TenantModule.Tenant.CreatePlatform(settings.Code, settings.LegalNameEn, settings.LegalNameAr, DateOnly.FromDateTime(DateTime.UtcNow));
         await dbContext.Tenants.AddAsync(row, cancellationToken);
         dbContext.Entry(row).Property(t => t.Id).CurrentValue = settings.TenantId;
+
+        // Harmony's own sign-in for the platform's people, the way every customer has one (design 3.1).
+        await dbContext.FederatedAuthorities.AddAsync(Domain.Entities.Aggregates.FederatedAuthorityModule.FederatedAuthority.Local(settings.TenantId), cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         serviceProvider.GetRequiredService<ILogger<PlatformTenantSeedV1>>()

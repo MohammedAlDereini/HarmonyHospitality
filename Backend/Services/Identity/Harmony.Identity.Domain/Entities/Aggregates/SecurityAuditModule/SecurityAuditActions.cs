@@ -123,4 +123,30 @@ public static class SecurityAuditActions
 
     /// <summary>A hotel account, credential right, at a client kept for the platform's own people (the console).</summary>
     public const string SignInPlatformOnly = "sign-in.platform-only-refused";
+
+    /// <summary>Signed in with the company's Microsoft or Google account; the detail is the provider.</summary>
+    public const string SignInCompany = "sign-in.company";
+
+    /// <summary>A company sign-in that did not get in (account not active, company login off, an ended link); the detail says why.</summary>
+    public const string SignInCompanyRefused = "sign-in.company-refused";
+
+    /// <summary>The person's company identity was bound to the account (first company sign-in); the detail is the provider.</summary>
+    public const string CompanyLinked = "account.company-linked";
+
+    /// <summary>An administrator ended the person's company link; the detail is the provider.</summary>
+    public const string CompanyLinkEnded = "account.company-link-ended";
+
+    /// <summary>An administrator kept the person on a Harmony password ("password") or gave them back to the company login ("company").</summary>
+    public const string SignInMethodChanged = "account.sign-in-method-changed";
+
+    /// <summary>The platform added a company login to a customer; the detail is "Provider@CUSTOMER domain".</summary>
+    public const string CompanyLoginAdded = "company-login.added";
+
+    /// <summary>The customer's administrator listed or removed an e-mail domain; the detail is the domain.</summary>
+    public const string CompanyLoginDomainAdded = "company-login.domain-added";
+    public const string CompanyLoginDomainRemoved = "company-login.domain-removed";
+
+    /// <summary>The customer's administrator switched the company login on or off; the detail is the provider.</summary>
+    public const string CompanyLoginSwitchedOn = "company-login.switched-on";
+    public const string CompanyLoginSwitchedOff = "company-login.switched-off";
 }

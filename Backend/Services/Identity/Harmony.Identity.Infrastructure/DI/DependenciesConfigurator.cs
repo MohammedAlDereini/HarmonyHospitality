@@ -13,6 +13,7 @@ using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Services;
 using Harmony.Identity.Infrastructure.Caching;
+using Harmony.Identity.Infrastructure.CompanyLogin;
 using Harmony.Identity.Infrastructure.BackgroundServices.DataRetention;
 using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
@@ -217,6 +218,9 @@ public static class DependenciesConfigurator
         // with Duende last, its cookie scheme becomes the default and every API call is sent to a login
         // page instead of Bearer validation. Verified live on 2026-10-02.
         services.AddIdentityServerHost(configuration);
+
+        // Stage A: sign-in with the company's Microsoft or Google account (each only when its settings are present).
+        services.AddCompanyLogin(configuration);
         services.AddDataProtectionKeyRing(configuration);
 
         services.AddIdentity(configuration, identityConfig =>

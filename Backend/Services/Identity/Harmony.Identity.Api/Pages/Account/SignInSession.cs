@@ -34,17 +34,31 @@ internal static class SignInSession
     /// </summary>
     public static readonly string[] PasskeyMethods = ["swk", "mfa"];
 
+    /// <summary>Duende's word for a sign-in another provider proved (its internal ExternalAuthenticationMethod).</summary>
+    public const string CompanyMethod = "external";
+
     /// <summary>
     /// Signs the person in at Identity (Duende's cookie, set up in 1.3). The cookie carries the SecurityVersion the person
     /// signed in with, so a later change (password, roles, suspension) can end this session. The methods say how: "pwd",
     /// "mfa", or the passkey pair. Returns the sign-in session Duende opened and this browser's device key, for the page's
     /// RecordSignInCommand.
     /// </summary>
-    public static async Task<SignedIn> SignInAsync(HttpContext http, User user, params string[] methods)
+    public static Task<SignedIn> SignInAsync(HttpContext http, User user, params string[] methods)
+        => SignInCoreAsync(http, user, identityProvider: null, methods);
+
+    /// <summary>
+    /// The same, for a person the company proved (stage A): Duende's "external" method and the provider as the session's
+    /// identity provider, so the token says the company signed them in ("idp": microsoft or google).
+    /// </summary>
+    public static Task<SignedIn> SignInWithCompanyAsync(HttpContext http, User user, string identityProvider)
+        => SignInCoreAsync(http, user, identityProvider, [CompanyMethod]);
+
+    private static async Task<SignedIn> SignInCoreAsync(HttpContext http, User user, string? identityProvider, string[] methods)
     {
         var person = new IdentityServerUser(user.Id.ToString("D"))
         {
             DisplayName = user.DisplayName,
+            IdentityProvider = identityProvider,
             AdditionalClaims = { new Claim(PlatformClaimTypes.SecurityVersion, user.SecurityVersion.ToString(CultureInfo.InvariantCulture)) },
         };
         foreach (var method in methods)

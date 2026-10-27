@@ -2,6 +2,7 @@ namespace Harmony.Identity.Handler.Commands.TenantModule;
 
 using Harmony.Core.Abstractions;
 using Harmony.Core.Identity.Permissions;
+using Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule;
 using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
@@ -32,6 +33,7 @@ public abstract class TenantAdministratorHandlerBase : TenantCommandHandlerBase
     private readonly UserManager<User> userManager;
     private readonly IAccountMailer mailer;
     private readonly ICacheService cacheService;
+    private readonly IFederatedAuthorityRepository authorities;
     private readonly ILogger logger;
 
     protected TenantAdministratorHandlerBase(
@@ -46,9 +48,11 @@ public abstract class TenantAdministratorHandlerBase : TenantCommandHandlerBase
         UserManager<User> userManager,
         IAccountMailer mailer,
         ICacheService cacheService,
+        IFederatedAuthorityRepository authorities,
         ILogger logger)
         : base(tenants, userAccounts, auditEvents, securityEvents, callContext, platform)
     {
+        this.authorities = authorities;
         this.permissions = permissions;
         this.roles = roles;
         this.userManager = userManager;
@@ -113,6 +117,12 @@ public abstract class TenantAdministratorHandlerBase : TenantCommandHandlerBase
             // The role: one system role with every tenant permission; a system role is never edited or deleted.
             role = await this.roles.FindInTenantByCodeAsync(tenant.Id, SystemRoles.Administrator, cancellationToken)
                 ?? await this.roles.AddAsync(Role.CreateSystem(SystemRoles.Administrator, AdministratorNameEn, AdministratorNameAr, PrivilegeLevel.Administrator, catalogue.Select(row => row.Id)), cancellationToken);
+
+            // Harmony's own sign-in, the customer's "local" authority (design 3.1): every customer has one.
+            if (!await this.authorities.HasLocalAsync(tenant.Id, cancellationToken))
+            {
+                await this.authorities.AddAsync(FederatedAuthority.Local(tenant.Id), cancellationToken);
+            }
 
             if (admin is null)
             {

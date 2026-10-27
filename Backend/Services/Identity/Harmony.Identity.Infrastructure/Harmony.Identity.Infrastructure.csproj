@@ -23,6 +23,8 @@
 		<PackageReference Include="Harmony.Core.Outbox" Version="*" />
 				<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.13" />
 		<PackageReference Include="Duende.IdentityServer" Version="8.0.10" />
+		<!-- Company login (stage A): Microsoft's OpenID Connect handler, the way Duende documents external providers. -->
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.13" />
 		<PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="8.0.10" />
 		<PackageReference Include="Duende.IdentityServer.EntityFramework" Version="8.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.13" />
