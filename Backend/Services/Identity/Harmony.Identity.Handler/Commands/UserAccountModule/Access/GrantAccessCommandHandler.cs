@@ -8,8 +8,8 @@ using Harmony.Identity.Domain.Services;
 
 public class GrantAccessCommandHandler : AccessCommandHandlerBase, IRequestHandler<GrantAccessCommand, CallResponse<Guid>>
 {
-    public GrantAccessCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, IPropertyRepository properties, IPropertyGroupRepository groups, ICallContext callContext, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, TimeProvider clock)
-        : base(userAccounts, roles, properties, groups, callContext, auditEvents, securityEvents, clock)
+    public GrantAccessCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, IPropertyRepository properties, IPropertyGroupRepository groups, ICallContext callContext, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, TimeProvider clock, ICacheService cache)
+        : base(userAccounts, roles, properties, groups, callContext, auditEvents, securityEvents, clock, cache)
     {
     }
 
@@ -49,6 +49,7 @@ public class GrantAccessCommandHandler : AccessCommandHandlerBase, IRequestHandl
         var grant = user.Grant(role.Id, scope, command.FromUtc ?? now, command.ToUtc, callerId, command.Reason);
         await this.AuditEvents.AddAsync(this.SecurityEvents.Create(user, SecurityAuditActions.AccessGranted, $"{role.Code}@{scopeCode} until {grant.ToUtc:O}"), cancellationToken);
         await this.UserAccounts.SaveChangesAsync(cancellationToken);
+        await this.ForgetAsync(user, cancellationToken);
         return CallResponseBuilder.CreateResponse<Guid>(eCallResponseStatus.Created).HasData(grant.Id);
     }
 }

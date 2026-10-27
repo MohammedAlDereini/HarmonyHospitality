@@ -1,5 +1,6 @@
 ﻿using Harmony.Core.BuildingBlocks;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.ConfigModule;
 using Harmony.Identity.Domain.Entities.Aggregates.LookupModule;
 using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
@@ -43,6 +44,8 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<PropertyGroup> PropertyGroups { get; set; }
     public DbSet<BrandDetail> BrandDetails { get; set; }
     public DbSet<PropertyGroupMember> PropertyGroupMembers { get; set; }
+    public DbSet<ConfigSetting> ConfigSettings { get; set; }
+    public DbSet<ConfigValue> ConfigValues { get; set; }
     public DbSet<User> UserAccounts { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<RoleAssignment> RoleAssignments { get; set; }

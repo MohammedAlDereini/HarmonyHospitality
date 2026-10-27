@@ -44,6 +44,135 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.ToTable("__SeedingHistory", (string)null);
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.ConfigModule.ConfigSetting", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .HasColumnName("Key");
+
+                    b.Property<string>("AppliesToTypes")
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DataType")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OwnerService")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("SystemDefault")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("OwnerService")
+                        .HasDatabaseName("IX_ConfigSettings_OwnerService");
+
+                    b.ToTable("ConfigSettings", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ConfigSettings_DataType", "[DataType] IN (N'time', N'int', N'bool', N'decimal', N'string')");
+                        });
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.ConfigModule.ConfigValue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("Scope")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ScopeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("Key");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "Key")
+                        .HasDatabaseName("IX_ConfigValues_TenantId_Key");
+
+                    b.HasIndex("TenantId", "Scope", "ScopeId", "Key")
+                        .IsUnique()
+                        .HasDatabaseName("UX_ConfigValues_Place_Key");
+
+                    b.ToTable("ConfigValues", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ConfigValues_Scope", "[Scope] IN (1, 2, 3)");
+
+                            t.HasCheckConstraint("CK_ConfigValues_TenantScope", "[Scope] <> 1 OR [ScopeId] = [TenantId]");
+                        });
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.GroupMembershipModule.PropertyGroupMember", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2025,6 +2154,21 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("UserAccountTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.ConfigModule.ConfigValue", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.ConfigModule.ConfigSetting", null)
+                        .WithMany()
+                        .HasForeignKey("Key")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.GroupMembershipModule.PropertyGroupMember", b =>

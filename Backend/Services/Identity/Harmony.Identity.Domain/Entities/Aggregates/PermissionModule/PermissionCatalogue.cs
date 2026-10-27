@@ -34,6 +34,9 @@ public static class PermissionCatalogue
         // Properties
         new(PermissionEnum.ViewProperties,        "View Properties",          "View the customer's own hotels and the lines they hold.",  "POST api/Property/mine; GET api/Property/mine/{id}; GET api/Tenant/mine"),
         new(PermissionEnum.ManageProperties,      "Manage Properties",        "Edit a hotel's own details and the people named at it.",   "PUT api/Property/Update; the contact doors"),
+        // Settings
+        new(PermissionEnum.ViewSettings,          "View Settings",            "See the customer's setting values and why a hotel's value wins.", "POST api/ConfigValue/mine; POST api/ConfigSetting/get-all; GET api/ConfigSetting/{key}"),
+        new(PermissionEnum.ManageSettings,        "Manage Settings",          "Set and clear setting values for the customer, a group or a hotel.", "PUT api/ConfigValue/Set; PUT api/ConfigValue/Clear"),
     ];
 
     /// <summary>The lines a tenant is for: everything for the platform tenant, the tenant-scope lines for a customer.</summary>

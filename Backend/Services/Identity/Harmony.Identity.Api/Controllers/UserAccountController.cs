@@ -410,4 +410,14 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
         var response = await this.Mediator.Send(new GetAccountAccessQuery { Id = id });
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
+
+    /// <summary>The caller at one hotel: may they act there, and with which roles beyond the token's. What a service asks when it holds no copy.</summary>
+    [HttpGet("MyAccessAt/{propertyId:guid}")]
+    [ProducesResponseType(typeof(Harmony.Core.Identity.Permissions.HotelAccess), (int)HttpStatusCode.OK)]
+    [AuthenticatedOnly]
+    public async Task<IActionResult> MyAccessAt(Guid propertyId)
+    {
+        var response = await this.Mediator.Send(new GetMyAccessAtQuery { PropertyId = propertyId });
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
 }

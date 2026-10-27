@@ -17,6 +17,12 @@ public interface IPropertyGroupMemberRepository : IRepository<PropertyGroupMembe
 
     Task AddAsync(PropertyGroupMember member, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// The groups a customer's hotel is in at a moment (the period covers it), with each group's precedence and whether it
+    /// is switched on: what the settings resolver reads. The customer is named, so the platform reads through the same door.
+    /// </summary>
+    Task<IReadOnlyList<HotelGroup>> GroupsOfHotelAsync(Guid tenantId, Guid propertyId, DateTimeOffset at, CancellationToken cancellationToken);
+
     /// <summary>The caller's own memberships, untracked, inside the wall.</summary>
     IQueryable<PropertyGroupMember> Query();
 

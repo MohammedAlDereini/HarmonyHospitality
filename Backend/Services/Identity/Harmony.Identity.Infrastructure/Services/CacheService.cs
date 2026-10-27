@@ -1,4 +1,4 @@
-using Harmony.Core.Cache.Abstractions;
+﻿using Harmony.Core.Cache.Abstractions;
 using Harmony.Core.Cache.Enums;
 using Harmony.Identity.Domain.Services;
 using Harmony.Identity.Infrastructure.Persistence;
@@ -101,6 +101,27 @@ public class CacheService : ICacheService
         if (result is not (eCacheOperationResult.Success or eCacheOperationResult.KeyDoesNotExist))
         {
             throw new InvalidOperationException($"Removing cache key '{cacheKey}' failed ({result}).");
+        }
+    }
+
+    public async Task DeleteByPrefixAsync(
+        string prefix,
+        CancellationToken cancellationToken = default)
+    {
+        // The framework's prefix delete walks Internal or Private keys only; ours live at the Public level ("Global:"),
+        // so list the Public keys (the framework strips "Global:") and drop each one under the prefix.
+        var keys = await this.redisCache.GetkeysAsync(eCacheAccessLevel.Public, cancellationToken);
+        if (keys.Value is null)
+        {
+            throw new InvalidOperationException($"Listing cache keys under '{prefix}' failed.");
+        }
+
+        foreach (var key in keys.Value.Cast<object>().Select(k => k.ToString()!))
+        {
+            if (key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                await this.DeleteAsync(key, cancellationToken);
+            }
         }
     }
 

@@ -9,8 +9,8 @@ using Harmony.Identity.Domain.Services;
 /// <summary>The account, the rank rules, the role of this tenant, the scope of this tenant, one current assignment per role and scope; the trail; one save.</summary>
 public class AssignRoleCommandHandler : AccessCommandHandlerBase, IRequestHandler<AssignRoleCommand, CallResponse<Guid>>
 {
-    public AssignRoleCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, IPropertyRepository properties, IPropertyGroupRepository groups, ICallContext callContext, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, TimeProvider clock)
-        : base(userAccounts, roles, properties, groups, callContext, auditEvents, securityEvents, clock)
+    public AssignRoleCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, IPropertyRepository properties, IPropertyGroupRepository groups, ICallContext callContext, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, TimeProvider clock, ICacheService cache)
+        : base(userAccounts, roles, properties, groups, callContext, auditEvents, securityEvents, clock, cache)
     {
     }
 
@@ -54,6 +54,7 @@ public class AssignRoleCommandHandler : AccessCommandHandlerBase, IRequestHandle
         var assignment = user.AssignRole(role.Id, scope, command.EndsAtUtc, now);
         await this.AuditEvents.AddAsync(this.SecurityEvents.Create(user, SecurityAuditActions.RoleAssigned, $"{role.Code}@{scopeCode}"), cancellationToken);
         await this.UserAccounts.SaveChangesAsync(cancellationToken);
+        await this.ForgetAsync(user, cancellationToken);
         return CallResponseBuilder.CreateResponse<Guid>(eCallResponseStatus.Created).HasData(assignment.Id);
     }
 }

@@ -14,12 +14,14 @@ namespace Harmony.Identity.Infrastructure.Seeds.Permissions;
 /// The permission catalogue as rows, per tenant: one per <see cref="PermissionEnum"/> value the tenant is for. Every
 /// tenant gets the tenant-scope rows; the platform-only rows (ViewTenants, ManageTenants) go to the platform tenant
 /// alone, so no customer role can ever hold them. Inserts only the values the tenant does not have yet and keeps each
-/// row's scope in step with the catalogue; nothing else existing is touched. Version 2: the scope. The catalogue itself
+/// row's scope in step with the catalogue; nothing else existing is touched. Version 2: the scope. Version 3: the two
+/// settings permissions (ViewSettings, ManageSettings). A new catalogue line needs a new version, or the configured
+/// tenants never get its row and PermissionEnumIntegrityCheck refuses to start. The catalogue itself
 /// lives in the domain (<see cref="PermissionCatalogue"/>): the birth of a tenant reads the same list.
 /// </summary>
 internal sealed class PermissionSeedV1 : IDbSeed<IdentityDbContext>
 {
-    public int Version => 2;
+    public int Version => 3;
 
     public async Task SeedAsync(IdentityDbContext dbContext, Tenant tenant, IServiceProvider serviceProvider, CancellationToken cancellationToken = default)
     {

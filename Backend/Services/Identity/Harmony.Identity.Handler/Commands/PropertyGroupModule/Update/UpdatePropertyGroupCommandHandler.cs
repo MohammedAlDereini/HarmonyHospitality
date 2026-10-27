@@ -8,9 +8,14 @@ using Harmony.Identity.Domain.Services;
 using Harmony.Identity.Infrastructure.Tenants;
 using Microsoft.Extensions.Options;
 
-/// <summary>The platform's door: the group is found across tenants (00096 when unknown), takes the change, the trail is written, one save.</summary>
+/// <summary>
+/// The platform's door: the group is found across tenants (00096 when unknown), takes the change, the trail is written,
+/// one save. Then the customer's settings copies go: the precedence and the switch decide which group wins.
+/// </summary>
 public class UpdatePropertyGroupCommandHandler : PropertyGroupCommandHandlerBase, IRequestHandler<UpdatePropertyGroupCommand, CallResponse>
 {
+    private readonly ICacheService cache;
+
     public UpdatePropertyGroupCommandHandler(
         ITenantRepository tenants,
         IPropertyGroupRepository groups,
@@ -19,9 +24,11 @@ public class UpdatePropertyGroupCommandHandler : PropertyGroupCommandHandlerBase
         ISecurityAuditEventRepository auditEvents,
         ISecurityEventFactory securityEvents,
         ICallContext callContext,
-        IOptions<PlatformTenantSettings> platform)
+        IOptions<PlatformTenantSettings> platform,
+        ICacheService cache)
         : base(tenants, groups, groupTypes, userAccounts, auditEvents, securityEvents, callContext, platform)
     {
+        this.cache = cache;
     }
 
     public async Task<CallResponse> Handle(UpdatePropertyGroupCommand command, CancellationToken cancellationToken)
@@ -46,6 +53,7 @@ public class UpdatePropertyGroupCommandHandler : PropertyGroupCommandHandlerBase
         group.SetBrandDetail(command.Brand?.ToDomain());
         await this.TrailAsync(SecurityAuditActions.PropertyGroupUpdated, group.Code, cancellationToken);
         await this.Groups.SaveChangesAsync(cancellationToken);
+        await this.cache.DeleteByPrefixAsync(Harmony.Core.Identity.Settings.SettingsCacheKeys.HotelSettingsPrefixOf(group.TenantId), cancellationToken);
         return Ok();
     }
 }

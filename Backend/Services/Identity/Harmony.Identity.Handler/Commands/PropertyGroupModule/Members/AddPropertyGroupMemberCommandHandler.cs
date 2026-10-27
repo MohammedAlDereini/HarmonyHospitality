@@ -19,6 +19,7 @@ public class AddPropertyGroupMemberCommandHandler : PropertyGroupCommandHandlerB
     private readonly IPropertyGroupMemberRepository members;
     private readonly IPropertyRepository properties;
     private readonly TimeProvider clock;
+    private readonly ICacheService cache;
 
     public AddPropertyGroupMemberCommandHandler(
         ITenantRepository tenants,
@@ -31,9 +32,11 @@ public class AddPropertyGroupMemberCommandHandler : PropertyGroupCommandHandlerB
         ISecurityEventFactory securityEvents,
         ICallContext callContext,
         IOptions<PlatformTenantSettings> platform,
-        TimeProvider clock)
+        TimeProvider clock,
+        ICacheService cache)
         : base(tenants, groups, groupTypes, userAccounts, auditEvents, securityEvents, callContext, platform)
     {
+        this.cache = cache;
         this.members = members;
         this.properties = properties;
         this.clock = clock;
@@ -90,6 +93,9 @@ public class AddPropertyGroupMemberCommandHandler : PropertyGroupCommandHandlerB
             return Fail<Guid>(BusinessErrorCodes.Identity.PropertyGroup.OneBrandPerHotel);
         }
 
+        // A hotel joined a group: every hotel copy of the customer is stale (group roles reach it now).
+        await this.cache.DeleteByPrefixAsync(Harmony.Core.Identity.Permissions.PermissionCacheKeys.HotelRolePrefixOf(group.TenantId), cancellationToken);
+        await this.cache.DeleteByPrefixAsync(Harmony.Core.Identity.Settings.SettingsCacheKeys.HotelSettingsPrefixOf(group.TenantId), cancellationToken);
         return CallResponseBuilder.CreateResponse<Guid>(eCallResponseStatus.Created).HasData(member.Id);
     }
 }

@@ -18,6 +18,7 @@ using Harmony.Identity.Infrastructure.IdentityServer;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
 using Harmony.Identity.Infrastructure.Mail;
+using Harmony.Identity.Infrastructure.Messaging;
 using Harmony.Identity.Infrastructure.Passkeys;
 using Harmony.Identity.Infrastructure.Tenants;
 using Harmony.Identity.Infrastructure.Passwords;
@@ -94,11 +95,20 @@ public static class DependenciesConfigurator
             {
                 mediatRConfig.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
                 mediatRConfig.AddValidationBehavior();
+
+                // Events added during a command are published when it is done (see Messaging).
+                if (IdentityMessaging.IsOn(configuration))
+                {
+                    mediatRConfig.AddEventBusPublishingBehavior();
+                }
             });
         });
 
-        // Needs RabbitMQ + Redis; remove until the event bus is wired.
-        services.RemoveAll<IIntegrationEventHandler<SystemEvent>>();
+        // The framework's system-events handler needs the bus: without messaging it goes.
+        if (!IdentityMessaging.IsOn(configuration))
+        {
+            services.RemoveAll<IIntegrationEventHandler<SystemEvent>>();
+        }
     }
 
     private static void AddCore(this IServiceCollection services, IConfiguration configuration)
@@ -152,11 +162,20 @@ public static class DependenciesConfigurator
                 // listed, and every customer tenant, born in the Tenants table, runs with its settings under its own id.
                 multiTenancyConfig.SharedDatabase = true;
 
+                // The bus settings ride on the listed tenant from the start, so every customer tenant (made from it) has them.
+                var bus = configuration.GetSection(IdentityMessaging.Section);
                 multiTenancyConfig.AddOrUpdateTenant(
                     tenantId,
                     "Harmony",
                     "en",
-                    database => { database.Configure(dbEngine, connectionString); });
+                    database => { database.Configure(dbEngine, connectionString); },
+                    IdentityMessaging.IsOn(configuration)
+                        ? eventBus =>
+                        {
+                            eventBus.UseDefaultCredentials = true;
+                            eventBus.Configure(bus["DefaultEndpoint"]!, bus["DefaultHost"]!, bus.GetValue<int>("DefaultPort"), bus["DefaultUserName"]!, bus["DefaultPassword"]!);
+                        }
+                        : null);
             });
         });
     }
@@ -170,6 +189,9 @@ public static class DependenciesConfigurator
 
         // Mail over SMTP: the provider (a mailbox, Azure Communication Services, SES) is a settings change.
         services.AddNotification(configuration, notification => notification.AddSmtpEmailClient());
+
+        // What Identity tells the other services: the framework's bus and outbox, or nothing when the settings say so.
+        services.AddMessaging(configuration);
     }
 
     private static void AddCache(this IServiceCollection services, IConfiguration configuration)

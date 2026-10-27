@@ -7,8 +7,8 @@ using Harmony.Identity.Domain.Services;
 
 public class EndAssignmentCommandHandler : AccessCommandHandlerBase, IRequestHandler<EndAssignmentCommand, CallResponse>
 {
-    public EndAssignmentCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, IPropertyRepository properties, IPropertyGroupRepository groups, ICallContext callContext, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, TimeProvider clock)
-        : base(userAccounts, roles, properties, groups, callContext, auditEvents, securityEvents, clock)
+    public EndAssignmentCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, IPropertyRepository properties, IPropertyGroupRepository groups, ICallContext callContext, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, TimeProvider clock, ICacheService cache)
+        : base(userAccounts, roles, properties, groups, callContext, auditEvents, securityEvents, clock, cache)
     {
     }
 
@@ -42,6 +42,7 @@ public class EndAssignmentCommandHandler : AccessCommandHandlerBase, IRequestHan
         var scopeCode = await this.ScopeCodeAsync(assignment.Scope, cancellationToken);
         await this.AuditEvents.AddAsync(this.SecurityEvents.Create(user, SecurityAuditActions.RoleAssignmentEnded, $"{role?.Code}@{scopeCode}"), cancellationToken);
         await this.UserAccounts.SaveChangesAsync(cancellationToken);
+        await this.ForgetAsync(user, cancellationToken);
         return Ok();
     }
 }

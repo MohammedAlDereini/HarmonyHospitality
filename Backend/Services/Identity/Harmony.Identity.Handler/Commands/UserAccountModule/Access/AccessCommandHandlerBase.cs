@@ -21,8 +21,10 @@ public abstract class AccessCommandHandlerBase
         ICallContext callContext,
         ISecurityAuditEventRepository auditEvents,
         ISecurityEventFactory securityEvents,
-        TimeProvider clock)
+        TimeProvider clock,
+        ICacheService cache)
     {
+        this.Cache = cache;
         this.UserAccounts = userAccounts;
         this.Roles = roles;
         this.Properties = properties;
@@ -48,6 +50,12 @@ public abstract class AccessCommandHandlerBase
     protected ISecurityEventFactory SecurityEvents { get; }
 
     protected TimeProvider Clock { get; }
+
+    protected ICacheService Cache { get; }
+
+    /// <summary>Every hotel copy of this person goes: the next call at any hotel asks Identity again.</summary>
+    protected Task ForgetAsync(Domain.Entities.Aggregates.UserAccountModule.User user, CancellationToken cancellationToken)
+        => this.Cache.DeleteByPrefixAsync(Harmony.Core.Identity.Permissions.PermissionCacheKeys.HotelRolePrefixOf(user.TenantId, user.Id), cancellationToken);
 
     /// <summary>The role, the way UpdateUserRoles reads it: of this tenant, with its standing.</summary>
     protected sealed record RoleFacts(Guid Id, string Code, int Rank);

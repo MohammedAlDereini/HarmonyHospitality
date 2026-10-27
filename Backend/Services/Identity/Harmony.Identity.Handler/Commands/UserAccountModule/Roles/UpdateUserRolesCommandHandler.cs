@@ -76,6 +76,9 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
         await this.auditEvents.AddAsync(this.securityEvents.Create(user, SecurityAuditActions.RolesChanged), cancellationToken);
         await this.userAccounts.SaveChangesAsync(cancellationToken);
 
+        // Tenant-wide roles decide "may act at every hotel": the person's hotel copies are stale.
+        await this.cacheService.DeleteByPrefixAsync(PermissionCacheKeys.HotelRolePrefixOf(user.TenantId, user.Id), cancellationToken);
+
         // Roles travel inside the token. A changed set bumped the version, and the published number makes every
         // token issued with the old roles fail at its next request.
         await this.cacheService.AddAsync(

@@ -74,7 +74,16 @@ public partial class Program
 
             // The hotel wall's question (framework PropertyAccessRequirement) is answered by Identity's grants.
             builder.Services.AddScoped<Harmony.Core.Identity.Permissions.IPropertyAccessChecker, Harmony.Identity.Api.Access.PropertyAccessChecker>();
+            builder.Services.AddScoped<Harmony.Core.Identity.Permissions.IHotelAccessSource, Harmony.Identity.Api.Access.LocalHotelAccessSource>();
+            builder.Services.AddScoped<Harmony.Core.Identity.Settings.ISettingsSource, Harmony.Identity.Api.Access.LocalSettingsSource>();
             builder.Services.AddApplicationService(builder.Configuration);
+            // Identity's events are never silently dropped where it matters: Production refuses to start without the bus.
+            if (builder.Environment.IsProduction() && !Harmony.Identity.Infrastructure.Messaging.IdentityMessaging.IsOn(builder.Configuration))
+            {
+                throw new InvalidOperationException(
+                    $"{Harmony.Identity.Infrastructure.Messaging.IdentityMessaging.Section} is required in Production: without it Identity's events (tenant, property, settings) would be dropped.");
+            }
+
             builder.Services.AddInfrastructureService(builder.Configuration);
         }
 

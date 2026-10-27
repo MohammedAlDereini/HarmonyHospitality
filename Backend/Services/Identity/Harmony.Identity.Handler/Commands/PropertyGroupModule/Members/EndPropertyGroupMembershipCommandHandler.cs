@@ -13,6 +13,7 @@ public class EndPropertyGroupMembershipCommandHandler : PropertyGroupCommandHand
     private readonly IPropertyGroupMemberRepository members;
     private readonly IPropertyRepository properties;
     private readonly TimeProvider clock;
+    private readonly ICacheService cache;
 
     public EndPropertyGroupMembershipCommandHandler(
         ITenantRepository tenants,
@@ -25,9 +26,11 @@ public class EndPropertyGroupMembershipCommandHandler : PropertyGroupCommandHand
         ISecurityEventFactory securityEvents,
         ICallContext callContext,
         IOptions<PlatformTenantSettings> platform,
-        TimeProvider clock)
+        TimeProvider clock,
+        ICacheService cache)
         : base(tenants, groups, groupTypes, userAccounts, auditEvents, securityEvents, callContext, platform)
     {
+        this.cache = cache;
         this.members = members;
         this.properties = properties;
         this.clock = clock;
@@ -63,6 +66,8 @@ public class EndPropertyGroupMembershipCommandHandler : PropertyGroupCommandHand
         member.End(end);
         await this.TrailAsync(SecurityAuditActions.PropertyGroupMemberEnded, $"{groupCode}:{hotelCode}", cancellationToken);
         await this.members.SaveChangesAsync(cancellationToken);
+        await this.cache.DeleteByPrefixAsync(Harmony.Core.Identity.Permissions.PermissionCacheKeys.HotelRolePrefixOf(member.TenantId), cancellationToken);
+        await this.cache.DeleteByPrefixAsync(Harmony.Core.Identity.Settings.SettingsCacheKeys.HotelSettingsPrefixOf(member.TenantId), cancellationToken);
         return Ok();
     }
 }

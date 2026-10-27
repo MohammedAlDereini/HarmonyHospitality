@@ -107,6 +107,14 @@ public static class SecurityAuditActions
     public const string AccessGranted = "account.access-granted";
     public const string AccessGrantRevoked = "account.access-grant-revoked";
 
+    /// <summary>The platform registered a setting key; the detail is the key.</summary>
+    public const string ConfigSettingRegistered = "config.setting-registered";
+    public const string ConfigSettingUpdated = "config.setting-updated";
+
+    /// <summary>A customer set or cleared a value; the detail is "KEY@PLACE" (the hotel's or group's code, or the customer's).</summary>
+    public const string ConfigValueSet = "config.value-set";
+    public const string ConfigValueCleared = "config.value-cleared";
+
     /// <summary>A call named a hotel the person may not act at; the detail is the hotel id. Written on the person's own trail.</summary>
     public const string PropertyAccessRefused = "access.property-refused";
 

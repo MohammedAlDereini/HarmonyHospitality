@@ -48,6 +48,21 @@ public class PropertyGroupMemberRepository : BaseRepository<PropertyGroupMember>
         await this.context.PropertyGroupMembers.AddAsync(member, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<HotelGroup>> GroupsOfHotelAsync(Guid tenantId, Guid propertyId, DateTimeOffset at, CancellationToken cancellationToken)
+    {
+        // Both walls dropped by name and the customer named instead: the platform resolves a customer's hotel too.
+        return await this.context.PropertyGroupMembers
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .Where(m => m.TenantId == tenantId && m.PropertyId == propertyId && m.Period.FromUtc <= at && (m.Period.ToUtc == null || m.Period.ToUtc > at))
+            .Join(
+                this.context.PropertyGroups.IgnoreQueryFilters([QueryFilterNames.Tenant]).Where(g => g.TenantId == tenantId),
+                m => m.PropertyGroupId,
+                g => g.Id,
+                (m, g) => new HotelGroup(g.Id, g.Code, g.Precedence.Value, g.IsActive))
+            .Distinct()
+            .ToListAsync(cancellationToken);
+    }
+
     public IQueryable<PropertyGroupMember> Query()
     {
         return this.context.PropertyGroupMembers.AsNoTracking();

@@ -25,4 +25,9 @@ public interface ICacheService
     public Task DeleteAsync(
         string cacheKey,
         CancellationToken cancellationToken = default);
+
+    /// <summary>Drops every key under a prefix (the hotel-access copies of one person or one customer).</summary>
+    public Task DeleteByPrefixAsync(
+        string prefix,
+        CancellationToken cancellationToken = default);
 }
