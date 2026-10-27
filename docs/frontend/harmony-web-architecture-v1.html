@@ -1,0 +1,1050 @@
+<title>Harmony Web Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: a working engineering document — sticky contents rail on wide screens, one reading column, wide tables scroll in their own frames.
+   Palette: Harmony's own (midnight shell, mineral bronze used sparingly, operational status colours kept for status only). */
+:root{
+  --paper:#ffffff; --frame:#f3f5f7; --ink:#17202a; --ink-2:#394756; --muted:#5f6b78; --rule:#dce1e6; --rule-2:#c8d0d8;
+  --shell:#101923; --shell-ink:#edf2f5; --mineral:#9a753c; --mineral-soft:#f3ede3;
+  --stop:#a73831; --stop-bg:#fff0ee; --warn:#906019; --warn-bg:#fff5e3; --ok:#26704a; --ok-bg:#eaf6ef; --info:#35658a; --info-bg:#eaf2f7;
+  --code-bg:#f6f8fa;
+  --display:"Source Serif 4", Constantia, Georgia, serif;
+  --sans:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", Consolas, "SFMono-Regular", monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#171e25; --frame:#10161c; --ink:#eef2f5; --ink-2:#c6cfd7; --muted:#9ca8b3; --rule:#313b45; --rule-2:#46525e;
+  --shell:#0b1118; --shell-ink:#edf2f5; --mineral:#c39b5c; --mineral-soft:#33291d;
+  --stop:#ff9289; --stop-bg:#3b201f; --warn:#edbc6e; --warn-bg:#392d1c; --ok:#78d09e; --ok-bg:#1d3428; --info:#8bb8d3; --info-bg:#20323e;
+  --code-bg:#11171d; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --paper:#171e25; --frame:#10161c; --ink:#eef2f5; --ink-2:#c6cfd7; --muted:#9ca8b3; --rule:#313b45; --rule-2:#46525e;
+  --shell:#0b1118; --shell-ink:#edf2f5; --mineral:#c39b5c; --mineral-soft:#33291d;
+  --stop:#ff9289; --stop-bg:#3b201f; --warn:#edbc6e; --warn-bg:#392d1c; --ok:#78d09e; --ok-bg:#1d3428; --info:#8bb8d3; --info-bg:#20323e;
+  --code-bg:#11171d; color-scheme:dark; }
+*,*::before,*::after{ box-sizing:border-box; }
+body{ background:var(--frame); color:var(--ink); font:15px/1.6 var(--sans); }
+a{ color:var(--info); text-underline-offset:2px; }
+a:focus-visible, button:focus-visible, summary:focus-visible{ outline:2px solid var(--info); outline-offset:2px; border-radius:2px; }
+code,kbd,pre{ font-family:var(--mono); font-size:.86em; }
+code{ background:var(--code-bg); border:1px solid var(--rule); border-radius:3px; padding:0 .3em; overflow-wrap:anywhere; }
+pre{ background:var(--code-bg); border:1px solid var(--rule); border-radius:4px; padding:12px 14px; overflow-x:auto; line-height:1.5; margin:0; }
+pre code{ background:none; border:0; padding:0; }
+pre.mermaid{ background:var(--paper); text-align:center; }
+
+/* masthead */
+.mast{ background:var(--shell); color:var(--shell-ink); padding-block:28px 26px; padding-inline:max(16px, calc((100% - 1240px)/2)); }
+.mast .kick{ font:600 12px/1 var(--sans); letter-spacing:.14em; text-transform:uppercase; color:#c39b5c; }
+.mast h1{ font:400 clamp(28px,4vw,42px)/1.1 var(--display); margin:10px 0 8px; text-wrap:balance; }
+.mast p{ margin:0; max-width:76ch; color:#c6d0d7; }
+.mast .meta{ display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:14px; font:13px/1.4 var(--mono); color:#aebbc4; }
+
+/* page */
+.page{ display:grid; grid-template-columns:minmax(0,1fr); gap:28px; padding-block:24px 64px; padding-inline:max(16px, calc((100% - 1240px)/2)); }
+@media (min-width:1100px){ .page{ grid-template-columns:240px minmax(0,1fr); } }
+nav.toc{ align-self:start; }
+@media (min-width:1100px){ nav.toc{ position:sticky; top:calc(env(safe-area-inset-top,0px) + 16px); max-height:calc(100vh - 32px); overflow-y:auto; } }
+nav.toc h2{ font:600 11px/1 var(--sans); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+nav.toc ol{ list-style:none; margin:0; padding:0; display:grid; gap:2px; }
+nav.toc a{ display:block; padding:5px 8px; border-radius:4px; color:var(--ink-2); text-decoration:none; font-size:14px; }
+nav.toc a:hover{ background:var(--paper); color:var(--ink); }
+nav.toc ol ol{ padding-inline-start:12px; margin-top:2px; }
+nav.toc ol ol a{ font-size:13px; color:var(--muted); padding-block:3px; }
+main{ min-width:0; display:grid; gap:22px; }
+section.sec{ background:var(--paper); border:1px solid var(--rule); border-radius:6px; padding-block:22px 24px; padding-inline:clamp(16px,3vw,32px); min-width:0; }
+section.sec > h2{ font:400 28px/1.15 var(--display); margin:0 0 4px; text-wrap:balance; }
+section.sec > .lede{ color:var(--muted); margin:0 0 16px; max-width:80ch; }
+h3{ font:600 18px/1.3 var(--sans); margin:26px 0 8px; text-wrap:balance; }
+h4{ font:600 15px/1.3 var(--sans); margin:18px 0 6px; color:var(--ink-2); }
+p,li{ max-width:82ch; }
+p{ margin:0 0 10px; }
+ul,ol{ margin:0 0 10px; padding-inline-start:1.3em; }
+li{ margin-bottom:4px; }
+.prose > *:last-child{ margin-bottom:0; }
+hr{ border:0; border-top:1px solid var(--rule); margin:22px 0; }
+
+/* evidence labels */
+.tag{ display:inline-block; font:600 10.5px/1 var(--mono); letter-spacing:.04em; padding:3px 6px 2px; border-radius:3px; vertical-align:2px; white-space:nowrap; border:1px solid transparent; }
+.t-std{ background:var(--info-bg); color:var(--info); border-color:var(--info); }
+.t-ng{ background:var(--ok-bg); color:var(--ok); border-color:var(--ok); }
+.t-repo{ background:var(--mineral-soft); color:var(--mineral); border-color:var(--mineral); }
+.t-reg{ background:var(--frame); color:var(--ink-2); border-color:var(--rule-2); }
+.t-rec{ background:var(--paper); color:var(--ink); border-color:var(--ink-2); }
+.t-gap{ background:var(--stop-bg); color:var(--stop); border-color:var(--stop); }
+.t-dec{ background:var(--warn-bg); color:var(--warn); border-color:var(--warn); }
+.legend{ display:flex; flex-wrap:wrap; gap:8px 16px; font-size:13px; color:var(--muted); margin:6px 0 4px; }
+.legend span{ display:inline-flex; gap:6px; align-items:center; }
+
+/* callouts */
+.note{ border-inline-start:3px solid var(--info); background:var(--info-bg); padding:10px 14px; border-radius:0 4px 4px 0; margin:12px 0; }
+.note.warn{ border-color:var(--warn); background:var(--warn-bg); }
+.note.stop{ border-color:var(--stop); background:var(--stop-bg); }
+.note.ok{ border-color:var(--ok); background:var(--ok-bg); }
+.note b:first-child{ display:block; margin-bottom:2px; }
+.note p:last-child{ margin-bottom:0; }
+
+/* tables */
+.tw{ overflow-x:auto; margin:10px 0 14px; border:1px solid var(--rule); border-radius:4px; }
+table{ border-collapse:collapse; width:100%; font-size:13.5px; }
+th,td{ text-align:start; vertical-align:top; padding:8px 10px; border-bottom:1px solid var(--rule); }
+th{ background:var(--frame); font-weight:600; font-size:12.5px; color:var(--ink-2); position:sticky; top:0; }
+tr:last-child td{ border-bottom:0; }
+td.num, th.num{ text-align:end; font-variant-numeric:tabular-nums; white-space:nowrap; }
+td code{ overflow-wrap:anywhere; }
+.wide table{ min-width:880px; }
+.mid table{ min-width:760px; }
+
+/* status pills in the matrix */
+.st{ display:inline-block; font:600 11px/1.2 var(--sans); padding:3px 7px; border-radius:10px; white-space:nowrap; }
+.s-ver{ background:var(--ok-bg); color:var(--ok); }
+.s-rec{ background:var(--info-bg); color:var(--info); }
+.s-imp{ background:var(--warn-bg); color:var(--warn); }
+.s-blk{ background:var(--stop-bg); color:var(--stop); }
+
+/* coverage */
+.cov{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:8px; margin:12px 0 4px; }
+.cov a{ display:flex; gap:10px; align-items:baseline; padding:9px 12px; border:1px solid var(--rule); border-radius:4px; background:var(--paper); color:var(--ink); text-decoration:none; }
+.cov a:hover{ border-color:var(--ink-2); }
+.cov b{ font:600 12px/1 var(--mono); color:var(--mineral); }
+.cov span{ font-size:14px; }
+.cov small{ display:block; font-size:12px; color:var(--muted); }
+
+details{ border:1px solid var(--rule); border-radius:4px; padding:8px 12px; margin:10px 0; background:var(--paper); }
+details > summary{ cursor:pointer; font-weight:600; }
+details[open] > summary{ margin-bottom:8px; }
+.cols{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+.cols > div{ min-width:0; }
+.kv{ display:grid; grid-template-columns:max-content minmax(0,1fr); gap:4px 14px; font-size:14px; }
+.kv dt{ color:var(--muted); }
+.kv dd{ margin:0; }
+@media (prefers-reduced-motion:reduce){ *{ scroll-behavior:auto!important; } }
+html{ scroll-behavior:smooth; }
+</style>
+
+<header class="mast">
+  <div class="kick">Proposal · engineering specification</div>
+  <h1>Harmony Web Architecture</h1>
+  <p>How the Harmony staff web app is built on Angular 22: structure, performance, security, failure handling, code standards, libraries, testing and delivery — with the evidence behind each choice and the test that proves it.</p>
+  <div class="meta"><span>Draft 1 · 6 October 2026</span><span>Angular 22.2.1 (stable)</span><span>Scope: staff PMS web app</span><span>No project files modified</span></div>
+</header>
+
+<div class="page">
+<nav class="toc" aria-label="Contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#coverage">Coverage checklist</a></li>
+    <li><a href="#context">0 · Context and evidence</a>
+      <ol><li><a href="#inspected">What was inspected</a></li><li><a href="#assumptions">Assumptions</a></li><li><a href="#decisions">Questions and decisions</a></li></ol></li>
+    <li><a href="#architecture">1 · Architecture</a>
+      <ol><li><a href="#topology">System topology</a></li><li><a href="#workspace">Workspace and libraries</a></li><li><a href="#layers">Layers and boundaries</a></li><li><a href="#routing">Routing and loading</a></li><li><a href="#state">State and caching</a></li><li><a href="#contracts">API contracts</a></li><li><a href="#realtime">Real-time and concurrency</a></li><li><a href="#context-switch">Tenant, property, session</a></li><li><a href="#design-system">Design system and locale</a></li><li><a href="#separate">Separate apps, SSR, offline</a></li><li><a href="#workflows">Workflow examples</a></li></ol></li>
+    <li><a href="#performance">2 · Performance</a></li>
+    <li><a href="#security">3 · Security</a></li>
+    <li><a href="#errors">4 · Exceptions and recovery</a></li>
+    <li><a href="#standards">5 · Code standards</a></li>
+    <li><a href="#libraries">6 · Libraries</a></li>
+    <li><a href="#testing">7 · Testing and delivery</a></li>
+    <li><a href="#matrix">8 · Verification matrix</a>
+      <ol><li><a href="#roadmap">Roadmap</a></li><li><a href="#gates">Release gates</a></li><li><a href="#sources">Sources</a></li></ol></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ======================================================================= -->
+<section class="sec" id="coverage">
+  <h2>Coverage checklist</h2>
+  <p class="lede">Every section the brief asked for, where it lives, and its state in this draft. Nothing was skipped; open items are listed in section 8 instead of being left out.</p>
+  <div class="cov">
+    <a href="#context"><b>0</b><span>Context, assumptions, questions<small>Done · 15 decisions open</small></span></a>
+    <a href="#architecture"><b>1</b><span>Frontend architecture<small>Done · 11 subsections, 5 diagrams</small></span></a>
+    <a href="#performance"><b>2</b><span>Performance<small>Done · budgets + measurement</small></span></a>
+    <a href="#security"><b>3</b><span>Security<small>Done · Angular vs backend split</small></span></a>
+    <a href="#errors"><b>4</b><span>Exceptions and recovery<small>Done · taxonomy + retry rules</small></span></a>
+    <a href="#standards"><b>5</b><span>Code standards<small>Done · with examples</small></span></a>
+    <a href="#libraries"><b>6</b><span>Library recommendations<small>Done · 24 entries, registry-checked</small></span></a>
+    <a href="#testing"><b>7</b><span>Testing and delivery<small>Done · CI/CD gates</small></span></a>
+    <a href="#matrix"><b>8</b><span>Verification matrix and roadmap<small>Done · 46 rows, 6 phases</small></span></a>
+  </div>
+  <h3>How to read the evidence labels</h3>
+  <div class="legend">
+    <span><i class="tag t-std">STANDARD</i> formal standard (RFC, W3C, OWASP)</span>
+    <span><i class="tag t-ng">ANGULAR</i> official Angular guidance</span>
+    <span><i class="tag t-reg">REGISTRY</i> npm registry or package files, read 6 Oct 2026</span>
+    <span><i class="tag t-repo">REPO</i> verified in the Harmony repository</span>
+    <span><i class="tag t-rec">RECOMMENDATION</i> my architectural judgement</span>
+    <span><i class="tag t-gap">GAP</i> missing today</span>
+    <span><i class="tag t-dec">DECISION</i> needs your choice</span>
+  </div>
+  <p>Recommendations are opinions with reasons. Standards and guidance are quoted from their source. Nothing here claims zero defects, perfect security or full compliance; where a target is stated, the test that measures it is stated next to it.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="sec" id="context">
+  <h2>0 · Context and evidence</h2>
+  <p class="lede">What exists today, what does not, and the questions whose answers change the architecture.</p>
+
+  <h3 id="inspected">What was inspected</h3>
+  <p>The repository at <code>D:\PMS System\Harmony</code> (branch <code>duende-identity-server</code>, latest commit <code>311da41</code>), its <code>docs</code> folder, the Identity service code, the existing web app, and the home(7) prototype. Read-only; nothing was changed.</p>
+  <div class="tw wide"><table>
+    <thead><tr><th>Area</th><th>Finding</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr><td>Backend services</td><td>Only <b>Identity</b> exists (<code>Backend/Services/Identity</code>: Api, Domain, Handler, Infrastructure, Shared). No reservations, rooms, folios, housekeeping, rates or reporting services yet.</td><td><i class="tag t-repo">REPO</i> directory listing</td></tr>
+      <tr><td>Existing web app</td><td><code>Frontend/harmony-web</code>: React 19.2 + Vite 8 + React Router 7, about 1,670 lines. Sign-in, two-step, forgot/reset password, invitation, change password, security page, one metadata-driven page for ten reference tables.</td><td><i class="tag t-repo">REPO</i> <code>package.json</code>, <code>src/</code>, commits <code>077a184</code>, <code>04fe5e1</code></td></tr>
+      <tr><td>How it signs in today</td><td>Password grant (<code>grant_type=password</code>) plus a custom <code>mfa_otp</code> grant on Duende's token endpoint; access and refresh tokens kept in <code>sessionStorage</code>; one refresh-and-retry on 401.</td><td><i class="tag t-repo">REPO</i> <code>src/api.ts</code>, <code>src/session.ts</code></td></tr>
+      <tr><td>Where sign-in is going</td><td>A confidential <b>BFF client</b> <code>harmony-web-bff</code> is defined: authorization code + PKCE, pushed authorization requests required (10 minutes), <code>private_key_jwt</code> with an EC P-256 key, <code>offline_access</code>, redirect <code>/signin-oidc</code>. The password validator is marked "to be removed once the web app signs in through the BFF". Server-rendered sign-in pages (no script, <code>form-action</code> limited to the BFF origins, <code>frame-ancestors 'none'</code>) and two-step for everyone are committed.</td><td><i class="tag t-repo">REPO</i> <code>IdentityServerResources.cs</code>, <code>WebBffSettings.cs</code>, <code>SignInPageHeadersAttribute.cs</code>, commits <code>ca1a671</code>…<code>311da41</code></td></tr>
+      <tr><td>The BFF host</td><td>Planned as YARP (namespace <code>…IdentityServer.Yarp</code>, docs <code>later.md</code> L2/L3) but <b>no BFF project exists</b> in the repository.</td><td><i class="tag t-repo">REPO</i> <i class="tag t-gap">GAP</i></td></tr>
+      <tr><td>Token and session rules</td><td>Access token 15 minutes; refresh one-time use, sliding 30 minutes, absolute 12 hours; claims <code>tenant_id</code>, <code>org_id</code>, role ids, <code>security_version</code>, <code>must_change_password</code>, <code>name</code>.</td><td><i class="tag t-repo">REPO</i> <code>IdentityServerResources.cs</code></td></tr>
+      <tr><td>Authorization model</td><td>The token carries role ids only; every service resolves role → permissions (one <code>PermissionEnum</code> of integers) from Redis and checks <code>[RequirePermission]</code>. A <code>security_version</code> bump (role change, password change, suspension, "sign out everywhere") makes old tokens fail.</td><td><i class="tag t-repo">REPO</i> <code>Harmony.Framework</code> permission code (reviewed in earlier sessions)</td></tr>
+      <tr><td>API envelope</td><td><code>{ data, errors: [{ code }] }</code>. 200/201 success, <b>202 business refusal with codes</b>, 400 validation with one code per field per rule, 401 codes <code>000.1</code>/<code>000.2</code>, 403 <code>000.4</code>, with a correlation id. The web app owns the Arabic and English wording for every code.</td><td><i class="tag t-repo">REPO</i> <code>src/api.ts</code>, <code>src/errors.ts</code>, framework error catalogue</td></tr>
+      <tr><td>Tenancy</td><td>Tenant = Harmony's own company in one country (a data wall); Organisation = the client hotel company (second wall); Property under the Organisation. Office staff reach client data only through a time-boxed support grant. Entitlements at organisation and property level.</td><td><i class="tag t-repo">REPO</i> <code>docs/identity-aggregates.html</code>, recorded decisions</td></tr>
+      <tr><td>Reference data</td><td>Countries, subdivisions, cities, time zones (IANA ids), languages, currencies, property types, property group types, regulatory environments, capabilities — managed through CRUD APIs, no seed.</td><td><i class="tag t-repo">REPO</i> <code>docs/identity-aggregates.html</code> wave one</td></tr>
+      <tr><td>Edge and transport</td><td>Planned edge: Caddy or Azure Front Door; HSTS at the edge only; YARP behind it; DPoP after the BFF works.</td><td><i class="tag t-repo">REPO</i> <code>docs/later.md</code> L2, L3, L4</td></tr>
+      <tr><td>UI prototype</td><td><code>home(7).html</code>: locked palette, shell (global bar, context bar, dock, navigation panel, command palette), "Hotel now" bands, Arabic/RTL, dark mode, keyboard model, and the test gates that proved them.</td><td><i class="tag t-repo">REPO</i> <code>Documents\Codex\…\outputs\home(7).html</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>The largest constraint</b><p>No hotel-operations API exists yet. Every reservation, room, folio or housekeeping contract in this document is a <b>proposal</b> for the backend to accept or change, not a description of something built.</p></div>
+
+  <h3 id="assumptions">Assumptions</h3>
+  <p>Stated so they can be challenged. Each is marked where it changes a decision.</p>
+  <ol>
+    <li><b>Users.</b> Hotel staff on desktop browsers (front desk, reservations, cashiers, managers, night auditors) are the primary audience. Housekeeping and engineering may use tablets later. Guests never use this app.</li>
+    <li><b>Browsers.</b> Current and previous major versions of Chrome, Edge, Firefox and Safari. No Internet Explorer, no legacy Edge.</li>
+    <li><b>Screens.</b> 1366×768 at 100 % and 125 % zoom is the smallest desk screen; 1920×1080 is common. These match the prototype's proven viewports.</li>
+    <li><b>Sessions.</b> Staff keep the app open for a full shift (8–12 hours), often with several tabs.</li>
+    <li><b>Network.</b> Hotel LAN or Wi-Fi, typically under 100 ms to the region; occasional drops. Not designed for offline operation (see 1.10).</li>
+    <li><b>Same-origin deployment.</b> The BFF serves the Angular files and proxies the APIs on one origin, so the browser talks to one host only. This is what RFC 10017 §6.1 describes and what <code>WebBffSettings</code> already assumes.</li>
+    <li><b>Languages.</b> Arabic and English at launch; more later. Arabic is right-to-left.</li>
+    <li><b>Money.</b> Several currencies per tenant country (SAR, JOD, AED…). JOD has three minor units; amounts must never be handled as binary floating point.</li>
+    <li><b>Time.</b> Every property has one IANA time zone and its own business date, changed by night audit, not by midnight.</li>
+    <li><b>Team.</b> One product team at the start; the same people build backend and frontend.</li>
+  </ol>
+
+  <h3 id="decisions">Questions and decisions that change the architecture</h3>
+  <p>Ordered by how early they block work. My recommendation is given for each, so a quick "yes" is possible.</p>
+  <div class="tw wide"><table>
+    <thead><tr><th>#</th><th>Question</th><th>Why it matters</th><th>Recommendation</th><th>Blocks</th></tr></thead>
+    <tbody>
+      <tr><td>D1</td><td>Who builds the YARP BFF, and with which endpoints?</td><td>The Angular app has no session without it. Sign-in, CSRF, API proxying and WebSocket proxying all live there.</td><td>Build it first, as one ASP.NET Core host serving the Angular files, <code>/bff/login</code>, <code>/bff/logout</code>, <code>/bff/session</code>, and <code>/api/*</code> + <code>/hubs/*</code> proxies.</td><td>Phase 1</td></tr>
+      <tr><td>D2</td><td>How does the UI learn what the person may do at a property?</td><td>With the BFF the browser never sees a token, so it cannot read role ids. Permissions are per role and role assignments will be per property (design docs).</td><td>A <code>GET /bff/session</code> (or Identity <code>/api/me/access</code>) returning user, tenant, organisation, properties, effective permission ids per property, entitlements and <code>mustChangePassword</code>.</td><td>Phase 1</td></tr>
+      <tr><td>D3</td><td>Which hotel-operations service comes first, and is its contract OpenAPI from the framework's Swagger?</td><td>Feature work needs real contracts; generated types prevent drift.</td><td>Front-desk read model ("Hotel now") first; OpenAPI from Swagger in CI; generated types only.</td><td>Phase 3</td></tr>
+      <tr><td>D4</td><td>Real-time: SignalR hub through the BFF? Event shape?</td><td>Arrivals, room status and folio balances change under the person's eyes.</td><td>SignalR via YARP WebSockets with the BFF cookie; events carry tenant, organisation, property, entity id, version and a per-property sequence number.</td><td>Phase 3</td></tr>
+      <tr><td>D5</td><td>How is optimistic concurrency exposed?</td><td>The design docs put a rowversion on every table; the UI must send it back and handle conflicts.</td><td>Version in the body (<code>version</code>) or <code>If-Match</code> ETag; one business code for "changed by someone else" returning the current row.</td><td>Phase 3</td></tr>
+      <tr><td>D6</td><td>Idempotency key: header name and server store?</td><td>Retrying a check-in or a payment must never double it. The framework's idempotency keys are planned (F2).</td><td><code>Idempotency-Key</code> header, UUID per user intent, stored server-side with the outcome for at least 24 hours.</td><td>Phase 3</td></tr>
+      <tr><td>D7</td><td>Translation: Angular's built-in i18n or a runtime library?</td><td>Built-in = one build per language, reload to switch, compile-time completeness. Runtime = live switch, one build, a third-party dependency.</td><td>Built-in <code>@angular/localize</code> (first-party, missing translations fail the build). Switching language reloads into the other build with drafts kept (see 1.9). This reverses my earlier quick suggestion of Transloco; the reason is supply-chain and completeness.</td><td>Phase 2</td></tr>
+      <tr><td>D8</td><td>Card payments: which provider, and hosted fields?</td><td>Decides PCI DSS scope, CSP <code>frame-src</code>, and the uncertain-outcome flow.</td><td>Provider-hosted fields or terminal integration only; card data never enters Harmony's pages.</td><td>Before cashiering</td></tr>
+      <tr><td>D9</td><td>Where do browser errors and performance data go?</td><td>Data residency per country tenant; cost.</td><td>OpenTelemetry to the company's own collector (no third-party SaaS by default); Sentry only if you accept its hosting terms.</td><td>Phase 2</td></tr>
+      <tr><td>D10</td><td>Supported devices list?</td><td>Sets performance budgets and test matrix.</td><td>Assumptions 2–3 above, plus one reference low-end desk PC model named by operations.</td><td>Phase 2</td></tr>
+      <tr><td>D11</td><td>Grid component for large lists?</td><td>Affects bundle size, Trusted Types and RTL.</td><td>CDK table + CDK virtual scroll by default; a two-week spike of AG Grid Community before any adoption.</td><td>Phase 4</td></tr>
+      <tr><td>D12</td><td>Where do unsaved drafts live?</td><td>Drafts can hold guest personal data; browser storage survives the session.</td><td>In memory per tab, and server-side drafts for long forms; no guest data in <code>localStorage</code> or IndexedDB.</td><td>Phase 3</td></tr>
+      <tr><td>D13</td><td>Is the property in the URL, and can one person see several organisations?</td><td>Deep links, multi-tab work, support grants for office staff.</td><td>Yes: <code>/p/{propertyCode}/…</code>. Cross-organisation only through a support grant, shown as a banner.</td><td>Phase 2</td></tr>
+      <tr><td>D14</td><td>Does the BFF serve the app files, or a CDN?</td><td>Per-request CSP nonce needs a server rendering <code>index.html</code>.</td><td>BFF serves <code>index.html</code> with a nonce; hashed chunks may come from a CDN on the same site.</td><td>Phase 1</td></tr>
+      <tr><td>D15</td><td>When does the React app and the password client retire?</td><td>Two clients double the attack surface.</td><td>When the Angular shell signs in through the BFF in staging; then disable the <code>harmony-web</code> password client.</td><td>Phase 2 exit</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="sec" id="architecture">
+  <h2>1 · Frontend architecture</h2>
+  <p class="lede">One staff application, one workspace, many libraries with enforced boundaries. Tokens stay on the server; the browser holds a cookie and plain data.</p>
+
+  <h3 id="topology">1.1 System topology</h3>
+  <pre class="mermaid">
+flowchart LR
+  B["Browser<br/>Angular 22 app<br/>(no tokens)"] -->|"HTTPS · cookie<br/>same origin"| E["Edge<br/>Caddy or Front Door<br/>TLS · HSTS"]
+  E --> F["BFF (YARP)<br/>serves index.html + nonce<br/>session cookie ⇄ tokens<br/>CSRF check · proxy /api /hubs"]
+  F -->|"PAR + code + PKCE<br/>private_key_jwt"| I["Identity<br/>(Duende, sign-in pages)"]
+  F -->|"Bearer access token<br/>(DPoP later)"| S1["Front office service"]
+  F --> S2["Rooms / housekeeping"]
+  F --> S3["Folios / cashiering"]
+  F -.->|"WebSocket proxy"| H["SignalR hub(s)"]
+  B -.->|"full-page redirect<br/>only for sign-in"| I
+  </pre>
+  <p><i class="tag t-std">STANDARD</i> RFC 10017 (BCP 212) recommends the backend-for-frontend pattern so that tokens never reach JavaScript. <i class="tag t-repo">REPO</i> The <code>harmony-web-bff</code> client is already configured for it. <i class="tag t-rec">RECOMMENDATION</i> The Angular app talks to <b>one origin only</b>; it never calls Identity or a service directly and never sees a token.</p>
+  <div class="note"><b>What changes for the frontend compared with today's React app</b><p>No token code at all in the browser: no <code>sessionStorage</code> tokens, no refresh logic, no reading claims from a JWT. Sign-in is a full-page navigation to <code>/bff/login</code>; everything the UI needs about the person comes from <code>/bff/session</code>.</p></div>
+
+  <h3 id="workspace">1.2 Workspace and library structure</h3>
+  <p><i class="tag t-rec">RECOMMENDATION</i> One Angular CLI workspace in the Harmony repository (<code>Frontend/harmony-staff</code>), one application, and libraries grouped by business domain. The Angular CLI is enough at this size; Nx is a valid alternative if build caching becomes a real problem (section 6).</p>
+  <pre><code>Frontend/harmony-staff/
+├─ angular.json · package.json · pnpm-lock.yaml · .npmrc (pnpm settings) · eslint.config.js
+├─ apps/
+│  └─ staff/                     the only application: bootstrap, root routes, shell composition
+│     └─ src/  main.ts · app.config.ts · app.routes.ts · index.html · locale/ (messages.ar.xlf …)
+├─ libs/
+│  ├─ platform/                  cross-cutting, no business words
+│  │  ├─ session/                BFF session, idle/absolute timers, cross-tab sync, sign-out
+│  │  ├─ http/                   envelope typing, interceptors (correlation id, CSRF header, errors, idempotency)
+│  │  ├─ errors/                 ErrorHandler, error taxonomy, code → message catalogue, reporting
+│  │  ├─ realtime/               SignalR connection, sequence tracking, resync, burst coalescing
+│  │  ├─ context/                tenant · organisation · property context, business date, property time zone
+│  │  ├─ access/                 permission and entitlement checks, guards, *hrIfAllowed directive
+│  │  ├─ i18n/                   locale, direction, number/money/date formatting, Arabic plural helpers
+│  │  └─ telemetry/              OpenTelemetry tracing, web-vitals, release markers
+│  ├─ ui/                        the design system (no data access, no business rules)
+│  │  ├─ tokens/                 CSS custom properties from home(7) (locked palette), density, dark
+│  │  ├─ primitives/             button, input, select, chip, badge, icon set, empty state
+│  │  ├─ overlays/               popover, dialog, drawer, toast, command palette (CDK Overlay / Angular Aria)
+│  │  ├─ data/                   table, virtual list, timeline canvas, stat, number door
+│  │  └─ shell/                  global bar, context bar, dock, navigation panel
+│  ├─ shared/
+│  │  ├─ domain/                 cross-domain value types: Money, BusinessDate, PropertyTime, Ids, Version
+│  │  └─ api-types/              generated TypeScript types from each service's OpenAPI (read-only)
+│  └─ domains/                   one folder per business domain, each split by layer
+│     ├─ front-office/   { feature-hotel-now, feature-arrivals, feature-check-in, data-access, domain, ui }
+│     ├─ reservations/   { feature-search, feature-booking, feature-groups, data-access, domain, ui }
+│     ├─ rooms/          { feature-room-plan, feature-housekeeping, feature-maintenance, data-access, domain, ui }
+│     ├─ cashiering/     { feature-folio, feature-payments, feature-shift-close, data-access, domain, ui }
+│     ├─ guests/         { feature-profile, data-access, domain, ui }
+│     ├─ revenue/        { feature-rates, feature-inventory, data-access, domain, ui }
+│     ├─ night-audit/    { feature-audit-run, data-access, domain }
+│     ├─ reports/        { feature-reports, data-access }
+│     └─ administration/ { feature-users-roles, feature-properties, feature-reference-data, feature-security, data-access, domain, ui }
+└─ e2e/                          Playwright: workflows, accessibility, security, performance, long-session</code></pre>
+  <p>Domains follow the PMS's own departments and the Identity design docs (tenancy, properties, reference data, users and roles). Each library exposes one <code>index.ts</code>; deep imports are refused by lint.</p>
+
+  <h3 id="layers">1.3 Layers, responsibilities and enforced boundaries</h3>
+  <div class="tw wide"><table>
+    <thead><tr><th>Layer (tag)</th><th>Owns</th><th>May import</th><th>Never does</th></tr></thead>
+    <tbody>
+      <tr><td><b>app</b></td><td>Bootstrap, root providers, root routes, error handler registration</td><td>feature, platform, ui</td><td>Business rules, HTTP calls</td></tr>
+      <tr><td><b>feature</b></td><td>Routed pages and workflows: composes UI, calls data-access, owns page-level state and drafts, orchestrates cross-domain steps</td><td>data-access, domain, ui, platform, shared (own domain; other domains only through their <code>data-access</code> public API)</td><td>Raw <code>HttpClient</code>, DTO types, direct DOM access</td></tr>
+      <tr><td><b>data-access</b></td><td>API adapters (DTO ↔ model mapping), server-state stores (<code>httpResource</code>/<code>resource</code>), cache and invalidation, real-time subscriptions for the domain</td><td>domain, shared, platform/http, platform/realtime, platform/context</td><td>Components, templates, routing</td></tr>
+      <tr><td><b>domain</b></td><td>Pure TypeScript models and rules: types, value objects, derivations (e.g. margin, collision), formatters' inputs</td><td>shared/domain only</td><td>Angular imports, I/O, time from the device clock</td></tr>
+      <tr><td><b>ui</b></td><td>Presentational components: inputs in, outputs out, accessible, RTL-safe</td><td>ui (lower levels), domain (types only)</td><td>Injecting services that fetch, knowing routes</td></tr>
+      <tr><td><b>platform</b></td><td>Session, HTTP plumbing, errors, real-time transport, context, access, i18n, telemetry</td><td>platform, shared</td><td>Business vocabulary</td></tr>
+      <tr><td><b>shared</b></td><td>Value types and generated API types</td><td>nothing above it</td><td>Logic with side effects</td></tr>
+    </tbody>
+  </table></div>
+  <pre class="mermaid">
+flowchart TB
+  app --> feature
+  feature --> dataaccess["data-access"]
+  feature --> ui
+  feature --> domain
+  dataaccess --> domain
+  dataaccess --> platform
+  ui --> domain
+  feature --> platform
+  domain --> shared
+  platform --> shared
+  dataaccess --> shared
+  feature -.->|"other domain: only via its index.ts"| otherDA["other-domain/data-access"]
+  </pre>
+  <p><b>Enforcement.</b> <i class="tag t-rec">RECOMMENDATION</i> <code>eslint-plugin-boundaries</code> 7.2 (ESLint flat config) with element types from folder patterns (<code>libs/domains/*/feature-*</code> → feature, and so on) and rules matching the table above. Lint runs in CI and fails the build on a forbidden import. <code>@softarc/sheriff-core</code> 0.20 is a lighter Angular-focused alternative but is still pre-1.0.</p>
+
+  <h3 id="routing">1.4 Standalone components, routing and lazy loading</h3>
+  <ul>
+    <li><i class="tag t-ng">ANGULAR</i> Standalone components only (no NgModules). Zoneless change detection is the default since v21 ("Zoneless is the default in Angular v21+").</li>
+    <li><b>The property is in the URL.</b> <code>/p/:property/front-office/hotel-now</code>, <code>/p/:property/rooms/plan</code>, <code>/admin/…</code> for platform administration. A deep link opens the same property in any tab; two tabs can work two properties without fighting over a global setting.</li>
+    <li><b>One lazy boundary per domain</b> (<code>loadChildren</code>), and <code>loadComponent</code> per heavy page. Domain routes declare their own providers (stores, adapters) so they are created when the route activates and destroyed when it leaves.</li>
+    <li><b>Guards check usability, not security.</b> <code>canMatch</code> with the access service hides routes the person cannot use and the entitlement the property lacks; the backend still refuses on its own (section 3).</li>
+    <li><b>Preloading:</b> a custom strategy that preloads only routes in the person's dock and favourites, after the first idle period, never on metered connections.</li>
+    <li><code>@defer</code> for below-the-fold and rarely opened widgets (charts, help, history panels).</li>
+  </ul>
+<pre><code>// apps/staff/src/app.routes.ts — shape, not final code
+export const routes: Routes = [
+  { path: 'signed-out', loadComponent: () => import('@harmony/platform/session').then(m => m.SignedOutPage) },
+  {
+    path: '',
+    canMatch: [sessionReady],                                 // waits for /bff/session; redirects to /bff/login if none
+    loadComponent: () => import('@harmony/ui/shell').then(m => m.Shell),
+    children: [
+      { path: 'p/:property', canMatch: [propertyAllowed], providers: [providePropertyContext()],
+        children: [
+          { path: 'front-office', loadChildren: () => import('@harmony/front-office/routes') },
+          { path: 'rooms', canMatch: [entitled('pms.core')], loadChildren: () => import('@harmony/rooms/routes') },
+          { path: 'cashiering', loadChildren: () => import('@harmony/cashiering/routes') },
+          { path: '', pathMatch: 'full', redirectTo: 'front-office/hotel-now' },
+        ] },
+      { path: 'admin', canMatch: [allowed(Permission.ViewTenants)], loadChildren: () => import('@harmony/administration/routes') },
+      { path: '', pathMatch: 'full', loadComponent: () => import('@harmony/platform/context').then(m => m.PropertyChooser) },
+    ],
+  },
+  { path: '**', loadComponent: () => import('@harmony/ui/shell').then(m => m.NotFoundPage) },
+];</code></pre>
+
+  <h3 id="state">1.5 State ownership, caching and invalidation</h3>
+  <p>One rule: <b>every piece of state has exactly one owner</b>, and its scope is as small as it can be.</p>
+  <div class="tw wide"><table>
+    <thead><tr><th>Kind of state</th><th>Owner</th><th>Mechanism</th><th>Lifetime</th></tr></thead>
+    <tbody>
+      <tr><td>Session (person, tenant, organisation, allowed properties, permissions, entitlements)</td><td><code>platform/session</code></td><td>Signals filled from <code>/bff/session</code>; refreshed on focus, on a 401, and after a <code>security_version</code> event</td><td>Tab, until sign-out</td></tr>
+      <tr><td>Property context (property, time zone, currency, business date, audit state)</td><td><code>platform/context</code></td><td>Route-scoped provider; derived from the URL</td><td>While the route is active</td></tr>
+      <tr><td>Server data (arrivals, rooms, folios…)</td><td>Domain <code>data-access</code> store</td><td><i class="tag t-ng">ANGULAR</i> <code>httpResource</code> / <code>resource</code> / <code>rxResource</code> (stable public API since 22.0) with an explicit cache key that includes tenant, organisation and property</td><td>Route-scoped; LRU across routes (limits in section 2)</td></tr>
+      <tr><td>Page UI state (filters, selection, open panels)</td><td>Feature component</td><td>Signals; filters mirrored in query parameters so links reproduce the view</td><td>Component</td></tr>
+      <tr><td>Form drafts</td><td>Feature component + <code>platform/session</code> draft registry</td><td>Signal Forms model; snapshot kept in memory per tab; long forms saved server-side (D12)</td><td>Until submitted or discarded</td></tr>
+      <tr><td>Preferences (theme, density, language, dock)</td><td><code>platform/session</code></td><td>Server-side user preferences; <code>localStorage</code> only as a first-paint hint (no personal data)</td><td>Account</td></tr>
+    </tbody>
+  </table></div>
+  <h4>Invalidation</h4>
+  <ol>
+    <li><b>After my own mutation:</b> the adapter returns the new version of the entity; the store patches it in place and marks dependent queries stale (for example, check-in → arrival row, room status, folio balance, "Hotel now" counts).</li>
+    <li><b>After someone else's change:</b> a real-time event names entity, version and property; if the version is newer, the store refetches that entity or marks the list stale. Events for another property are dropped.</li>
+    <li><b>After a gap:</b> if the per-property sequence number jumps, or the connection was down, the store refetches everything it shows (resync) instead of trusting partial events.</li>
+    <li><b>On property switch or sign-out:</b> every property-scoped cache is cleared; nothing from the previous property can render under the new name (the prototype's honesty rule).</li>
+  </ol>
+  <h4>Cross-domain workflows</h4>
+  <p>A workflow that spans domains (check-in touches reservations, rooms, cashiering and key encoding) lives in the <b>feature</b> of the domain that owns the user's intent (<code>front-office/feature-check-in</code>). It calls each domain's public <code>data-access</code> API in order, carries one idempotency key per step, and shows each step's outcome. The backend should eventually offer one command for check-in; until then the client orchestrates and must handle partial completion (section 1.11).</p>
+  <p><i class="tag t-rec">RECOMMENDATION</i> No global store library at the start. Angular's resources and signals cover the needs above. <code>@ngrx/signals</code> 22.0 is the first candidate if a store grows beyond a few hundred lines or needs entity collections and devtools (section 6).</p>
+
+  <h3 id="contracts">1.6 API contracts, mapping and recovery</h3>
+  <ul>
+    <li><b>Source of truth:</b> each service's OpenAPI document (the framework already serves Swagger). CI generates TypeScript types into <code>shared/api-types</code>; adapters map DTOs to domain models. Components never see DTOs.</li>
+    <li><b>The envelope is typed once</b> in <code>platform/http</code>: <code>Envelope&lt;T&gt; = { data?: T; errors?: { code: string }[]; correlationId?: string }</code>. One function turns an HTTP response into a result: <code>ok</code>, <code>refused</code> (202 with business codes), <code>invalid</code> (400 with field codes), <code>unauthenticated</code>, <code>forbidden</code>, <code>conflict</code>, <code>unavailable</code>.</li>
+    <li><b>Money</b> travels as a decimal string plus an ISO 4217 code (or integer minor units — <i class="tag t-dec">DECISION</i> with the backend); never as a JavaScript float. <b>Dates</b> travel as ISO 8601 with offset for instants, and <code>YYYY-MM-DD</code> for business dates.</li>
+    <li><b>Versions:</b> every mutable entity carries its row version; every update sends it back (D5).</li>
+    <li><b>Idempotency:</b> every non-idempotent command (create, check-in, post charge, payment) sends <code>Idempotency-Key</code>; the key is created when the person presses the button and reused for every retry of that same press (D6).</li>
+    <li><b>Correlation:</b> the BFF assigns a trace id per request (W3C <code>traceparent</code>); the UI shows the envelope's correlation id on any error so support can find the server log.</li>
+    <li><b>Contract tests:</b> the generated types are compiled against the adapters in CI; a breaking change in a service's OpenAPI fails the frontend build before release, not in production.</li>
+  </ul>
+
+  <h3 id="realtime">1.7 Real-time updates, concurrency and idempotency</h3>
+  <pre class="mermaid">
+sequenceDiagram
+  participant UI as Store (data-access)
+  participant RT as platform/realtime
+  participant BFF as BFF (YARP)
+  participant Hub as SignalR hub
+  RT->>BFF: WebSocket /hubs/property (cookie)
+  BFF->>Hub: upgrade with access token
+  Hub-->>RT: RoomStatusChanged {property, room, version, seq: 41}
+  RT->>UI: dispatch (same property, seq = last + 1)
+  Hub-->>RT: ArrivalUpdated {seq: 43}
+  RT->>RT: gap detected (42 missing)
+  RT->>UI: resync(property)
+  UI->>BFF: GET current snapshot
+  Note over RT,Hub: on reconnect: resync always, then resume
+  </pre>
+  <ul>
+    <li><b>Transport:</b> <code>@microsoft/signalr</code> 10.0 (the ASP.NET Core client). The browser connects to the BFF with its cookie; YARP proxies the WebSocket and attaches the access token server-side. The framework's existing <code>?access_token</code> on <code>/wss</code> is then only used between BFF and hub, never by the browser.</li>
+    <li><b>Ordering:</b> per-property sequence numbers; any gap or reconnect triggers a resync. Events are hints to refetch or patch, not the source of truth.</li>
+    <li><b>Bursts:</b> events are queued and applied once per animation frame, deduplicated by entity id keeping the highest version. Night audit and group check-in can emit hundreds per second.</li>
+    <li><b>Concurrent edits:</b> on a version conflict the form keeps the person's changes, shows the other person's current values side by side, and lets them re-apply. No silent overwrite.</li>
+    <li><b>Presence (later):</b> "Maha is editing this reservation" is a convenience, not a lock; the version check remains the guard.</li>
+  </ul>
+
+  <h3 id="context-switch">1.8 Tenant and property switching, permissions, entitlements and session lifecycle</h3>
+  <h4>Context</h4>
+  <ul>
+    <li>Tenant and organisation come from the session (the token's <code>tenant_id</code>/<code>org_id</code>, held by the BFF). The browser never chooses a tenant by sending an id.</li>
+    <li>Property is chosen in the global bar and lives in the URL. Switching navigates to the same page in the other property; property-scoped caches, real-time subscriptions and drafts for the old property are closed (drafts with unsaved changes ask first).</li>
+    <li>Office staff working under a support grant see a permanent banner naming the client, the grant's reason and its expiry.</li>
+  </ul>
+  <h4>Permissions and entitlements</h4>
+  <ul>
+    <li>The session response lists effective permission ids per property and the entitlements of the organisation and property (D2). <code>platform/access</code> exposes <code>can(permission, property?)</code> as a signal, a route guard and a structural directive.</li>
+    <li>The UI hides what the person cannot do and explains disabled actions ("Your role cannot post charges"). It never relies on hiding for safety: every call is checked again by the service (<code>[RequirePermission]</code>, tenant and organisation filters).</li>
+    <li>A 403 with <code>000.4</code> refreshes the session once (roles may have changed) and then shows the refusal.</li>
+  </ul>
+  <h4>Session lifecycle</h4>
+  <pre class="mermaid">
+stateDiagram-v2
+  [*] --> Loading: app start
+  Loading --> SignedOut: /bff/session = 401
+  SignedOut --> Redirect: /bff/login (full page)
+  Redirect --> Active: back with cookie
+  Loading --> Active: session ok
+  Active --> Warning: 25 min idle
+  Warning --> Active: activity or Stay signed in
+  Warning --> Expired: 30 min idle (refresh window gone)
+  Active --> Expired: 12 h absolute, security_version bump, signed out elsewhere
+  Expired --> Redirect: Sign in again, drafts kept in memory
+  Active --> SignedOut: Sign out (this device / everywhere)
+  </pre>
+  <ul>
+    <li>Idle and absolute limits are the server's (30 minutes idle, 12 hours absolute, refresh tokens on the BFF). The UI mirrors them to warn before they hit, and synchronises across tabs with <code>BroadcastChannel</code> (one tab's activity keeps the others alive; one tab's sign-out signs all out).</li>
+    <li>After expiry, unsaved drafts stay in memory; after signing back in, the app returns to the same URL and offers to restore them. Drafts are lost only if the tab is closed.</li>
+    <li><code>must_change_password</code> routes to the change-password page before anything else.</li>
+  </ul>
+
+  <h3 id="design-system">1.9 Design system, responsiveness, accessibility, language, money and time</h3>
+  <h4>Design system</h4>
+  <ul>
+    <li><b>Tokens</b> come straight from home(7): the locked palette, the type scale, density levels and dark-mode values. They become CSS custom properties in <code>libs/ui/tokens</code>; components use tokens only (a lint rule refuses raw colour literals in component styles).</li>
+    <li><b>Behaviour</b> comes from <code>@angular/cdk</code> (overlay, bidi, scrolling, a11y focus management) and <code>@angular/aria</code> (headless WAI-ARIA patterns: listbox, combobox, menu, tabs, tree, grid). No visual component library: Material's look is not Harmony's.</li>
+    <li><b>Icons:</b> the home(7) SVG set as an <code>&lt;hr-icon&gt;</code> component; direction icons mirror in RTL.</li>
+    <li><b>Motion:</b> <i class="tag t-ng">ANGULAR</i> <code>@angular/animations</code> is deprecated in 22 ("Use <code>animate.enter</code> and <code>animate.leave</code> instead"); use CSS transitions with those hooks, and honour <code>prefers-reduced-motion</code>.</li>
+  </ul>
+  <h4>Responsive behaviour</h4>
+  <p>Proven in the prototype and carried over: layout follows the container, not the window (CSS container queries on the stream and other panels); "Needs you" becomes a drawer below 1180 px instead of disappearing; below 720 px of height the work area scrolls as one page. The supported floor is 1366×768 at 125 %; 911×512 (150 %) must remain usable without horizontal scrolling.</p>
+  <h4>Accessibility</h4>
+  <p><i class="tag t-std">STANDARD</i> Target WCAG 2.2 level AA for the staff app. In practice: every control reachable and operable by keyboard; focus moved into and back out of every overlay; one Escape closes one layer; visible focus; 4.5:1 contrast for text under 18.66 px bold or 24 px; status never by colour alone; live regions for asynchronous results; single-key shortcuts matched on the key typed for Latin layouts and on the physical key otherwise, and suppressed inside text fields and overlays. The prototype's keyboard checks become the first automated suite.</p>
+  <h4>Arabic, English and right-to-left</h4>
+  <ul>
+    <li><i class="tag t-ng">ANGULAR</i> <code>@angular/localize</code> with one build per locale (D7). The BFF serves <code>/ar/</code> or <code>/en/</code> from the person's saved preference. Switching language saves drafts, then reloads into the other build at the same route.</li>
+    <li><code>dir</code> and <code>lang</code> on <code>&lt;html&gt;</code>; CSS logical properties only (lint refuses <code>margin-left</code>, <code>left:</code>, <code>text-align: left</code> in component styles); CDK <code>Directionality</code> for components that compute positions.</li>
+    <li>ICU plural messages for counts (Arabic has six plural categories; the prototype's hand-made helper shows why a real plural engine is required).</li>
+    <li>Names and other user data rendered with <code>unicode-bidi: plaintext</code> so a Latin name in an Arabic row keeps its beginning; identifiers (rooms, folios, reservations) keep canonical digits; quantities, money and times use Arabic-Indic digits in Arabic. Separators beside digits use the Arabic comma.</li>
+  </ul>
+  <h4>Money, time zones and business dates</h4>
+  <ul>
+    <li><b>Money:</b> a <code>Money</code> value type (decimal string + currency). Display with <code>Intl.NumberFormat(locale, { style: 'currency', currency })</code>, which knows each currency's minor units (JOD 3, SAR 2). Arithmetic is the server's job; the client never adds money except for display totals already given by the API.</li>
+    <li><b>Instants</b> are shown in the <b>property's</b> time zone, not the device's: <code>Intl.DateTimeFormat(locale, { timeZone: property.timeZoneId })</code>. A front desk in Amman viewed from a laptop set to Dubai shows Amman times, labelled with the zone when they differ.</li>
+    <li><b>Business date</b> comes only from the server (property context), as <code>YYYY-MM-DD</code>; it is never derived from the device clock. During night audit the bar shows the business date marker, as in the prototype.</li>
+    <li><i class="tag t-std">STANDARD</i> The Temporal API is <b>not Baseline</b> yet (MDN). For date arithmetic in a property's zone (room timeline, stay lengths), use <code>temporal-polyfill</code> 1.0 behind <code>shared/domain</code> helpers, so the polyfill can be removed later without touching features.</li>
+  </ul>
+
+  <h3 id="separate">1.10 When separate applications, SSR, offline or micro-frontends are justified</h3>
+  <div class="tw wide"><table>
+    <thead><tr><th>Option</th><th>Justified when</th><th>For Harmony now</th></tr></thead>
+    <tbody>
+      <tr><td>Separate application</td><td>Different audience, security model or release cadence</td><td><b>Yes</b> for: Identity sign-in pages (already separate, server-rendered); a future guest booking engine; a future POS terminal app. <b>No</b> for platform administration: same staff audience, same session, route group <code>/admin</code> guarded by permission.</td></tr>
+      <tr><td>Server-side rendering</td><td>Public pages needing search indexing or first paint on slow devices</td><td><b>No</b> for the staff app: everything is behind sign-in, data is personal, and SSR adds a Node server and hydration risk. <b>Yes</b> later for a public booking engine (<code>@angular/ssr</code> 22.2).</td></tr>
+      <tr><td>Offline support</td><td>Work must continue without a network and conflicts are cheap to resolve</td><td><b>No</b> for core PMS: room assignment and money need the server's answer. A later read-only offline view for housekeeping tablets (assignments, room list) can be a separate PWA. The staff app shows a clear "connection lost" state and never queues money operations.</td></tr>
+      <tr><td>Micro-frontends</td><td>Several independent teams must deploy parts of one UI separately</td><td><b>No</b>: one team, one release train. Native Federation 22.2 exists if that changes; the domain-library boundaries above make a later split possible without rewriting.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="workflows">1.11 Representative workflows</h3>
+  <h4>A · Check-in with room move, pre-authorisation and key encoding</h4>
+  <pre class="mermaid">
+sequenceDiagram
+  actor Clerk
+  participant CI as feature-check-in
+  participant RES as reservations/data-access
+  participant RM as rooms/data-access
+  participant CSH as cashiering/data-access
+  Clerk->>CI: Check in Khalid (room 1802 out of order)
+  CI->>RM: reassign to 2010 (Idempotency-Key k1, version v7)
+  RM-->>CI: ok, version v8
+  CI->>CSH: pre-authorise card via provider (k2)
+  CSH-->>CI: pending (provider timeout)
+  CI->>CSH: query outcome by k2 (no new charge)
+  CSH-->>CI: authorised
+  CI->>RES: check in (k3, version v12)
+  RES-->>CI: ok
+  CI->>Clerk: Checked in · room 2010 · keys ready to encode
+  </pre>
+  <p>If step 3 fails after step 1 succeeded, the screen shows "Room changed to 2010; check-in not completed" with one button to resume from the failed step. Every step reuses its own key on retry, so nothing happens twice.</p>
+  <h4>B · Property switch with unsaved work</h4>
+  <p>The person chooses Dubai Marina while a folio adjustment is half typed. The app asks "Keep this draft for Grand Riyadh?" Yes keeps it in the tab's draft registry; the router navigates to <code>/p/DXB/…</code>; property caches and the hub subscription for GRD close; nothing of Grand Riyadh renders under Dubai Marina.</p>
+  <h4>C · Session ends mid-edit</h4>
+  <p>A manager changes the clerk's role. The next API call returns 401 (stale <code>security_version</code>). The app keeps the form model in memory, shows "Your access changed. Sign in again to continue", and after the full-page sign-in returns to the same URL and offers the draft back. If the new role no longer allows the action, the restored form shows that before any submission.</p>
+  <h4>D · Uncertain payment outcome</h4>
+  <p>The payment request times out. The UI shows "Payment status unknown", disables "Charge again", and polls the cashiering service for the outcome by idempotency key. Only a confirmed failure allows a new attempt, with a new key. This is a backend contract (D6, D8); the UI's job is to never offer a second charge while the first is unknown.</p>
+  <h4>E · Two clerks edit one reservation</h4>
+  <p>Clerk A saves first (version 12 → 13). Clerk B saves with version 12 and gets the conflict code with the current row. B's screen shows the changed fields side by side and keeps B's typing; B re-applies or discards.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="sec" id="performance">
+  <h2>2 · Performance</h2>
+  <p class="lede">What we promise, how we measure it, and the techniques that keep it true over a 12-hour shift.</p>
+
+  <h3>2.1 Budgets</h3>
+  <p>Published thresholds and project targets are kept apart. Project targets are proposals until measured on the reference device (D10).</p>
+  <div class="tw wide"><table>
+    <thead><tr><th>Metric</th><th>Target</th><th>Kind</th><th>Measured by</th></tr></thead>
+    <tbody>
+      <tr><td>Largest Contentful Paint</td><td class="num">≤ 2.5 s</td><td><i class="tag t-std">STANDARD</i> web.dev "good", 75th percentile</td><td>RUM (web-vitals) per route, desktop segment</td></tr>
+      <tr><td>Interaction to Next Paint</td><td class="num">≤ 200 ms</td><td><i class="tag t-std">STANDARD</i> web.dev "good", 75th percentile</td><td>RUM; Playwright interaction traces in CI</td></tr>
+      <tr><td>Cumulative Layout Shift</td><td class="num">≤ 0.1</td><td><i class="tag t-std">STANDARD</i> web.dev "good", 75th percentile</td><td>RUM; Lighthouse CI</td></tr>
+      <tr><td>Initial JavaScript (shell + first route), compressed</td><td class="num">≤ 250 KB</td><td><i class="tag t-rec">PROJECT</i></td><td>Angular CLI budgets (fail the build) + size report</td></tr>
+      <tr><td>Any lazy domain chunk, compressed</td><td class="num">≤ 150 KB</td><td><i class="tag t-rec">PROJECT</i></td><td>CLI <code>anyComponentStyle</code>/<code>bundle</code> budgets</td></tr>
+      <tr><td>Route change with warm cache (p75, reference PC)</td><td class="num">≤ 300 ms</td><td><i class="tag t-rec">PROJECT</i></td><td>Router events + RUM custom metric</td></tr>
+      <tr><td>Long tasks during list scroll (10,000 rows)</td><td class="num">0 &gt; 50 ms</td><td><i class="tag t-rec">PROJECT</i></td><td>Playwright trace, Long Animation Frames</td></tr>
+      <tr><td>Room timeline: 600 rooms × 31 nights first render</td><td class="num">≤ 500 ms</td><td><i class="tag t-rec">PROJECT</i></td><td>Synthetic benchmark in CI on fixed data</td></tr>
+      <tr><td>Real-time burst: 200 events/s for 10 s</td><td class="num">INP ≤ 200 ms during burst</td><td><i class="tag t-rec">PROJECT</i></td><td>Playwright with a fake hub</td></tr>
+      <tr><td>Heap growth over an 8-hour scripted shift</td><td class="num">≤ 30 MB, no detached-DOM growth</td><td><i class="tag t-rec">PROJECT</i></td><td>Nightly soak: Chrome DevTools Protocol heap samples every 10 min</td></tr>
+      <tr><td>API calls cancelled when the person leaves a page</td><td class="num">100 %</td><td><i class="tag t-rec">PROJECT</i></td><td>Playwright network log assertions</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Reference conditions</b> (to confirm, D10): a desk PC with a 4-core CPU from about 2018 and 8 GB RAM, Chrome or Edge current; hotel network around 50 ms round trip; datasets of 600 rooms, 1,500 in-house guests, 400 arrivals per day, 10,000-row lists, 31-night timelines.</p>
+
+  <h3>2.2 Techniques</h3>
+  <div class="cols">
+    <div>
+      <h4>Rendering</h4>
+      <ul>
+        <li>Zoneless (default) and <code>OnPush</code> on every component, so only signal changes re-render.</li>
+        <li><code>computed()</code> for every derived value; no function calls in templates that compute on each check.</li>
+        <li><code>@for</code> always with <code>track</code> on a stable id (never <code>$index</code> for data rows).</li>
+        <li>Expensive pure computations (availability matrix, collision series) in the <code>domain</code> layer, memoised by input identity; above about 16 ms move to a Web Worker.</li>
+        <li><code>@defer (on viewport | on idle)</code> for charts, history, rarely opened panels.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Lists, grids, timelines</h4>
+      <ul>
+        <li>CDK virtual scroll for long one-dimensional lists (fixed row height per density).</li>
+        <li>The room timeline (rooms × nights) draws on a <code>&lt;canvas&gt;</code> with a DOM layer only for focus and the selected cell; keyboard navigation and screen-reader summaries come from the DOM layer, not the canvas.</li>
+        <li>Server-side paging and filtering for anything over a few thousand rows; the client never downloads a whole hotel history.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Network and memory</h4>
+      <ul>
+        <li>Resources cancel their request when their parameters change or their owner is destroyed; feature code uses <code>AbortSignal</code> for anything manual.</li>
+        <li>Store caches are LRU-bounded (for example 20 entities per detail store, 5 list pages per query) and cleared on property switch.</li>
+        <li>Every subscription, interval, observer and hub handler is tied to a <code>DestroyRef</code>; the soak test proves it.</li>
+        <li>Fonts self-hosted, subsetted for Latin and Arabic, <code>font-display: swap</code>; icons inline SVG; images (guest photos, scans) loaded on demand and never cached by the service worker (none is used).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>2.3 Measurement, profiling and monitoring</h3>
+  <ul>
+    <li><b>Lab:</b> Lighthouse CI on the shell and three key routes with fixed data; Playwright performance scenarios record traces on every merge to main. Lab numbers are for regressions only; they are not user experience.</li>
+    <li><b>Field (RUM):</b> <code>web-vitals</code> 6.2 attribution build sends LCP, INP and CLS with route and release to the telemetry endpoint through the BFF; dashboards at p75, segmented by device class and property.</li>
+    <li><b>Profiling:</b> Angular DevTools profiler for change-detection hot spots; Chrome performance panel for long tasks; heap snapshots for leaks.</li>
+    <li><b>Regression checks in CI:</b> bundle budgets fail the build; Lighthouse CI fails if LCP or CLS regress beyond a set margin; the scroll and burst scenarios fail on any long task over 50 ms.</li>
+  </ul>
+  <h3>2.4 Deployment and caching</h3>
+  <ul>
+    <li>Content-hashed files (<code>main-*.js</code>, chunks, styles) served with <code>Cache-Control: public, max-age=31536000, immutable</code>.</li>
+    <li><code>index.html</code> served by the BFF with <code>Cache-Control: no-store</code> (it carries the per-request CSP nonce).</li>
+    <li>The last <b>three</b> releases' chunks stay on the server, so a tab opened before a deploy can still load its lazy routes (section 4.6).</li>
+  </ul>
+</section>
+
+<!-- ======================================================================= -->
+<section class="sec" id="security">
+  <h2>3 · Security</h2>
+  <p class="lede">The browser is never trusted. Angular reduces mistakes; the BFF and the services enforce.</p>
+
+  <h3>3.1 Threats and controls</h3>
+  <div class="tw wide"><table>
+    <thead><tr><th>Threat</th><th>Angular / frontend control</th><th>Backend control (authoritative)</th></tr></thead>
+    <tbody>
+      <tr><td>Cross-site scripting</td><td><i class="tag t-ng">ANGULAR</i> Built-in sanitisation of HTML, style and URL bindings; lint bans <code>innerHTML</code> binding with untrusted data and every <code>bypassSecurityTrust*</code> outside one reviewed file; Trusted Types enforced (<code>trusted-types angular angular#bundler; require-trusted-types-for 'script'</code>)</td><td>Strict CSP header with a per-request nonce from the BFF; output encoding in any server-rendered page (Identity's sign-in pages already run with no script)</td></tr>
+      <tr><td>Token theft</td><td>No tokens in the browser at all</td><td>BFF holds tokens (RFC 10017 §6.1); <code>private_key_jwt</code>; DPoP later (RFC 9449, <code>later.md</code> L3)</td></tr>
+      <tr><td>Cross-site request forgery</td><td><i class="tag t-ng">ANGULAR</i> <code>HttpClient</code> sends the XSRF header on mutating same-origin requests; the app only calls relative URLs</td><td>BFF cookie <code>__Host-</code>, <code>HttpOnly</code>, <code>Secure</code>, <code>SameSite=Strict</code> (or <code>Lax</code> if the sign-in return needs it); BFF verifies the anti-forgery header on every state-changing request. Angular states it "supports only the client half"</td></tr>
+      <tr><td>Clickjacking</td><td>—</td><td><code>frame-ancestors 'none'</code> on the app and Identity</td></tr>
+      <tr><td>Broken access control</td><td>UI hides and explains; never the guard</td><td><code>[RequirePermission]</code> on every endpoint; tenant/organisation query filters; property check per request</td></tr>
+      <tr><td>Cross-tenant / cross-property leakage</td><td>Caches keyed and cleared by tenant, organisation and property; nothing tenant-specific in browser storage</td><td>Framework query filters (Tenant, Org) and <code>OrgMismatch</code> on save; property id validated against the person's assignments</td></tr>
+      <tr><td>Sensitive data exposure</td><td>Masking (card last 4, document numbers), no personal data in URLs, logs or storage; copy guarded for full document numbers</td><td>Field-level authorisation; audit log of reads of sensitive fields</td></tr>
+      <tr><td>Malicious uploads</td><td>Client checks size and type for usability only</td><td>Server validates type by content, size, scans, stores outside the web root, serves with <code>Content-Disposition: attachment</code> and <code>X-Content-Type-Options: nosniff</code></td></tr>
+      <tr><td>Supply-chain compromise</td><td>Lockfile, <code>pnpm install --frozen-lockfile</code>, release-age delay, no install scripts except allow-listed, SBOM, review of new dependencies</td><td>Build in isolated CI; signed artefacts; dependency alerts</td></tr>
+      <tr><td>Third-party scripts</td><td>None by default; telemetry goes through the BFF to our collector</td><td>CSP allows only <code>'self'</code> and the payment provider's frame</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>3.2 Content Security Policy and Trusted Types</h3>
+  <p><i class="tag t-ng">ANGULAR</i> Angular's minimal policy is <code>default-src 'self'; style-src 'self' 'nonce-…'; script-src 'self' 'nonce-…'</code> with the nonce passed through <code>ngCspNonce</code> or <code>CSP_NONCE</code>, unique per request. <code>autoCsp</code> (hashes) is meant for static hosting and adds <code>'unsafe-inline'</code> and <code>https:</code> as fallbacks for old browsers, so with a BFF that renders <code>index.html</code> the nonce approach is stricter.</p>
+<pre><code>Content-Security-Policy:
+  default-src 'none';
+  script-src 'self' 'nonce-{n}';
+  style-src 'self' 'nonce-{n}';
+  img-src 'self' data: blob:;
+  font-src 'self';
+  connect-src 'self';                      # API + hub through the BFF, same origin
+  frame-src https://{payment-provider};    # hosted card fields only (D8)
+  form-action 'self';
+  base-uri 'none';
+  object-src 'none';
+  frame-ancestors 'none';
+  trusted-types angular angular#bundler;
+  require-trusted-types-for 'script';
+  report-to csp</code></pre>
+  <p><i class="tag t-std">STANDARD</i> Trusted Types is Baseline 2026 (MDN: supported in current Chrome, Edge, Firefox and Safari since February 2026), so it can be enforced rather than only reported. Roll-out: report-only for one staging week with zero violations, then enforce.</p>
+
+  <h3>3.3 Authentication, session expiry and sign-out through the BFF</h3>
+  <ul>
+    <li>Sign-in: full-page navigation to <code>/bff/login?returnUrl=…</code>; the BFF pushes the authorization request (PAR), Identity shows its own pages, the BFF exchanges the code with PKCE and <code>private_key_jwt</code>, and sets its cookie. <code>returnUrl</code> must be a relative path checked by the BFF (open-redirect).</li>
+    <li>Expiry: refresh happens on the BFF; when it fails, API calls return 401 and the app follows section 1.8.</li>
+    <li>Sign-out (this device): <code>POST /bff/logout</code> with the anti-forgery header; the BFF revokes the refresh token, clears its cookie and redirects through Identity's end-session endpoint. "Sign out everywhere" calls the Identity API through the BFF and bumps <code>security_version</code>.</li>
+    <li>The existing password-grant client and the React app's <code>sessionStorage</code> tokens are retired when the BFF is live (D15).</li>
+  </ul>
+
+  <h3>3.4 Browser storage policy</h3>
+  <div class="tw mid"><table>
+    <thead><tr><th>Storage</th><th>Allowed</th><th>Never</th></tr></thead>
+    <tbody>
+      <tr><td>Cookies</td><td>The BFF's session cookie (HttpOnly) and the anti-forgery token cookie</td><td>Anything set by Angular code with personal data</td></tr>
+      <tr><td><code>localStorage</code></td><td>Theme, density, language and last property <b>code</b> as first-paint hints</td><td>Tokens, guest or employee data, drafts, permissions</td></tr>
+      <tr><td><code>sessionStorage</code></td><td>Nothing by default</td><td>Tokens (today's React app does this; it goes away with the BFF)</td></tr>
+      <tr><td>IndexedDB, Cache Storage</td><td>Nothing in the staff app</td><td>Anything with personal data</td></tr>
+      <tr><td>Memory</td><td>Drafts and caches, cleared on sign-out and property switch</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>3.5 Card data, documents, downloads</h3>
+  <ul>
+    <li>Card numbers are entered only in the payment provider's hosted fields or on the terminal (D8). Harmony pages never see a full card number, which keeps the app out of most PCI DSS scope; the CSP's <code>frame-src</code> names only that provider.</li>
+    <li>Passport and ID scans: uploaded through the BFF to a service that validates and stores them; previews are served as images from the API with <code>Content-Disposition: inline</code> only for image types, never as HTML.</li>
+    <li>Exports (CSV, PDF) are generated server-side and downloaded through the BFF with <code>attachment</code>; CSV cells starting with <code>= + - @</code> are escaped server-side against formula injection.</li>
+  </ul>
+
+  <h3>3.6 Dependency and supply-chain controls</h3>
+  <ul>
+    <li><i class="tag t-reg">REGISTRY</i> pnpm 12 with <code>minimumReleaseAge</code> (pnpm docs: minutes, default 1440 since v11, added in 10.16) raised to <b>4320</b> (3 days), so a freshly published malicious version is not installed before the community notices; security patches go through <code>minimumReleaseAgeExclude</code> by name.</li>
+    <li>Install scripts blocked except an explicit allow-list (pnpm build settings); <code>--frozen-lockfile</code> in CI; one registry configured.</li>
+    <li>Every new dependency goes through a written review: purpose, licence, maintainers, last release, peer ranges, advisories (OSV), size, Trusted Types and RTL behaviour.</li>
+    <li>CycloneDX SBOM attached to every release; OSV-Scanner or <code>pnpm audit</code> fails CI on high/critical advisories with no accepted exception.</li>
+  </ul>
+
+  <h3>3.7 Negative tests (must fail safely)</h3>
+  <ol>
+    <li>Change <code>/p/GRD/</code> to another organisation's property code in the URL → the API refuses (403/404 by policy), the UI shows "Not available" and leaks no data, and no request carries the foreign id beyond the first refusal.</li>
+    <li>Replay a captured API request from another origin without the anti-forgery header → BFF refuses.</li>
+    <li>Call <code>/api/*</code> without the cookie → 401 envelope; with a cookie for tenant A against a tenant-B resource id → refused.</li>
+    <li>Demote a user while their tab is open → next call 401 (stale <code>security_version</code>), UI returns to sign-in, drafts kept in memory only.</li>
+    <li>Inject <code>&lt;img src=x onerror=…&gt;</code> into every text field that is later displayed (guest names, notes) → rendered as text; zero CSP or Trusted Types violations.</li>
+    <li>Open <code>/bff/login?returnUrl=https://evil.example</code> → redirected to the app root, never off-site.</li>
+    <li>Support-grant staff after the grant expires → refused on the next call; banner shows "Grant expired".</li>
+    <li>A user with a permission at property A but not B → B's routes hidden and B's APIs refuse the action.</li>
+  </ol>
+</section>
+
+<!-- ======================================================================= -->
+<section class="sec" id="errors">
+  <h2>4 · Exceptions and recovery</h2>
+  <p class="lede">Every failure has one place it is handled, one message the person understands, and one log line support can find. Nothing is swallowed.</p>
+
+  <h3>4.1 Error taxonomy</h3>
+  <div class="tw wide"><table>
+    <thead><tr><th>Kind</th><th>Detected by</th><th>Handled</th><th>What the person sees</th><th>Retry</th><th>Logged</th></tr></thead>
+    <tbody>
+      <tr><td>Unexpected app error</td><td>Global <code>ErrorHandler</code></td><td>Global</td><td>"Something went wrong on this page. Your changes are kept. Reference: 7f3a…" with Reload</td><td>No auto-retry</td><td>Error + stack + route + release, no personal data</td></tr>
+      <tr><td>Field validation (400, field codes)</td><td>Envelope mapper</td><td>Local (form)</td><td>Message under each field from the code catalogue</td><td>After the person edits</td><td>Count only</td></tr>
+      <tr><td>Business refusal (202 + codes)</td><td>Envelope mapper</td><td>Local (action)</td><td>Plain reason next to the action ("Room 1802 is out of order until 16:00")</td><td>After the cause changes</td><td>Code + correlation id</td></tr>
+      <tr><td>Not signed in (401)</td><td>Interceptor</td><td>Global</td><td>"Sign in again to continue" (drafts kept)</td><td>After sign-in</td><td>Event only</td></tr>
+      <tr><td>Not allowed (403, <code>000.4</code>)</td><td>Interceptor + local</td><td>Local after one session refresh</td><td>"Your role cannot do this"</td><td>No</td><td>Code + route</td></tr>
+      <tr><td>Conflict (version)</td><td>Envelope mapper</td><td>Local (form)</td><td>Side-by-side changes, keep mine / take theirs</td><td>Manual</td><td>Code</td></tr>
+      <tr><td>Network down / timeout</td><td>Interceptor + <code>navigator.onLine</code> + timeouts</td><td>Global banner + local</td><td>"Connection lost. Retrying…" then "Check the network"</td><td>Safe requests only (below)</td><td>When back online</td></tr>
+      <tr><td>Rate limited (429)</td><td>Interceptor</td><td>Local</td><td>"Too many attempts. Try again in 30 s"</td><td>After <code>Retry-After</code></td><td>Count</td></tr>
+      <tr><td>Service unavailable (502/503/504)</td><td>Interceptor</td><td>Global banner</td><td>"Rooms service is not responding; other areas keep working"</td><td>Safe requests, backoff</td><td>Yes</td></tr>
+      <tr><td>Partial bulk failure</td><td>Per-item results in the response</td><td>Local</td><td>"18 of 20 rooms updated. 2 failed:" list with reasons and retry for those 2</td><td>Failed items only</td><td>Counts + codes</td></tr>
+      <tr><td>Uncertain payment</td><td>Timeout on a payment command</td><td>Local, blocking</td><td>"Payment status unknown — checking", charge button disabled</td><td>Query by key, never re-send</td><td>Yes, high priority</td></tr>
+      <tr><td>Failed lazy chunk</td><td>Router navigation error (chunk load)</td><td>Global</td><td>"Harmony was updated. Save and reload" (drafts kept)</td><td>One automatic reload if no draft</td><td>Yes</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>4.2 Global versus local</h3>
+  <p>Local handling comes first: the component that made the call decides how to show validation, refusals and conflicts, because only it knows the field or action. The interceptor and the global handler take only what no component can handle (sign-in, outages, crashes, updates). Every error that reaches the global handler is reported; local handling of an expected code is not an error and is counted, not reported.</p>
+
+  <h3>4.3 Safe retry rules</h3>
+  <ol>
+    <li><code>GET</code>/<code>HEAD</code>: up to 2 automatic retries with exponential backoff and jitter (0.5 s, 1.5 s), only for network errors, 502, 503, 504.</li>
+    <li>Commands with an <code>Idempotency-Key</code>: automatic retry allowed for network errors and 503, with the <b>same</b> key.</li>
+    <li>Commands without a key: never retried automatically.</li>
+    <li>Payments: never retried; outcome queried by key (workflow D).</li>
+    <li>401 and 403 are never retried as such (401 leads to sign-in; 403 to one session refresh).</li>
+  </ol>
+
+  <h3>4.4 Drafts</h3>
+  <p>Each form registers its model with the draft registry. Drafts survive: an error, a sign-in round trip, a language switch, an app update reload in the same tab (kept in memory and restored by route). They do not survive closing the tab, by design, because they can hold guest personal data (D12).</p>
+
+  <h3>4.5 Correlation, privacy-safe logging and monitoring</h3>
+  <ul>
+    <li>Every request carries W3C <code>traceparent</code>; the BFF links it to the service call. The UI shows the envelope's correlation id on errors.</li>
+    <li>Client logs contain: error kind, code, route pattern (<code>/p/:property/front-office/check-in</code>, not the real codes), release, browser, correlation id. They never contain names, document numbers, card data, free text the person typed, or tokens.</li>
+    <li>Alerts: error rate per release, chunk-load failures, uncertain-payment count, CSP/Trusted Types reports, 401 spikes (identity problems).</li>
+  </ul>
+
+  <h3>4.6 Application updates and failed chunks</h3>
+  <p>The BFF serves <code>/version.json</code>; the app checks it on focus and every 10 minutes. A new version shows a quiet "Update ready — reload when convenient" banner; it becomes blocking only when the API declares the old client incompatible (a minimum client version header). Old chunks are kept for three releases, so failures are rare; when one happens, the router error handler saves drafts and offers a reload.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="sec" id="standards">
+  <h2>5 · Code standards</h2>
+  <p class="lede">Few rules, each enforced by a tool where possible. No pattern without a demonstrated problem.</p>
+
+  <h3>5.1 Compiler strictness</h3>
+<pre><code>// tsconfig.json (excerpt)
+"strict": true,
+"noUncheckedIndexedAccess": true,
+"noImplicitOverride": true,
+"noPropertyAccessFromIndexSignature": true,
+"exactOptionalPropertyTypes": true,
+"useUnknownInCatchVariables": true
+
+// angularCompilerOptions
+"strictTemplates": true,
+"strictInjectionParameters": true,
+"strictInputAccessModifiers": true,
+"extendedDiagnostics": { "defaultCategory": "error" }</code></pre>
+  <p><i class="tag t-reg">REGISTRY</i> TypeScript is pinned to <b>6.0.x</b> (6.0.3 today): Angular 22.2's compiler declares <code>typescript &gt;=6.0 &lt;6.1</code>, while npm's <code>latest</code> is already 7.0.2. Upgrading TypeScript follows Angular, never the registry.</p>
+
+  <h3>5.2 Naming and files</h3>
+  <ul>
+    <li>Files <code>kebab-case</code>; one component, service or type per file; component selector prefix <code>hr-</code>.</li>
+    <li>Suffix by role only where it informs: <code>…-page.ts</code> (routed), <code>…-store.ts</code>, <code>…-adapter.ts</code>, <code>…-dto.ts</code> (generated only).</li>
+    <li>Domain words from the hotel, not from the database (<code>Arrival</code>, <code>Folio</code>, <code>BusinessDate</code>).</li>
+  </ul>
+
+  <h3>5.3 Components</h3>
+<pre><code>@Component({
+  selector: 'hr-arrival-row',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { role: 'listitem' },
+  template: `
+    &lt;button class="row" [attr.aria-current]="selected()" (click)="open.emit(arrival().id)"&gt;
+      &lt;span class="name"&gt;{{ arrival().guestName }}&lt;/span&gt;
+      &lt;hr-margin [minutes]="arrival().marginMinutes" /&gt;
+    &lt;/button&gt;`,
+})
+export class ArrivalRow {
+  readonly arrival = input.required&lt;Arrival&gt;();
+  readonly selected = input(false);
+  readonly open = output&lt;ArrivalId&gt;();
+}</code></pre>
+  <ul>
+    <li><code>input()</code>, <code>output()</code>, <code>model()</code>, <code>inject()</code>; no decorators for inputs, no constructor injection.</li>
+    <li>Presentational components take data and emit intent; pages own fetching and workflow.</li>
+    <li>No logic in templates beyond reading signals; derived values are <code>computed()</code>.</li>
+  </ul>
+
+  <h3>5.4 Reactive patterns and cleanup</h3>
+  <ul>
+    <li>Signals for state; RxJS for event streams (real-time, debounced search); bridge with <code>toSignal</code>/<code>toObservable</code>. No nested <code>subscribe</code>.</li>
+    <li><code>effect()</code> only for side effects that leave Angular (focus, storage hints, telemetry), never to sync one signal into another (use <code>computed</code> or <code>linkedSignal</code>).</li>
+    <li>Every manual subscription uses <code>takeUntilDestroyed()</code>; lint forbids <code>subscribe</code> without it outside tests.</li>
+    <li>Immutable updates: <code>signal.update(list =&gt; list.map(…))</code>; never mutate arrays or objects held in signals.</li>
+  </ul>
+
+  <h3>5.5 Forms</h3>
+  <p><i class="tag t-reg">REGISTRY</i> Signal Forms are public API in 22.0 (<code>@publicApi 22.0</code> in <code>@angular/forms/signals</code>; only the WebMCP integration is experimental). <i class="tag t-rec">RECOMMENDATION</i> Use Signal Forms for all new forms. Server validation codes map to fields through one helper; the field message comes from the code catalogue in the person's language.</p>
+
+  <h3>5.6 API mapping and public contracts</h3>
+<pre><code>// libs/domains/front-office/data-access/arrivals-adapter.ts
+export function toArrival(dto: ArrivalDto, ctx: PropertyContext): Arrival {
+  return {
+    id: dto.id as ArrivalId,
+    guestName: dto.guestName,
+    eta: PropertyTime.fromIso(dto.eta, ctx.timeZoneId),   // never the device zone
+    deposit: Money.of(dto.deposit.amount, dto.deposit.currency),
+    version: dto.version,
+  };
+}</code></pre>
+  <ul>
+    <li>Each library exports only from <code>index.ts</code>; anything not exported is private.</li>
+    <li>Branded id types (<code>ArrivalId</code>, <code>PropertyCode</code>) prevent mixing ids.</li>
+    <li>Breaking a library's public API needs a note in its <code>CHANGELOG.md</code> in the same change.</li>
+  </ul>
+
+  <h3>5.7 Lint, format, document</h3>
+  <ul>
+    <li>ESLint flat config: <code>angular-eslint</code> 22.5, <code>typescript-eslint</code> 8.71 (supports TypeScript &lt; 6.1), <code>eslint-plugin-boundaries</code>; rules for no <code>any</code>, no non-null assertion in app code, no physical CSS properties in components, no raw colours, no <code>innerHTML</code>/bypass outside the reviewed file.</li>
+    <li>Prettier 3.9 for formatting; no debate in review.</li>
+    <li>TSDoc on every exported symbol of <code>platform</code>, <code>ui</code> and <code>data-access</code>; decisions recorded as short ADRs in <code>Frontend/harmony-staff/docs/adr/</code>.</li>
+  </ul>
+  <h3>5.8 What we do not add</h3>
+  <p>No base classes for components, no generic repository layer over <code>HttpClient</code>, no global event bus, no facade per component, no state library before a store proves too big. Each would add a layer without solving a problem we have.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="sec" id="libraries">
+  <h2>6 · Library recommendations</h2>
+  <p class="lede">Versions, licences and peer ranges read from the npm registry on 6 October 2026. A peer range is necessary evidence, not proof: our own CI build and tests are the proof, and no peer conflict is overridden.</p>
+
+  <div class="note"><b>Platform baseline</b><p><i class="tag t-ng">ANGULAR</i> Angular 22 is the active major (released 3 June 2026; active support to June 2027, LTS to June 2028). From v22 Angular ships one major every 12 months. <i class="tag t-reg">REGISTRY</i> <code>@angular/core</code> 22.2.1 requires Node <code>^22.22.3 || ^24.15.0 || &gt;=26.0.0</code>; zone.js is an optional peer.</p></div>
+
+  <div class="tw wide"><table>
+    <thead><tr><th>Library</th><th>Purpose · why</th><th>Version · Angular 22 evidence</th><th>Licence · maintenance</th><th>Security · limits</th><th>Zoneless · RTL · a11y</th><th>Alternatives · decision</th></tr></thead>
+    <tbody>
+      <tr><td><b>@angular/core, common, router, forms, platform-browser</b></td><td>The framework</td><td>22.2.1</td><td>MIT · Google, active to 2027-06, LTS to 2028-06</td><td>Follow Angular security advisories; patch within a week</td><td>Zoneless default</td><td>— · <b>Adopt</b></td></tr>
+      <tr><td><b>@angular/cdk</b></td><td>Overlay, bidi, scrolling, a11y focus tools, table</td><td>22.2.1 (same release train)</td><td>MIT · Angular team</td><td>No HTML injection APIs used</td><td>RTL via <code>Directionality</code>; focus trap, live announcer</td><td>Hand-made overlays (the prototype) · <b>Adopt</b></td></tr>
+      <tr><td><b>@angular/aria</b></td><td>Headless WAI-ARIA patterns (listbox, combobox, menu, tabs, tree, grid)</td><td>22.2.1; peers <code>@angular/cdk 22.2.1</code>, <code>@angular/core ^22 || ^23</code></td><td>MIT · Angular team; new; no preview/experimental tags in the 22.2.1 type definitions</td><td>—</td><td>Handles keyboard, focus, ARIA, RTL navigation</td><td>CDK alone · <b>Adopt per pattern</b> with its test harnesses; re-check status each minor</td></tr>
+      <tr><td><b>@angular/localize</b></td><td>Compile-time translations, ICU plurals</td><td>22.2.1, peer <code>@angular/compiler 22.2.1</code></td><td>MIT · Angular team</td><td>None at runtime</td><td>One build per locale; RTL independent</td><td>@jsverse/transloco 8.4.0 (MIT, runtime switch, peer <code>@angular/core &gt;=16</code>, no upper bound) · <b>Adopt localize</b> (D7)</td></tr>
+      <tr><td><b>@angular/build</b> (Vitest runner)</td><td>Build and unit tests</td><td>22.2.1; peers <code>vitest ^4.0.8 || ^5.0.0</code>, <code>typescript &gt;=6.0 &lt;6.1</code></td><td>MIT · Angular team</td><td>—</td><td>TestBed zoneless by default</td><td>Karma (still supported) · <b>Adopt Vitest</b></td></tr>
+      <tr><td><b>typescript</b></td><td>Compiler</td><td><b>6.0.3</b> (pinned); 7.0.2 is npm latest but outside Angular's range</td><td>Apache-2.0 · Microsoft</td><td>—</td><td>—</td><td>— · <b>Pin 6.0.x</b></td></tr>
+      <tr><td><b>@microsoft/signalr</b></td><td>Real-time client matching ASP.NET Core hubs</td><td>10.0.11; no Angular peer (framework-agnostic)</td><td>MIT · Microsoft</td><td>Cookie auth through BFF; never put tokens in query strings from the browser</td><td>Wrap in a service; push into signals</td><td>Raw WebSocket / SSE · <b>Adopt</b> (D4)</td></tr>
+      <tr><td><b>temporal-polyfill</b></td><td>Date arithmetic in a property's time zone</td><td>1.0.5</td><td>MIT · FullCalendar</td><td>Pure computation</td><td>—</td><td>@js-temporal/polyfill 0.5.1 (ISC, still 0.x); date-fns 4.4 + @date-fns/tz 1.5 · <b>Adopt</b>, behind domain helpers</td></tr>
+      <tr><td><b>@hey-api/openapi-ts</b></td><td>Generate TypeScript types from OpenAPI</td><td>0.99.0; peer <code>typescript &gt;=5.5.3 || &gt;=6.0.0</code></td><td>MIT · pre-1.0, frequent changes</td><td>Dev-only; types only, no generated runtime client</td><td>—</td><td>openapi-typescript 7.13.0 <b>excluded</b>: peer <code>typescript ^5.x</code> conflicts with 6.0; NSwag 14.7 (.NET side) · <b>Adopt, pinned</b> (D3)</td></tr>
+      <tr><td><b>@ngrx/signals</b></td><td>Signal store if a store outgrows plain services</td><td>22.0.1; peer <code>@angular/core ^22.0.0</code></td><td>MIT · NgRx team</td><td>—</td><td>Signals-native</td><td>Plain services · <b>Defer</b> until needed</td></tr>
+      <tr><td><b>@tanstack/angular-query-experimental</b></td><td>Server-state cache</td><td>5.104.1; peer <code>@angular/core &gt;=16</code></td><td>MIT · package name states <b>experimental</b></td><td>—</td><td>—</td><td>Angular <code>httpResource</code> (stable in 22) · <b>Do not adopt</b> for core while experimental</td></tr>
+      <tr><td><b>ag-grid-angular / ag-grid-community</b></td><td>Large interactive grids</td><td>36.2.0; peer <code>@angular/core &gt;= 20.0.0</code></td><td>MIT (Community); Enterprise features are commercial</td><td>Check Trusted Types and CSP compatibility in the spike</td><td>Has RTL mode; a11y to be tested</td><td>CDK table + virtual scroll; @tanstack/angular-table 9.2.6 · <b>Spike before adopting</b> (D11)</td></tr>
+      <tr><td><b>@playwright/test</b></td><td>End-to-end, accessibility, performance, long-session</td><td>1.63.0</td><td>Apache-2.0 · Microsoft</td><td>Test-only</td><td>—</td><td>Cypress · <b>Adopt</b></td></tr>
+      <tr><td><b>@axe-core/playwright</b></td><td>Automated accessibility checks</td><td>4.13.0 (axe-core 4.14.0)</td><td>MPL-2.0 (file-level copyleft; test-only use, no redistribution)</td><td>—</td><td>Finds a subset of WCAG issues; manual checks still required</td><td>Lighthouse a11y · <b>Adopt</b></td></tr>
+      <tr><td><b>jsdom</b></td><td>DOM for Vitest unit tests</td><td>30.1.2</td><td>MIT</td><td>—</td><td>Not a real browser: layout-dependent tests go to Playwright</td><td>Vitest browser mode · <b>Adopt</b></td></tr>
+      <tr><td><b>angular-eslint</b></td><td>Angular lint rules and template lint</td><td>22.5.0; peer <code>eslint ^9 || ^10</code></td><td>MIT</td><td>—</td><td>Template a11y rules</td><td>— · <b>Adopt</b></td></tr>
+      <tr><td><b>typescript-eslint</b></td><td>Type-aware lint</td><td>8.71.1; peer <code>typescript &gt;=4.8.4 &lt;6.1.0</code></td><td>MIT</td><td>—</td><td>—</td><td>— · <b>Adopt</b></td></tr>
+      <tr><td><b>eslint</b></td><td>Lint engine</td><td>10.12.0</td><td>MIT · OpenJS</td><td>—</td><td>—</td><td>— · <b>Adopt</b></td></tr>
+      <tr><td><b>eslint-plugin-boundaries</b></td><td>Enforce library layers</td><td>7.2.0; peer <code>eslint &gt;=6</code></td><td>MIT</td><td>—</td><td>—</td><td>Nx 23.2.1 (MIT, peer <code>@angular-devkit/core &gt;=20 &lt;23</code>); Sheriff 0.20 (pre-1.0) · <b>Adopt</b></td></tr>
+      <tr><td><b>prettier</b></td><td>Formatting</td><td>3.9.9</td><td>MIT</td><td>—</td><td>—</td><td>— · <b>Adopt</b></td></tr>
+      <tr><td><b>web-vitals</b></td><td>Field LCP / INP / CLS</td><td>6.2.3</td><td>Apache-2.0 · Google Chrome team</td><td>Send through the BFF only</td><td>—</td><td>— · <b>Adopt</b></td></tr>
+      <tr><td><b>@opentelemetry/sdk-trace-web</b></td><td>Browser traces to our collector</td><td>2.12.0</td><td>Apache-2.0 · CNCF</td><td>Strip personal data in a span processor</td><td>Zone-free context propagation must be verified in the spike</td><td>@sentry/angular 11.4.0 (MIT SDK, peer <code>@angular/core &gt;= 14.x &lt;= 22.x</code>; SaaS data residency to decide) · <b>Adopt OTel</b> (D9)</td></tr>
+      <tr><td><b>pnpm</b></td><td>Package manager (already used)</td><td>12.9.1</td><td>MIT</td><td><code>minimumReleaseAge</code>, build-script allow-list, frozen lockfile</td><td>—</td><td>npm · <b>Adopt</b></td></tr>
+      <tr><td><b>dompurify</b></td><td>Only if rich text from users must be rendered as HTML</td><td>3.4.16</td><td>MPL-2.0 OR Apache-2.0</td><td>Supports Trusted Types; needs its own policy name in CSP</td><td>—</td><td>Render text, not HTML · <b>Avoid unless required</b></td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Not recommended:</b> <code>@angular/animations</code> (deprecated in 22), Angular Material components (visual system conflicts with Harmony's), any library that requires <code>'unsafe-inline'</code> or <code>'unsafe-eval'</code> in the CSP, any package whose peer range excludes Angular 22 or TypeScript 6.0.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="sec" id="testing">
+  <h2>7 · Testing and production delivery</h2>
+  <p class="lede">Each level proves something the level below cannot. The gates that proved home(7) carry over.</p>
+
+  <h3>7.1 Test levels</h3>
+  <div class="tw wide"><table>
+    <thead><tr><th>Level</th><th>Tool</th><th>Proves</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td>Unit</td><td>Vitest + jsdom</td><td>Pure rules and mappers are correct</td><td>Money formatting per currency; margin from minutes; collision window; Arabic plural selection; DTO → model mapping</td></tr>
+      <tr><td>Component</td><td>Vitest + TestBed (zoneless) + CDK/Aria harnesses</td><td>Components render, react to inputs, emit intent, are accessible in isolation</td><td>Arrival row keyboard focus; popover focus in/out; drawer at 1180 px</td></tr>
+      <tr><td>Integration</td><td>Vitest with a fake BFF (MSW-style handlers)</td><td>Data-access + feature + error handling work together</td><td>202 refusal shows reason; 409 shows conflict view; 401 keeps draft</td></tr>
+      <tr><td>Contract</td><td>Generated types compiled against adapters; recorded examples replayed</td><td>Frontend and service agree</td><td>A renamed field fails CI</td></tr>
+      <tr><td>End-to-end</td><td>Playwright against staging BFF + services</td><td>Real workflows work through the real BFF and Identity</td><td>Sign-in with two-step; check-in; property switch; sign out everywhere</td></tr>
+      <tr><td>Accessibility</td><td>axe in Playwright + keyboard scripts + manual screen reader (NVDA, VoiceOver) per release</td><td>WCAG 2.2 AA risks are caught</td><td>0 serious/critical axe issues on key routes; the ported keyboard checks</td></tr>
+      <tr><td>Security</td><td>Playwright negative suite; CSP/TT report monitoring; DAST (OWASP ZAP baseline) on staging; dependency scan</td><td>Refusals hold; no injection; no leaks</td><td>Section 3.7 cases</td></tr>
+      <tr><td>Performance</td><td>Lighthouse CI; Playwright traces; synthetic benchmarks</td><td>Budgets hold</td><td>Section 2.1</td></tr>
+      <tr><td>Long session</td><td>Nightly Playwright soak (8 h scripted shift, real hub)</td><td>No leaks, no drift, session rules hold</td><td>Heap ≤ +30 MB; idle warning at 25 min; absolute sign-out at 12 h (time-shifted test identity)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>7.2 Hotel scenarios that must have end-to-end tests</h3>
+  <ol>
+    <li>Morning shift: sign in → choose property → "Hotel now" → assign room → check in → encode key (stub) → post payment.</li>
+    <li>Two clerks edit the same reservation in two browser contexts; the second sees the conflict view and keeps their input.</li>
+    <li>Property switch with an unsaved draft; drafts per property restored; no data from the first property appears.</li>
+    <li>Role demoted mid-shift: next action returns to sign-in; after sign-in the draft returns and the forbidden action is explained.</li>
+    <li>Network drop during check-in: banner, safe retries with the same idempotency key, no duplicate check-in.</li>
+    <li>Hub disconnect and reconnect: resync happens, no stale counts remain.</li>
+    <li>Night audit running: business date marker, blocked actions explained.</li>
+    <li>Arabic, dark, 1366×768 at 125 % and 150 %: the prototype's layout audit, ported.</li>
+    <li>Deploy while a tab is open: update banner; lazy route of the old release still loads; reload keeps drafts.</li>
+  </ol>
+
+  <h3>7.3 CI/CD pipeline</h3>
+  <pre class="mermaid">
+flowchart LR
+  A["Install<br/>frozen lockfile<br/>release-age guard"] --> B["Lint + boundaries<br/>typecheck strict"]
+  B --> C["Unit + component<br/>+ integration"]
+  C --> D["Build per locale<br/>budgets enforced"]
+  D --> E["SBOM + dependency<br/>scan + licence check"]
+  E --> F["Deploy to staging<br/>(BFF + Identity + services)"]
+  F --> G["E2E + a11y + security<br/>+ performance suites"]
+  G --> H{"Release gates"}
+  H -- pass --> I["Production<br/>keep last 3 releases' chunks"]
+  H -- fail --> X["Stop"]
+  I --> J["Monitor: errors, RUM,<br/>CSP reports, 401 rate"]
+  J -->|regression| R["Roll back:<br/>switch index.html to previous release"]
+  </pre>
+  <ul>
+    <li><b>Reproducible builds:</b> Node pinned in <code>.nvmrc</code> and CI image (24.x LTS within Angular's range); pnpm pinned through <code>packageManager</code>; lockfile committed; build output hashed and compared between two clean builds in CI weekly.</li>
+    <li><b>Dependency review:</b> automated update PRs grouped weekly, Angular updates by <code>ng update</code> only, never merged without the full staging suite.</li>
+    <li><b>Version compatibility:</b> each release declares the API versions it needs; the BFF reports service versions on <code>/bff/version</code>; staging runs the new client against the current production services before release.</li>
+    <li><b>Rollback:</b> the BFF serves <code>index.html</code> of a chosen release; switching back is a configuration change; hashed chunks of the last three releases remain available, so open tabs keep working.</li>
+    <li><b>Already-open sessions:</b> covered by the update banner and kept chunks (4.6); a breaking API change requires a minimum client version so old tabs are asked to reload rather than failing silently.</li>
+  </ul>
+</section>
+
+<!-- ======================================================================= -->
+<section class="sec" id="matrix">
+  <h2>8 · Verification matrix, roadmap and release gates</h2>
+  <p class="lede">Every significant requirement, where it comes from, how it is built, how it is proven, and where it stands today.</p>
+  <div class="legend">
+    <span><i class="st s-ver">Verified in existing code</i> already true in the Harmony backend or prototype</span>
+    <span><i class="st s-rec">Recommended</i> not implemented in Angular yet</span>
+    <span><i class="st s-imp">Implemented, not tested</i></span>
+    <span><i class="st s-blk">Blocked / needs decision</i></span>
+  </div>
+  <div class="tw wide"><table>
+    <thead><tr><th>#</th><th>Requirement</th><th>Source or rationale</th><th>Implementation</th><th>Verification</th><th>Acceptance</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Tokens never reach the browser</td><td>RFC 10017 §6.1; repo BFF client</td><td>YARP BFF, cookie session</td><td>E2E: inspect storage, network; no <code>Authorization</code> header from the browser</td><td>0 tokens in browser storage or requests</td><td><span class="st s-blk">Blocked · D1</span></td></tr>
+      <tr><td>2</td><td>BFF client uses code + PKCE + PAR + private_key_jwt</td><td>RFC 9126, RFC 7523; repo</td><td>Duende client <code>harmony-web-bff</code></td><td>Identity harness; BFF sign-in e2e</td><td>Sign-in works; plain PKCE and missing PAR refused</td><td><span class="st s-ver">Verified in code</span> (client config); BFF host missing</td></tr>
+      <tr><td>3</td><td>Password grant retired</td><td>Repo comment "to be removed"; attack surface</td><td>Disable <code>harmony-web</code> client</td><td>Token endpoint test</td><td><code>grant_type=password</code> refused in production</td><td><span class="st s-blk">Blocked · D15</span></td></tr>
+      <tr><td>4</td><td>Session: 30 min idle, 12 h absolute, mirrored in UI</td><td>Design docs; repo lifetimes</td><td><code>platform/session</code> timers + BroadcastChannel</td><td>Soak with time-shifted identity</td><td>Warning at 25 min; sign-out at limits in all tabs</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>5</td><td>Access-change ends the session</td><td>Repo <code>security_version</code></td><td>401 handling → sign-in, drafts kept</td><td>E2E scenario 4</td><td>Next call after demotion → sign-in; draft restored</td><td><span class="st s-ver">Verified in code</span> (server); UI recommended</td></tr>
+      <tr><td>6</td><td>UI knows permissions per property</td><td>Token has role ids only; BFF hides token</td><td><code>/bff/session</code> access payload</td><td>Integration + e2e</td><td>Menus match a 12-role × N-endpoint matrix</td><td><span class="st s-blk">Blocked · D2</span></td></tr>
+      <tr><td>7</td><td>Backend authoritative for every action</td><td>OWASP ASVS access control; repo <code>[RequirePermission]</code></td><td>Server checks; UI only hides</td><td>Negative suite 3.7</td><td>100 % of forbidden calls refused</td><td><span class="st s-ver">Verified in code</span> (Identity); other services pending</td></tr>
+      <tr><td>8</td><td>No cross-tenant/property leakage</td><td>Repo tenancy walls</td><td>Keyed caches, clear on switch; server filters</td><td>Negative tests 1, 3, 8</td><td>0 foreign rows rendered or returned</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>9</td><td>Strict CSP with nonce</td><td>Angular security guide</td><td>BFF renders <code>index.html</code>; <code>ngCspNonce</code></td><td>Header test; CSP reports</td><td>No <code>unsafe-inline</code>/<code>unsafe-eval</code>; 0 violations in 7 staging days</td><td><span class="st s-blk">Blocked · D14</span></td></tr>
+      <tr><td>10</td><td>Trusted Types enforced</td><td>Angular guide; MDN Baseline 2026</td><td>CSP <code>require-trusted-types-for</code></td><td>Report-only week, then enforce</td><td>0 violations; app works in all four engines</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>11</td><td>CSRF protection</td><td>Angular guide (client half only)</td><td>XSRF header + BFF validation, SameSite cookie</td><td>Negative test 2</td><td>Cross-site mutation refused</td><td><span class="st s-blk">Blocked · D1</span></td></tr>
+      <tr><td>12</td><td>No personal data or tokens in browser storage</td><td>Privacy; ASVS data protection</td><td>Storage policy 3.4; lint + test</td><td>E2E storage dump after workflows</td><td>Only allowed keys present</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>13</td><td>Card data never in Harmony pages</td><td>PCI DSS scope</td><td>Provider hosted fields / terminal</td><td>CSP frame-src; DOM inspection</td><td>No card input element in Harmony DOM</td><td><span class="st s-blk">Blocked · D8</span></td></tr>
+      <tr><td>14</td><td>Safe uploads and downloads</td><td>OWASP file upload guidance</td><td>Server validation, attachment, nosniff</td><td>Security suite</td><td>HTML upload never rendered; formula cells escaped</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>15</td><td>Supply-chain controls</td><td>pnpm docs; incidents of compromised packages</td><td>Release-age 3 days, build allow-list, SBOM, OSV scan</td><td>CI checks</td><td>CI fails on high/critical; SBOM per release</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>16</td><td>Peer ranges respected (TS 6.0)</td><td>Registry; brief's rule</td><td>Pin TypeScript 6.0.x; no overrides</td><td><code>pnpm install</code> with strict peers</td><td>0 peer warnings</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>17</td><td>Envelope mapped once</td><td>Repo envelope contract</td><td><code>platform/http</code></td><td>Unit tests per status</td><td>Every status/code shape maps to one result kind</td><td><span class="st s-ver">Verified in code</span> (React <code>api.ts</code> shape); Angular recommended</td></tr>
+      <tr><td>18</td><td>Every error code has Arabic and English text</td><td>Repo decision: app owns wording</td><td>Code catalogue with <code>$localize</code></td><td>CI: catalogue vs framework code list</td><td>0 codes without both texts</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>19</td><td>Errors never swallowed</td><td>Brief</td><td>ErrorHandler + lint (no empty catch)</td><td>Lint; injected faults test</td><td>Every injected fault reported once</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>20</td><td>Correlation id on every error</td><td>Repo envelope; W3C Trace Context</td><td><code>traceparent</code> + display</td><td>Integration test</td><td>Error UI shows id; matches server log</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>21</td><td>Safe retries only</td><td>Section 4.3</td><td>Interceptor policy</td><td>Fault-injection tests</td><td>0 duplicate commands under retry</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>22</td><td>Idempotent commands</td><td>Framework F2 plan</td><td><code>Idempotency-Key</code> per intent</td><td>E2E scenario 5</td><td>Duplicate press → one effect</td><td><span class="st s-blk">Blocked · D6</span></td></tr>
+      <tr><td>23</td><td>Uncertain payment never re-charged</td><td>Money safety</td><td>Workflow D</td><td>E2E with provider timeout stub</td><td>Charge button disabled until outcome known</td><td><span class="st s-blk">Blocked · D8</span></td></tr>
+      <tr><td>24</td><td>Optimistic concurrency with merge view</td><td>Design docs rowversion</td><td>Version in requests; conflict UI</td><td>E2E scenario 2</td><td>No silent overwrite</td><td><span class="st s-blk">Blocked · D5</span></td></tr>
+      <tr><td>25</td><td>Partial bulk results shown per item</td><td>Brief</td><td>Per-item result list</td><td>Integration test</td><td>Failed items listed with reasons; retry those only</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>26</td><td>Real-time with ordering and resync</td><td>Brief; operations</td><td>SignalR, sequence numbers</td><td>E2E scenario 6; fake hub gaps</td><td>No stale counts after reconnect or gap</td><td><span class="st s-blk">Blocked · D4</span></td></tr>
+      <tr><td>27</td><td>Bursts do not freeze the UI</td><td>Project budget</td><td>Frame-batched apply, dedupe</td><td>Burst benchmark</td><td>INP ≤ 200 ms during 200 events/s</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>28</td><td>Property in URL; switch clears scope</td><td>Prototype honesty rule; D13</td><td>Route param + scoped providers</td><td>E2E scenario 3</td><td>No previous-property data after switch</td><td><span class="st s-ver">Verified in prototype</span>; Angular recommended</td></tr>
+      <tr><td>29</td><td>Support-grant banner and expiry</td><td>Repo staff/client separation</td><td>Session payload + banner</td><td>Negative test 7</td><td>Expired grant refused; banner shown</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>30</td><td>Drafts survive errors, sign-in, language switch</td><td>Brief</td><td>Draft registry</td><td>E2E scenarios 3, 4, 9</td><td>Draft restored in all three</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>31</td><td>Failed chunks and updates handled</td><td>Brief</td><td>Version check, kept chunks, router error</td><td>E2E scenario 9</td><td>Old tab loads lazy route; banner shown</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>32</td><td>WCAG 2.2 AA on key workflows</td><td>W3C WCAG 2.2</td><td>CDK/Aria, keyboard model</td><td>axe + keyboard + manual SR</td><td>0 serious/critical axe; keyboard suite passes; SR walkthrough signed off</td><td><span class="st s-ver">Verified in prototype</span> (keyboard suite); Angular recommended</td></tr>
+      <tr><td>33</td><td>Arabic/RTL correctness</td><td>Product requirement</td><td>localize, logical CSS, bidi rules</td><td>Ported layout audit in Arabic</td><td>0 overflow, 0 truncation, mirrored arrows</td><td><span class="st s-ver">Verified in prototype</span>; Angular recommended</td></tr>
+      <tr><td>34</td><td>Arabic plurals correct</td><td>CLDR (six categories)</td><td>ICU messages</td><td>Unit tests 0,1,2,3,11,100</td><td>All categories render correctly</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>35</td><td>Money displayed with correct minor units</td><td>ISO 4217</td><td><code>Money</code> + <code>Intl.NumberFormat</code></td><td>Unit tests JOD/SAR/AED</td><td>JOD 3 decimals, SAR 2</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>36</td><td>Times in property zone; business date from server</td><td>Operations</td><td><code>PropertyTime</code>, context</td><td>Tests with device zone ≠ property zone</td><td>All times in property zone</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>37</td><td>Responsive floor 1366×768 @125 %/150 %</td><td>Prototype proof</td><td>Container queries, drawer</td><td>Ported viewport audit</td><td>0 overflow at every supported viewport, ar/en, light/dark</td><td><span class="st s-ver">Verified in prototype</span> (viewport audit); Angular recommended</td></tr>
+      <tr><td>38</td><td>Core Web Vitals "good" at p75</td><td>web.dev</td><td>Section 2</td><td>RUM</td><td>LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>39</td><td>Bundle budgets</td><td>Project</td><td>CLI budgets</td><td>Build fails above budget</td><td>Initial ≤ 250 KB compressed</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>40</td><td>No leaks over a shift</td><td>Long sessions</td><td>DestroyRef discipline, LRU caches</td><td>8 h soak</td><td>Heap ≤ +30 MB, no detached DOM growth</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>41</td><td>Layer boundaries enforced</td><td>Maintainability</td><td>eslint-plugin-boundaries</td><td>CI lint</td><td>0 forbidden imports</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>42</td><td>Strict typing and templates</td><td>Section 5.1</td><td>tsconfig + angularCompilerOptions</td><td>CI typecheck</td><td>0 errors, 0 suppressed diagnostics without ADR</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>43</td><td>Contracts generated and checked</td><td>D3</td><td>@hey-api/openapi-ts types</td><td>CI compile against adapters</td><td>Breaking API change fails CI</td><td><span class="st s-blk">Blocked · D3</span></td></tr>
+      <tr><td>44</td><td>Privacy-safe telemetry</td><td>Data residency; privacy</td><td>OTel with scrubber via BFF</td><td>Telemetry payload inspection test</td><td>0 personal fields in payloads</td><td><span class="st s-blk">Blocked · D9</span></td></tr>
+      <tr><td>45</td><td>Reproducible, reversible releases</td><td>Delivery</td><td>Pinned toolchain, kept chunks, index switch</td><td>Weekly double-build compare; rollback drill</td><td>Identical hashes; rollback ≤ 5 min</td><td><span class="st s-rec">Recommended</span></td></tr>
+      <tr><td>46</td><td>No hotel-operations contracts yet</td><td>Repo: Identity only</td><td>Backend roadmap</td><td>—</td><td>First service OpenAPI published</td><td><span class="st s-blk">Blocked · D3</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="roadmap">Prioritised roadmap</h3>
+  <div class="tw wide"><table>
+    <thead><tr><th>Phase</th><th>Delivers</th><th>Depends on</th><th>Exit criteria</th></tr></thead>
+    <tbody>
+      <tr><td><b>1 · BFF and session</b></td><td>YARP BFF: <code>/bff/login</code>, <code>/bff/logout</code>, <code>/bff/session</code> (with access payload), API and hub proxy, CSRF, nonce-rendered <code>index.html</code></td><td>D1, D2, D14</td><td>Sign-in with two-step through the BFF in staging; negative tests 2, 3, 6 pass</td></tr>
+      <tr><td><b>2 · Foundation</b></td><td>Angular workspace, tokens, shell (bar, context bar, dock, navigation, command palette), platform libs, localize (ar/en), CI pipeline with gates, telemetry</td><td>Phase 1; D7, D9, D10, D13</td><td>Shell passes the ported keyboard and viewport suites; CSP + Trusted Types enforced with 0 violations; React app and password client retired (D15)</td></tr>
+      <tr><td><b>3 · First operations slice</b></td><td>Administration screens (reference data, users and roles, security) ported from React; "Hotel now" on the first front-office read model; real-time hub</td><td>D3, D4, D5, D6</td><td>Contract tests in CI; resync tests pass; RUM baseline recorded</td></tr>
+      <tr><td><b>4 · Front-desk workflows</b></td><td>Arrivals, room assignment, check-in/out, room plan timeline, housekeeping board</td><td>Phase 3 services; D11</td><td>Hotel scenarios 1–7 green; timeline budget met</td></tr>
+      <tr><td><b>5 · Money</b></td><td>Folios, payments with hosted fields, shift close, night audit</td><td>D8; cashiering service</td><td>Uncertain-payment and duplicate-press tests green; PCI scope confirmed by the provider</td></tr>
+      <tr><td><b>6 · Hardening</b></td><td>DPoP (with backend), pen test, 8-hour soak, accessibility audit with real users, performance tuning</td><td>All above</td><td>Release gates below</td></tr>
+    </tbody>
+  </table></div>
+  <h4>Risks</h4>
+  <ul>
+    <li><b>Backend contracts arrive later than the UI.</b> Mitigation: build each slice against an agreed OpenAPI document and a contract-tested fake before the service exists.</li>
+    <li><b>New Angular APIs change.</b> Aria and Signal Forms are new; resources became stable in 22.0. Mitigation: wrap them in our <code>ui</code>/<code>platform</code> libraries; re-check API status at each minor.</li>
+    <li><b>Peer ranges lag.</b> TypeScript 7 is already out; libraries may move before Angular does. Mitigation: no overrides; upgrade only together with Angular.</li>
+    <li><b>Licence and data-residency choices</b> (grid, telemetry, payments) can stall phases 4–5. Mitigation: decide D8, D9, D11 early.</li>
+    <li><b>Two front ends during migration.</b> Mitigation: retire React and the password client as a phase 2 exit criterion, not later.</li>
+  </ul>
+
+  <h3 id="gates">Objective production release gates</h3>
+  <ol>
+    <li>All unit, component, integration, contract and end-to-end suites pass on the release commit; no test skipped without a linked, approved exception.</li>
+    <li>Negative security suite (section 3.7) passes 100 %; DAST baseline shows no high findings; dependency scan shows no high or critical advisories without an accepted exception.</li>
+    <li>CSP and Trusted Types enforced in staging for 7 days with 0 violations from the app's own code.</li>
+    <li>axe: 0 serious or critical issues on the key routes; keyboard suite passes; manual screen-reader walkthrough of the release's new flows recorded.</li>
+    <li>Layout audit passes at all supported viewports in Arabic and English, light and dark.</li>
+    <li>Bundle budgets pass; staging RUM (or lab equivalents where RUM is not yet available) within the section 2.1 targets.</li>
+    <li>8-hour soak: heap growth within budget, no failed session transitions.</li>
+    <li>Rollback drill done for this release: previous <code>index.html</code> restored and verified in under 5 minutes.</li>
+    <li>External penetration test before the first production tenant (repo decision for Identity; extended to the web app).</li>
+  </ol>
+
+  <h3 id="sources">Sources</h3>
+  <h4>Formal standards</h4>
+  <ul>
+    <li>RFC 10017, OAuth 2.0 for Browser-Based Applications (BCP 212, August 2026): <a href="https://www.rfc-editor.org/rfc/rfc10017.html">rfc-editor.org/rfc/rfc10017</a></li>
+    <li>RFC 9700, OAuth 2.0 Security Best Current Practice: <a href="https://www.rfc-editor.org/rfc/rfc9700">rfc-editor.org/rfc/rfc9700</a></li>
+    <li>RFC 9126, Pushed Authorization Requests: <a href="https://www.rfc-editor.org/rfc/rfc9126">rfc-editor.org/rfc/rfc9126</a> · RFC 7523, JWT client authentication: <a href="https://www.rfc-editor.org/rfc/rfc7523">rfc-editor.org/rfc/rfc7523</a> · RFC 9449, DPoP: <a href="https://www.rfc-editor.org/rfc/rfc9449">rfc-editor.org/rfc/rfc9449</a></li>
+    <li>W3C, Web Content Accessibility Guidelines 2.2: <a href="https://www.w3.org/TR/WCAG22/">w3.org/TR/WCAG22</a></li>
+    <li>OWASP Application Security Verification Standard: <a href="https://owasp.org/www-project-application-security-verification-standard/">owasp.org/www-project-application-security-verification-standard</a></li>
+    <li>W3C Trace Context: <a href="https://www.w3.org/TR/trace-context/">w3.org/TR/trace-context</a></li>
+  </ul>
+  <h4>Official framework and platform guidance</h4>
+  <ul>
+    <li>Angular release and support policy: <a href="https://angular.dev/reference/releases">angular.dev/reference/releases</a></li>
+    <li>Angular zoneless guide: <a href="https://angular.dev/guide/zoneless">angular.dev/guide/zoneless</a></li>
+    <li>Angular security guide (sanitisation, CSP, Trusted Types, XSRF): <a href="https://angular.dev/best-practices/security">angular.dev/best-practices/security</a></li>
+    <li>Angular testing guide (Vitest default): <a href="https://angular.dev/guide/testing">angular.dev/guide/testing</a></li>
+    <li>Angular Signal Forms: <a href="https://angular.dev/guide/forms/signals/overview">angular.dev/guide/forms/signals/overview</a> · Angular Aria: <a href="https://angular.dev/guide/aria/overview">angular.dev/guide/aria/overview</a></li>
+    <li>web.dev, Web Vitals thresholds: <a href="https://web.dev/articles/vitals">web.dev/articles/vitals</a></li>
+    <li>MDN, Trusted Types API (Baseline 2026): <a href="https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API">developer.mozilla.org/…/Trusted_Types_API</a> · Temporal (not Baseline): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Temporal">developer.mozilla.org/…/Temporal</a></li>
+    <li>pnpm settings, <code>minimumReleaseAge</code>: <a href="https://pnpm.io/settings#minimumreleaseage">pnpm.io/settings#minimumreleaseage</a></li>
+  </ul>
+  <h4>Registry facts (read 6 October 2026)</h4>
+  <p>Versions, licences, peer ranges and deprecation notices come from <code>https://registry.npmjs.org/&lt;package&gt;/latest</code>; API stability tags (<code>@publicApi</code>, <code>@experimental</code>) from the published <code>@angular/core</code>, <code>@angular/common</code>, <code>@angular/forms</code> and <code>@angular/aria</code> 22.2.1 type definitions.</p>
+  <h4>Repository evidence</h4>
+  <p><code>Backend/Services/Identity/…/IdentityServer/IdentityServerResources.cs</code>, <code>…/Yarp/WebBffSettings.cs</code>, <code>…/Pages/Account/SignInPageHeadersAttribute.cs</code>, <code>Frontend/harmony-web/src/api.ts</code>, <code>session.ts</code>, <code>errors.ts</code>, <code>docs/identity-aggregates.html</code>, <code>docs/identity-analysis.md</code>, <code>docs/identity-backlog.md</code>, <code>docs/later.md</code>; commits <code>077a184</code>, <code>04fe5e1</code>, <code>ca1a671</code>–<code>311da41</code>.</p>
+</section>
+
+</main>
+</div>

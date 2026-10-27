@@ -1,0 +1,677 @@
+<title>Harmony Azure Platform</title>
+<meta name="description" content="Harmony on Azure, version 1.0 (23 October 2026): hosting, data, containers, multitenancy, reliability, security, delivery, observability, cost and the decisions needed, each checked against Microsoft's own documentation and the Harmony code.">
+<style>
+/* Same family as the Harmony Angular architecture document: midnight masthead, mineral bronze for numbering only,
+   status colours for status only. One reading column, a sticky contents rail on wide screens. */
+:root{
+  --paper:#ffffff; --frame:#f3f5f7; --ink:#17202a; --ink-2:#394756; --muted:#5f6b78; --rule:#dce1e6; --rule-2:#c8d0d8;
+  --shell:#101923; --shell-ink:#edf2f5; --shell-dim:#aebbc4; --mineral:#9a753c; --mineral-2:#c39b5c; --mineral-soft:#f3ede3;
+  --stop:#a73831; --stop-bg:#fff0ee; --warn:#906019; --warn-bg:#fff5e3; --ok:#26704a; --ok-bg:#eaf6ef;
+  --info:#35658a; --info-bg:#eaf2f7; --vip:#765493; --vip-bg:#f2edf7; --code-bg:#f6f8fa;
+  --sans:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"Cascadia Mono",Consolas,"SFMono-Regular",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#171e25; --frame:#10161c; --ink:#eef2f5; --ink-2:#c6cfd7; --muted:#9ca8b3; --rule:#313b45; --rule-2:#46525e;
+  --shell:#0b1118; --shell-ink:#edf2f5; --shell-dim:#9fb0bc; --mineral:#c39b5c; --mineral-2:#d4b07a; --mineral-soft:#33291d;
+  --stop:#ff9289; --stop-bg:#3b201f; --warn:#edbc6e; --warn-bg:#392d1c; --ok:#78d09e; --ok-bg:#1d3428;
+  --info:#8bb8d3; --info-bg:#20323e; --vip:#c3a6dd; --vip-bg:#2e2639; --code-bg:#11171d; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --paper:#171e25; --frame:#10161c; --ink:#eef2f5; --ink-2:#c6cfd7; --muted:#9ca8b3; --rule:#313b45; --rule-2:#46525e;
+  --shell:#0b1118; --shell-ink:#edf2f5; --shell-dim:#9fb0bc; --mineral:#c39b5c; --mineral-2:#d4b07a; --mineral-soft:#33291d;
+  --stop:#ff9289; --stop-bg:#3b201f; --warn:#edbc6e; --warn-bg:#392d1c; --ok:#78d09e; --ok-bg:#1d3428;
+  --info:#8bb8d3; --info-bg:#20323e; --vip:#c3a6dd; --vip-bg:#2e2639; --code-bg:#11171d; color-scheme:dark; }
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+@media (prefers-reduced-motion:reduce){ html{ scroll-behavior:auto; } }
+body{ background:var(--frame); color:var(--ink); font:14.5px/1.6 var(--sans); }
+a{ color:var(--info); text-underline-offset:2px; }
+a:focus-visible, summary:focus-visible{ outline:2px solid var(--info); outline-offset:2px; border-radius:2px; }
+code,kbd,pre{ font-family:var(--mono); font-size:.86em; }
+code{ background:var(--code-bg); border:1px solid var(--rule); border-radius:3px; padding:0 .3em; overflow-wrap:anywhere; }
+pre{ background:var(--code-bg); border:1px solid var(--rule); border-radius:4px; padding:12px 14px; overflow-x:auto; line-height:1.5; margin:8px 0 12px; }
+pre code{ background:none; border:0; padding:0; overflow-wrap:normal; }
+pre.mermaid{ background:var(--paper); text-align:center; font-family:var(--sans); }
+
+.mast{ background:var(--shell); color:var(--shell-ink); padding-block:28px 26px; padding-inline:max(16px, calc((100% - 1280px)/2)); }
+.mast .kick{ font:600 12px/1 var(--sans); letter-spacing:.14em; text-transform:uppercase; color:var(--mineral-2); }
+.mast h1{ font:600 clamp(26px,3.6vw,38px)/1.12 var(--sans); letter-spacing:-.02em; margin:10px 0 8px; text-wrap:balance; }
+.mast p{ margin:0; max-width:80ch; color:var(--shell-dim); }
+.mast .meta{ display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:14px; font:12.5px/1.4 var(--mono); color:var(--shell-dim); }
+.verdict{ display:inline-flex; align-items:center; gap:10px; margin-top:16px; padding:8px 12px; border-radius:4px; background:#392d1c; color:#ffe2b3; font-weight:600; border:1px solid #906019; }
+.verdict b{ font:700 12px/1 var(--mono); letter-spacing:.08em; background:#906019; color:#fff; padding:4px 7px; border-radius:3px; }
+
+.page{ display:grid; grid-template-columns:minmax(0,1fr); gap:28px; padding-block:24px 64px; padding-inline:max(16px, calc((100% - 1280px)/2)); }
+@media (min-width:1120px){ .page{ grid-template-columns:250px minmax(0,1fr); } }
+nav.toc{ align-self:start; }
+@media (min-width:1120px){ nav.toc{ position:sticky; top:calc(env(safe-area-inset-top,0px) + 16px); max-height:calc(100vh - 32px); overflow-y:auto; } }
+nav.toc h2{ font:600 11px/1 var(--sans); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+nav.toc ol{ list-style:none; margin:0; padding:0; display:grid; gap:1px; }
+nav.toc a{ display:block; padding:4px 8px; border-radius:4px; color:var(--ink-2); text-decoration:none; font-size:13.5px; }
+nav.toc a:hover{ background:var(--paper); color:var(--ink); }
+main{ min-width:0; display:grid; gap:22px; }
+section.sec{ background:var(--paper); border:1px solid var(--rule); border-radius:6px; padding-block:22px 24px; padding-inline:clamp(16px,3vw,32px); min-width:0; }
+section.sec > h2{ font:600 24px/1.2 var(--sans); letter-spacing:-.015em; margin:0 0 4px; text-wrap:balance; }
+section.sec > h2 .n{ color:var(--mineral); font-variant-numeric:tabular-nums; margin-inline-end:6px; }
+section.sec > .lede{ color:var(--muted); margin:0 0 16px; max-width:84ch; }
+h3{ font:600 17px/1.3 var(--sans); margin:24px 0 8px; text-wrap:balance; }
+h4{ font:600 14.5px/1.35 var(--sans); margin:16px 0 6px; color:var(--ink-2); }
+p,li{ max-width:86ch; }
+p{ margin:0 0 10px; }
+ul,ol{ margin:0 0 10px; padding-inline-start:1.3em; }
+li{ margin-bottom:4px; }
+
+.t{ display:inline-block; font:600 10px/1 var(--mono); letter-spacing:.03em; padding:3px 5px 2px; border-radius:3px; vertical-align:1px; white-space:nowrap; border:1px solid currentColor; }
+.t-impl{ color:var(--ok); background:var(--ok-bg); }
+.t-std{ color:var(--info); background:var(--info-bg); }
+.t-dec{ color:var(--mineral); background:var(--mineral-soft); }
+.t-asm{ color:var(--vip); background:var(--vip-bg); }
+.t-gap{ color:var(--stop); background:var(--stop-bg); }
+.t-sec{ color:#fff; background:var(--stop); border-color:var(--stop); }
+.t-cost{ color:#fff; background:var(--warn); border-color:var(--warn); }
+.legend{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:6px 16px; font-size:13px; color:var(--ink-2); margin:8px 0; }
+.legend span{ display:flex; gap:8px; align-items:baseline; }
+
+.st{ display:inline-block; font:600 11px/1.2 var(--sans); padding:3px 7px; border-radius:10px; white-space:nowrap; }
+.s-ok{ background:var(--ok-bg); color:var(--ok); }
+.s-blk{ background:var(--stop-bg); color:var(--stop); }
+.s-def{ background:var(--info-bg); color:var(--info); }
+.s-risk{ background:var(--warn-bg); color:var(--warn); }
+
+.note{ border-inline-start:3px solid var(--info); background:var(--info-bg); padding:10px 14px; border-radius:0 4px 4px 0; margin:12px 0; }
+.note.warn{ border-color:var(--warn); background:var(--warn-bg); }
+.note.stop{ border-color:var(--stop); background:var(--stop-bg); }
+.note.ok{ border-color:var(--ok); background:var(--ok-bg); }
+.note > b:first-child{ display:block; margin-bottom:2px; }
+.note p:last-child, .note ul:last-child{ margin-bottom:0; }
+
+.tw{ overflow-x:auto; margin:10px 0 14px; border:1px solid var(--rule); border-radius:4px; }
+table{ border-collapse:collapse; width:100%; font-size:13px; }
+th,td{ text-align:start; vertical-align:top; padding:7px 9px; border-bottom:1px solid var(--rule); }
+th{ background:var(--frame); font-weight:600; font-size:12px; color:var(--ink-2); }
+tr:last-child td{ border-bottom:0; }
+td.num, th.num{ text-align:end; font-variant-numeric:tabular-nums; white-space:nowrap; }
+tr.sum td{ font-weight:600; background:var(--frame); }
+td code{ overflow-wrap:anywhere; }
+.w-wide table{ min-width:1000px; }
+.w-mid table{ min-width:760px; }
+
+.cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:10px; margin:12px 0; }
+.card{ border:1px solid var(--rule); border-radius:5px; padding:12px 14px; background:var(--paper); min-width:0; }
+.card h4{ margin:0 0 4px; }
+.card p{ margin:0; font-size:13.5px; color:var(--ink-2); }
+.card .big{ font:600 22px/1.1 var(--sans); font-variant-numeric:tabular-nums; color:var(--ink); }
+.cols{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:16px; }
+.cols > div{ min-width:0; }
+details{ border:1px solid var(--rule); border-radius:4px; padding:8px 12px; margin:10px 0; background:var(--paper); }
+details > summary{ cursor:pointer; font-weight:600; }
+details[open] > summary{ margin-bottom:8px; }
+.ev{ font:11px/1.3 var(--mono); color:var(--muted); }
+</style>
+
+<header class="mast">
+  <div class="kick">Harmony PMS · cloud platform architecture · version 1.0</div>
+  <h1>Harmony on Azure: zone-redundant, replica-safe, recoverable</h1>
+  <p>Where every Harmony part runs on Azure, how it is containerised, how it keeps working when a server, a data centre or a release fails, and how it comes back when a whole region fails. Every Azure fact here was checked on Microsoft Learn on 23 October 2026; every Harmony fact was read from the code.</p>
+  <div class="meta">
+    <span>v1.0 · 23 October 2026 · proposal, nothing built in Azure yet</span>
+    <span>repo: duende-identity-server @ 7d67aac · framework @ 174a8c5</span>
+    <span>prices: Azure Retail Prices API, 23 Oct 2026</span>
+  </div>
+  <div class="verdict"><b>PROPOSED</b> 18 decisions (A1–A18) and 14 fixes that make Harmony safe to run as many copies (G1–G14) come before production.</div>
+</header>
+
+<div class="page">
+<nav class="toc" aria-label="Contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#s1">1 · The honest answer</a></li>
+    <li><a href="#s2">2 · What runs today</a></li>
+    <li><a href="#s3">3 · Target platform</a></li>
+    <li><a href="#s4">4 · Service by service</a></li>
+    <li><a href="#s5">5 · Docker the right way</a></li>
+    <li><a href="#s6">6 · Safe to run many copies</a></li>
+    <li><a href="#s7">7 · Multitenancy</a></li>
+    <li><a href="#s8">8 · Reliability and recovery</a></li>
+    <li><a href="#s9">9 · Security and network</a></li>
+    <li><a href="#s10">10 · Delivery</a></li>
+    <li><a href="#s11">11 · Observability</a></li>
+    <li><a href="#s12">12 · Cost</a></li>
+    <li><a href="#s13">13 · Decisions</a></li>
+    <li><a href="#s14">14 · Roadmap</a></li>
+    <li><a href="#s15">15 · Evidence and sources</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ===================================================================== 1 -->
+<section class="sec" id="s1">
+  <h2><span class="n">1</span>The honest answer</h2>
+  <p class="lede">You asked for an app that never goes down and a setup that is 100% complete. No cloud sells that, and Microsoft's own guidance says so. Here is what we can promise and prove instead.</p>
+
+  <div class="note stop"><b>Never down is not on sale</b>
+    <p>Microsoft publishes availability promises (SLAs) for each service, and none is 100%. Its Well-Architected guidance says a system's availability is the <i>product</i> of its parts: every service you add lowers the ceiling. For targets of 99.99% and above it recommends at least three regions. Anyone who promises "never down" is selling a feeling, not a design.</p>
+  </div>
+
+  <h3>What this design promises</h3>
+  <div class="cards">
+    <div class="card"><h4>One server dies</h4><p>Nobody notices. Every part runs as at least two copies; Azure replaces the dead one.</p></div>
+    <div class="card"><h4>One data centre dies</h4><p>Nobody notices. App, database, cache and registry are spread over the three zones in UAE North. The database loses no committed data.</p></div>
+    <div class="card"><h4>A bad release ships</h4><p>Traffic goes back to the previous version in seconds. A new version gets traffic only after its smoke test passes.</p></div>
+    <div class="card"><h4>The whole region dies</h4><p>Harmony restarts in the second region under a written, rehearsed plan. Some recent seconds of data may be lost (the RPO), and users sign in again.</p></div>
+  </div>
+
+  <h3>The numbers, honestly</h3>
+  <p>Microsoft's table for what each target allows per month, and the arithmetic for one region with the parts this design uses:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Target</th><th class="num">Down per month</th><th class="num">Down per year</th><th>What it takes on Azure</th></tr></thead>
+    <tbody>
+      <tr><td>99.9%</td><td class="num">43.2 min</td><td class="num">8.76 h</td><td>One region, three zones. <b>This design's starting target.</b></td></tr>
+      <tr><td>99.95%</td><td class="num">21.6 min</td><td class="num">4.38 h</td><td>Above the one-region ceiling (below). Needs a second region that takes traffic quickly.</td></tr>
+      <tr><td>99.99%</td><td class="num">4.32 min</td><td class="num">52.6 min</td><td>Microsoft: at least three regions, active-active. A different, much larger project.</td></tr>
+    </tbody>
+  </table></div>
+  <pre><code>One region, multiplied (Microsoft: a composite target is the product of its parts)
+  Front Door 99.99%  x  Private Link 99.99%  x  Container Apps 99.95%
+  x  Azure SQL 99.99% (assumed, confirm)  x  Managed Redis 99.99% (assumed, confirm)
+  = about 99.91%   →   roughly 39 minutes a month before any bug, bad release or human mistake</code></pre>
+  <p>So the honest first promise is <b>99.9% per month for the critical flows</b> (sign-in, the front desk, check-in and check-out), measured per hotel, with a <b>recovery point and recovery time for region loss that you choose</b> (decision A2) and that we rehearse. Raising it later means adding regions, not tweaking settings.</p>
+  <p class="ev">Front Door 99.99%, Container Apps 99.95% and Private Link 99.99% are the figures Microsoft uses in its own worked example (Well-Architected, reliability targets). The SQL and Redis figures are placeholders until read from the SLA page.</p>
+
+  <h3>How to read the labels</h3>
+  <div class="legend">
+    <span><i class="t t-impl">HAVE</i> exists in Harmony today (read from the code)</span>
+    <span><i class="t t-std">MS</i> Microsoft's documented guidance</span>
+    <span><i class="t t-gap">GAP</i> missing; must change before production</span>
+    <span><i class="t t-sec">SEC</i> security risk</span>
+    <span><i class="t t-dec">DECIDE</i> needs your decision (section 13)</span>
+    <span><i class="t t-asm">ASSUMED</i> not verified; to confirm</span>
+    <span><i class="t t-cost">COST</i> paid service or paid tier</span>
+  </div>
+</section>
+
+<!-- ===================================================================== 2 -->
+<section class="sec" id="s2">
+  <h2><span class="n">2</span>What runs today</h2>
+  <p class="lede">Measured from the repository on 23 October. The platform has to fit this, not the other way round.</p>
+
+  <div class="tw w-wide"><table>
+    <thead><tr><th>Part</th><th>What it is</th><th>State it keeps</th><th>Facts that matter for Azure</th></tr></thead>
+    <tbody>
+      <tr><td><b>Identity</b><br><code>Harmony.Identity.Api</code></td><td>.NET 10, Duende IdentityServer 8.0.9, ASP.NET Identity, EF Core on SQL Server</td><td>Users, grants and the Data Protection key ring in SQL (key ring encrypted with a certificate)</td><td>
+        <i class="t t-impl">HAVE</i> signing keys and certificates read from <b>file paths</b> (fits mounted secrets)<br>
+        <i class="t t-impl">HAVE</i> trusted proxies by address <i>and</i> network<br>
+        <i class="t t-gap">GAP</i> rate-limit counts in memory (later.md L11)<br>
+        <i class="t t-gap">GAP</i> Duende replay cache in memory (later.md L4)<br>
+        <i class="t t-gap">GAP</i> DataRetention cleanup runs on every copy, no lock<br>
+        <i class="t t-gap">GAP</i> applies EF migrations at every start (<code>Program.cs:30</code>)</td></tr>
+      <tr><td><b>BFF</b><br><code>Harmony.Web.Bff</code></td><td>.NET 10, YARP 2.3.0, Microsoft OIDC; one build, two hosts (web, console)</td><td>Sessions and its Data Protection key ring in Redis (certificate-protected); a Redis distributed lock</td><td>
+        <i class="t t-impl">HAVE</i> serves the Angular build from <code>wwwroot/en</code>, <code>wwwroot/ar</code>; renders <code>index.html</code> per request (nonce CSP)<br>
+        <i class="t t-impl">HAVE</i> <code>/healthz</code> liveness<br>
+        <i class="t t-gap">GAP</i> trusted proxies by single address only; Azure's ingress addresses change<br>
+        <i class="t t-gap">GAP</i> no readiness check for Redis</td></tr>
+      <tr><td><b>Angular web</b></td><td>Angular 22 workspace, two apps, en/ar builds</td><td>none</td><td>Ships inside the BFF image. Hashed asset files may be cached at the edge; <code>index.html</code> never.</td></tr>
+      <tr><td><b>Framework</b><br><code>Harmony.Core.*</code></td><td>Shared NuGet packages</td><td>—</td><td>
+        <i class="t t-gap">GAP</i> settings file is loaded <b>after</b> environment variables, so the file wins (section 6, G1)<br>
+        Packages present but not wired in Identity: RabbitMQ event bus ("remove until the event bus is wired"), Hangfire/Quartz, Elasticsearch logging, SignalR Redis backplane, SendGrid/MailKit, Azure Blob/S3/Google storage</td></tr>
+      <tr><td><b>Containers</b></td><td>—</td><td>—</td><td><i class="t t-gap">GAP</i> no Dockerfile or container build exists. Only <code>infra/redis/docker-compose.yml</code> (Redis 7, TLS, ACL) for local work.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note ok"><b>Good news: the hard parts are already cloud-shaped</b>
+    <p>Keys and certificates come from file paths, both key rings live outside the container, the BFF already uses a distributed lock, and Identity already trusts proxy networks. Most of the work in section 6 is small and named.</p>
+  </div>
+</section>
+
+<!-- ===================================================================== 3 -->
+<section class="sec" id="s3">
+  <h2><span class="n">3</span>Target platform</h2>
+  <p class="lede">One stamp in UAE North across three availability zones, private behind Azure Front Door, with a warm standby in a second region.</p>
+
+<pre class="mermaid">
+flowchart LR
+  U["Hotel staff and guests"] --> AFD["Azure Front Door Premium<br/>WAF, bot rules, TLS"]
+  AFD -->|"Private Link"| PE
+  subgraph R1["UAE North: 3 availability zones"]
+    PE["Private endpoint"] --> ENV
+    subgraph ENV["Container Apps environment: internal, zone-redundant"]
+      WEB["web BFF x3"]
+      CON["console BFF x2"]
+      IDP["Identity x3"]
+      SVC["future services<br/>internal only"]
+    end
+    ENV --> SQL[("Azure SQL<br/>Business Critical, zone-redundant")]
+    ENV --> RED[("Azure Managed Redis<br/>HA, zone-redundant, persistence")]
+    ENV --> KV["Key Vault"]
+    ENV --> ST["Storage, zone-redundant"]
+  end
+  subgraph R2["Second region: warm standby"]
+    SQL2[("SQL geo-secondary")]
+    ENV2["Container Apps environment<br/>scaled down"]
+    RED2[("Managed Redis, empty")]
+  end
+  SQL -. "async geo-replication" .-> SQL2
+  AFD -. "priority 2 origin" .-> ENV2
+  ACR["Container Registry Premium<br/>geo-replicated"] --> ENV
+  ACR --> ENV2
+</pre>
+
+  <h3>How a request travels</h3>
+  <ol>
+    <li>The browser reaches Front Door at the nearest Microsoft edge. TLS ends there; the WAF checks the request.</li>
+    <li>Front Door forwards it over <b>Private Link</b> to the Container Apps environment. The environment has <b>no public address</b>.</li>
+    <li>The environment's ingress picks the app (web BFF, console BFF or Identity) by host name and a healthy copy in any zone.</li>
+    <li>The BFF reads the session from Redis and calls Identity or a service on the internal network. Every data service is reached through a private endpoint.</li>
+  </ol>
+
+  <h3>Three public host names, three Front Door routes</h3>
+  <div class="tw w-mid"><table>
+    <thead><tr><th>Host (example)</th><th>Goes to</th><th>Why public</th></tr></thead>
+    <tbody>
+      <tr><td><code>app.harmony…</code></td><td>web BFF</td><td>The hotel staff app and its API.</td></tr>
+      <tr><td><code>console.harmony…</code></td><td>console BFF</td><td>The platform team's console (B9). Can also be limited by IP at the WAF.</td></tr>
+      <tr><td><code>id.harmony…</code></td><td>Identity</td><td>The browser must reach the sign-in pages and <code>/connect/*</code> directly; that is how OpenID Connect works.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Future PMS services (reservations, front desk, housekeeping, billing) get <b>internal ingress only</b>. The browser never calls them directly; it calls the BFF, which already proxies with YARP.</p>
+</section>
+
+<!-- ===================================================================== 4 -->
+<section class="sec" id="s4">
+  <h2><span class="n">4</span>Service by service</h2>
+  <p class="lede">Every row is a Microsoft service and every one is an outside service under our rule, so each needs your yes (section 13).</p>
+
+  <div class="tw w-wide"><table>
+    <thead><tr><th>Need</th><th>Azure service and tier</th><th>Why this one (Microsoft's words, summarised)</th><th>Harmony change</th><th>Decision</th></tr></thead>
+    <tbody>
+      <tr><td>Run the containers</td><td><b>Azure Container Apps</b>, workload-profiles environment, own VNet, zone redundancy on, internal only</td><td><i class="t t-std">MS</i> Microsoft's microservices guidance: start on Container Apps; choose AKS only when you need the Kubernetes API itself. Zone redundancy needs a VNet, is chosen when the environment is created (cannot be added later) and costs nothing extra. Private Link from Front Door works only with workload-profiles environments.</td><td>Images (section 5). Minimum 2 copies per app; 3 for Identity and web BFF.</td><td>A4</td></tr>
+      <tr><td>Front door, WAF</td><td><b>Azure Front Door Premium</b></td><td><i class="t t-std">MS</i> Premium is required for Private Link to the origin and for the managed WAF rule sets and bot protection. Supports WebSockets (limits below).</td><td>BFF trusted-proxy networks (G6).</td><td>A5</td></tr>
+      <tr><td>Relational data</td><td><b>Azure SQL Database</b>, vCore Business Critical, 4 vCores to start, zone-redundant, Entra-only sign-in</td><td><i class="t t-std">MS</i> Zone redundancy loses no committed data when a zone fails. In Business Critical it is free (it reuses the existing replicas) and gives a readable copy. Entra-only authentication turns passwords off; apps sign in with managed identity.</td><td>Connection string by managed identity (G9). Migrations out of start-up (G5).</td><td>A6</td></tr>
+      <tr><td>Region copy of data</td><td><b>Failover group</b> to the second region</td><td><i class="t t-std">MS</i> Works across any two regions; replication is asynchronous, so a forced failover can lose recent data. The secondary must match the primary's tier and size and is billed as a separate database. It is not zone-redundant unless you switch that on.</td><td>Use the failover group's listener name in the connection string.</td><td>A2, A16</td></tr>
+      <tr><td>Sessions, key ring, cache, locks</td><td><b>Azure Managed Redis</b>, high availability on, zone-redundant, data persistence on</td><td><i class="t t-std">MS</i> Azure Cache for Redis is retiring; new customers have been blocked since 1 April 2026. Managed Redis is the replacement and is zone-redundant by default when HA is on. ASP.NET Core: keep Data Protection keys only in a Redis <b>with persistence</b>. Persistence and active geo-replication cannot be combined, so the second region gets its own empty cache.</td><td>None for the code; connection from Key Vault (G10).</td><td>A7</td></tr>
+      <tr><td>Secrets, keys, certificates</td><td><b>Key Vault</b> (RBAC mode, soft delete, purge protection, private endpoint)</td><td><i class="t t-std">MS</i> Container Apps reads Key Vault secrets by managed identity and exposes them as environment variables or <b>mounted files</b>. Use the versionless secret URL so rotation is picked up.</td><td>Production settings point the existing <code>*Path</code> keys at <code>/mnt/secrets/…</code> (section 6).</td><td>A8</td></tr>
+      <tr><td>Images</td><td><b>Azure Container Registry Premium</b>, geo-replicated to the second region, private endpoint</td><td><i class="t t-std">MS</i> Zone-redundant by default. Apps pull with managed identity, never an admin password. Defender scans images pushed here.</td><td>None.</td><td>A8</td></tr>
+      <tr><td>Files (guest documents, exports)</td><td><b>Storage account</b>, zone-redundant (geo-zone-redundant if the data must survive a region)</td><td><i class="t t-std">MS</i> The framework already has an Azure Blob provider.</td><td>Use it when file features arrive.</td><td>A8</td></tr>
+      <tr><td>Messages between services</td><td><b>None yet.</b> When the second service needs events: <b>Azure Service Bus</b></td><td><i class="t t-std">MS</i> Microsoft's .NET microservices guide: a hand-made RabbitMQ event bus is for development and tests; evaluate Service Bus for production. Service Bus is zone-redundant automatically in every tier; Premium adds private endpoints and geo-replication. Azure has no managed RabbitMQ.</td><td>Framework event bus gets a Service Bus transport when needed.</td><td>A9</td></tr>
+      <tr><td>Telemetry</td><td><b>Azure Monitor</b>: Application Insights and Log Analytics, via OpenTelemetry</td><td><i class="t t-std">MS</i> For new .NET apps Microsoft now points to the Microsoft OpenTelemetry Distro (<code>Microsoft.OpenTelemetry</code>); the older Azure Monitor distro remains supported. Container Apps sends console logs to Log Analytics.</td><td>Logging module change (G12).</td><td>A10</td></tr>
+      <tr><td>Email</td><td><b>Azure Communication Services Email</b>, or SendGrid (the framework already supports it)</td><td>Replaces the Gmail app password found in the 22 October audit (A07-001).</td><td>Notification settings (G13).</td><td>A11</td></tr>
+      <tr><td>Threat and image scanning</td><td><b>Defender for Cloud</b>: free posture checks, plus Defender for Containers (registry images) and Defender for SQL</td><td><i class="t t-std">MS</i> Defender scans images in ACR and running containers; Container Apps itself is not scanned, its registry is.</td><td>None.</td><td>A15</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note warn"><b>Two limits that shape later features</b>
+    <ul>
+      <li><b>WebSockets through Front Door:</b> idle connections close after 5 minutes, any connection after at most 2 hours, and one Front Door profile carries at most <b>3,000 concurrent WebSocket connections</b> worldwide. Live front-desk updates for many hotels can hit that. Decide the live-update path before building it (A17).</li>
+      <li><b>Slow requests:</b> Front Door waits 30 seconds for the origin by default, 240 at most. Long reports and exports must run as background jobs that the page polls, not as one long request.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================================================================== 5 -->
+<section class="sec" id="s5">
+  <h2><span class="n">5</span>Docker the right way</h2>
+  <p class="lede">One image per deployable, built the same way every time, small, without a shell, never running as root.</p>
+
+  <h3>The image standard</h3>
+  <div class="tw w-wide"><table>
+    <thead><tr><th>Rule</th><th>Harmony setting</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Images</td><td>Two: <code>harmony-identity</code> and <code>harmony-bff</code> (web and console are the same image with different settings, as B9 built it)</td><td>One build, many hosts; fewer images to patch.</td></tr>
+      <tr><td>Build</td><td><code>dotnet publish --os linux --arch x64 /t:PublishContainer</code> with project properties <code>ContainerRepository</code>, <code>ContainerImageTag</code>, <code>ContainerBaseImage</code>, <code>ContainerUser</code>. No Dockerfile (A12).</td><td><i class="t t-std">MS</i> The .NET SDK builds the image itself; nothing extra to maintain. A multi-stage Dockerfile is the fallback if we ever need OS packages.</td></tr>
+      <tr><td>Base image</td><td><b><code>mcr.microsoft.com/dotnet/aspnet</code> Ubuntu chiseled <code>-extra</code></b> for .NET 10 (exact tag confirmed when the first image is built)</td><td><i class="t t-std">MS</i> Chiseled images are about 100 MB smaller, have no shell or package manager and fewer CVEs. <b>Plain chiseled images have no ICU and no time-zone data</b>; they need invariant globalization. Harmony speaks Arabic and keeps hotel-local times, so it needs the <code>-extra</code> variant, which adds ICU and tzdata.</td></tr>
+      <tr><td>User</td><td>The built-in non-root <code>app</code> user</td><td><i class="t t-std">MS</i> Chiseled images ship it enabled.</td></tr>
+      <tr><td>Port</td><td>8080 inside the container (<code>ASPNETCORE_HTTP_PORTS</code>); TLS ends at Front Door and the Container Apps ingress</td><td><i class="t t-std">MS</i> The .NET 8+ image default; a non-root user cannot bind 80.</td></tr>
+      <tr><td>Angular files</td><td>CI builds Angular first, copies <code>dist</code> into the BFF's <code>wwwroot/en</code> and <code>wwwroot/ar</code>, then publishes</td><td>The BFF already serves them and renders <code>index.html</code> with a nonce.</td></tr>
+      <tr><td>Tags</td><td>The git commit id (for example <code>7d67aac</code>); never <code>latest</code>. Deploys refer to the image by digest.</td><td>A tag must always mean the same bytes; rollback is exact.</td></tr>
+      <tr><td>Patching</td><td>Rebuild weekly and on every .NET patch; Defender flags vulnerable images in ACR</td><td><i class="t t-std">MS</i> .NET images are updated for each .NET patch and each base OS update.</td></tr>
+      <tr><td>Files on disk</td><td>Nothing is written inside the container except <code>/tmp</code>. Keys and certificates arrive as read-only mounted files.</td><td>Copies are disposable; state lives in SQL, Redis or Storage.</td></tr>
+      <tr><td>Settings</td><td>Environment variables and mounted secret files only; no secret in any image or committed file</td><td>The same image runs in dev, QA, UAT and production.</td></tr>
+      <tr><td>Shutdown</td><td>Finish in-flight requests on SIGTERM within the platform's grace period; background loops honour the stopping token</td><td>Copies are stopped during every release and every scale-in.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Health probes</h3>
+  <div class="tw w-mid"><table>
+    <thead><tr><th>Probe</th><th>Identity</th><th>BFF</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td>Startup</td><td>a light path, generous time (migrations and cache seeding run first today)</td><td><code>/healthz</code></td><td>Gives slow starters time without killing them.</td></tr>
+      <tr><td>Liveness</td><td><i class="t t-gap">GAP</i> needs a path with <b>no</b> database check</td><td><code>/healthz</code> <i class="t t-impl">HAVE</i></td><td>Never put SQL or Redis in liveness: a database blip would restart every copy at once.</td></tr>
+      <tr><td>Readiness</td><td><code>/healthchecks</code> (framework, checks SQL) <i class="t t-impl">HAVE</i></td><td><i class="t t-gap">GAP</i> needs one that pings Redis</td><td>A copy that cannot reach its data stops receiving traffic but is not restarted.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Locally: the same images</h3>
+  <p>Docker Compose runs <b>two copies</b> of Identity and of the BFF, SQL Server and Redis, all from the images CI builds. If something breaks with two copies on your PC, it would break in Azure. This is where G1–G14 are proven before anything is deployed.</p>
+</section>
+
+<!-- ===================================================================== 6 -->
+<section class="sec" id="s6">
+  <h2><span class="n">6</span>Safe to run many copies</h2>
+  <p class="lede">Zone redundancy means at least two copies of every app. Today some Harmony code assumes it is alone. You write these changes; each is small and named.</p>
+
+  <div class="tw w-wide"><table>
+    <thead><tr><th>#</th><th>Problem</th><th>What goes wrong in Azure</th><th>Change</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr id="g1"><td>G1</td><td><i class="t t-gap">GAP</i> The settings file is added <b>after</b> environment variables, so a value in the file beats Azure's</td><td>A Key Vault secret delivered as an environment variable is silently ignored whenever the same key exists in the file, even as an empty string.</td><td>Restore Microsoft's order (files first, environment variables last): add environment variables again after the file. See the code below.</td><td>Framework <code>Harmony.Core.Utilities/Extensions.cs</code>, <code>ConfigureFileConfiguration</code> (line 1962)</td></tr>
+      <tr><td>G2</td><td><i class="t t-gap">GAP</i> Duende's replay cache is in memory (later.md L4)</td><td>A one-time token used on copy A can be replayed on copy B.</td><td>Back Duende's replay cache with Redis (Duende uses <code>IDistributedCache</code>). Check first whether the framework cache module already registers it.</td><td>Identity infrastructure</td></tr>
+      <tr><td>G3</td><td><i class="t t-gap">GAP</i> Rate-limit counts in memory (later.md L11)</td><td>Three copies allow three times the limit.</td><td>Move counts to Redis (L11). Until then the Front Door WAF rate rules are the first line.</td><td>Identity <code>RateLimitPolicies.cs</code></td></tr>
+      <tr><td>G4</td><td><i class="t t-gap">GAP</i> DataRetention cleanup runs on every copy</td><td>Three copies delete at the same time; wasted work and lock waits.</td><td>Take the framework's Redis distributed lock (the BFF already uses it) around each run, or move the cleanup to a Container Apps scheduled job.</td><td>Identity <code>BackgroundServices/DataRetention</code></td></tr>
+      <tr><td>G5</td><td><i class="t t-gap">GAP</i> EF migrations run at every start</td><td>EF Core 9+ serialises concurrent migrations with a lock, but the app's identity then needs rights to change the schema. Least privilege says the app reads and writes data only.</td><td>Remove start-up migration in production; migrations become a pipeline step that <b>you</b> run, written so old and new versions both work during a release.</td><td>Identity <code>Program.cs:30</code></td></tr>
+      <tr><td>G6</td><td><i class="t t-gap">GAP</i> BFF trusts proxies by single address only</td><td>Container Apps' ingress addresses change; the BFF either trusts nobody (wrong client address, rate limits and audit see the proxy) or someone adds a wide guess.</td><td>Add a network list next to the address list, as Identity already has. See the code below. Prove the <code>X-Forwarded-For</code> chain on the test environment.</td><td>BFF <code>BffSettings</code>, <code>Program.cs:53–70</code></td></tr>
+      <tr><td>G7</td><td><i class="t t-gap">GAP</i> BFF has no readiness check</td><td>A copy that lost Redis keeps receiving traffic and fails every request.</td><td>Add a readiness endpoint that pings Redis; keep <code>/healthz</code> as liveness.</td><td>BFF <code>Program.cs</code></td></tr>
+      <tr><td>G8</td><td><i class="t t-gap">GAP</i> Identity has no dependency-free liveness path</td><td>See section 5.</td><td>Add <code>/healthz</code> like the BFF's.</td><td>Identity <code>Program.cs</code></td></tr>
+      <tr><td>G9</td><td><i class="t t-sec">SEC</i> SQL by password</td><td>A password to rotate and leak.</td><td>Connection string with <code>Authentication=Active Directory Managed Identity;User ID=&lt;client id&gt;</code>; turn on Entra-only authentication. Confirm every SQL path (EF Core, the health check, any <code>System.Data.SqlClient</code> use in the framework) accepts it.</td><td>Settings only, plus the check</td></tr>
+      <tr><td>G10</td><td><i class="t t-sec">SEC</i> Redis password in settings files</td><td>Same as above.</td><td>Start with the access key as a Key Vault secret; Entra sign-in to Managed Redis later.</td><td>Settings only</td></tr>
+      <tr><td>G11</td><td><i class="t t-gap">GAP</i> Globalization in the image</td><td>A plain chiseled image fails or falls back to invariant culture: Arabic formatting and hotel time zones break.</td><td>Use the <code>-extra</code> base image; keep <code>InvariantGlobalization</code> off.</td><td>BFF and Identity <code>.csproj</code></td></tr>
+      <tr><td>G12</td><td><i class="t t-gap">GAP</i> Logs go to Elasticsearch</td><td>No Elasticsearch in this design.</td><td>Logs, traces and metrics through OpenTelemetry to Azure Monitor (A10).</td><td>Framework <code>Harmony.Core.Logging</code></td></tr>
+      <tr><td>G13</td><td><i class="t t-sec">SEC</i> Email through a Gmail app password (audit A07-001)</td><td>A personal-account secret in a hotel system.</td><td>The provider chosen in A11; secret from Key Vault or none (managed identity).</td><td>Notification settings</td></tr>
+      <tr><td>G14</td><td><i class="t t-asm">ASSUMED</i> BFF key ring and sessions live only in Redis</td><td>If the region is lost, the second region's empty Redis cannot read old cookies: everyone signs in again. Identity's key ring is in SQL and survives.</td><td>Accept it (recommended: sign-in again after a region disaster is normal) or replicate the key ring elsewhere.</td><td>Decision A7</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>G1, the exact change</h4>
+<pre><code>// Harmony.Core.Utilities/Extensions.cs, ConfigureFileConfiguration(IConfigurationBuilder …)
+configurationBuilder.TryAddJsonFile(hostingEnvironment.GetEnvironmentalJsonFileNamePath(basePath, "", fileName), optional: optional, reloadOnChange: false);
+
+// Microsoft's order is files first, environment variables last. Added again after every file this method loads,
+// so Container Apps settings and Key Vault references always win over a committed file.
+configurationBuilder.AddEnvironmentVariables();</code></pre>
+  <p>A repeated environment-variable source is harmless; the last source wins. Every module that calls this method gets the same order. <code>AddEnvironmentVariables</code> comes from Microsoft's <code>Microsoft.Extensions.Configuration.EnvironmentVariables</code>; check the project already references it before building.</p>
+
+  <h4>G6, the exact change</h4>
+<pre><code>// BffSettings: next to TrustedProxyAddresses
+public string[] TrustedProxyNetworks { get; init; } = [];
+
+// Program.cs, the ForwardedHeadersOptions block
+if (bff.Value.TrustedProxyAddresses.Length == 0 &amp;&amp; bff.Value.TrustedProxyNetworks.Length == 0)
+{
+    options.ForwardedHeaders = ForwardedHeaders.None;
+    return;
+}
+// … after the address loop:
+foreach (var network in bff.Value.TrustedProxyNetworks)
+{
+    options.KnownIPNetworks.Add(System.Net.IPNetwork.Parse(network));
+}
+// Front Door, then the Container Apps ingress: walk back through every trusted hop (safe only because a list is set).
+options.ForwardLimit = null;</code></pre>
+
+  <h3>Where each secret comes from in Azure</h3>
+  <div class="tw w-wide"><table>
+    <thead><tr><th>Setting today</th><th>In Azure</th></tr></thead>
+    <tbody>
+      <tr><td><code>ApplicationSettings:ConnectionStrings:Default</code></td><td>No secret: managed-identity connection string to the failover group listener</td></tr>
+      <tr><td><code>TokenIssuerSettings:SigningKeyPath</code>, previous keys</td><td>Key Vault → mounted file <code>/mnt/secrets/…</code></td></tr>
+      <tr><td><code>DataProtectionSettings:CertificatePath</code>, previous paths (both apps)</td><td>Key Vault → mounted file</td></tr>
+      <tr><td><code>BffSettings:ClientPrivateKeyPath</code>; Identity's <code>WebBff/ConsoleBff:ClientPublicKeyPath</code></td><td>Key Vault → mounted files</td></tr>
+      <tr><td><code>CacheSettings:CacheProviders:Redis:Password</code></td><td>Key Vault reference → environment variable (needs G1)</td></tr>
+      <tr><td><code>NotificationSettings:EmailClient:SmtpPassword</code></td><td>Key Vault reference, or nothing with managed identity (A11)</td></tr>
+      <tr><td><code>Duende:IdentityServer:LicenseKey</code></td><td>Key Vault reference → environment variable</td></tr>
+      <tr><td><code>ApiDocs:PasswordPath</code></td><td>Mounted file, or API docs switched off in production</td></tr>
+      <tr><td><code>IdentitySettings:SuperAdmin:Password</code></td><td>Never in production settings. The first platform admin is created once, by you.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="ev">Environment variable names use a double underscore for each level, for example <code>CacheSettings__CacheProviders__Redis__Password</code>.</p>
+</section>
+
+<!-- ===================================================================== 7 -->
+<section class="sec" id="s7">
+  <h2><span class="n">7</span>Multitenancy</h2>
+  <p class="lede">Harmony's model stays: one shared database, every row carries its hotel's tenant id, and the platform tenant (us) sits outside every hotel. Azure adds a second lock and a way to grow by country.</p>
+
+  <div class="cols">
+    <div>
+      <h3>Keep: shared database, tenant filter</h3>
+      <p><i class="t t-impl">HAVE</i> <code>MultiTenancyOptions.SharedDatabase</code> with EF query filters. <i class="t t-std">MS</i> Microsoft lists this as the shared (pooled) model: the cheapest per hotel and the simplest to run, with noisy neighbours as its known risk.</p>
+      <h3>Add: Row-Level Security as a second lock <i class="t t-dec">DECIDE A13</i></h3>
+      <p><i class="t t-std">MS</i> Microsoft recommends SQL Row-Level Security for multitenant databases. The app sets the tenant in <code>SESSION_CONTEXT</code> when it opens a connection; SQL itself then refuses another hotel's rows, even if a query forgets its filter. The platform tenant and the background readers that must see every hotel use a separate, audited database principal.</p>
+    </div>
+    <div>
+      <h3>Grow by stamps</h3>
+      <p><i class="t t-std">MS</i> Microsoft's Deployment Stamps pattern: a stamp is one complete copy (Container Apps environment, SQL, Redis, Key Vault) serving a group of hotels. Start with one stamp in UAE North. Add a stamp when a country requires its data at home, or when a large chain needs its own.</p>
+      <p>A tenant catalogue in the platform database records which stamp holds which hotel. Front Door routes by host name. The same Bicep deploys every stamp.</p>
+      <h3>Measure per hotel</h3>
+      <p><i class="t t-std">MS</i> For SaaS, Microsoft says to measure availability per customer. Tenant id is a telemetry dimension (an id, never a name or personal data), so the SLO report shows each hotel's own minutes.</p>
+    </div>
+  </div>
+
+  <div class="note warn"><b>Data residency is a legal question first (A3)</b>
+    <p>Microsoft's region list (checked 23 October) shows three Middle East regions with three zones: UAE North, Qatar Central and Israel Central. UAE Central is restricted and has no zones. <b>No Saudi Arabia region appears in that list.</b> If Saudi hotels must keep guest data in the Kingdom, that needs a lawyer's answer before the first Saudi contract, and later a stamp in a Saudi region once one exists. Re-check the list when deciding.</p>
+  </div>
+</section>
+
+<!-- ===================================================================== 8 -->
+<section class="sec" id="s8">
+  <h2><span class="n">8</span>Reliability and recovery</h2>
+  <p class="lede">Every failure we design for, what happens, and how we know it works.</p>
+
+  <div class="tw w-wide"><table>
+    <thead><tr><th>Failure</th><th>What Azure does</th><th>What Harmony does</th><th>Users see</th><th>Proof</th></tr></thead>
+    <tbody>
+      <tr><td>A copy crashes</td><td>Container Apps restarts it; others carry the load</td><td>Nothing; no state in the copy</td><td>Nothing (a retry at most)</td><td>Kill a copy during a load test</td></tr>
+      <tr><td>A zone fails</td><td>App copies, SQL replicas, Redis shards and the registry already sit in other zones. Redis fails over in about 10–15 s; SQL loses no committed data</td><td>Retries with backoff on SQL and Redis</td><td>Seconds of slowness</td><td>Zone-down simulation (Chaos Studio, optional) on the test stamp</td></tr>
+      <tr><td>A bad release</td><td>New revision gets traffic only after its smoke test on its own address; old revision stays ready</td><td>Migrations that old and new code both accept</td><td>Nothing, or one quick rollback</td><td>Every release</td></tr>
+      <tr><td>SQL or Redis maintenance</td><td>Planned failovers, usually under a second for Redis</td><td>Retry on transient errors</td><td>Nothing</td><td>Monitoring</td></tr>
+      <tr><td>The region fails</td><td>Nothing automatic for the whole app</td><td>Runbook: fail the SQL group over, scale up the standby environment, Front Door sends traffic there</td><td>Downtime up to the chosen RTO; data since the last replicated write lost (RPO); everyone signs in again</td><td>Failover drill every quarter (A2)</td></tr>
+      <tr><td>Data deleted or corrupted by mistake</td><td>SQL automatic backups, point-in-time restore</td><td>Restore to a new database, copy back what is needed</td><td>Depends on the incident</td><td>Restore drill every quarter</td></tr>
+      <tr><td>A secret leaks</td><td>Key Vault versioning</td><td>Rotate; versionless references pick up the new value; previous keys stay readable (already supported for signing and key rings)</td><td>Nothing</td><td>Rotation drill</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Second region <i class="t t-dec">DECIDE A2</i></h3>
+  <div class="tw w-mid"><table>
+    <thead><tr><th>Option</th><th>For</th><th>Against</th></tr></thead>
+    <tbody>
+      <tr><td><b>Qatar Central</b> (recommended technically)</td><td>Three zones; open to all customers; close to the UAE</td><td>Data crosses a border: needs the legal yes in A3</td></tr>
+      <tr><td><b>UAE Central</b></td><td>Data stays in the UAE</td><td>Restricted (access by request); no zones, so after a failover Harmony runs without zone protection</td></tr>
+      <tr><td><b>No second region at first</b></td><td>Cheapest; zone redundancy already covers most failures</td><td>A region loss means rebuilding from geo-backups: hours, not minutes</td></tr>
+    </tbody>
+  </table></div>
+  <p>Suggested first targets for a region loss, to confirm in A2: <b>RPO under 1 minute</b> (asynchronous SQL replication), <b>RTO under 1 hour</b> (a person runs the runbook; no automatic region failover, so a short glitch never splits the data).</p>
+</section>
+
+<!-- ===================================================================== 9 -->
+<section class="sec" id="s9">
+  <h2><span class="n">9</span>Security and network</h2>
+  <p class="lede">No public door except Front Door, no passwords between Azure services, no person with standing admin rights.</p>
+  <div class="cols">
+    <div>
+      <h3>Network</h3>
+      <ul>
+        <li>Container Apps environment: internal only, public access off, own VNet (a <code>/23</code> subnet for the environment, a separate <code>/24</code> for private endpoints, as Microsoft's Front Door guide suggests).</li>
+        <li>SQL, Redis, Key Vault, Storage and ACR: private endpoints, public network access off.</li>
+        <li>Front Door Premium WAF: Microsoft's managed rule set and bot rules, in detection first, then prevention; rate rules per path (sign-in, password reset) until G3 lands.</li>
+        <li>Outbound: a NAT gateway gives one fixed address if hotels or partners must allow-list us (A14).</li>
+      </ul>
+      <h3>Identities</h3>
+      <ul>
+        <li>One user-assigned managed identity per app; it pulls images, reads its Key Vault secrets and signs in to SQL. Nothing else.</li>
+        <li>SQL: Entra-only authentication; the app identity gets read and write on data, not schema.</li>
+        <li>People: Entra Privileged Identity Management, no standing Owner, two break-glass accounts kept offline.</li>
+        <li>CI: GitHub signs in with OpenID Connect to a federated identity. No client secret anywhere.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Secrets and keys</h3>
+      <ul>
+        <li>Key Vault in RBAC mode with soft delete and purge protection. Only the app identities read secrets; only CI writes them.</li>
+        <li>Token signing keys, both key-ring certificates and the BFF's client key live in Key Vault and arrive as mounted files.</li>
+        <li><i class="t t-sec">SEC</i> Before any of this goes live, the secrets the 22 October audit found committed are rotated and removed from the repository (later.md L1b). The parked audit items stay parked until you say so.</li>
+      </ul>
+      <h3>Guard rails</h3>
+      <ul>
+        <li>Azure Policy: only the chosen regions; no public network access on data services; diagnostic logs on.</li>
+        <li>Defender for Cloud posture checks (free); Defender for Containers and for SQL (paid, A15).</li>
+        <li>Container Apps built-in roles that can list secrets are not handed out; Microsoft warns several include <code>listSecrets</code>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== 10 -->
+<section class="sec" id="s10">
+  <h2><span class="n">10</span>Delivery</h2>
+  <p class="lede">Everything in Azure is created from code, every release goes through the same gates, and you approve production.</p>
+
+  <h3>Infrastructure as code <i class="t t-dec">DECIDE A12</i></h3>
+  <p><b>Bicep</b> with <b>Azure Verified Modules</b> (Microsoft's maintained modules) in <code>infra/azure/</code>: one <code>stamp.bicep</code> for everything in a stamp, one parameter file per environment, and the global parts (Front Door, ACR, DNS) separate. Every pull request shows <code>what-if</code>; nothing is changed by hand in the portal.</p>
+
+  <h3>Environments</h3>
+  <div class="tw w-mid"><table>
+    <thead><tr><th>Environment</th><th>Shape</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>dev</td><td>One zone, smallest sizes, consumption only</td><td>Daily integration</td></tr>
+      <tr><td>QA / UAT</td><td>Same shape as production, small sizes, zone-redundant</td><td>Tests, client acceptance, failover drills</td></tr>
+      <tr><td>production</td><td>Section 3</td><td>Hotels</td></tr>
+    </tbody>
+  </table></div>
+  <p>Two subscriptions at least: production and non-production, so a test mistake cannot touch hotel data.</p>
+
+  <h3>A release</h3>
+<pre class="mermaid">
+flowchart LR
+  A["Pull request<br/>build, tests, gates"] --> B["Images<br/>SDK publish, commit tag"]
+  B --> C["ACR push<br/>Defender scan"]
+  C --> D["Migrations<br/>run by you"]
+  D --> E["New revision<br/>0% traffic, label green"]
+  E --> F["Smoke test<br/>on the label address"]
+  F --> G["10% then 100%"]
+  G --> H["Old revision kept<br/>for instant rollback"]
+</pre>
+  <p><i class="t t-std">MS</i> Container Apps revisions with labels and traffic weights are Microsoft's documented blue-green method. CI is GitHub Actions with OpenID Connect (ties to the open frontend decision D22). Commits and pushes still follow your rule: only on "commit" and "push".</p>
+</section>
+
+<!-- ===================================================================== 11 -->
+<section class="sec" id="s11">
+  <h2><span class="n">11</span>Observability</h2>
+  <p class="lede">See a problem before a hotel calls, and know which hotel it hits.</p>
+  <ul>
+    <li><b>One pipe:</b> logs, traces and metrics through OpenTelemetry to Application Insights and Log Analytics (A10). <code>ILogger</code> stays the logging API; the Elasticsearch sink goes.</li>
+    <li><b>What we watch (SLIs):</b> sign-in success rate, front-desk API success rate and 95th-percentile latency, per hotel; Front Door health-probe results per origin; SQL and Redis failovers.</li>
+    <li><b>Outside-in checks:</b> Application Insights availability tests hit the sign-in page and a health page from several locations every few minutes.</li>
+    <li><b>Alerts:</b> on burning the monthly error budget too fast, not on single errors. Someone must be on call to receive them (A18).</li>
+    <li><b>Cost control:</b> log ingestion in UAE North is $3.29 per GB (retail, 23 October). Verbose logs are sampled; Microsoft's distro samples logs along with traces by default.</li>
+    <li><b>Never in telemetry:</b> guest names, documents, card data or tokens. Tenant id and request id only.</li>
+  </ul>
+</section>
+
+<!-- ===================================================================== 12 -->
+<section class="sec" id="s12">
+  <h2><span class="n">12</span>Cost</h2>
+  <p class="lede">Indicative monthly list prices in US dollars, pay as you go, 730 hours, read from Microsoft's Retail Prices API on 23 October 2026. Not a quote.</p>
+
+  <div class="tw w-wide"><table>
+    <thead><tr><th>Item</th><th>Size</th><th>Unit price (UAE North)</th><th class="num">Per month</th></tr></thead>
+    <tbody>
+      <tr><td>Front Door Premium</td><td>base fee</td><td>$330 a month</td><td class="num">330</td></tr>
+      <tr><td>Container Apps (consumption in a workload-profiles environment)</td><td>Identity 3×(1 vCPU, 2 GiB), web BFF 3×(0.5, 1), console BFF 2×(0.5, 1), always active</td><td>$0.000024 per vCPU-second, $0.000003 per GiB-second</td><td class="num">434</td></tr>
+      <tr><td>Container Apps private endpoint</td><td>environment</td><td>$0.143 an hour</td><td class="num">104</td></tr>
+      <tr><td>Azure SQL, Business Critical Gen5, zone-redundant</td><td>4 vCores, 50 GB</td><td>compute $1.607 an hour; licence $0.375 per vCore-hour; storage $0.33 per GB</td><td class="num">2,285</td></tr>
+      <tr><td>Azure Managed Redis, Balanced B5</td><td>HA, zone-redundant, persistence</td><td>$0.223 an hour <i class="t t-asm">ASSUMED</i> confirm the listed price includes HA</td><td class="num">163</td></tr>
+      <tr><td>Container Registry Premium</td><td>one registry</td><td>$1.667 a day</td><td class="num">51</td></tr>
+      <tr><td>Log Analytics</td><td>about 3 GB a day</td><td>$3.29 per GB ingested</td><td class="num">300</td></tr>
+      <tr><td>Key Vault</td><td>operations</td><td>$0.0396 per 10,000</td><td class="num">5</td></tr>
+      <tr class="sum"><td colspan="3">Production, one region (Business Critical)</td><td class="num">≈ 3,670</td></tr>
+      <tr><td colspan="3">Same, with SQL General Purpose zone-redundant (4 vCores: compute $0.804, zone redundancy $0.482 an hour, licence $0.10 per vCore-hour)</td><td class="num">≈ 2,630</td></tr>
+      <tr><td colspan="3">With Azure Hybrid Benefit (if you own SQL Server licences): minus the SQL licence</td><td class="num">− 1,095</td></tr>
+      <tr><td>Second region, warm standby</td><td>SQL geo-secondary (same size, billed as its own database), environment scaled down, empty Redis, ACR replica</td><td>same unit prices in Qatar Central for SQL, Redis, ACR</td><td class="num">≈ 2,680</td></tr>
+      <tr class="sum"><td colspan="3">Production with a warm second region (Business Critical)</td><td class="num">≈ 6,350</td></tr>
+      <tr><td>Service Bus Premium, only when events are needed</td><td>1 messaging unit</td><td>$0.979 an hour</td><td class="num">715</td></tr>
+    </tbody>
+  </table></div>
+  <p class="ev">Not included: data transfer and Front Door request charges, private endpoints for each data service, NAT gateway, Defender plans, dev/QA/UAT environments, support plan, VAT. Reservations and savings plans lower compute and SQL prices. Check in the Azure pricing calculator before buying.</p>
+</section>
+
+<!-- ===================================================================== 13 -->
+<section class="sec" id="s13">
+  <h2><span class="n">13</span>Decisions</h2>
+  <p class="lede">Each Azure service is an outside service under our rule, so nothing here is used until you say yes. My recommendation is first in each row.</p>
+  <div class="tw w-wide"><table>
+    <thead><tr><th>#</th><th>Decision</th><th>Recommended</th><th>Other options</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>A1</td><td>Availability target</td><td>99.9% a month per critical flow, per hotel</td><td>99.95% (needs a second active region); 99.99% (three regions)</td><td><span class="st s-blk">open</span></td></tr>
+      <tr><td>A2</td><td>Second region, RPO, RTO</td><td>Qatar Central warm standby; RPO &lt; 1 min, RTO &lt; 1 h; quarterly drill</td><td>UAE Central; no second region at first</td><td><span class="st s-blk">open · needs A3</span></td></tr>
+      <tr><td>A3</td><td>Where guest data may live</td><td>Lawyer's answer for UAE, Qatar transfer and Saudi hotels before the first contract</td><td>—</td><td><span class="st s-blk">open · legal</span></td></tr>
+      <tr><td>A4</td><td>Container hosting</td><td>Azure Container Apps</td><td>AKS (only if we need the Kubernetes API)</td><td><span class="st s-blk">open</span></td></tr>
+      <tr><td>A5</td><td>Edge</td><td>Front Door Premium with WAF and Private Link</td><td>Front Door Standard (no Private Link, no managed rules); Application Gateway (regional only)</td><td><span class="st s-blk">open</span> <i class="t t-cost">COST</i></td></tr>
+      <tr><td>A6</td><td>SQL tier</td><td>Business Critical 4 vCores, zone-redundant</td><td>General Purpose zone-redundant (about $1,040 a month less, slower failover, no readable replica); Hyperscale (zone redundancy only chosen at creation)</td><td><span class="st s-blk">open</span> <i class="t t-cost">COST</i></td></tr>
+      <tr><td>A7</td><td>Redis</td><td>Azure Managed Redis, HA, zone-redundant, persistence on; accept sign-in again after a region loss (G14)</td><td>Active geo-replication instead of persistence (then move the BFF key ring out of Redis)</td><td><span class="st s-blk">open</span></td></tr>
+      <tr><td>A8</td><td>Key Vault, ACR Premium, Storage</td><td>As in section 4</td><td>ACR Standard (no geo-replication, no private endpoint)</td><td><span class="st s-blk">open</span></td></tr>
+      <tr><td>A9</td><td>Event bus</td><td>None until a second service needs one; then Service Bus</td><td>Self-hosted RabbitMQ (Microsoft: dev and test only)</td><td><span class="st s-def">later</span></td></tr>
+      <tr><td>A10</td><td>Telemetry</td><td>OpenTelemetry to Azure Monitor</td><td>Keep Elastic (self-run or Elastic Cloud, a third party)</td><td><span class="st s-blk">open</span></td></tr>
+      <tr><td>A11</td><td>Email</td><td>Azure Communication Services Email</td><td>SendGrid (framework ready); another SMTP provider</td><td><span class="st s-blk">open</span></td></tr>
+      <tr><td>A12</td><td>Build and infrastructure code</td><td>SDK container publish; Bicep with Azure Verified Modules</td><td>Dockerfiles; Terraform</td><td><span class="st s-blk">open</span></td></tr>
+      <tr><td>A13</td><td>Row-Level Security as the second tenant lock</td><td>Yes, in the framework, before the first PMS module stores hotel data</td><td>Query filters only</td><td><span class="st s-blk">open</span></td></tr>
+      <tr><td>A14</td><td>Fixed outbound address</td><td>NAT gateway when the first partner needs allow-listing</td><td>Azure Firewall (inspection, much more expensive)</td><td><span class="st s-def">later</span></td></tr>
+      <tr><td>A15</td><td>Defender plans</td><td>Free posture checks + Defender for Containers + Defender for SQL</td><td>Posture checks only</td><td><span class="st s-blk">open</span> <i class="t t-cost">COST</i></td></tr>
+      <tr><td>A16</td><td>Standby warmth</td><td>Warm: SQL secondary live, apps scaled down</td><td>Hot (active-active, needed for 99.95%); cold (geo-restore, hours)</td><td><span class="st s-blk">open · with A2</span></td></tr>
+      <tr><td>A17</td><td>Live updates path</td><td>Decide when live updates are built (Front Door's 3,000 WebSocket limit)</td><td>Azure SignalR Service; Server-Sent Events; polling</td><td><span class="st s-def">later</span></td></tr>
+      <tr><td>A18</td><td>Who is on call</td><td>Name a person and a rota before go-live</td><td>—</td><td><span class="st s-blk">open</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ===================================================================== 14 -->
+<section class="sec" id="s14">
+  <h2><span class="n">14</span>Roadmap</h2>
+  <p class="lede">In order. Each step ends with proof, not a promise.</p>
+  <div class="tw w-wide"><table>
+    <thead><tr><th>Step</th><th>Work</th><th>Done when</th></tr></thead>
+    <tbody>
+      <tr><td>P0</td><td>Your decisions A1–A18</td><td>This table has no "open" rows that block P1–P3</td></tr>
+      <tr><td>P1</td><td>G1–G14 in code (you write it), proved with two copies of each app in Docker Compose</td><td>Sign-in, refresh, sign-out and rate limits behave the same with one copy and with two; killing a copy mid-test loses nothing</td></tr>
+      <tr><td>P2</td><td>Container images: SDK publish, chiseled <code>-extra</code>, non-root, probes</td><td>Images run locally from the same tags CI will push; Arabic dates and hotel time zones correct inside the container</td></tr>
+      <tr><td>P3</td><td>Bicep and GitHub Actions with OpenID Connect; the dev stamp in UAE North</td><td>A pull request deploys dev from nothing; <code>what-if</code> shows no drift</td></tr>
+      <tr><td>P4</td><td>QA/UAT and production stamps: zone redundancy, Front Door, WAF, private network, Defender</td><td>Load test at the expected peak; a zone failure simulated on QA; a release rolled back in under a minute</td></tr>
+      <tr><td>P5</td><td>Second region and the runbook</td><td>A timed failover drill meets the RPO and RTO from A2</td></tr>
+      <tr><td>P6</td><td>Per-hotel SLO dashboard and on-call</td><td>A month of measured availability per hotel</td></tr>
+      <tr><td>P7</td><td>More stamps (country or chain), when needed</td><td>A new stamp deploys from the same Bicep with one new parameter file</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ===================================================================== 15 -->
+<section class="sec" id="s15">
+  <h2><span class="n">15</span>Evidence and sources</h2>
+  <p class="lede">What was checked, and what was not.</p>
+
+  <h3>Not claimed</h3>
+  <ul>
+    <li>No "100%" and no "never down": section 1 explains why.</li>
+    <li>The SLA percentages for zone-redundant Azure SQL and Managed Redis were not read from the SLA page; they are marked assumed.</li>
+    <li>Whether the listed Managed Redis price includes high availability was not confirmed.</li>
+    <li>The exact .NET 10 chiseled <code>-extra</code> tag is confirmed when the first image is built.</li>
+    <li>The <code>X-Forwarded-For</code> chain through Front Door, Private Link and the Container Apps ingress is proved on the test stamp, not assumed.</li>
+    <li>Nothing about data-residency law is legal advice.</li>
+  </ul>
+
+  <h3>Harmony code read</h3>
+  <ul>
+    <li><code>Backend/ApiGateways/Harmony.Web.Bff/Program.cs</code> (proxies 50–70, key ring 89–100, <code>/healthz</code> 305, static files 218–260), <code>Harmony.Web.Bff.csproj</code></li>
+    <li><code>Backend/Services/Identity/Harmony.Identity.Api/Program.cs</code> (migrations 30, 78–83), <code>applicationSettings*.json</code> (key names only)</li>
+    <li><code>Harmony.Identity.Infrastructure/DI/DependenciesConfigurator.cs</code> (health checks 132, proxies 290–315, signing keys 387–410, key ring 504–516), <code>RateLimiting/RateLimitPolicies.cs</code>, <code>BackgroundServices/DataRetention</code></li>
+    <li>Framework: <code>Harmony.Core.Utilities/Extensions.cs</code> 1954–1978, <code>Harmony.Core/DI/DependenciesConfigurator.cs</code> 643–657, package lists of every <code>Harmony.Core.*</code> project</li>
+    <li><code>docs/later.md</code> L1b, L4, L11; <code>docs/security/owasp-top10-2025-audit-2026-10-22.md</code> (A07-001)</li>
+  </ul>
+
+  <h3>Microsoft Learn, read 23 October 2026</h3>
+  <ul>
+    <li>Reliability targets and composite SLOs: <a href="https://learn.microsoft.com/azure/well-architected/reliability/metrics">Well-Architected, reliability metrics</a> · <a href="https://learn.microsoft.com/azure/well-architected/mission-critical/mission-critical-application-platform">mission-critical application platform</a></li>
+    <li>Container Apps: <a href="https://learn.microsoft.com/azure/architecture/example-scenario/serverless/microservices-with-container-apps">microservices on Container Apps</a> · <a href="https://learn.microsoft.com/azure/container-apps/manage-secrets">secrets and Key Vault references</a> · <a href="https://learn.microsoft.com/azure/container-apps/security">security overview</a> · <a href="https://learn.microsoft.com/azure/container-apps/blue-green-deployment">blue-green deployment</a> · <a href="https://learn.microsoft.com/azure/container-apps/traffic-splitting">traffic splitting</a> · <a href="https://learn.microsoft.com/azure/container-apps/front-door-custom-virtual-network-private-link">Front Door Premium with Private Link</a></li>
+    <li>Front Door: <a href="https://learn.microsoft.com/azure/frontdoor/private-link">Private Link origins</a> · <a href="https://learn.microsoft.com/azure/frontdoor/standard-premium/websocket">WebSocket limits</a> · <a href="https://learn.microsoft.com/troubleshoot/azure/front-door/troubleshoot-issues">origin timeout</a></li>
+    <li>Azure SQL: <a href="https://learn.microsoft.com/azure/azure-sql/database/high-availability-sla-local-zone-redundancy">availability through redundancy</a> · <a href="https://learn.microsoft.com/azure/reliability/reliability-sql-database">reliability in SQL Database</a> · <a href="https://learn.microsoft.com/azure/azure-sql/database/enable-zone-redundancy">enable zone redundancy</a> · <a href="https://learn.microsoft.com/azure/azure-sql/database/authentication-azure-ad-only-authentication">Entra-only authentication</a> · <a href="https://learn.microsoft.com/sql/connect/ado-net/sql/azure-active-directory-authentication">SqlClient managed identity</a></li>
+    <li>Redis: <a href="https://learn.microsoft.com/azure/redis/plan-reliability-and-durability">Managed Redis reliability and durability</a> · <a href="https://learn.microsoft.com/azure/reliability/reliability-managed-redis">reliability in Managed Redis</a> · <a href="https://learn.microsoft.com/azure/well-architected/service-guides/azure-managed-redis">Well-Architected service guide</a></li>
+    <li>ASP.NET Core: <a href="https://learn.microsoft.com/aspnet/core/security/data-protection/configuration/overview">Data Protection configuration (Docker, Redis persistence)</a> · <a href="https://learn.microsoft.com/aspnet/core/security/data-protection/implementation/key-storage-providers">key storage providers</a></li>
+    <li>.NET containers: <a href="https://learn.microsoft.com/dotnet/core/docker/container-images">.NET container images (chiseled, extra, globalization)</a> · <a href="https://learn.microsoft.com/dotnet/core/docker/introduction">introduction to .NET and Docker</a></li>
+    <li>Telemetry: <a href="https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable">enable OpenTelemetry (Microsoft OpenTelemetry Distro)</a> · <a href="https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-configuration">configuration</a></li>
+    <li>Delivery: <a href="https://learn.microsoft.com/azure/developer/github/connect-from-azure-openid-connect">Azure Login with OpenID Connect</a> · <a href="https://learn.microsoft.com/azure/azure-resource-manager/bicep/deploy-github-actions">Bicep with GitHub Actions</a></li>
+    <li>Security: <a href="https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-introduction">Defender for Containers</a> · <a href="https://learn.microsoft.com/security/benchmark/azure/baselines/azure-container-apps-security-baseline">Container Apps security baseline</a></li>
+    <li>Earlier in this session: Azure Cache for Redis retirement, Middle East regions and zones, multitenant tenancy models and Deployment Stamps, Service Bus versus RabbitMQ in Microsoft's .NET microservices guide, Container Apps zone redundancy requirements.</li>
+  </ul>
+  <h3>Prices</h3>
+  <p><a href="https://prices.azure.com/api/retail/prices">Azure Retail Prices API</a>, regions <code>uaenorth</code> and <code>qatarcentral</code>, queried 23 October 2026.</p>
+</section>
+
+</main>
+</div>
