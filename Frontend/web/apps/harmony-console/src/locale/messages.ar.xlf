@@ -7786,6 +7786,606 @@
           <context context-type="linenumber">93</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="administration.company-login.title" datatype="html">
+        <source>Company login</source>
+        <target>تسجيل الدخول بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.lead" datatype="html">
+        <source> Your staff sign in with their company&apos;s Microsoft or Google account: they type their work e-mail and Harmony sends them to the company. You choose the e-mail domains and who keeps a Harmony password. </source>
+        <target>يسجّل موظفوك الدخول بحساب Microsoft أو Google الخاص بشركتهم: يكتبون بريد العمل فيحوّلهم Harmony إلى الشركة. أنت تختار نطاقات البريد ومن يحتفظ بكلمة مرور Harmony.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">5,11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.try-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">22,25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.loading" datatype="html">
+        <source>Reading the company login…</source>
+        <target>جارٍ قراءة تسجيل الدخول بحساب الشركة…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">26,28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.none" datatype="html">
+        <source> Harmony has not added a company login for you yet. Ask Harmony to add Microsoft or Google. </source>
+        <target>لم يُضف Harmony تسجيل الدخول بحساب الشركة لك بعد. اطلب من Harmony إضافة Microsoft أو Google.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">29,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.on" datatype="html">
+        <source>On</source>
+        <target>مفعّل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">39,40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.off" datatype="html">
+        <source>Off</source>
+        <target>متوقف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">41,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.state" datatype="html">
+        <source>Company sign-in</source>
+        <target>الدخول بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">42,45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.consent" datatype="html">
+        <source>Your company&apos;s IT approves Harmony once, before the first sign-in:</source>
+        <target>يوافق قسم تقنية المعلومات في شركتك على Harmony مرة واحدة، قبل أول تسجيل دخول:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">48,50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.consent-link" datatype="html">
+        <source>Microsoft approval page</source>
+        <target>صفحة موافقة Microsoft</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">54,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.domains" datatype="html">
+        <source>E-mail domains</source>
+        <target>نطاقات البريد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">58,60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.remove" datatype="html">
+        <source> Remove </source>
+        <target>إزالة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">79,81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.domain" datatype="html">
+        <source>Domain</source>
+        <target>النطاق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">88,90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.domain-placeholder" datatype="html">
+        <source>ritz.com</source>
+        <target>ritz.com</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">96,99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.add" datatype="html">
+        <source> Add domain </source>
+        <target>إضافة النطاق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">111,113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.cancel" datatype="html">
+        <source> Cancel </source>
+        <target>إلغاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">119,121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.add-go" datatype="html">
+        <source> Add a domain </source>
+        <target>إضافة نطاق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">131,133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.switch-off" datatype="html">
+        <source> Switch off </source>
+        <target>إيقاف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">142,144</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.switch-on" datatype="html">
+        <source> Switch on </source>
+        <target>تفعيل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">153,156</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.on.heading" datatype="html">
+        <source>Switch company sign-in on?</source>
+        <target>تفعيل الدخول بحساب الشركة؟</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">164,165</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.on.ask" datatype="html">
+        <source>From their next sign-in, everyone with an e-mail on these domains signs in with the company account. People you kept on a Harmony password are not changed.</source>
+        <target>من تسجيل الدخول التالي، كل من بريده على هذه النطاقات يسجّل الدخول بحساب الشركة. من أبقيتهم على كلمة مرور Harmony لا يتغيّرون.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">166,167</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.on.go" datatype="html">
+        <source>Switch on</source>
+        <target>تفعيل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">168,169</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.on.stay" datatype="html">
+        <source>Not now</source>
+        <target>ليس الآن</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.html</context>
+          <context context-type="linenumber">171,172</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.toast.domain-added" datatype="html">
+        <source>Domain added.</source>
+        <target>أُضيف النطاق.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.ts</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.toast.domain-removed" datatype="html">
+        <source>Domain removed.</source>
+        <target>أُزيل النطاق.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.toast.on" datatype="html">
+        <source>Company sign-in is on.</source>
+        <target>الدخول بحساب الشركة مفعّل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.ts</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.toast.off" datatype="html">
+        <source>Company sign-in is off.</source>
+        <target>الدخول بحساب الشركة متوقف.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/company-login-page.ts</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.title" datatype="html">
+        <source>How they sign in</source>
+        <target>كيف يسجّل الدخول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">103,105</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.company" datatype="html">
+        <source>With their company account; Harmony asks for no password:</source>
+        <target>بحساب شركته؛ لا يطلب Harmony كلمة مرور:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">110,111</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.kept" datatype="html">
+        <source>With a Harmony password, kept by an administrator.</source>
+        <target>بكلمة مرور Harmony، أبقاها المسؤول.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">114,117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.password" datatype="html">
+        <source>With a Harmony password.</source>
+        <target>بكلمة مرور Harmony.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">117,120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.follow" datatype="html">
+        <source> Use the company sign-in </source>
+        <target>استخدام الدخول بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">130,132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.keep" datatype="html">
+        <source> Keep on a Harmony password </source>
+        <target>الإبقاء على كلمة مرور Harmony</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">141,144</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.link-open" datatype="html">
+        <source>Linked</source>
+        <target>مرتبط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">157,159</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.link-ended" datatype="html">
+        <source>Ended</source>
+        <target>منتهٍ</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">159,161</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.link" datatype="html">
+        <source>Company account</source>
+        <target>حساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">161,163</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.since" datatype="html">
+        <source>Since</source>
+        <target>منذ</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">165,167</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.end-link" datatype="html">
+        <source> End link </source>
+        <target>إنهاء الربط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">178,180</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.end-link.heading" datatype="html">
+        <source>End this company link?</source>
+        <target>إنهاء ربط حساب الشركة هذا؟</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">191,192</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.end-link.ask" datatype="html">
+        <source>That company account cannot sign in here again, and the person is signed out everywhere now.</source>
+        <target>لن يستطيع حساب الشركة هذا الدخول هنا مجدداً، ويُسجَّل خروج الشخص من كل مكان الآن.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">193,194</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.end-link.go" datatype="html">
+        <source>End link</source>
+        <target>إنهاء الربط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">195,196</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.end-link.stay" datatype="html">
+        <source>Keep it</source>
+        <target>إبقاؤه</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">198,200</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.linked-first" datatype="html">
+        <source>On their first company sign-in</source>
+        <target>عند أول دخول له بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">156</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-in.linked-admin" datatype="html">
+        <source>By an administrator</source>
+        <target>بواسطة مسؤول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">157</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.company-login.page-title" datatype="html">
+        <source>Company login</source>
+        <target>تسجيل الدخول بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/routes.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.company-login" datatype="html">
+        <source>Company login</source>
+        <target>الدخول بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">26,29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.title" datatype="html">
+        <source>Company login</source>
+        <target>تسجيل الدخول بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">2,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.none" datatype="html">
+        <source> None yet: the customer&apos;s staff sign in with Harmony passwords. </source>
+        <target>لا يوجد بعد: يسجّل موظفو العميل الدخول بكلمات مرور Harmony.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">7,10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.on" datatype="html">
+        <source>On</source>
+        <target>مفعّل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">24,25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.off" datatype="html">
+        <source>Off</source>
+        <target>متوقف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">26,27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.state" datatype="html">
+        <source>Company sign-in</source>
+        <target>الدخول بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">27,31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.provider" datatype="html">
+        <source>Provider</source>
+        <target>المزوّد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">40,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.domain" datatype="html">
+        <source>One of the company&apos;s e-mail domains</source>
+        <target>أحد نطاقات بريد الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">48,51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.domain-placeholder" datatype="html">
+        <source>ritz.com</source>
+        <target>ritz.com</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">57,60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.add" datatype="html">
+        <source> Add company login </source>
+        <target>إضافة الدخول بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">70,72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.cancel" datatype="html">
+        <source> Cancel </source>
+        <target>إلغاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">78,81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.add-go" datatype="html">
+        <source> Add company login </source>
+        <target>إضافة الدخول بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.html</context>
+          <context context-type="linenumber">90,95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform-admin.company-login.toast.added" datatype="html">
+        <source>Company login added. The customer&apos;s administrator switches it on.</source>
+        <target>أُضيف الدخول بحساب الشركة. يفعّله مسؤول العميل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/platform-admin/feature-tenants/company-login-panel.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00118" datatype="html">
+        <source>There is no such company login for this company.</source>
+        <target>لا يوجد هذا الدخول بحساب الشركة لهذه الشركة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00119" datatype="html">
+        <source>Harmony is not connected to that provider yet.</source>
+        <target>لم يُربط Harmony بهذا المزوّد بعد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00120" datatype="html">
+        <source>This company already has that company login.</source>
+        <target>لدى هذه الشركة هذا الدخول بحساب الشركة بالفعل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00121" datatype="html">
+        <source>The provider knows no company with that domain.</source>
+        <target>لا يعرف المزوّد شركة بهذا النطاق.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00122" datatype="html">
+        <source>That company already signs in to another Harmony customer.</source>
+        <target>هذه الشركة تسجّل الدخول بالفعل لدى عميل آخر في Harmony.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00123" datatype="html">
+        <source>That e-mail domain is already on a company login list.</source>
+        <target>نطاق البريد هذا موجود بالفعل في قائمة دخول بحساب شركة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00124" datatype="html">
+        <source>That e-mail domain is not on the list.</source>
+        <target>نطاق البريد هذا ليس في القائمة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00125" datatype="html">
+        <source>A public mail domain like gmail.com cannot be a company domain.</source>
+        <target>لا يمكن أن يكون نطاق بريد عام مثل gmail.com نطاقاً لشركة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00126" datatype="html">
+        <source>Company sign-in needs at least one e-mail domain while it is on.</source>
+        <target>يحتاج الدخول بحساب الشركة إلى نطاق بريد واحد على الأقل ما دام مفعّلاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00127" datatype="html">
+        <source>Keep at least one administrator on a Harmony password while company sign-in is on.</source>
+        <target>أبقِ مسؤولاً واحداً على الأقل على كلمة مرور Harmony ما دام الدخول بحساب الشركة مفعّلاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00128" datatype="html">
+        <source>That company link does not exist.</source>
+        <target>ربط حساب الشركة هذا غير موجود.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">105</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10901" datatype="html">
+        <source>Choose the company.</source>
+        <target>اختر الشركة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10902" datatype="html">
+        <source>Choose Microsoft or Google.</source>
+        <target>اختر Microsoft أو Google.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10903" datatype="html">
+        <source>Give the e-mail domain.</source>
+        <target>اكتب نطاق البريد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10904" datatype="html">
+        <source>Write the domain like ritz.com.</source>
+        <target>اكتب النطاق مثل ritz.com.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10905" datatype="html">
+        <source>Choose the company login.</source>
+        <target>اختر الدخول بحساب الشركة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10906" datatype="html">
+        <source>Choose the company link.</source>
+        <target>اختر ربط حساب الشركة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

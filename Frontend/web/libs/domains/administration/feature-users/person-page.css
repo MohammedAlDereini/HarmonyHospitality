@@ -30,7 +30,8 @@
 .part .rows {
   margin: 0 calc(-1 * var(--s6));
 }
-.drow {
+.drow,
+.lrow {
   grid-template-columns: minmax(200px, 1.4fr) 140px 220px 120px;
 }
 .krow {
@@ -67,6 +68,7 @@
 }
 @media (max-width: 900px) {
   .drow,
+  .lrow,
   .krow,
   .erow,
   .arow,
@@ -75,6 +77,7 @@
     row-gap: 6px;
   }
   .drow .row-act,
+  .lrow .row-act,
   .krow .row-act,
   .erow .obj,
   .arow .row-act,

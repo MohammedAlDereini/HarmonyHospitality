@@ -1,0 +1,94 @@
+<section class="part" aria-labelledby="company-login-heading">
+  <h2 id="company-login-heading" i18n="@@platform-admin.company-login.title">Company login</h2>
+  @if (store.problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  } @else if (store.rows().length === 0) {
+    <p class="line" i18n="@@platform-admin.company-login.none">
+      None yet: the customer's staff sign in with Harmony passwords.
+    </p>
+  } @else {
+    <div class="rows" role="list">
+      @for (login of store.rows(); track login.id) {
+        <div class="srow crow" role="listitem" data-login>
+          <div class="s-who">
+            <div class="s-nm">
+              <b>{{ login.provider }}</b>
+              <span dir="ltr"
+                ><bdi>{{ login.domains.join(', ') }}</bdi></span
+              >
+            </div>
+          </div>
+          <div class="obj" [attr.data-s]="login.isEnabled ? 'ok' : null">
+            @if (login.isEnabled) {
+              <b i18n="@@platform-admin.company-login.on">On</b>
+            } @else {
+              <b i18n="@@platform-admin.company-login.off">Off</b>
+            }
+            <span i18n="@@platform-admin.company-login.state">Company sign-in</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
+  <div class="acts" *hrIfAllowed="manageTenants">
+    @if (adding()) {
+      <form class="editor" (submit)="onSubmit($event)" novalidate>
+        <label for="company-provider" i18n="@@platform-admin.company-login.provider"
+          >Provider</label
+        >
+        <select id="company-provider" class="field" [formField]="form.provider">
+          @for (provider of providers; track provider) {
+            <option [value]="provider">{{ provider }}</option>
+          }
+        </select>
+        <label for="company-domain" i18n="@@platform-admin.company-login.domain"
+          >One of the company's e-mail domains</label
+        >
+        <input
+          id="company-domain"
+          class="field"
+          type="text"
+          dir="ltr"
+          autocomplete="off"
+          i18n-placeholder="@@platform-admin.company-login.domain-placeholder"
+          placeholder="ritz.com"
+          [formField]="form.domain"
+        />
+        @if (form.domain().touched() && form.domain().errors().length > 0) {
+          <p class="field-error" role="alert">{{ form.domain().errors()[0]?.message }}</p>
+        }
+        <div class="acts">
+          <button
+            type="submit"
+            class="btn primary"
+            [disabled]="busy()"
+            i18n="@@platform-admin.company-login.add"
+          >
+            Add company login
+          </button>
+          <button
+            type="button"
+            class="btn"
+            (click)="adding.set(false)"
+            i18n="@@platform-admin.company-login.cancel"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    } @else {
+      <button
+        type="button"
+        class="btn"
+        data-act="add-company-login"
+        (click)="start()"
+        i18n="@@platform-admin.company-login.add-go"
+      >
+        Add company login
+      </button>
+    }
+  </div>
+</section>

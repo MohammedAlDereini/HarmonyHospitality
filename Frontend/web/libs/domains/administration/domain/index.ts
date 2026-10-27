@@ -23,3 +23,10 @@ export type {
   SettingVerdict,
 } from './settings';
 export { placesOf } from './settings';
+export type {
+  AccountSignIn,
+  CompanyLink,
+  CompanyLogin,
+  CompanyProvider,
+  SignInMethod,
+} from './company-login';

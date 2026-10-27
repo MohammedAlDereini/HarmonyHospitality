@@ -45,3 +45,8 @@ export {
   rowPath,
   updatePath,
 } from './reference-store';
+export {
+  CompanyLoginsStore,
+  addCompanyLoginPath,
+  tenantCompanyLoginsPath,
+} from './company-logins-store';

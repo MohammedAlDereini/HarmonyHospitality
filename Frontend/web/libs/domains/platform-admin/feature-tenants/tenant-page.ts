@@ -18,6 +18,7 @@ import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
 import { Drawer, Toasts } from '@harmony/ui/overlays';
 import { Tone } from '@harmony/ui/primitives';
+import { CompanyLoginPanel } from './company-login-panel';
 import { ReasonForm } from './reason-form';
 import { SubscriptionEditor } from './subscription-editor';
 import { TenantEditor } from './tenant-editor';
@@ -43,7 +44,16 @@ const headings: Readonly<Record<Opened, string>> = {
  */
 @Component({
   selector: 'hr-tenant-page',
-  imports: [RouterLink, FormField, IfAllowed, TenantEditor, ReasonForm, SubscriptionEditor, Drawer],
+  imports: [
+    RouterLink,
+    FormField,
+    IfAllowed,
+    TenantEditor,
+    ReasonForm,
+    SubscriptionEditor,
+    Drawer,
+    CompanyLoginPanel,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tenant-page.html',
   styleUrl: './tenant-page.css',

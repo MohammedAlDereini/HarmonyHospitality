@@ -1,0 +1,171 @@
+<header class="page-head">
+  <div>
+    <h1 i18n="@@administration.company-login.title">Company login</h1>
+    <p class="lead" i18n="@@administration.company-login.lead">
+      Your staff sign in with their company's Microsoft or Google account: they type their work
+      e-mail and Harmony sends them to the company. You choose the e-mail domains and who keeps a
+      Harmony password.
+    </p>
+  </div>
+</header>
+@if (problem(); as text) {
+  <p class="empty" role="alert">{{ text }}</p>
+}
+@if (store.problem(); as text) {
+  <p class="empty" role="alert">
+    {{ text }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="store.reload()"
+      i18n="@@administration.company-login.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (store.loading() && store.rows().length === 0) {
+  <p class="empty" i18n="@@administration.company-login.loading">Reading the company login…</p>
+} @else if (store.rows().length === 0) {
+  <p class="empty" i18n="@@administration.company-login.none">
+    Harmony has not added a company login for you yet. Ask Harmony to add Microsoft or Google.
+  </p>
+} @else {
+  @for (login of store.rows(); track login.id) {
+    <section class="part" [attr.aria-labelledby]="'login-' + login.id" data-login>
+      <div class="sec-h">
+        <h2 [id]="'login-' + login.id">{{ login.provider }}</h2>
+        <div class="obj" [attr.data-s]="login.isEnabled ? 'ok' : null">
+          @if (login.isEnabled) {
+            <b i18n="@@administration.company-login.on">On</b>
+          } @else {
+            <b i18n="@@administration.company-login.off">Off</b>
+          }
+          <span i18n="@@administration.company-login.state">Company sign-in</span>
+        </div>
+      </div>
+      @if (login.consentUrl; as consent) {
+        <p class="line">
+          <span i18n="@@administration.company-login.consent"
+            >Your company's IT approves Harmony once, before the first sign-in:</span
+          >&ngsp;<a
+            [href]="consent"
+            target="_blank"
+            rel="noopener noreferrer"
+            i18n="@@administration.company-login.consent-link"
+            >Microsoft approval page</a
+          >
+        </p>
+      }
+      <h3 class="sub" i18n="@@administration.company-login.domains">E-mail domains</h3>
+      <div class="rows" role="list">
+        @for (domain of login.domains; track domain) {
+          <div class="srow mrow" role="listitem" data-domain>
+            <div class="s-who">
+              <div class="s-nm">
+                <b dir="ltr"
+                  ><bdi>{{ domain }}</bdi></b
+                >
+              </div>
+            </div>
+            <div class="row-act">
+              <button
+                *hrIfAllowed="manageUsers"
+                type="button"
+                class="btn"
+                data-act="remove-domain"
+                (click)="removeDomain(login, domain)"
+                [disabled]="busy()"
+                i18n="@@administration.company-login.remove"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="acts" *hrIfAllowed="manageUsers">
+        @if (adding() === login.id) {
+          <form class="editor" (submit)="addDomain($event, login)" novalidate>
+            <label for="new-domain" i18n="@@administration.company-login.domain">Domain</label>
+            <input
+              id="new-domain"
+              class="field"
+              type="text"
+              dir="ltr"
+              autocomplete="off"
+              i18n-placeholder="@@administration.company-login.domain-placeholder"
+              placeholder="ritz.com"
+              [formField]="form.domain"
+            />
+            @if (domainProblem(); as text) {
+              <p class="field-error" role="alert">{{ text }}</p>
+            } @else if (form.domain().touched() && form.domain().errors().length > 0) {
+              <p class="field-error" role="alert">{{ form.domain().errors()[0]?.message }}</p>
+            }
+            <div class="acts">
+              <button
+                type="submit"
+                class="btn primary"
+                [disabled]="busy()"
+                i18n="@@administration.company-login.add"
+              >
+                Add domain
+              </button>
+              <button
+                type="button"
+                class="btn"
+                (click)="adding.set(null)"
+                i18n="@@administration.company-login.cancel"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        } @else {
+          <button
+            type="button"
+            class="btn"
+            data-act="add-domain"
+            (click)="startAdding(login)"
+            i18n="@@administration.company-login.add-go"
+          >
+            Add a domain
+          </button>
+          @if (login.isEnabled) {
+            <button
+              type="button"
+              class="btn"
+              data-act="switch-off"
+              (click)="switchOff(login)"
+              [disabled]="busy()"
+              i18n="@@administration.company-login.switch-off"
+            >
+              Switch off
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn primary"
+              data-act="switch-on"
+              (click)="switchOn(login)"
+              [disabled]="busy()"
+              i18n="@@administration.company-login.switch-on"
+            >
+              Switch on
+            </button>
+          }
+        }
+      </div>
+    </section>
+  }
+}
+<hr-confirm-dialog
+  #onDialog
+  i18n-heading="@@administration.company-login.on.heading"
+  heading="Switch company sign-in on?"
+  i18n-message="@@administration.company-login.on.ask"
+  message="From their next sign-in, everyone with an e-mail on these domains signs in with the company account. People you kept on a Harmony password are not changed."
+  i18n-go="@@administration.company-login.on.go"
+  go="Switch on"
+  i18n-stay="@@administration.company-login.on.stay"
+  stay="Not now"
+/>

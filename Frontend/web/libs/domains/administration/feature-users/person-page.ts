@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { PersonStore } from '@harmony/administration/data-access';
 import {
+  CompanyLink,
   Device,
   HotelAccessGrant,
   HotelRoleAssignment,
@@ -28,6 +29,8 @@ import { HotelAccessEditor } from './hotel-access-editor';
 import { RoleAssignment } from './role-assignment';
 
 const dateAndTime: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'short' };
+/** How Identity names a link made by the person's own first company sign-in. */
+const FIRST_SIGN_IN = 'first-sign-in';
 
 /**
  * One account: who they are, the roles they hold tenant-wide and at one hotel or group (assignments, grants), how
@@ -65,6 +68,7 @@ export class PersonPage {
   private readonly grantDrawer = viewChild.required<Drawer>('grantDrawer');
   private readonly endDialog = viewChild.required<ConfirmDialog>('endDialog');
   private readonly revokeDialog = viewChild.required<ConfirmDialog>('revokeDialog');
+  private readonly endLinkDialog = viewChild.required<ConfirmDialog>('endLinkDialog');
   /** True while the exemption reason form is open. */
   protected readonly exempting = signal(false);
   /** True while the assign form is open; the same for the grant form. */
@@ -145,6 +149,26 @@ export class PersonPage {
   protected async revokeGrant(user: UserAccount, grant: HotelAccessGrant): Promise<void> {
     if (!(await this.revokeDialog().ask())) return;
     await this.press(this.store.revokeGrant(user, grant, newIntentKey()));
+  }
+
+  protected linkedByText(linkedBy: string): string {
+    return linkedBy === FIRST_SIGN_IN
+      ? $localize`:@@administration.person.sign-in.linked-first:On their first company sign-in`
+      : $localize`:@@administration.person.sign-in.linked-admin:By an administrator`;
+  }
+
+  /** The administrator keeps the person on a Harmony password, whatever the company login covers. */
+  protected keepPassword(user: UserAccount): void {
+    void this.press(this.store.setPasswordSignIn(user, true, newIntentKey()));
+  }
+
+  protected followCompany(user: UserAccount): void {
+    void this.press(this.store.setPasswordSignIn(user, false, newIntentKey()));
+  }
+
+  protected async endLink(user: UserAccount, link: CompanyLink): Promise<void> {
+    if (!(await this.endLinkDialog().ask())) return;
+    await this.press(this.store.endLink(user, link, newIntentKey()));
   }
 
   protected resetTwoFactor(user: UserAccount): void {

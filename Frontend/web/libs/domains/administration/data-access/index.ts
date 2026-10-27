@@ -28,14 +28,24 @@ export {
   devicesPath,
   endAssignmentPath,
   endExemptionPath,
+  endLinkPath,
   eventsPath,
   grantAccessPath,
   myGroupsPath,
   passkeysPath,
+  passwordSignInPath,
   removePasskeyPath,
   resetTwoFactorPath,
   revokeGrantPath,
+  signInPath,
   signOutDevicePath,
   updateRolesPath,
 } from './person-store';
 export { SettingsStore, clearValuePath, effectivePath, setValuePath } from './settings-store';
+export {
+  CompanyLoginStore,
+  addDomainPath,
+  myCompanyLoginsPath,
+  removeDomainPath,
+  switchCompanyLoginPath,
+} from './company-login-store';

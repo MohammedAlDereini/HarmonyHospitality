@@ -3,6 +3,8 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   AccessScope,
   AccountAccess,
+  AccountSignIn,
+  CompanyLink,
   Device,
   GroupChoice,
   HotelAccessGrant,
@@ -31,6 +33,9 @@ export const endAssignmentPath = '/api/UserAccount/EndAssignment';
 export const grantAccessPath = '/api/UserAccount/GrantAccess';
 export const revokeGrantPath = '/api/UserAccount/RevokeGrant';
 export const myGroupsPath = '/api/PropertyGroup/mine';
+export const signInPath = (id: string): string => `/api/CompanyLogin/account/${id}`;
+export const passwordSignInPath = '/api/CompanyLogin/PasswordSignIn';
+export const endLinkPath = '/api/CompanyLogin/EndLink';
 /** Identity pages its answers, at most 100 a page; a customer's groups fit in one. */
 export const GROUPS_PAGE_SIZE = 100;
 const FIRST_PAGE = 1;
@@ -67,6 +72,10 @@ export class PersonStore {
     const id = this.id();
     return id === null ? undefined : { url: accessPath(id) };
   });
+  private readonly signIn = httpResource<Envelope<AccountSignIn>>(() => {
+    const id = this.id();
+    return id === null ? undefined : { url: signInPath(id) };
+  });
   private readonly groups = httpResource<Envelope<Paged<GroupChoice>>>(() =>
     this.choicesWanted()
       ? {
@@ -93,6 +102,9 @@ export class PersonStore {
     () => this.access.value()?.data?.grants ?? [],
   );
   readonly accessProblem = computed(() => this.sentence(this.access.error()));
+  /** How the person signs in (company login or a Harmony password) and their company links; null until read. */
+  readonly signInState = computed<AccountSignIn | null>(() => this.signIn.value()?.data ?? null);
+  readonly signInProblem = computed(() => this.sentence(this.signIn.error()));
   /** The customer's groups a role may be given at; empty until loadChoices() and while Identity has none. */
   readonly groupRows = computed<readonly GroupChoice[]>(
     () => this.groups.value()?.data?.results ?? [],
@@ -224,6 +236,30 @@ export class PersonStore {
         this.events.reload();
       },
     );
+  }
+
+  /** Keep the person on a Harmony password (true), or give them to the company login (false). */
+  setPasswordSignIn(
+    user: UserAccount,
+    keep: boolean,
+    intent: IntentKey,
+  ): Promise<ApiResult<unknown>> {
+    return this.write(
+      this.api.put(passwordSignInPath, { id: user.id, passwordSignIn: keep }, intent),
+      () => {
+        this.signIn.reload();
+        this.events.reload();
+      },
+    );
+  }
+
+  /** That company identity cannot sign in to this account again; the person's sessions end. */
+  endLink(user: UserAccount, link: CompanyLink, intent: IntentKey): Promise<ApiResult<unknown>> {
+    return this.write(this.api.put(endLinkPath, { id: user.id, linkId: link.id }, intent), () => {
+      this.signIn.reload();
+      this.devices.reload();
+      this.events.reload();
+    });
   }
 
   private sentence(error: unknown): string | null {

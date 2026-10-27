@@ -1,6 +1,12 @@
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { AccountState, Device, UserAccount } from '@harmony/administration/domain';
+import {
+  AccountSignIn,
+  AccountState,
+  CompanyLink,
+  Device,
+  UserAccount,
+} from '@harmony/administration/domain';
 import { API_RETRY_DELAYS, newIntentKey, provideHarmonyHttp } from '@harmony/platform/http';
 import {
   GROUPS_PAGE_SIZE,
@@ -9,14 +15,31 @@ import {
   accountPath,
   assignRolePath,
   devicesPath,
+  endLinkPath,
   eventsPath,
   myGroupsPath,
   passkeysPath,
+  passwordSignInPath,
+  signInPath,
   signOutDevicePath,
   updateRolesPath,
 } from './person-store';
 
 const ACCEPTED = 202;
+const microsoftLink: CompanyLink = {
+  id: 'l1',
+  provider: 'Microsoft',
+  linkedBy: 'first-sign-in',
+  isOpen: true,
+  since: '2026-10-27T08:00:00Z',
+  until: null,
+};
+const viaCompany: AccountSignIn = {
+  passwordSignIn: false,
+  coveredBy: 'Microsoft',
+  signsInWith: 'Company',
+  links: [microsoftLink],
+};
 const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 1));
 
 const rana: UserAccount = {
@@ -48,13 +71,14 @@ describe('PersonStore', () => {
     TestBed.tick();
     await tick();
   };
-  /** Answers the five reads; the account's request may already be in hand. */
+  /** Answers the six reads; the account's request may already be in hand. */
   const answerAll = (account = http.expectOne(accountPath('u5'))): void => {
     account.flush({ data: rana });
     http.expectOne(devicesPath('u5')).flush({ data: [laptop] });
     http.expectOne(passkeysPath('u5')).flush({ data: [] });
     http.expectOne(eventsPath('u5')).flush({ data: [] });
     http.expectOne(accessPath('u5')).flush({ data: { id: 'u5', assignments: [], grants: [] } });
+    http.expectOne(signInPath('u5')).flush({ data: viaCompany });
   };
 
   beforeEach(() => {
@@ -89,6 +113,34 @@ describe('PersonStore', () => {
     expect(store.assignmentRows()).toEqual([]);
     expect(store.problem()).toBeNull();
     expect(store.accessProblem()).toBeNull();
+    expect(store.signInState()?.signsInWith).toBe('Company');
+  });
+
+  it('keeping a person on a password and ending a link: one PUT each with the key, then the sign-in and the trail again', async () => {
+    store.open('u5');
+    await settle();
+    answerAll();
+    await settle();
+    const keep = store.setPasswordSignIn(rana, true, newIntentKey());
+    await settle();
+    const put = http.expectOne(passwordSignInPath);
+    expect(put.request.method).toBe('PUT');
+    expect(put.request.body).toEqual({ id: 'u5', passwordSignIn: true });
+    put.flush({ data: 1 });
+    expect((await keep).kind).toBe('ok');
+    await settle();
+    http.expectOne(signInPath('u5')).flush({ data: { ...viaCompany, passwordSignIn: true } });
+    http.expectOne(eventsPath('u5')).flush({ data: [] });
+    const end = store.endLink(rana, microsoftLink, newIntentKey());
+    await settle();
+    const endPut = http.expectOne(endLinkPath);
+    expect(endPut.request.body).toEqual({ id: 'u5', linkId: 'l1' });
+    endPut.flush({ data: 1 });
+    expect((await end).kind).toBe('ok');
+    await settle();
+    http.expectOne(signInPath('u5')).flush({ data: viaCompany });
+    http.expectOne(devicesPath('u5')).flush({ data: [] });
+    http.expectOne(eventsPath('u5')).flush({ data: [] });
   });
 
   it('the group choices are read only once an editor asks; a hotel-role write reads the access and the trail again', async () => {

@@ -99,6 +99,104 @@
       }
     </hr-drawer>
   </section>
+  <section class="part" aria-labelledby="sign-in-heading">
+    <h2 id="sign-in-heading" i18n="@@administration.person.sign-in.title">How they sign in</h2>
+    @if (store.signInProblem(); as text) {
+      <p class="field-error" role="alert">{{ text }}</p>
+    } @else if (store.signInState(); as signIn) {
+      <p class="line" data-sign-in>
+        @if (signIn.signsInWith === 'Company') {
+          <span i18n="@@administration.person.sign-in.company"
+            >With their company account; Harmony asks for no password:</span
+          >&ngsp;<bdi>{{ signIn.coveredBy }}</bdi>
+        } @else if (signIn.passwordSignIn) {
+          <span i18n="@@administration.person.sign-in.kept"
+            >With a Harmony password, kept by an administrator.</span
+          >
+        } @else {
+          <span i18n="@@administration.person.sign-in.password">With a Harmony password.</span>
+        }
+      </p>
+      <div class="acts" *hrIfAllowed="manageUsers">
+        @if (signIn.passwordSignIn) {
+          <button
+            type="button"
+            class="btn"
+            data-act="follow-company"
+            (click)="followCompany(person)"
+            [disabled]="busy()"
+            i18n="@@administration.person.sign-in.follow"
+          >
+            Use the company sign-in
+          </button>
+        } @else if (signIn.coveredBy !== null) {
+          <button
+            type="button"
+            class="btn"
+            data-act="keep-password"
+            (click)="keepPassword(person)"
+            [disabled]="busy()"
+            i18n="@@administration.person.sign-in.keep"
+          >
+            Keep on a Harmony password
+          </button>
+        }
+      </div>
+      @if (signIn.links.length > 0) {
+        <div class="rows" role="list">
+          @for (link of signIn.links; track link.id) {
+            <div class="srow lrow" role="listitem" data-link>
+              <div class="s-who">
+                <div class="s-nm">
+                  <b>{{ link.provider }}</b>
+                  <span>{{ linkedByText(link.linkedBy) }}</span>
+                </div>
+              </div>
+              <div class="obj">
+                @if (link.isOpen) {
+                  <b i18n="@@administration.person.sign-in.link-open">Linked</b>
+                } @else {
+                  <b i18n="@@administration.person.sign-in.link-ended">Ended</b>
+                }
+                <span i18n="@@administration.person.sign-in.link">Company account</span>
+              </div>
+              <div class="s-when">
+                <span class="num">{{ when(link.since) }}</span>
+                <small i18n="@@administration.person.sign-in.since">Since</small>
+              </div>
+              <div class="row-act">
+                @if (link.isOpen) {
+                  <button
+                    *hrIfAllowed="manageUsers"
+                    type="button"
+                    class="btn"
+                    data-act="end-link"
+                    (click)="endLink(person, link)"
+                    [disabled]="busy()"
+                    i18n="@@administration.person.sign-in.end-link"
+                  >
+                    End link
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+    <hr-confirm-dialog
+      #endLinkDialog
+      tone="stop"
+      i18n-heading="@@administration.person.sign-in.end-link.heading"
+      heading="End this company link?"
+      i18n-message="@@administration.person.sign-in.end-link.ask"
+      message="That company account cannot sign in here again, and the person is signed out everywhere now."
+      i18n-go="@@administration.person.sign-in.end-link.go"
+      go="End link"
+      i18n-stay="@@administration.person.sign-in.end-link.stay"
+      stay="Keep it"
+    />
+  </section>
   <section class="part" aria-labelledby="devices-heading">
     <h2 id="devices-heading">
       <span i18n="@@administration.person.devices">Devices</span>&ngsp;<span class="num">{{

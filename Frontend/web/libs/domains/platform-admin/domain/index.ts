@@ -37,3 +37,5 @@ export type {
   ReferenceTable,
   ReferenceValues,
 } from './reference';
+export type { CompanyProvider, TenantCompanyLogin } from './company-login';
+export { COMPANY_PROVIDERS } from './company-login';

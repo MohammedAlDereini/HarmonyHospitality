@@ -192,6 +192,7 @@
       </button>
     </div>
   </section>
+  <hr-company-login-panel [tenantId]="tenant.id" />
   <hr-drawer #drawer [heading]="drawerHeading()" [lead]="drawerLead()" (closed)="drawerClosed()">
     @if (opened() === 'edit') {
       <hr-tenant-editor [tenant]="tenant" (done)="changed()" (cancelled)="drawer.close()" />

@@ -2,7 +2,9 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PersonStore, RolesStore, UsersStore } from '@harmony/administration/data-access';
 import {
+  AccountSignIn,
   AccountState,
+  CompanyLink,
   Device,
   GroupChoice,
   HotelAccessGrant,
@@ -104,8 +106,25 @@ const nightCover: HotelAccessGrant = {
   isActive: true,
 };
 
+const microsoftLink: CompanyLink = {
+  id: 'l1',
+  provider: 'Microsoft',
+  linkedBy: 'first-sign-in',
+  isOpen: true,
+  since: '2026-10-27T08:00:00Z',
+  until: null,
+};
+const viaCompany: AccountSignIn = {
+  passwordSignIn: false,
+  coveredBy: 'Microsoft',
+  signsInWith: 'Company',
+  links: [microsoftLink],
+};
+
 class FakeStore {
   readonly person = signal<UserAccount | null>(rana);
+  readonly signInState = signal<AccountSignIn | null>(viaCompany);
+  readonly signInProblem = signal<string | null>(null);
   readonly assignmentRows = signal<readonly HotelRoleAssignment[]>([atAmman, atLevantEnded]);
   readonly grantRows = signal<readonly HotelAccessGrant[]>([nightCover]);
   readonly accessProblem = signal<string | null>(null);
@@ -165,6 +184,14 @@ class FakeStore {
   }
   revokeGrant(_user: UserAccount, grant: HotelAccessGrant): Promise<ApiResult<unknown>> {
     this.calls.push(`revoke-grant:${grant.id}`);
+    return Promise.resolve(this.answer);
+  }
+  setPasswordSignIn(_user: UserAccount, keep: boolean, k: IntentKey): Promise<ApiResult<unknown>> {
+    this.calls.push(`password-sign-in:${String(keep)}:${String(k.value.length)}`);
+    return Promise.resolve(this.answer);
+  }
+  endLink(_user: UserAccount, link: CompanyLink): Promise<ApiResult<unknown>> {
+    this.calls.push(`end-link:${link.id}`);
     return Promise.resolve(this.answer);
   }
 }
@@ -287,6 +314,34 @@ describe('PersonPage', () => {
     await settle();
     expect(page.querySelector('hr-hotel-access-editor #access-days')).not.toBeNull();
     expect(store.calls).toEqual(['end-assignment:a1:36', 'choices']);
+  });
+
+  it('sign-in: a company person reads "company account"; Keep on a password is one press; End link asks first', async () => {
+    expect(text('[data-sign-in]')).toBe(
+      'With their company account; Harmony asks for no password: Microsoft',
+    );
+    expect(text('[data-link] .s-nm span')).toBe('On their first company sign-in');
+    expect(page.querySelector('[data-act="follow-company"]')).toBeNull();
+    click('[data-act="keep-password"]');
+    await settle();
+    expect(store.calls).toEqual(['password-sign-in:true:36']);
+    click('[data-act="end-link"]');
+    await settle();
+    expect(store.calls).toEqual(['password-sign-in:true:36']);
+    click('dialog[open] .dlg-a .solid');
+    await settle();
+    expect(store.calls).toEqual(['password-sign-in:true:36', 'end-link:l1']);
+  });
+
+  it('sign-in: a person kept on a password is offered the company sign-in back; a refusal is worded', async () => {
+    store.signInState.set({ ...viaCompany, passwordSignIn: true, signsInWith: 'Password' });
+    store.answer = { kind: 'refused', status: ACCEPTED, codes: ['00127'] };
+    await settle();
+    expect(text('[data-sign-in]')).toBe('With a Harmony password, kept by an administrator.');
+    click('[data-act="follow-company"]');
+    await settle();
+    expect(store.calls).toEqual(['password-sign-in:false:36']);
+    expect(text('.empty[role="alert"]')).toContain('Keep at least one administrator');
   });
 
   it('a device is signed out and a passkey removed with one press each', async () => {
