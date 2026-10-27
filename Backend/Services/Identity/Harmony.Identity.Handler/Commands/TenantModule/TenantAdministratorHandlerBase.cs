@@ -2,6 +2,7 @@ namespace Harmony.Identity.Handler.Commands.TenantModule;
 
 using Harmony.Core.Abstractions;
 using Harmony.Core.Identity.Permissions;
+using Harmony.Identity.Domain.Entities.Aggregates.EnrolmentModule;
 using Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule;
 using Harmony.Identity.Domain.Entities.Aggregates.PermissionModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
@@ -34,6 +35,7 @@ public abstract class TenantAdministratorHandlerBase : TenantCommandHandlerBase
     private readonly IAccountMailer mailer;
     private readonly ICacheService cacheService;
     private readonly IFederatedAuthorityRepository authorities;
+    private readonly ILocalStaffEnrolmentRepository enrolments;
     private readonly ILogger logger;
 
     protected TenantAdministratorHandlerBase(
@@ -49,10 +51,12 @@ public abstract class TenantAdministratorHandlerBase : TenantCommandHandlerBase
         IAccountMailer mailer,
         ICacheService cacheService,
         IFederatedAuthorityRepository authorities,
+        ILocalStaffEnrolmentRepository enrolments,
         ILogger logger)
         : base(tenants, userAccounts, auditEvents, securityEvents, callContext, platform)
     {
         this.authorities = authorities;
+        this.enrolments = enrolments;
         this.permissions = permissions;
         this.roles = roles;
         this.userManager = userManager;
@@ -155,6 +159,14 @@ public abstract class TenantAdministratorHandlerBase : TenantCommandHandlerBase
         // The cache follows the database at once, the way CreateRole does.
         await this.cacheService.AddAsync(PermissionCacheKeys.RolePermissionKey(tenant.Id, role.Id), values, PermissionCacheKeys.RolePermissionsLifetime, cancellationToken);
 
+        // A new invitation replaces an older one still waiting: that one is cancelled and its link dies (new stamp).
+        var earlier = await this.enrolments.LatestOfAccountAsync(admin.Id, cancellationToken);
+        if (earlier is { State: EnrolmentState.Pending })
+        {
+            earlier.Cancel();
+            await this.userManager.UpdateSecurityStampAsync(admin);
+        }
+
         // The link: a one-time token bound to the account's security stamp, 24 hours (Identity's default), dead with the first password.
         var token = await this.userManager.GeneratePasswordResetTokenAsync(admin);
         Invitation outcome;
@@ -162,6 +174,8 @@ public abstract class TenantAdministratorHandlerBase : TenantCommandHandlerBase
         {
             await this.mailer.SendTenantAdministratorInvitationAsync(admin, tenant.LegalNameEn, token, cancellationToken);
             await this.TrailAsync(SecurityAuditActions.TenantAdministratorInvited, tenant, cancellationToken);
+            var local = (await this.authorities.OfTenantAsync(tenant.Id, cancellationToken)).First(a => a.Scheme == AuthorityScheme.Local);
+            await this.enrolments.AddAsync(LocalStaffEnrolment.Invite(tenant.Id, RankRules.CallerId(this.CallContext), local.Id, admin.Id, admin.Email!, DateTimeOffset.UtcNow), cancellationToken);
             outcome = Invitation.Sent;
         }
         catch (Exception exception)

@@ -122,3 +122,36 @@ public class GetCompanyRouteQueryHandler : IRequestHandler<GetCompanyRouteQuery,
         return new CompanyRoute(CompanyLoginSchemes.Of(login.Scheme), domain);
     }
 }
+
+/// <summary>Where a signed-in company person confirms it is them: their company login, and the e-mail to hint. Null otherwise.</summary>
+public class GetCompanyConfirmRouteQuery : BaseQueryRequest<CompanyConfirmRoute?>
+{
+    public Guid UserId { get; set; }
+}
+
+public sealed record CompanyConfirmRoute(CompanyRoute Route, string Email);
+
+public class GetCompanyConfirmRouteQueryHandler : IRequestHandler<GetCompanyConfirmRouteQuery, CompanyConfirmRoute?>
+{
+    private readonly IUserAccountRepository userAccounts;
+    private readonly IMediator mediator;
+
+    public GetCompanyConfirmRouteQueryHandler(IUserAccountRepository userAccounts, IMediator mediator)
+    {
+        this.userAccounts = userAccounts;
+        this.mediator = mediator;
+    }
+
+    public async Task<CompanyConfirmRoute?> Handle(GetCompanyConfirmRouteQuery request, CancellationToken cancellationToken)
+    {
+        var user = await this.userAccounts.FindByIdAcrossTenantsAsync(request.UserId, cancellationToken);
+        if (user?.Email is null)
+        {
+            return null;
+        }
+
+        // The same rule as the sign-in page: the company covers the e-mail and the person was not kept on a password.
+        var route = await this.mediator.Send(new GetCompanyRouteQuery { Email = user.Email }, cancellationToken);
+        return route is null ? null : new CompanyConfirmRoute(route, user.Email);
+    }
+}

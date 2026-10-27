@@ -18,11 +18,15 @@ internal sealed class DataRetentionCleanupService : IDataRetentionCleanupService
 {
     private readonly ISecurityAuditEventRepository trail;
     private readonly IUserDeviceRepository devices;
+    private readonly Harmony.Identity.Domain.Repositories.IOperatorSessionRepository sessionRecords;
+    private readonly Harmony.Identity.Domain.Repositories.IStepUpAuthorizationRepository proofs;
     private readonly DataRetentionSettings settings;
     private readonly ILogger<DataRetentionCleanupService> logger;
 
-    public DataRetentionCleanupService(ISecurityAuditEventRepository trail, IUserDeviceRepository devices, IOptions<DataRetentionSettings> options, ILogger<DataRetentionCleanupService> logger)
+    public DataRetentionCleanupService(ISecurityAuditEventRepository trail, IUserDeviceRepository devices, Harmony.Identity.Domain.Repositories.IOperatorSessionRepository sessionRecords, Harmony.Identity.Domain.Repositories.IStepUpAuthorizationRepository proofs, IOptions<DataRetentionSettings> options, ILogger<DataRetentionCleanupService> logger)
     {
+        this.sessionRecords = sessionRecords;
+        this.proofs = proofs;
         this.trail = trail;
         this.devices = devices;
         this.settings = options.Value;
@@ -34,6 +38,9 @@ internal sealed class DataRetentionCleanupService : IDataRetentionCleanupService
         var now = DateTimeOffset.UtcNow;
         var trailGone = await DrainAsync(cutoff => this.trail.DeleteOlderThanAsync(cutoff, this.settings.DeleteBatchSize, cancellationToken), now.AddMonths(-this.settings.SecurityTrailMonths));
         var devicesGone = await DrainAsync(cutoff => this.devices.DeleteUnseenSinceAsync(cutoff, this.settings.DeleteBatchSize, cancellationToken), now.AddDays(-this.settings.UnseenDeviceDays));
+        // Stage B: ended session records live as long as the trail; spent confirmations a day.
+        await DrainAsync(cutoff => this.sessionRecords.DeleteEndedBeforeAsync(cutoff, this.settings.DeleteBatchSize, cancellationToken), now.AddMonths(-this.settings.SecurityTrailMonths));
+        await DrainAsync(cutoff => this.proofs.DeleteExpiredBeforeAsync(cutoff, this.settings.DeleteBatchSize, cancellationToken), now.AddDays(-1));
 
         this.logger.LogInformation(
             "Data retention cleanup done: {Trail} trail row(s) past {TrailMonths} months and {Devices} device(s) unseen {DeviceDays} days removed.",

@@ -139,6 +139,10 @@ public static class SecurityAuditActions
     /// <summary>An administrator kept the person on a Harmony password ("password") or gave them back to the company login ("company").</summary>
     public const string SignInMethodChanged = "account.sign-in-method-changed";
 
+    /// <summary>An administrator sent a fresh invitation (the waiting one's link died) or withdrew the waiting one.</summary>
+    public const string InvitationResent = "account.invitation-resent";
+    public const string InvitationCancelled = "account.invitation-cancelled";
+
     /// <summary>The platform added a company login to a customer; the detail is "Provider@CUSTOMER domain".</summary>
     public const string CompanyLoginAdded = "company-login.added";
 
@@ -149,4 +153,19 @@ public static class SecurityAuditActions
     /// <summary>The customer's administrator switched the company login on or off; the detail is the provider.</summary>
     public const string CompanyLoginSwitchedOn = "company-login.switched-on";
     public const string CompanyLoginSwitchedOff = "company-login.switched-off";
+
+    /// <summary>Stage D: a risky change waits for a second person; the detail is its kind.</summary>
+    public const string ApprovalRequested = "approval.requested";
+
+    /// <summary>A second administrator approved (the change ran), rejected, or found the request void (the account moved).</summary>
+    public const string ApprovalApproved = "approval.approved";
+    public const string ApprovalRejected = "approval.rejected";
+    public const string ApprovalVoided = "approval.voided";
+
+    /// <summary>The customer's administrator switched approvals on or off.</summary>
+    public const string ApprovalsSwitchedOn = "approvals.switched-on";
+    public const string ApprovalsSwitchedOff = "approvals.switched-off";
+
+    /// <summary>Two accounts of one person: written on both; the merged one is terminated, never deleted.</summary>
+    public const string AccountMerged = "account.merged";
 }

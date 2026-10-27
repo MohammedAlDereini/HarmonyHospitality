@@ -1,6 +1,8 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.Create;
 
 using Harmony.Core.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.EnrolmentModule;
+using Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
@@ -22,11 +24,17 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
     private readonly IUserAccountRepository userAccounts;
     private readonly ICallContext callContext;
     private readonly IAccountMailer mailer;
+    private readonly IFederatedAuthorityRepository authorities;
+    private readonly ILocalStaffEnrolmentRepository enrolments;
+    private readonly TimeProvider clock;
     private readonly ILogger<CreateUserAccountCommandHandler> logger;
 
-    public CreateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IRoleRepository roles, IUserAccountRepository userAccounts, ICallContext callContext, IAccountMailer mailer, ILogger<CreateUserAccountCommandHandler> logger)
+    public CreateUserAccountCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IRoleRepository roles, IUserAccountRepository userAccounts, ICallContext callContext, IAccountMailer mailer, IFederatedAuthorityRepository authorities, ILocalStaffEnrolmentRepository enrolments, TimeProvider clock, ILogger<CreateUserAccountCommandHandler> logger)
         : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
+        this.authorities = authorities;
+        this.enrolments = enrolments;
+        this.clock = clock;
         this.roles = roles;
         this.userAccounts = userAccounts;
         this.callContext = callContext;
@@ -65,6 +73,9 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
         user.UpdateRoles(wanted);
 
         var byInvitation = string.IsNullOrEmpty(command.InitialPassword);
+
+        // An e-mail the customer's company login covers needs no password: the company signs the person in.
+        var company = byInvitation ? await this.CompanyCoveringAsync(email, cancellationToken) : null;
         if (!byInvitation)
         {
             user.RequirePasswordChange();
@@ -91,7 +102,19 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
             return Fail<Guid>(BusinessErrorCodes.Identity.UserAccount.StoreRefused);
         }
 
-        if (byInvitation)
+        if (company is not null)
+        {
+            try
+            {
+                await this.mailer.SendCompanyWelcomeAsync(user, company.Scheme.ToString(), cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                // The account works without the mail: the person signs in with the company. The log says so.
+                this.logger.LogWarning(exception, "The company welcome mail for account {UserId} could not be sent.", user.Id);
+            }
+        }
+        else if (byInvitation)
         {
             // The link carries a one-time token bound to the account's security stamp; it dies with the first password set.
             var token = await this.UserManager.GeneratePasswordResetTokenAsync(user);
@@ -111,6 +134,13 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
         // Written once the account is kept for good: an invitation that fails removes the account again, and the trail must
         // never point at an account that does not exist.
         await this.TrailAsync(user, SecurityAuditActions.AccountCreated, cancellationToken);
+        if (byInvitation && company is null)
+        {
+            // The invitation as a record (design 3.3): who sent it, until when; the e-mail only as a digest.
+            var local = (await this.authorities.OfTenantAsync(user.TenantId, cancellationToken)).First(a => a.Scheme == AuthorityScheme.Local);
+            await this.enrolments.AddAsync(LocalStaffEnrolment.Invite(user.TenantId, RankRules.CallerId(this.callContext), local.Id, user.Id, email, this.clock.GetUtcNow()), cancellationToken);
+        }
+
         await this.AuditEvents.SaveChangesAsync(cancellationToken);
 
         // The cache follows the database at once, so the first token this person gets finds its version.
@@ -123,5 +153,18 @@ public class CreateUserAccountCommandHandler : UserAccountCommandHandlerBase, IR
             byInvitation ? "an invitation link was sent" : "the password must be changed at first login");
 
         return CallResponseBuilder.CreateResponse<Guid>(eCallResponseStatus.Created).HasData(user.Id);
+    }
+
+    /// <summary>The caller's customer's switched-on company login that covers the e-mail, or null.</summary>
+    private async Task<FederatedAuthority?> CompanyCoveringAsync(string email, CancellationToken cancellationToken)
+    {
+        var domain = FederatedAuthority.DomainOf(email);
+        if (domain is null || !FederatedAuthority.IsDomainName(domain))
+        {
+            return null;
+        }
+
+        var login = await this.authorities.CoveringAsync(domain, cancellationToken);
+        return login is not null && login.TenantId.ToString("D") == this.callContext.TenantId() ? login : null;
     }
 }

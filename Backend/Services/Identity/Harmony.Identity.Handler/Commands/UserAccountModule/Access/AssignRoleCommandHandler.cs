@@ -1,18 +1,23 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.Access;
 
 using Harmony.Core.Abstractions;
+using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
+using Harmony.Identity.Handler.Commands.ApprovalModule;
 
 /// <summary>The account, the rank rules, the role of this tenant, the scope of this tenant, one current assignment per role and scope; the trail; one save.</summary>
 public class AssignRoleCommandHandler : AccessCommandHandlerBase, IRequestHandler<AssignRoleCommand, CallResponse<Guid>>
 {
-    public AssignRoleCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, IPropertyRepository properties, IPropertyGroupRepository groups, ICallContext callContext, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, TimeProvider clock, ICacheService cache)
+    public AssignRoleCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, IPropertyRepository properties, IPropertyGroupRepository groups, ICallContext callContext, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, TimeProvider clock, ICacheService cache, IApprovalGate gate)
         : base(userAccounts, roles, properties, groups, callContext, auditEvents, securityEvents, clock, cache)
     {
+        this.gate = gate;
     }
+
+    private readonly IApprovalGate gate;
 
     public async Task<CallResponse<Guid>> Handle(AssignRoleCommand command, CancellationToken cancellationToken)
     {
@@ -49,6 +54,13 @@ public class AssignRoleCommandHandler : AccessCommandHandlerBase, IRequestHandle
         if (user.RoleAssignments.Any(a => a.RoleId == role.Id && a.Scope == scope && a.IsCurrentAt(now)))
         {
             return Fail<Guid>(BusinessErrorCodes.Identity.UserAccount.AssignmentExists);
+        }
+
+        // Stage D: an administrator-level role waits for a second administrator when the customer requires approvals.
+        if (role.Rank >= RoleRank.Administrator
+            && await this.gate.HoldAsync(ApprovalKinds.AdministratorAssignment, command, user.Id, [user.Id], cancellationToken) is { } hold)
+        {
+            return Fail<Guid>(hold);
         }
 
         var assignment = user.AssignRole(role.Id, scope, command.EndsAtUtc, now);

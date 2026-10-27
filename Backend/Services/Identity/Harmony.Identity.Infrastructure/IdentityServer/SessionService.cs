@@ -19,10 +19,12 @@ public sealed class SessionService : ISessionService
     private readonly ISessionManagementService sessions;
     private readonly IPersistedGrantService grants;
     private readonly IServerSideSessionStore sessionStore;
+    private readonly Harmony.Identity.Domain.Repositories.IOperatorSessionRepository records;
     private readonly ILogger<SessionService> logger;
 
-    public SessionService(ISessionManagementService sessions, IPersistedGrantService grants, IServerSideSessionStore sessionStore, ILogger<SessionService> logger)
+    public SessionService(ISessionManagementService sessions, IPersistedGrantService grants, IServerSideSessionStore sessionStore, Harmony.Identity.Domain.Repositories.IOperatorSessionRepository records, ILogger<SessionService> logger)
     {
+        this.records = records;
         this.sessions = sessions;
         this.grants = grants;
         this.sessionStore = sessionStore;
@@ -34,6 +36,14 @@ public sealed class SessionService : ISessionService
         var subject = userId.ToString("D");
         await this.sessions.RemoveSessionsAsync(new RemoveSessionsContext { SubjectId = subject, RevokeConsents = false }, cancellationToken);
         await this.grants.RemoveAllGrantsAsync(subject, cancellationToken);
+
+        // Their records end too (design 3.4): every open sign-in of the person, for the same reason.
+        foreach (var record in await this.records.OpenOfAccountAsync(userId, cancellationToken))
+        {
+            record.End(DateTimeOffset.UtcNow, Harmony.Identity.Domain.Entities.Aggregates.SessionModule.OperatorSession.AllEnded);
+        }
+
+        await this.records.SaveChangesAsync(cancellationToken);
         this.logger.LogInformation("All sessions ended for account {UserId}: sign-in sessions and refresh tokens removed.", userId);
     }
 
@@ -43,6 +53,12 @@ public sealed class SessionService : ISessionService
         await this.sessions.RemoveSessionsAsync(
             new RemoveSessionsContext { SubjectId = userId.ToString("D"), SessionId = sessionId, RevokeConsents = false },
             cancellationToken);
+        if (await this.records.OpenByKeyAsync(sessionId, cancellationToken) is { } record)
+        {
+            record.End(DateTimeOffset.UtcNow, Harmony.Identity.Domain.Entities.Aggregates.SessionModule.OperatorSession.DeviceSignedOut);
+            await this.records.SaveChangesAsync(cancellationToken);
+        }
+
         this.logger.LogInformation("One sign-in session ended for account {UserId}.", userId);
     }
 

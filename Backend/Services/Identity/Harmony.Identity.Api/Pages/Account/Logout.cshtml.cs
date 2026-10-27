@@ -18,9 +18,11 @@ public sealed class LogoutModel : PageModel
 {
     private readonly IIdentityServerInteractionService interaction;
     private readonly IUserSession userSession;
+    private readonly IMediator mediator;
 
-    public LogoutModel(IIdentityServerInteractionService interaction, IUserSession userSession)
+    public LogoutModel(IIdentityServerInteractionService interaction, IUserSession userSession, IMediator mediator)
     {
+        this.mediator = mediator;
         this.interaction = interaction;
         this.userSession = userSession;
     }
@@ -45,6 +47,13 @@ public sealed class LogoutModel : PageModel
     {
         if (await this.userSession.GetUserAsync(this.HttpContext.RequestAborted) is not null)
         {
+            // The record of this sign-in ends (design 3.4); the session id is read before the cookie goes.
+            var sid = await this.userSession.GetSessionIdAsync(this.HttpContext.RequestAborted);
+            if (!string.IsNullOrEmpty(sid))
+            {
+                await this.mediator.Send(new Harmony.Identity.Handler.Commands.UserAccountModule.SignInRecords.EndSessionRecordCommand { SessionKey = sid }, this.HttpContext.RequestAborted);
+            }
+
             // Duende's cookie by name: the default scheme here is the platform token, which has no sign-out.
             await this.HttpContext.SignOutAsync(IdentityServerConstants.DefaultCookieAuthenticationScheme);
         }

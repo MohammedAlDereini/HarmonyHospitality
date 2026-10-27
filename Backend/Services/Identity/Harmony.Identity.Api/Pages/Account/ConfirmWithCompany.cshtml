@@ -1,0 +1,10 @@
+@page
+@model ConfirmWithCompanyModel
+@{
+    ViewData["Title"] = "Confirm it is you";
+}
+<h1>Confirm it is you</h1>
+@if (Model.Problem is not null)
+{
+    <p class="error" role="alert">@Model.Problem</p>
+}

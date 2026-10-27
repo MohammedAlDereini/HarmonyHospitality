@@ -51,6 +51,16 @@ public sealed class AccountMailer : IAccountMailer
         return this.SendAsync(user, "Welcome to Harmony: set your password", body, cancellationToken);
     }
 
+    public Task SendCompanyWelcomeAsync(User user, string provider, CancellationToken cancellationToken)
+    {
+        var body =
+            $"Hello {user.DisplayName},\n\n" +
+            $"An account was created for you on Harmony. Your company signs you in with your {provider} work account:\n" +
+            "type your work e-mail on the Harmony sign-in page and press Sign in. There is no Harmony password to choose.\n";
+
+        return this.SendAsync(user, "Welcome to Harmony", body, cancellationToken);
+    }
+
     public Task SendTenantAdministratorInvitationAsync(User user, string tenantName, string token, CancellationToken cancellationToken)
     {
         var link = WebLinkSettings.Fill(this.links.InvitationUrl, user.Email!, token);

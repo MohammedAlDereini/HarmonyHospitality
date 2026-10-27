@@ -54,6 +54,13 @@ public sealed partial class Tenant : AggregateRoot<Guid>, IAuditableEntity, ICon
     /// <summary>After termination: until when the customer may still export its data. Null before.</summary>
     public DateOnly? ExportWindowEndsOn { get; private set; }
 
+    /// <summary>
+    /// The customer's administrator asks for a second person on risky changes (stage D): an administrator-level role, a
+    /// two-step exemption, a merge, switching company login off, letting a quarantined person in, and switching this off.
+    /// Off by default.
+    /// </summary>
+    public bool ApprovalsRequired { get; private set; }
+
     /// <summary>The contract, as lines: a hotel's module with its counts, or a chain-wide module. Changed only through Subscribe and Unsubscribe.</summary>
     public ICollection<TenantSubscription> Subscriptions { get; private set; } = new List<TenantSubscription>();
 
@@ -114,6 +121,13 @@ public sealed partial class Tenant : AggregateRoot<Guid>, IAuditableEntity, ICon
         DefaultCurrency = Letters(defaultCurrency, 3, nameof(defaultCurrency));
         Tier = TierOf(tier);
         ExternalIdentifier = External(externalIdentifier);
+    }
+
+    /// <summary>Approvals on or off. Switching off when approvals are on goes through an approval itself (the handler's rule).</summary>
+    public void RequireApprovals(bool required)
+    {
+        AssertNotTerminated();
+        ApprovalsRequired = required;
     }
 
     /// <summary>Nobody in it signs in until it is reinstated. Suspending twice is a no-op.</summary>

@@ -1,5 +1,8 @@
 ﻿namespace Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
+using Harmony.Identity.Domain.Entities.Aggregates.SessionModule;
+
 using Harmony.Core.Exceptions;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
@@ -23,10 +26,12 @@ public class RecordSignInCommandHandler : IRequestHandler<RecordSignInCommand, C
     private readonly ISecurityAuditEventRepository auditEvents;
     private readonly ISecurityEventFactory securityEvents;
     private readonly IAccountMailer mailer;
+    private readonly IOperatorSessionRepository sessions;
     private readonly ILogger<RecordSignInCommandHandler> logger;
 
-    public RecordSignInCommandHandler(IUserAccountRepository userAccounts, IUserDeviceRepository devices, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IAccountMailer mailer, ILogger<RecordSignInCommandHandler> logger)
+    public RecordSignInCommandHandler(IUserAccountRepository userAccounts, IUserDeviceRepository devices, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IAccountMailer mailer, IOperatorSessionRepository sessions, ILogger<RecordSignInCommandHandler> logger)
     {
+        this.sessions = sessions;
         this.userAccounts = userAccounts;
         this.devices = devices;
         this.auditEvents = auditEvents;
@@ -48,6 +53,13 @@ public class RecordSignInCommandHandler : IRequestHandler<RecordSignInCommand, C
 
         var row = this.securityEvents.Create(user, command.TrailAction, command.Detail);
         await this.auditEvents.AddAsync(row, cancellationToken);
+
+        // The sign-in's own record (design 3.4), once per Duende session: a sign-in that reached us twice opens one row.
+        if (!string.IsNullOrWhiteSpace(command.SessionId) && await this.sessions.OpenByKeyAsync(command.SessionId, cancellationToken) is null)
+        {
+            var (methods, provider) = HowOf(command.TrailAction, command.Detail);
+            await this.sessions.AddAsync(OperatorSession.Start(user.TenantId, user.Id, command.SessionId, methods, provider, row.OccurredAtUtc), cancellationToken);
+        }
 
         var label = row.Device ?? UnknownDevice;
         var hash = UserDevice.HashOf(command.DeviceKey);
@@ -86,4 +98,13 @@ public class RecordSignInCommandHandler : IRequestHandler<RecordSignInCommand, C
 
         return CallResponseBuilder.CreateResponse(eCallResponseStatus.Success);
     }
+
+    /// <summary>How the sign-in was made, as the token's amr says it, from the trail action the page recorded.</summary>
+    private static (string[] Methods, string Provider) HowOf(string trailAction, string? detail) => trailAction switch
+    {
+        SecurityAuditActions.SignInPasskey => (["swk", "mfa"], "local"),
+        SecurityAuditActions.SignInPasswordOnly => (["pwd"], "local"),
+        SecurityAuditActions.SignInCompany => (["external"], (detail ?? "company").ToLowerInvariant()),
+        _ => (["mfa"], "local"),
+    };
 }

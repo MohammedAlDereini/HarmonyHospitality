@@ -6,6 +6,7 @@ using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
+using Harmony.Identity.Handler.Commands.ApprovalModule;
 
 public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesCommand, CallResponse>
 {
@@ -16,8 +17,9 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
     private readonly ISessionService sessionService;
     private readonly ISecurityAuditEventRepository auditEvents;
     private readonly ISecurityEventFactory securityEvents;
+    private readonly IApprovalGate gate;
 
-    public UpdateUserRolesCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, ICallContext callContext, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents)
+    public UpdateUserRolesCommandHandler(IUserAccountRepository userAccounts, IRoleRepository roles, ICallContext callContext, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IApprovalGate gate)
     {
         this.userAccounts = userAccounts;
         this.roles = roles;
@@ -26,6 +28,7 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
         this.sessionService = sessionService;
         this.auditEvents = auditEvents;
         this.securityEvents = securityEvents;
+        this.gate = gate;
     }
 
     public async Task<CallResponse> Handle(UpdateUserRolesCommand command, CancellationToken cancellationToken)
@@ -65,6 +68,14 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
 
         // A changed set bumps the version. The same set is a no-op success: nothing is
         // saved, no trail row, and nobody is signed out because an admin pressed Save without changing anything.
+        // Stage D: a new administrator-level role waits for a second administrator when the customer requires approvals.
+        var held = user.UserRoles.Select(ur => ur.RoleId).ToHashSet();
+        if (known.Any(r => !held.Contains(r.Id) && RoleRank.Of(r.PrivilegeLevel, r.IsSuperRole) >= RoleRank.Administrator)
+            && await this.gate.HoldAsync(ApprovalKinds.AdministratorRoles, command, user.Id, [user.Id], cancellationToken) is { } hold)
+        {
+            return Fail(hold);
+        }
+
         var before = user.SecurityVersion;
         user.UpdateRoles(wanted);
         if (user.SecurityVersion == before)

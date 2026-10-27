@@ -200,6 +200,22 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
         BumpSecurityVersion();
     }
 
+    /// <summary>
+    /// Merged into another account of the same person (stage D): this one points at the one kept and is terminated, never
+    /// deleted, so every audit row that names it still resolves.
+    /// </summary>
+    public void SupersedeBy(Guid keptId, string reason)
+    {
+        AssertNotTerminated();
+        if (keptId == Guid.Empty || keptId == Id)
+        {
+            throw new ArgumentException("The account kept is another account.", nameof(keptId));
+        }
+
+        SupersededByUserAccountId = keptId;
+        Terminate(reason);
+    }
+
     /// <summary>The account holds exactly these roles afterwards: missing ones are added, others removed.</summary>
     public void UpdateRoles(IEnumerable<Guid>? roleIds)
     {

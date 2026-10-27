@@ -311,6 +311,13 @@ public static class DependenciesConfigurator
             .ValidateOnStart();
         services.TryAddScoped<IDataRetentionCleanupService, DataRetentionCleanupService>();
         services.AddHostedService<DataRetentionBackgroundService>();
+        // Stage B: records of sessions that expired without a sign-out are ended every few minutes.
+        services.AddHostedService<Harmony.Identity.Infrastructure.BackgroundServices.SessionRecords.SessionRecordClosingService>();
+        // Stage C: the revocation feed is read through its own repository and compacted every hour.
+        services.TryAddScoped<Harmony.Identity.Domain.Repositories.IRevocationFeedRepository, RevocationFeedRepository>();
+        services.AddHostedService<Harmony.Identity.Infrastructure.BackgroundServices.RevocationFeed.RevocationCompactionService>();
+        // Stage D: risky changes wait for a second administrator when the customer requires approvals.
+        services.TryAddScoped<IApprovalGate, Harmony.Identity.Infrastructure.Approvals.ApprovalGate>();
 
         // Item 5: the real caller address (X-Forwarded-For), believed only from the front doors the settings list.
         services.AddOptions<TrustedProxySettings>()

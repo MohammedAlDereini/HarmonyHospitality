@@ -125,7 +125,7 @@ public class ConfirmIdentityCommandHandler : UserAccountCommandHandlerBase, IReq
 
     private async Task ConfirmedAsync(User user, string how, CancellationToken cancellationToken)
     {
-        await this.confirmation.MarkAsync(user.Id, how, cancellationToken);
+        await this.confirmation.MarkAsync(user.TenantId, user.Id, how, cancellationToken);
         await this.AuditEvents.AddAsync(this.SecurityEvents.Create(user, SecurityAuditActions.IdentityConfirmed, how), cancellationToken);
         await this.AuditEvents.SaveChangesAsync(cancellationToken);
         this.logger.LogInformation("Identity confirmed for account {UserId} by {How}.", user.Id, how);

@@ -5,6 +5,7 @@ using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
+using Harmony.Identity.Handler.Commands.ApprovalModule;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -19,14 +20,16 @@ public class ExemptFromTwoStepCommandHandler : UserAccountCommandHandlerBase, IR
     private readonly ICallContext callContext;
     private readonly IAccountMailer mailer;
     private readonly ILogger<ExemptFromTwoStepCommandHandler> logger;
+    private readonly IApprovalGate gate;
 
-    public ExemptFromTwoStepCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserAccountRepository userAccounts, ICallContext callContext, IAccountMailer mailer, ILogger<ExemptFromTwoStepCommandHandler> logger)
+    public ExemptFromTwoStepCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserAccountRepository userAccounts, ICallContext callContext, IAccountMailer mailer, ILogger<ExemptFromTwoStepCommandHandler> logger, IApprovalGate gate)
         : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
         this.userAccounts = userAccounts;
         this.callContext = callContext;
         this.mailer = mailer;
         this.logger = logger;
+        this.gate = gate;
     }
 
     public async Task<CallResponse> Handle(ExemptFromTwoStepCommand command, CancellationToken cancellationToken)
@@ -57,6 +60,13 @@ public class ExemptFromTwoStepCommandHandler : UserAccountCommandHandlerBase, IR
         // their sign-in actually changes (going on the list), not when an admin rewords the reason.
         var wasExempt = user.IsTwoStepExempt;
         var reasonBefore = user.TwoStepExemptReason;
+
+        // Stage D: going on the list waits for a second administrator when the customer requires approvals (rewording does not).
+        if (!wasExempt && await this.gate.HoldAsync(ApprovalKinds.TwoStepExemption, command, user.Id, [user.Id], cancellationToken) is { } hold)
+        {
+            return Fail(hold);
+        }
+
         user.ExemptFromTwoStep(command.Reason);
         if (user.TwoStepExemptReason == reasonBefore)
         {

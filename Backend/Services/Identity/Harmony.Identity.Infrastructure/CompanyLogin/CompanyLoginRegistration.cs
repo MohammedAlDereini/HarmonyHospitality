@@ -1,4 +1,4 @@
-using Duende.IdentityServer;
+﻿using Duende.IdentityServer;
 using Harmony.Identity.Domain.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -99,6 +99,9 @@ public static class CompanyLoginRegistration
 
         // The claims as the provider wrote them (oid, tid, hd, email_verified), nothing renamed; no tokens kept.
         options.MapInboundClaims = false;
+
+        // The handler drops iat by default; "confirm it is you" reads it (with auth_time) to know the sign-in is fresh.
+        options.ClaimActions.Remove("iat");
         options.GetClaimsFromUserInfoEndpoint = false;
         options.SaveTokens = false;
         options.DisableTelemetry = true;

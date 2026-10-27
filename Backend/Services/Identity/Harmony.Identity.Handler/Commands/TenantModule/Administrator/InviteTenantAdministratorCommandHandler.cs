@@ -25,8 +25,9 @@ public class InviteTenantAdministratorCommandHandler : TenantAdministratorHandle
         IAccountMailer mailer,
         ICacheService cacheService,
         IFederatedAuthorityRepository authorities,
+        ILocalStaffEnrolmentRepository enrolments,
         ILogger<InviteTenantAdministratorCommandHandler> logger)
-        : base(tenants, userAccounts, auditEvents, securityEvents, callContext, platform, permissions, roles, userManager, mailer, cacheService, authorities, logger)
+        : base(tenants, userAccounts, auditEvents, securityEvents, callContext, platform, permissions, roles, userManager, mailer, cacheService, authorities, enrolments, logger)
     {
     }
 

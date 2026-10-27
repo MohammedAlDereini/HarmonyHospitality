@@ -205,6 +205,16 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 
+    /// <summary>An account's sign-ins from start to end (stage B, design 3.4), the newest first.</summary>
+    [HttpGet("{id:guid}/sessions")]
+    [ProducesResponseType(typeof(List<Harmony.Identity.Handler.Queries.UserAccountModule.SignInRecords.SessionRecordModel>), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewUsers)]
+    public async Task<IActionResult> Sessions(Guid id)
+    {
+        var response = await this.Mediator.Send(new Harmony.Identity.Handler.Queries.UserAccountModule.SignInRecords.GetSessionRecordsQuery { Id = id });
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
     /// <summary>The browsers an account signed in from (Mews: "Devices and activity").</summary>
     [HttpGet("{id:guid}/devices")]
     [ProducesResponseType(typeof(List<UserDeviceModel>), (int)HttpStatusCode.OK)]

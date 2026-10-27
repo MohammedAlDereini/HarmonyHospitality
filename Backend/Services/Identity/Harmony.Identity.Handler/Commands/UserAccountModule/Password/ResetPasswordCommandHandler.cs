@@ -17,11 +17,15 @@ public class ResetPasswordCommandHandler : UserAccountCommandHandlerBase, IReque
 {
     private readonly IUserAccountRepository userAccounts;
     private readonly IAccountMailer mailer;
+    private readonly ILocalStaffEnrolmentRepository enrolments;
+    private readonly TimeProvider clock;
     private readonly ILogger<ResetPasswordCommandHandler> logger;
 
-    public ResetPasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserAccountRepository userAccounts, IAccountMailer mailer, ILogger<ResetPasswordCommandHandler> logger)
+    public ResetPasswordCommandHandler(UserManager<User> userManager, ICacheService cacheService, ISessionService sessionService, ISecurityAuditEventRepository auditEvents, ISecurityEventFactory securityEvents, IUserAccountRepository userAccounts, IAccountMailer mailer, ILocalStaffEnrolmentRepository enrolments, TimeProvider clock, ILogger<ResetPasswordCommandHandler> logger)
         : base(userManager, cacheService, sessionService, auditEvents, securityEvents)
     {
+        this.enrolments = enrolments;
+        this.clock = clock;
         this.userAccounts = userAccounts;
         this.mailer = mailer;
         this.logger = logger;
@@ -40,6 +44,16 @@ public class ResetPasswordCommandHandler : UserAccountCommandHandlerBase, IReque
         }
 
         var user = candidates[0];
+
+        // A first password (an invitation): only while the invitation is open. Cancelled or expired never redeems,
+        // whatever the token says. Accounts invited before invitations were kept have no row and keep the token's rule.
+        var now = this.clock.GetUtcNow();
+        var invitation = user.PasswordHash is null ? await this.enrolments.LatestOfAccountAsync(user.Id, cancellationToken) : null;
+        if (invitation is not null && !invitation.IsOpen(now))
+        {
+            this.logger.LogInformation("First password refused for account {UserId}: the invitation is {State} (expires {Expiry}).", user.Id, invitation.State, invitation.ExpiresAtUtc);
+            return Fail(BusinessErrorCodes.Identity.UserAccount.ResetTokenInvalid);
+        }
 
         // The token is bound to the security stamp, so it is checked BEFORE anything rotates the stamp.
         var result = await this.UserManager.ResetPasswordAsync(user, command.Token, command.NewPassword);
@@ -63,6 +77,7 @@ public class ResetPasswordCommandHandler : UserAccountCommandHandlerBase, IReque
 
         // The hash is stored; now the domain side of a password change, same as ChangePassword.
         user.MarkPasswordChanged();
+        invitation?.Redeem(now);
         await this.TrailAsync(user, SecurityAuditActions.PasswordResetByLink, cancellationToken);
         await this.SaveAsync(user);
         await this.UserManager.ResetAccessFailedCountAsync(user);

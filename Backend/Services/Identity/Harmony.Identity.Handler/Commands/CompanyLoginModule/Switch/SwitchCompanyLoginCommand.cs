@@ -4,6 +4,7 @@ using Harmony.Core.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
+using Harmony.Identity.Handler.Commands.ApprovalModule;
 using Harmony.Identity.Infrastructure.Tenants;
 using Microsoft.Extensions.Options;
 
@@ -37,10 +38,14 @@ public class SwitchCompanyLoginCommandHandler : CompanyLoginCommandHandlerBase, 
         ISecurityAuditEventRepository auditEvents,
         ISecurityEventFactory securityEvents,
         ICallContext callContext,
-        IOptions<PlatformTenantSettings> platform)
+        IOptions<PlatformTenantSettings> platform,
+        IApprovalGate gate)
         : base(authorities, tenants, userAccounts, auditEvents, securityEvents, callContext, platform)
     {
+        this.gate = gate;
     }
+
+    private readonly IApprovalGate gate;
 
     public async Task<CallResponse> Handle(SwitchCompanyLoginCommand command, CancellationToken cancellationToken)
     {
@@ -70,6 +75,12 @@ public class SwitchCompanyLoginCommandHandler : CompanyLoginCommandHandlerBase, 
         }
         else
         {
+            // Stage D: off sends everybody back to passwords; it waits for a second administrator when the customer requires approvals.
+            if (await this.gate.HoldAsync(ApprovalKinds.CompanyLoginOff, command, null, [], cancellationToken) is { } hold)
+            {
+                return Fail(hold);
+            }
+
             login.SwitchOff();
         }
 
