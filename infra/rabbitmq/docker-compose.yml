@@ -1,0 +1,14 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: harmony-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/conf.d/90-harmony.conf:ro
+      - harmony-rabbitmq-data:/var/lib/rabbitmq
+    restart: unless-stopped
+
+volumes:
+  harmony-rabbitmq-data:
