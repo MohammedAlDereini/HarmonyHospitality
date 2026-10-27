@@ -42,7 +42,7 @@ public sealed class OperatorSession : AggregateRoot<Guid>, IAuditableEntity, IMu
     /// <summary>local, microsoft or google.</summary>
     public string Provider { get; private set; } = null!;
 
-    /// <summary>Two-step was done at sign-in (a code, a passkey, or the company's own sign-in, which Harmony trusts).</summary>
+    /// <summary>Two-step was done at sign-in: a code, a passkey, or a company sign-in whose company said so ("mfa").</summary>
     public bool MultiFactorSatisfied { get; private set; }
 
     public DateTimeOffset StartedAtUtc { get; private set; }
@@ -77,7 +77,7 @@ public sealed class OperatorSession : AggregateRoot<Guid>, IAuditableEntity, IMu
             SessionKey = Clip(sessionKey.Trim(), SessionKeyMaxLength),
             Methods = Clip(amr.Length == 0 ? "pwd" : amr, MethodsMaxLength),
             Provider = Clip(string.IsNullOrWhiteSpace(provider) ? "local" : provider.Trim().ToLowerInvariant(), ProviderMaxLength),
-            MultiFactorSatisfied = methods.Any(m => m is "mfa" or "external"),
+            MultiFactorSatisfied = methods.Contains("mfa"),
             StartedAtUtc = at.ToUniversalTime(),
         };
     }

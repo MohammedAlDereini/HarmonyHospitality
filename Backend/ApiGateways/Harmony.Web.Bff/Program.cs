@@ -258,7 +258,9 @@ if (bffSettings.ServeStaticFiles)
         {
             PageLanguage.Remember(context, wanted.ToString());
             var rest = QueryString.Create(context.Request.Query.Where(q => q.Key != PageLanguage.Query).SelectMany(q => q.Value.Select(v => new KeyValuePair<string, string?>(q.Key, v))));
-            context.Response.Redirect(path + rest);
+
+            // The same address, never another site: a request for "//evil.example?lang=ar" comes home instead.
+            context.Response.Redirect((IsLocalPath(path.Value) ? path.ToString() : "/") + rest);
             return Task.CompletedTask;
         }
 
@@ -518,11 +520,19 @@ static ConfigurationOptions RedisConnection(IConfiguration configuration)
     return options;
 }
 
-// A path like "/reservations" is welcome; "//evil.example", "https://evil.example" and friends fall back to home.
-static string LocalPathOnly(string? returnUrl)
-    => !string.IsNullOrEmpty(returnUrl) && returnUrl.StartsWith('/') && !returnUrl.StartsWith("//", StringComparison.Ordinal) && !returnUrl.Contains(':')
-        ? returnUrl
-        : "/";
+// A path like "/reservations" is welcome; "//evil.example", "/\evil.example" (browsers read the backslash as a slash),
+// "https://evil.example" and friends fall back to home.
+static string LocalPathOnly(string? returnUrl) => IsLocalPath(returnUrl) ? returnUrl! : "/";
+
+// ASP.NET's own IsLocalUrl rule, stricter: one leading slash, no second slash or backslash after it, no backslash or
+// scheme colon anywhere, no control characters.
+static bool IsLocalPath(string? path)
+    => !string.IsNullOrEmpty(path)
+       && path[0] == '/'
+       && (path.Length == 1 || (path[1] != '/' && path[1] != '\\'))
+       && !path.Contains('\\')
+       && !path.Contains(':')
+       && !path.Any(char.IsControl);
 
 static void ConfigureAuthentication(WebApplicationBuilder builder)
 {

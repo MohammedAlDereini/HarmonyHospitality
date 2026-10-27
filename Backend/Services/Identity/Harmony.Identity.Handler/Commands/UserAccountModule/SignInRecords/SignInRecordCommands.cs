@@ -59,10 +59,15 @@ public class ConfirmWithCompanyCommand : BaseCommandRequest<CallResponse>
 
     /// <summary>When the company signed them in (auth_time): within the confirmation's lifetime, or it is not fresh.</summary>
     public DateTimeOffset? AuthenticatedAt { get; set; }
+
+    /// <summary>When the confirmation began here: a company sign-in from before it is an old session, not a fresh proof.</summary>
+    public DateTimeOffset? StartedAt { get; set; }
 }
 
 public class ConfirmWithCompanyCommandHandler : IRequestHandler<ConfirmWithCompanyCommand, CallResponse>
 {
+    private static readonly TimeSpan ClockLeeway = TimeSpan.FromMinutes(1);
+
     private readonly IFederatedAuthorityRepository authorities;
     private readonly IExternalIdentityLinkRepository links;
     private readonly IUserAccountRepository userAccounts;
@@ -105,10 +110,14 @@ public class ConfirmWithCompanyCommandHandler : IRequestHandler<ConfirmWithCompa
             ? (command.HostedDomain is { Length: > 0 } hd && FederatedAuthority.IsDomainName(hd) ? await this.authorities.ListingAsync(FederatedAuthority.DomainName(hd), cancellationToken) : null)
             : await this.authorities.FindByIssuerAsync(AuthorityScheme.Microsoft, command.Issuer, cancellationToken);
 
-        // The company identity must be the one linked to this very person, signed in just now.
+        // The company identity must be the one linked to this very person, signed in just now: after this confirmation
+        // began (a minute's leeway for the two clocks), and within the confirmation's lifetime.
         var link = login is null ? null : await this.links.FindAsync(login.Id, command.Subject, cancellationToken);
         var now = this.clock.GetUtcNow();
-        var fresh = command.AuthenticatedAt is { } at && now - at < Domain.Entities.Aggregates.StepUpModule.StepUpAuthorization.Lifetime;
+        var fresh = command.AuthenticatedAt is { } at
+            && command.StartedAt is { } started
+            && at >= started - ClockLeeway
+            && now - at < Domain.Entities.Aggregates.StepUpModule.StepUpAuthorization.Lifetime;
         if (login is null || link is null || !link.IsOpen || link.UserAccountId != user.Id || login.TenantId != user.TenantId || !fresh)
         {
             this.logger.LogInformation("Company confirmation refused for account {UserId} (link {Linked}, fresh {Fresh}).", user.Id, link?.IsOpen == true && link.UserAccountId == user.Id, fresh);

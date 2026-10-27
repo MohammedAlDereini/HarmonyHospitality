@@ -57,7 +57,7 @@ public class RecordSignInCommandHandler : IRequestHandler<RecordSignInCommand, C
         // The sign-in's own record (design 3.4), once per Duende session: a sign-in that reached us twice opens one row.
         if (!string.IsNullOrWhiteSpace(command.SessionId) && await this.sessions.OpenByKeyAsync(command.SessionId, cancellationToken) is null)
         {
-            var (methods, provider) = HowOf(command.TrailAction, command.Detail);
+            var (methods, provider) = HowOf(command.TrailAction, command.Detail, command.CompanyTwoStep);
             await this.sessions.AddAsync(OperatorSession.Start(user.TenantId, user.Id, command.SessionId, methods, provider, row.OccurredAtUtc), cancellationToken);
         }
 
@@ -100,11 +100,11 @@ public class RecordSignInCommandHandler : IRequestHandler<RecordSignInCommand, C
     }
 
     /// <summary>How the sign-in was made, as the token's amr says it, from the trail action the page recorded.</summary>
-    private static (string[] Methods, string Provider) HowOf(string trailAction, string? detail) => trailAction switch
+    private static (string[] Methods, string Provider) HowOf(string trailAction, string? detail, bool companyTwoStep) => trailAction switch
     {
         SecurityAuditActions.SignInPasskey => (["swk", "mfa"], "local"),
         SecurityAuditActions.SignInPasswordOnly => (["pwd"], "local"),
-        SecurityAuditActions.SignInCompany => (["external"], (detail ?? "company").ToLowerInvariant()),
+        SecurityAuditActions.SignInCompany => (companyTwoStep ? ["external", "mfa"] : ["external"], (detail ?? "company").ToLowerInvariant()),
         _ => (["mfa"], "local"),
     };
 }

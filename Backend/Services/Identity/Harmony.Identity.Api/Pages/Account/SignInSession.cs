@@ -48,10 +48,11 @@ internal static class SignInSession
 
     /// <summary>
     /// The same, for a person the company proved (stage A): Duende's "external" method and the provider as the session's
-    /// identity provider, so the token says the company signed them in ("idp": microsoft or google).
+    /// identity provider, so the token says the company signed them in ("idp": microsoft or google). "mfa" joins only when
+    /// the company itself said its two-step happened.
     /// </summary>
-    public static Task<SignedIn> SignInWithCompanyAsync(HttpContext http, User user, string identityProvider)
-        => SignInCoreAsync(http, user, identityProvider, [CompanyMethod]);
+    public static Task<SignedIn> SignInWithCompanyAsync(HttpContext http, User user, string identityProvider, bool companyTwoStep)
+        => SignInCoreAsync(http, user, identityProvider, companyTwoStep ? [CompanyMethod, "mfa"] : [CompanyMethod]);
 
     private static async Task<SignedIn> SignInCoreAsync(HttpContext http, User user, string? identityProvider, string[] methods)
     {

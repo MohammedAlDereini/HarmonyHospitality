@@ -97,11 +97,9 @@ public static class CompanyLoginRegistration
         options.Scope.Add("email");
         options.CallbackPath = callbackPath;
 
-        // The claims as the provider wrote them (oid, tid, hd, email_verified), nothing renamed; no tokens kept.
+        // The claims as the provider wrote them (oid, tid, hd, email_verified, xms_edov, amr, auth_time), nothing renamed;
+        // no tokens kept.
         options.MapInboundClaims = false;
-
-        // The handler drops iat by default; "confirm it is you" reads it (with auth_time) to know the sign-in is fresh.
-        options.ClaimActions.Remove("iat");
         options.GetClaimsFromUserInfoEndpoint = false;
         options.SaveTokens = false;
         options.DisableTelemetry = true;

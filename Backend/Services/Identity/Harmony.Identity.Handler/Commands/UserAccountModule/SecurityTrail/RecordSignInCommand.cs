@@ -16,4 +16,7 @@ public class RecordSignInCommand : BaseCommandRequest<CallResponse>
 
     /// <summary>One short fact for the trail line: which passkey signed in. Null for the other methods.</summary>
     public string? Detail { get; init; }
+
+    /// <summary>A company sign-in whose company said its own two-step happened (Microsoft's amr named "mfa").</summary>
+    public bool CompanyTwoStep { get; init; }
 }

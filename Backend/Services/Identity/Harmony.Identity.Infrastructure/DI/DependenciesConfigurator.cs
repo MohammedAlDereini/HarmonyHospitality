@@ -489,6 +489,12 @@ public static class DependenciesConfigurator
             options.Authentication.CookieLifetime = IdentityServerResources.RefreshIdleLifetime;
             options.Authentication.CookieSlidingExpiration = true;
 
+            // The BFF's refreshes are the sign of a person still at work: each one extends the server-side session, so a
+            // busy person's session (their device row, their sign-in record) is not ended at minute 60. When it does
+            // expire, idle, the BFF is told at once through back-channel logout (Duende: "Inactivity timeout").
+            options.Authentication.CoordinateClientLifetimesWithUserSession = true;
+            options.ServerSideSessions.ExpiredSessionsTriggerBackchannelLogout = true;
+
             // Lax: the cookie goes with a normal sign-in redirect, never with a POST, image or frame from another site.
             // Duende's default (None) exists only for the check-session iframe; the BFF does not use it, so it is off.
             options.Authentication.CookieSameSiteMode = SameSiteMode.Lax;

@@ -7,12 +7,22 @@ export const signedInPath = `/${signedInRoute}`;
 /** Where a person lands after signing out; outside the signed-in frame, so nothing bounces them to sign-in. */
 export const signedOutRoute = 'signed-out';
 
+/** A control character: never part of a path this app writes. */
+const isControl = (character: string): boolean => character < ' ' || character === '\u007f';
+
 /**
- * Mirrors the BFF's own rule: "/reservations" is welcome; "//evil.example" and "https://evil.example" fall back to
- * home. Only a path of this app ever rides along as a return path (rule 15, sign-in return paths).
+ * Mirrors the BFF's own rule: "/reservations" is welcome; "//evil.example", "/\evil.example" (browsers read the
+ * backslash as a slash) and "https://evil.example" fall back to home. Only a path of this app ever rides along as a
+ * return path (rule 15, sign-in return paths).
  */
 export const localPathOnly = (path: string): string =>
-  path.startsWith('/') && !path.startsWith('//') && !path.includes(':') ? path : '/';
+  path.startsWith('/') &&
+  !path.startsWith('//') &&
+  !path.includes('\\') &&
+  !path.includes(':') &&
+  !Array.from(path).some(isControl)
+    ? path
+    : '/';
 
 /** The sign-in door with its return path, built with URLSearchParams, never string-joined (rule 15). */
 export const signInUrl = (returnUrl: string): string =>

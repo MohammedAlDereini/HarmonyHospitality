@@ -78,10 +78,9 @@ public sealed class CompanySignInModel : PageModel
                 Subject = subject,
                 Email = email,
 
-                // Microsoft gives a multi-tenant app an e-mail only when the company verified the domain; Google says so itself.
-                EmailVerified = scheme == AuthorityScheme.Microsoft
-                    ? !string.IsNullOrEmpty(email)
-                    : string.Equals(person.FindFirst("email_verified")?.Value, "true", StringComparison.OrdinalIgnoreCase),
+                // Each provider says it itself: Microsoft's xms_edov (the e-mail's domain is verified by the company, an
+                // optional claim set on Harmony's app), Google's email_verified. A missing claim is "not verified".
+                EmailVerified = !string.IsNullOrEmpty(email) && IsTrue(person.FindFirst(scheme == AuthorityScheme.Microsoft ? "xms_edov" : "email_verified")?.Value),
                 HostedDomain = person.FindFirst("hd")?.Value,
             },
             this.HttpContext.RequestAborted);
@@ -98,12 +97,17 @@ public sealed class CompanySignInModel : PageModel
             return this.Back(returnUrl!, "company-platform-only");
         }
 
-        var signedIn = await SignInSession.SignInWithCompanyAsync(this.HttpContext, account, schemeName!);
+        // Two-step counts only when the company says it happened: Microsoft's amr (an optional claim) names "mfa". Google
+        // says nothing about it, so a Google sign-in is never recorded as two-step.
+        var companyTwoStep = scheme == AuthorityScheme.Microsoft && person.FindAll("amr").Any(c => c.Value == "mfa");
+        var signedIn = await SignInSession.SignInWithCompanyAsync(this.HttpContext, account, schemeName!, companyTwoStep);
         await this.mediator.Send(
-            new RecordSignInCommand { UserId = account.Id, TrailAction = SecurityAuditActions.SignInCompany, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId, Detail = scheme.Value.ToString() },
+            new RecordSignInCommand { UserId = account.Id, TrailAction = SecurityAuditActions.SignInCompany, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId, Detail = scheme.Value.ToString(), CompanyTwoStep = companyTwoStep },
             this.HttpContext.RequestAborted);
         return this.Redirect(returnUrl!);
     }
+
+    private static bool IsTrue(string? value) => string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
 
     private static string NoticeOf(string? refusal) => refusal switch
     {

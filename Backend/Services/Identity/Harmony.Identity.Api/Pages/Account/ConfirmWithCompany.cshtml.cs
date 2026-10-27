@@ -31,6 +31,9 @@ public sealed class ConfirmWithCompanyModel : PageModel
     /// <summary>Where to go back to (a web app address), kept the same way.</summary>
     public const string BackItem = "confirm-back";
 
+    /// <summary>When the confirmation began (Unix seconds), kept the same way: the company sign-in must come after it.</summary>
+    public const string StartedItem = "confirm-started";
+
     private readonly IUserSession userSession;
     private readonly IMediator mediator;
     private readonly IOptions<WebBffSettings> web;
@@ -81,6 +84,7 @@ public sealed class ConfirmWithCompanyModel : PageModel
         properties.Items[CompanyLoginSchemes.DomainHintItem] = route.Route.Domain;
         properties.Items[PersonItem] = userId.ToString("D");
         properties.Items[BackItem] = this.ReturnUrl;
+        properties.Items[StartedItem] = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(System.Globalization.CultureInfo.InvariantCulture);
         return this.Challenge(properties, route.Route.AuthenticationScheme);
     }
 
@@ -130,9 +134,11 @@ public sealed class CompanyConfirmedModel : PageModel
             return this.Page();
         }
 
-        // auth_time when the company sends it; otherwise iat: the token answers this very request (its nonce), so it is fresh.
-        var at = claims.FindFirst("auth_time")?.Value ?? claims.FindFirst("iat")?.Value;
-        var authTime = long.TryParse(at, out var seconds) ? DateTimeOffset.FromUnixTimeSeconds(seconds) : (DateTimeOffset?)null;
+        // auth_time only: when the person typed their credentials at the company. iat says only when the token was made,
+        // and a token can be made from an open company session without a password (a removed prompt=login). Microsoft
+        // sends auth_time once it is an optional claim on Harmony's app; Google sends it because max_age is asked.
+        var authTime = Seconds(claims.FindFirst("auth_time")?.Value);
+        var started = Seconds(Item(external.Properties, ConfirmWithCompanyModel.StartedItem));
         var result = await this.mediator.Send(
             new ConfirmWithCompanyCommand
             {
@@ -142,6 +148,7 @@ public sealed class CompanyConfirmedModel : PageModel
                 Subject = claims.FindFirst(scheme == AuthorityScheme.Microsoft ? "oid" : "sub")?.Value ?? string.Empty,
                 HostedDomain = claims.FindFirst("hd")?.Value,
                 AuthenticatedAt = authTime,
+                StartedAt = started,
             },
             this.HttpContext.RequestAborted);
 
@@ -156,4 +163,7 @@ public sealed class CompanyConfirmedModel : PageModel
 
     private static string? Item(AuthenticationProperties? properties, string key)
         => properties is not null && properties.Items.TryGetValue(key, out var value) && !string.IsNullOrEmpty(value) ? value : null;
+
+    private static DateTimeOffset? Seconds(string? value)
+        => long.TryParse(value, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var seconds) ? DateTimeOffset.FromUnixTimeSeconds(seconds) : null;
 }

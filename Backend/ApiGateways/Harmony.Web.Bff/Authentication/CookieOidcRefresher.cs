@@ -82,7 +82,8 @@ internal sealed class CookieOidcRefresher
         var first = await locks.AcquireLockAsync(lockKey, TimeSpan.FromSeconds(30), privateCache: false);
         if (!first)
         {
-            for (var wait = 0; wait < 20 && !await locks.AcquireLockAsync(lockKey, TimeSpan.FromSeconds(30), privateCache: false); wait++)
+            var taken = false;
+            for (var wait = 0; wait < 20 && !(taken = await locks.AcquireLockAsync(lockKey, TimeSpan.FromSeconds(30), privateCache: false)); wait++)
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(250));
             }
@@ -90,7 +91,13 @@ internal sealed class CookieOidcRefresher
             // The winner refreshed while we waited: this request rides on with what the WINNER stored, never
             // its own stale copy.
             _ = await this.AdoptStoredAsync(context);
-            _ = await locks.UnlockAsync(lockKey, privateCache: false);
+
+            // Only a lock this request holds is released: a waiter that gave up never frees the winner's lock.
+            if (taken)
+            {
+                _ = await locks.UnlockAsync(lockKey, privateCache: false);
+            }
+
             return;
         }
 

@@ -140,8 +140,12 @@ describe('SessionStore', () => {
   it('sign-in is a top-level navigation carrying only a local return path', () => {
     store.signIn('/p/GRD/front-office?tab=arrivals');
     store.signIn('https://evil.example/');
+    store.signIn('//evil.example');
+    store.signIn('/\\evil.example');
     expect(navigation.went).toEqual([
       '/bff/login?returnUrl=%2Fp%2FGRD%2Ffront-office%3Ftab%3Darrivals',
+      '/bff/login?returnUrl=%2F',
+      '/bff/login?returnUrl=%2F',
       '/bff/login?returnUrl=%2F',
     ]);
   });

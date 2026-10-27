@@ -12,7 +12,7 @@ The user said "do all this in one go" for stages B to F. These decisions are tak
   - It ends on sign-out, on signing out one device, on "sign out everywhere" and on any security-version bump.
   - A job closes rows whose Duende session has gone, after an idle timeout or expiry.
   - Rows are kept as long as the security trail (12 months), then the retention job removes them.
-  - A company sign-in counts as two-step done, because we trust the company's own two-step.
+  - A company sign-in counts as two-step done only when the company says so (Microsoft's amr names mfa); Google never says it. Changed on 27 Oct by the login review (docs/security/login-deep-review-2026-10-27.md, M3).
 - **B, confirm it is you:** StepUpAuthorizations replaces the 5-minute Redis mark.
   - The expiry is set once and never extended.
   - Company people confirm by going back to Microsoft or Google with a forced sign-in (prompt=login, max_age=0).
