@@ -13,6 +13,7 @@ import {
   PrivilegeLevel,
   Role,
   SecurityEvent,
+  SessionRecord,
   UserAccount,
 } from '@harmony/administration/domain';
 import { AccessStore } from '@harmony/platform/access';
@@ -36,6 +37,7 @@ const rana: UserAccount = {
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',
+  isDirectoryManaged: false,
   roleIds: ['r1'],
 };
 const frontDesk: Role = {
@@ -121,6 +123,15 @@ const viaCompany: AccountSignIn = {
   links: [microsoftLink],
 };
 
+const signedIn: SessionRecord = {
+  startedAtUtc: '2026-10-24T08:00:00Z',
+  endedAtUtc: null,
+  endReason: null,
+  methods: 'external,mfa',
+  provider: 'Microsoft',
+  multiFactorSatisfied: true,
+};
+
 class FakeStore {
   readonly person = signal<UserAccount | null>(rana);
   readonly signInState = signal<AccountSignIn | null>(viaCompany);
@@ -137,6 +148,7 @@ class FakeStore {
   readonly passkeysProblem = signal<string | null>(null);
   readonly eventRows = signal<readonly SecurityEvent[]>([created]);
   readonly eventsProblem = signal<string | null>(null);
+  readonly sessionRows = signal<readonly SessionRecord[]>([signedIn]);
   opened: string[] = [];
   reloads = 0;
   calls: string[] = [];
@@ -252,6 +264,19 @@ describe('PersonPage', () => {
     expect(text('.drow .s-nm b')).toBe('Chrome on Windows');
     expect(text('.krow .s-nm b')).toBe('Work laptop');
     expect(text('.erow .s-nm b')).toBe('account.created');
+    expect(text('[data-session] .s-nm b')).toBe('Microsoft');
+    expect(text('[data-session] .obj b')).toBe('Yes');
+    expect(text('[data-session] .s-when:last-child')).toBe('Still signed in');
+    expect(page.querySelector('[data-directory]')).toBeNull();
+  });
+
+  it('a person from the company directory: the note says so; roles and state actions are not offered', async () => {
+    store.person.set({ ...rana, isDirectoryManaged: true });
+    await settle();
+    expect(page.querySelector('[data-directory]')).not.toBeNull();
+    expect(page.querySelector('hr-role-assignment')).toBeNull();
+    expect(page.querySelector('[data-act="assign-role"]')).toBeNull();
+    expect(page.querySelector('[data-act="end-assignment"]')).toBeNull();
   });
 
   it('roles: Save is off until something changes; then the whole set goes with a key; a refusal is worded', async () => {

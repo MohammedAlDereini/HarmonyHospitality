@@ -23,6 +23,7 @@ import {
 import { MyProperties, PropertySummary, propertyName } from '@harmony/platform/context';
 import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
+import { IdentityConfirmation } from '@harmony/platform/session';
 
 /** Assign: a role at one hotel or group until ended. Grant: the same role lent for hours, with a reason. */
 export type AccessMode = 'assign' | 'grant';
@@ -102,6 +103,7 @@ export class HotelAccessEditor {
   protected readonly roles = inject(RolesStore);
   protected readonly hotels = inject(MyProperties);
   protected readonly person = inject(PersonStore);
+  private readonly confirmation = inject(IdentityConfirmation);
   private readonly roleBox = viewChild.required<ElementRef<HTMLSelectElement>>('roleBox');
   private readonly locale = $localize.locale ?? 'en';
   private readonly model = signal<Draft>(blank);
@@ -157,7 +159,8 @@ export class HotelAccessEditor {
       this.problem.set(null);
       const draft = field().value();
       const scope = scopeOf(draft.where);
-      // The key is this press's own: a retry inside the call reuses it, a new press is a new intent.
+      // The key is this press's own: a retry inside the call reuses it, a new press is a new intent; after
+      // "confirm it is you" the change goes once more with a new key.
       const result = this.granting()
         ? await this.person.grantAccess(
             this.user(),
@@ -167,12 +170,14 @@ export class HotelAccessEditor {
             draft.reason.trim(),
             newIntentKey(),
           )
-        : await this.person.assignRole(
-            this.user(),
-            draft.roleId,
-            scope,
-            draft.days === null ? null : hoursFromNow(draft.days * HOURS_PER_DAY),
-            newIntentKey(),
+        : await this.confirmation.run((intent) =>
+            this.person.assignRole(
+              this.user(),
+              draft.roleId,
+              scope,
+              draft.days === null ? null : hoursFromNow(draft.days * HOURS_PER_DAY),
+              intent,
+            ),
           );
       return this.settle(result, field);
     });

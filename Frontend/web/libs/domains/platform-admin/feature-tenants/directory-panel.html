@@ -1,0 +1,81 @@
+<section class="part" aria-labelledby="directory-heading">
+  <h2 id="directory-heading" i18n="@@platform-admin.directory.title">Company directory</h2>
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
+  @if (store.problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  } @else if (store.directory(); as directory) {
+    <div class="srow drow" data-directory>
+      <div class="obj" [attr.data-s]="directory.isEnabled ? 'ok' : null">
+        @if (directory.isEnabled) {
+          <b i18n="@@platform-admin.directory.on">On</b>
+        } @else {
+          <b i18n="@@platform-admin.directory.off">Off</b>
+        }
+        <span i18n="@@platform-admin.directory.state">Directory</span>
+      </div>
+      <div class="obj">
+        <b class="num">{{ directory.people }}</b>
+        <span i18n="@@platform-admin.directory.people">People</span>
+      </div>
+      <div class="obj">
+        <b class="num">{{ directory.groups.length }}</b>
+        <span i18n="@@platform-admin.directory.groups">Groups</span>
+      </div>
+      <div class="row-act" *hrIfAllowed="manageTenants">
+        <button
+          type="button"
+          class="btn"
+          data-act="remove-directory"
+          (click)="remove()"
+          [disabled]="busy()"
+          i18n="@@platform-admin.directory.remove"
+        >
+          Remove
+        </button>
+      </div>
+    </div>
+    @if (directory.groups.length > 0) {
+      <div class="rows" role="list">
+        @for (group of directory.groups; track group.id) {
+          <div class="srow grow" role="listitem" data-group>
+            <div class="s-who">
+              <div class="s-nm">
+                <b
+                  ><bdi>{{ group.displayName }}</bdi></b
+                >
+                @if (group.roleId === null) {
+                  <span i18n="@@platform-admin.directory.group.nothing">Gives nothing</span>
+                } @else {
+                  <span i18n="@@platform-admin.directory.group.mapped">Gives a role</span>
+                }
+              </div>
+            </div>
+            <div class="obj">
+              <b class="num">{{ group.members }}</b>
+              <span i18n="@@platform-admin.directory.group.members">Members</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <p class="line" i18n="@@platform-admin.directory.none">
+      None: the customer's administrator opens it in Harmony when the company wants its directory to
+      add and remove staff.
+    </p>
+  }
+</section>
+<hr-confirm-dialog
+  #removeDialog
+  i18n-heading="@@platform-admin.directory.remove.heading"
+  heading="Remove the company directory?"
+  i18n-message="@@platform-admin.directory.remove.ask"
+  message="The directory can no longer add or change people. Its people stay, with the roles they hold now, and the customer's administrators manage them again. The groups go."
+  i18n-go="@@platform-admin.directory.remove.go"
+  go="Remove"
+  i18n-stay="@@platform-admin.directory.remove.stay"
+  stay="Keep it"
+  tone="stop"
+/>

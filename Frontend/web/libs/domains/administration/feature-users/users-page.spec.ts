@@ -29,6 +29,7 @@ const ahmad: UserAccount = {
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',
+  isDirectoryManaged: false,
   roleIds: ['r1'],
 };
 const lina: UserAccount = {
@@ -188,6 +189,23 @@ describe('UsersPage', () => {
     expect(editor?.querySelector('button[type="submit"]')?.textContent.trim()).toBe(
       'Terminate account',
     );
+  });
+
+  it('a person from the company directory offers no state action: the directory changes them', async () => {
+    store.rows.set([{ ...ahmad, isDirectoryManaged: true }, lina]);
+    await render();
+    expect(text('tr.urow:first-child .tlink')).toEqual([]);
+    expect(text('tr.urow:last-child .tlink')).toEqual(['Reinstate', 'Terminate']);
+  });
+
+  it('the head links lead to company login, the directory, invitations and the rules', () => {
+    const links = [...page.querySelectorAll<HTMLAnchorElement>('.head-links a')];
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/company-login',
+      '/directory',
+      '/invitations',
+      '/security-rules',
+    ]);
   });
 
   it('without ManageUsers: no action buttons at all', async () => {

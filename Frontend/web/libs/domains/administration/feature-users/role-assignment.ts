@@ -12,7 +12,7 @@ import { PersonStore, RolesStore } from '@harmony/administration/data-access';
 import { Role, UserAccount, roleName } from '@harmony/administration/domain';
 import { AccessStore, Permission } from '@harmony/platform/access';
 import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
-import { newIntentKey } from '@harmony/platform/http';
+import { IdentityConfirmation } from '@harmony/platform/session';
 
 /** Identity refuses an account with no role at all (ModelValidationErrorCodes 10302); said here before the call. */
 const NONE_CHOSEN = '10302';
@@ -35,6 +35,7 @@ export class RoleAssignment {
   protected readonly roles = inject(RolesStore);
   private readonly person = inject(PersonStore);
   private readonly access = inject(AccessStore);
+  private readonly confirmation = inject(IdentityConfirmation);
   private readonly locale = $localize.locale ?? 'en';
 
   protected readonly mayAssign = computed(() => this.access.can(Permission.AssignUsersToRole));
@@ -80,7 +81,9 @@ export class RoleAssignment {
     }
     this.problem.set(null);
     this.saving.set(true);
-    const result = await this.person.updateRoles(this.user(), roleIds, newIntentKey());
+    const result = await this.confirmation.run((intent) =>
+      this.person.updateRoles(this.user(), roleIds, intent),
+    );
     this.saving.set(false);
     if (result.kind === 'ok') {
       this.done.emit();

@@ -23,6 +23,7 @@ const sami: UserAccount = {
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',
+  isDirectoryManaged: false,
   roleIds: ['r1'],
 };
 

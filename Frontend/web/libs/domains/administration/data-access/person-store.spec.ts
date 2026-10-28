@@ -5,6 +5,7 @@ import {
   AccountState,
   CompanyLink,
   Device,
+  SessionRecord,
   UserAccount,
 } from '@harmony/administration/domain';
 import { API_RETRY_DELAYS, newIntentKey, provideHarmonyHttp } from '@harmony/platform/http';
@@ -20,6 +21,7 @@ import {
   myGroupsPath,
   passkeysPath,
   passwordSignInPath,
+  sessionsPath,
   signInPath,
   signOutDevicePath,
   updateRolesPath,
@@ -52,6 +54,7 @@ const rana: UserAccount = {
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',
+  isDirectoryManaged: false,
   roleIds: ['r1'],
 };
 const laptop: Device = {
@@ -61,6 +64,14 @@ const laptop: Device = {
   lastSeenUtc: '2026-10-24T09:00:00Z',
   lastAddress: '10.0.0.5',
   signedIn: true,
+};
+const webSession: SessionRecord = {
+  startedAtUtc: '2026-10-24T08:00:00Z',
+  endedAtUtc: null,
+  endReason: null,
+  methods: 'pwd,otp',
+  provider: 'local',
+  multiFactorSatisfied: true,
 };
 
 describe('PersonStore', () => {
@@ -76,6 +87,7 @@ describe('PersonStore', () => {
     account.flush({ data: rana });
     http.expectOne(devicesPath('u5')).flush({ data: [laptop] });
     http.expectOne(passkeysPath('u5')).flush({ data: [] });
+    http.expectOne(sessionsPath('u5')).flush({ data: [webSession] });
     http.expectOne(eventsPath('u5')).flush({ data: [] });
     http.expectOne(accessPath('u5')).flush({ data: { id: 'u5', assignments: [], grants: [] } });
     http.expectOne(signInPath('u5')).flush({ data: viaCompany });
@@ -98,7 +110,7 @@ describe('PersonStore', () => {
     http.verify();
   });
 
-  it('reads nothing until a person is named; then the account, devices, passkeys, events and access, all GET', async () => {
+  it('reads nothing until a person is named; then the account, devices, passkeys, sign-ins, events and access, all GET', async () => {
     await settle();
     http.expectNone(accountPath('u5'));
     store.open('u5');
@@ -110,6 +122,7 @@ describe('PersonStore', () => {
     expect(store.person()).toEqual(rana);
     expect(store.deviceRows()).toEqual([laptop]);
     expect(store.passkeyRows()).toEqual([]);
+    expect(store.sessionRows()).toEqual([webSession]);
     expect(store.assignmentRows()).toEqual([]);
     expect(store.problem()).toBeNull();
     expect(store.accessProblem()).toBeNull();
@@ -140,6 +153,7 @@ describe('PersonStore', () => {
     await settle();
     http.expectOne(signInPath('u5')).flush({ data: viaCompany });
     http.expectOne(devicesPath('u5')).flush({ data: [] });
+    http.expectOne(sessionsPath('u5')).flush({ data: [] });
     http.expectOne(eventsPath('u5')).flush({ data: [] });
   });
 

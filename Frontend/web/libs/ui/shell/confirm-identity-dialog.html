@@ -1,0 +1,56 @@
+<dialog
+  #box
+  class="dlg"
+  aria-labelledby="confirm-identity-heading"
+  aria-describedby="confirm-identity-lead"
+  (close)="stay()"
+>
+  <h2 id="confirm-identity-heading" class="dlg-h" i18n="@@platform.session.confirm.title">
+    Confirm it is you
+  </h2>
+  @if (viaCompany()) {
+    <p id="confirm-identity-lead" class="dlg-m" i18n="@@platform.session.confirm.company">
+      This change needs you to confirm it is you. Your company signs you in, and confirming with it
+      is not on this screen yet: ask an administrator who signs in with a Harmony password.
+    </p>
+    <div class="dlg-a">
+      <button type="button" class="btn" (click)="stay()" i18n="@@platform.session.confirm.close">
+        Close
+      </button>
+    </div>
+  } @else {
+    <p id="confirm-identity-lead" class="dlg-m" i18n="@@platform.session.confirm.lead">
+      This change needs you to confirm it is you. Type your password; it counts for 5 minutes.
+    </p>
+    <form class="editor" (submit)="onSubmit($event)" novalidate>
+      <label for="confirm-identity-password" i18n="@@platform.session.confirm.password"
+        >Password</label
+      >
+      <input
+        #password
+        id="confirm-identity-password"
+        class="field"
+        type="password"
+        autocomplete="current-password"
+        [attr.aria-invalid]="problem() === null ? null : 'true'"
+        [attr.aria-describedby]="problem() === null ? null : 'confirm-identity-problem'"
+      />
+      @if (problem(); as text) {
+        <p id="confirm-identity-problem" class="field-error" role="alert">{{ text }}</p>
+      }
+      <div class="dlg-a">
+        <button type="button" class="btn" (click)="stay()" i18n="@@platform.session.confirm.cancel">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn solid"
+          [disabled]="busy()"
+          i18n="@@platform.session.confirm.go"
+        >
+          Confirm
+        </button>
+      </div>
+    </form>
+  }
+</dialog>

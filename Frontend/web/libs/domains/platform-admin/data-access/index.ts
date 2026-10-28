@@ -50,3 +50,8 @@ export {
   addCompanyLoginPath,
   tenantCompanyLoginsPath,
 } from './company-logins-store';
+export {
+  TenantDirectoryStore,
+  removeDirectoryPath,
+  tenantDirectoryPath,
+} from './tenant-directory-store';

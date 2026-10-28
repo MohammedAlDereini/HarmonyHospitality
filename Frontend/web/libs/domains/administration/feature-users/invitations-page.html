@@ -1,0 +1,95 @@
+<header class="page-head">
+  <div>
+    <h1 i18n="@@administration.invitations.title">Invitations</h1>
+    <p class="lead" i18n="@@administration.invitations.lead">
+      People who have not chosen their password yet. A link works for 24 hours.
+    </p>
+  </div>
+</header>
+@if (problem(); as text) {
+  <p class="empty" role="alert">{{ text }}</p>
+}
+@if (store.problem(); as text) {
+  <p class="empty" role="alert">
+    {{ text }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="store.reload()"
+      i18n="@@administration.invitations.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (store.loading() && store.rows().length === 0) {
+  <p class="empty" role="status" i18n="@@administration.invitations.loading">Loading…</p>
+} @else if (store.rows().length === 0) {
+  <p class="empty" i18n="@@administration.invitations.none">No invitation is waiting.</p>
+} @else {
+  <div class="rows" role="list">
+    @for (invitation of store.rows(); track invitation.id) {
+      <div class="srow irow" role="listitem" data-invitation>
+        <div class="s-who">
+          <div class="s-nm">
+            <b
+              ><bdi>{{ invitation.displayName }}</bdi></b
+            >
+            <span dir="ltr"
+              ><bdi>{{ invitation.email ?? '' }}</bdi></span
+            >
+          </div>
+        </div>
+        <div class="obj">
+          <b
+            ><bdi>{{ invitation.sentBy ?? '' }}</bdi></b
+          >
+          <span i18n="@@administration.invitations.sent-by">Sent by</span>
+        </div>
+        <div class="s-when">
+          <span class="num">{{ when(invitation.sentAtUtc) }}</span>
+          <small i18n="@@administration.invitations.sent">Sent</small>
+        </div>
+        <div class="obj" [attr.data-s]="invitation.isExpired ? 'warn' : null">
+          @if (invitation.isExpired) {
+            <b i18n="@@administration.invitations.expired">Expired</b>
+          } @else {
+            <b class="num">{{ when(invitation.expiresAtUtc) }}</b>
+          }
+          <span i18n="@@administration.invitations.link">Link</span>
+        </div>
+        <div class="row-act" *hrIfAllowed="manageUsers">
+          <button
+            type="button"
+            class="btn"
+            data-act="resend"
+            (click)="resend(invitation)"
+            [disabled]="busy()"
+            i18n="@@administration.invitations.resend"
+          >
+            Send again
+          </button>
+          <button
+            type="button"
+            class="btn"
+            data-act="cancel"
+            (click)="cancel(invitation)"
+            [disabled]="busy()"
+            i18n="@@administration.invitations.cancel"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}
+<hr-confirm-dialog
+  #cancelDialog
+  i18n-heading="@@administration.invitations.cancel.heading"
+  heading="Cancel this invitation?"
+  i18n-message="@@administration.invitations.cancel.ask"
+  message="The link stops working. The account stays; you can send a new invitation later."
+  i18n-go="@@administration.invitations.cancel.go"
+  go="Cancel the invitation"
+  i18n-stay="@@administration.invitations.cancel.stay"
+  stay="Keep it"
+/>

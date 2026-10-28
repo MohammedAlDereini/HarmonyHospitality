@@ -18,6 +18,8 @@ export interface UserAccount {
   readonly twoStepExemptReason: string | null;
   readonly state: AccountState;
   readonly stateReason: string | null;
+  /** Stage E: the company directory owns this person; name, state and roles change only there. */
+  readonly isDirectoryManaged: boolean;
   /** As Identity sends it; shown in the property's zone. */
   readonly createdDate: string;
   /** The roles the account holds. */

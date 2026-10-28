@@ -116,6 +116,12 @@ describe('PropertyContext', () => {
     expect(riyadh.formatInstant(instant)).toBe('Oct 24, 2026, 6:30 PM');
   });
 
+  it('a time Identity sends without a zone (a DateTime column) is read as UTC, not as the device time', async () => {
+    const riyadh = await inside('/p/GRD');
+    expect(riyadh.formatInstant('2026-10-24T22:30:00.1234567')).toBe('Oct 25, 2026, 1:30 AM');
+    expect(riyadh.formatInstant('2026-10-24T22:30:00+00:00')).toBe('Oct 25, 2026, 1:30 AM');
+  });
+
   it('a property switch resets the scope once; moving inside the same property does not', async () => {
     const context = await inside('/p/GRD');
     await router.navigateByUrl('/p/GRD/arrivals');

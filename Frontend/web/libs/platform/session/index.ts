@@ -9,3 +9,8 @@ export { sessionReady } from './session-ready.guard';
 export { sessionRoutes } from './session-routes';
 export { SignedInPage } from './signed-in-page';
 export { SignedOutPage } from './signed-out-page';
+export {
+  CONFIRMATION_REQUIRED,
+  IdentityConfirmation,
+  confirmIdentityPath,
+} from './identity-confirmation';

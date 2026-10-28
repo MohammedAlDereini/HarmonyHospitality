@@ -102,17 +102,18 @@ export class UsersPage {
     return toneOf(user);
   }
 
+  /** The company directory's people change state only there (stage E): no state action here. */
   protected canSuspend(user: UserAccount): boolean {
-    return user.state === AccountState.active;
+    return user.state === AccountState.active && !user.isDirectoryManaged;
   }
 
   protected canReinstate(user: UserAccount): boolean {
-    return user.state === AccountState.suspended;
+    return user.state === AccountState.suspended && !user.isDirectoryManaged;
   }
 
   /** Termination is final: never offered twice. */
   protected canTerminate(user: UserAccount): boolean {
-    return user.state !== AccountState.terminated;
+    return user.state !== AccountState.terminated && !user.isDirectoryManaged;
   }
 
   /** The write whose form is open for this row, or null. */

@@ -18,13 +18,40 @@
       terminated one cannot.
     </p>
   </div>
-  <a
-    class="btn"
-    routerLink="company-login"
-    data-act="company-login"
-    i18n="@@administration.users.company-login"
-    >Company login</a
+  <nav
+    class="head-links"
+    i18n-aria-label="@@administration.users.more"
+    aria-label="Sign-in and security"
   >
+    <a
+      class="btn"
+      routerLink="company-login"
+      data-act="company-login"
+      i18n="@@administration.users.company-login"
+      >Company login</a
+    >
+    <a
+      class="btn"
+      routerLink="directory"
+      data-act="directory"
+      i18n="@@administration.users.directory"
+      >Company directory</a
+    >
+    <a
+      class="btn"
+      routerLink="invitations"
+      data-act="invitations"
+      i18n="@@administration.users.invitations"
+      >Invitations</a
+    >
+    <a
+      class="btn"
+      routerLink="security-rules"
+      data-act="security-rules"
+      i18n="@@administration.users.security-rules"
+      >Approvals and rules</a
+    >
+  </nav>
 </header>
 <form class="toolbar" (submit)="onSearch($event, search.value)">
   <div class="tf wide">

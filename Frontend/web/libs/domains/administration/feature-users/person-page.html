@@ -26,10 +26,18 @@
       <span i18n="@@administration.person.two-step">Two-step</span>
     </div>
   </div>
+  @if (person.isDirectoryManaged) {
+    <p class="line" data-directory i18n="@@administration.person.directory">
+      This person comes from your company directory: their name, state and roles change there,
+      through the directory's groups.
+    </p>
+  }
   @if (actionProblem(); as text) {
     <p class="empty" role="alert">{{ text }}</p>
   }
-  <hr-role-assignment [user]="person" (done)="store.reload()" />
+  @if (!person.isDirectoryManaged) {
+    <hr-role-assignment [user]="person" (done)="store.reload()" />
+  }
   <section class="part" aria-labelledby="two-step-heading">
     <h2 id="two-step-heading" i18n="@@administration.person.two-step.title">Two-step sign-in</h2>
     <p class="line">
@@ -355,7 +363,7 @@
               <span i18n="@@administration.person.hotel-roles.state">State</span>
             </div>
             <div class="row-act">
-              @if (assignment.isCurrent) {
+              @if (assignment.isCurrent && !person.isDirectoryManaged) {
                 <button
                   *hrIfAllowed="assignRoles"
                   type="button"
@@ -373,18 +381,20 @@
         }
       </div>
     }
-    <div class="acts" *hrIfAllowed="assignRoles">
-      <button
-        type="button"
-        class="btn"
-        data-act="assign-role"
-        (click)="openAssign()"
-        [attr.aria-expanded]="assigning()"
-        i18n="@@administration.person.hotel-roles.give"
-      >
-        Give a role at a hotel or group
-      </button>
-    </div>
+    @if (!person.isDirectoryManaged) {
+      <div class="acts" *hrIfAllowed="assignRoles">
+        <button
+          type="button"
+          class="btn"
+          data-act="assign-role"
+          (click)="openAssign()"
+          [attr.aria-expanded]="assigning()"
+          i18n="@@administration.person.hotel-roles.give"
+        >
+          Give a role at a hotel or group
+        </button>
+      </div>
+    }
     <hr-drawer
       #assignDrawer
       i18n-heading="@@administration.person.drawer.assign"
@@ -511,6 +521,49 @@
       i18n-stay="@@administration.person.grants.revoke.stay"
       stay="Keep it"
     />
+  </section>
+  <section class="part" aria-labelledby="sign-ins-heading">
+    <h2 id="sign-ins-heading">
+      <span i18n="@@administration.person.sign-ins">Sign-ins</span>&ngsp;<span class="num">{{
+        store.sessionRows().length
+      }}</span>
+    </h2>
+    @if (store.sessionRows().length === 0) {
+      <p class="line" i18n="@@administration.person.sign-ins.none">No sign-in recorded yet.</p>
+    } @else {
+      <div class="rows" role="list">
+        @for (record of store.sessionRows(); track record.startedAtUtc) {
+          <div class="srow nrow" role="listitem" data-session>
+            <div class="s-who">
+              <div class="s-nm">
+                <b dir="ltr">{{ record.provider }}</b>
+                <span dir="ltr">{{ record.methods }}</span>
+              </div>
+            </div>
+            <div class="s-when">
+              <span class="num">{{ when(record.startedAtUtc) }}</span>
+              <small i18n="@@administration.person.sign-ins.started">Started</small>
+            </div>
+            <div class="obj" [attr.data-s]="record.multiFactorSatisfied ? 'ok' : null">
+              @if (record.multiFactorSatisfied) {
+                <b i18n="@@administration.person.sign-ins.two-step-yes">Yes</b>
+              } @else {
+                <b i18n="@@administration.person.sign-ins.two-step-no">No</b>
+              }
+              <span i18n="@@administration.person.sign-ins.two-step">Two-step</span>
+            </div>
+            <div class="s-when">
+              @if (record.endedAtUtc; as ended) {
+                <span class="num">{{ when(ended) }}</span>
+                <small dir="ltr">{{ record.endReason ?? '' }}</small>
+              } @else {
+                <span i18n="@@administration.person.sign-ins.open">Still signed in</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
   </section>
   <section class="part" aria-labelledby="trail-heading">
     <h2 id="trail-heading">

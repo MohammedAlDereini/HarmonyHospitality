@@ -1,1 +1,6 @@
-/* The accounts as a table (ui/data); nothing of its own. */
+/* The accounts as a table (ui/data); the page head carries the links to the sign-in and security pages. */
+.head-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}

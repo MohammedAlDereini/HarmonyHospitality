@@ -39,3 +39,4 @@ export type {
 } from './reference';
 export type { CompanyProvider, TenantCompanyLogin } from './company-login';
 export { COMPANY_PROVIDERS } from './company-login';
+export type { TenantDirectory, TenantDirectoryGroup } from './directory';

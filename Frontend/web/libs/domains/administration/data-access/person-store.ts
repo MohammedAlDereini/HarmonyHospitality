@@ -11,6 +11,7 @@ import {
   HotelRoleAssignment,
   Passkey,
   SecurityEvent,
+  SessionRecord,
   UserAccount,
 } from '@harmony/administration/domain';
 import { messageOf } from '@harmony/platform/errors';
@@ -22,6 +23,8 @@ export const accountPath = (id: string): string => `/api/UserAccount/${id}`;
 export const devicesPath = (id: string): string => `${accountPath(id)}/devices`;
 export const passkeysPath = (id: string): string => `${accountPath(id)}/passkeys`;
 export const eventsPath = (id: string): string => `${accountPath(id)}/security-events`;
+/** Stage B: the person's latest sign-ins (the newest 50). */
+export const sessionsPath = (id: string): string => `${accountPath(id)}/sessions`;
 export const accessPath = (id: string): string => `${accountPath(id)}/access`;
 export const updateRolesPath = '/api/UserAccount/UpdateRoles';
 export const resetTwoFactorPath = '/api/UserAccount/ResetTwoFactor';
@@ -64,6 +67,10 @@ export class PersonStore {
     const id = this.id();
     return id === null ? undefined : { url: passkeysPath(id) };
   });
+  private readonly sessions = httpResource<Envelope<SessionRecord[]>>(() => {
+    const id = this.id();
+    return id === null ? undefined : { url: sessionsPath(id) };
+  });
   private readonly events = httpResource<Envelope<SecurityEvent[]>>(() => {
     const id = this.id();
     return id === null ? undefined : { url: eventsPath(id) };
@@ -94,6 +101,9 @@ export class PersonStore {
   readonly passkeyRows = computed<readonly Passkey[]>(() => this.passkeys.value()?.data ?? []);
   readonly passkeysProblem = computed(() => this.sentence(this.passkeys.error()));
   readonly eventRows = computed<readonly SecurityEvent[]>(() => this.events.value()?.data ?? []);
+  readonly sessionRows = computed<readonly SessionRecord[]>(
+    () => this.sessions.value()?.data ?? [],
+  );
   readonly eventsProblem = computed(() => this.sentence(this.events.error()));
   readonly assignmentRows = computed<readonly HotelRoleAssignment[]>(
     () => this.access.value()?.data?.assignments ?? [],
@@ -156,6 +166,7 @@ export class PersonStore {
       this.api.put(signOutDevicePath, { id: user.id, deviceId: device.id }, intent),
       () => {
         this.devices.reload();
+        this.sessions.reload();
         this.events.reload();
       },
     );
@@ -258,6 +269,7 @@ export class PersonStore {
     return this.write(this.api.put(endLinkPath, { id: user.id, linkId: link.id }, intent), () => {
       this.signIn.reload();
       this.devices.reload();
+      this.sessions.reload();
       this.events.reload();
     });
   }

@@ -5,6 +5,7 @@ import { CompanyLogin } from '@harmony/administration/domain';
 import { IfAllowed, Permission } from '@harmony/platform/access';
 import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
+import { IdentityConfirmation } from '@harmony/platform/session';
 import { ConfirmDialog, Toasts } from '@harmony/ui/overlays';
 
 /** A domain name has at most this many characters (FederatedAuthorityDomain.DomainMaxLength). */
@@ -35,6 +36,7 @@ interface DomainDraft {
 export class CompanyLoginPage {
   protected readonly store = inject(CompanyLoginStore);
   private readonly toasts = inject(Toasts);
+  private readonly confirmation = inject(IdentityConfirmation);
   private readonly onDialog = viewChild.required<ConfirmDialog>('onDialog');
 
   protected readonly manageUsers = Permission.ManageUsers;
@@ -101,7 +103,9 @@ export class CompanyLoginPage {
   }
 
   private async switchTo(login: CompanyLogin, on: boolean): Promise<void> {
-    const result = await this.run(this.store.switch(login, on, newIntentKey()));
+    const result = await this.run(
+      this.confirmation.run((intent) => this.store.switch(login, on, intent)),
+    );
     if (result.kind === 'ok') {
       this.toasts.show(
         on

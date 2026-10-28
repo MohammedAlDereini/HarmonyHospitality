@@ -1,0 +1,36 @@
+/* A customer's company directory: prototype rows and one action. Tokens only. */
+.part {
+  padding: var(--s3) var(--s6);
+  border-block-end: 1px solid var(--rule);
+}
+.part h2 {
+  margin: 0 0 var(--s2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.line {
+  margin: 0 0 var(--s2);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.part .rows {
+  margin: 0 calc(-1 * var(--s6));
+}
+.drow {
+  grid-template-columns: 160px 160px 160px minmax(120px, 1fr);
+}
+.grow {
+  grid-template-columns: minmax(200px, 1fr) 160px;
+}
+.row-act {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s2);
+  min-width: 0;
+}
+.field-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--stop);
+}

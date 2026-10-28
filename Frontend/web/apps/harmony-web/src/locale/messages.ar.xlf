@@ -4494,6 +4494,1182 @@
           <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="administration.approvals.kind.administrator-roles" datatype="html">
+        <source>An administrator role</source>
+        <target>دور مسؤول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/domain/security.ts</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.approvals.kind.administrator-assignment" datatype="html">
+        <source>An administrator role at a hotel</source>
+        <target>دور مسؤول في فندق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/domain/security.ts</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.approvals.kind.two-step-exemption" datatype="html">
+        <source>Two-step exception</source>
+        <target>استثناء من التحقق بخطوتين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/domain/security.ts</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.approvals.kind.merge" datatype="html">
+        <source>Merging two accounts</source>
+        <target>دمج حسابين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/domain/security.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.approvals.kind.company-login-off" datatype="html">
+        <source>Switching company sign-in off</source>
+        <target>إيقاف الدخول بحساب الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/domain/security.ts</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.approvals.kind.approvals-off" datatype="html">
+        <source>Switching approvals off</source>
+        <target>إيقاف الموافقات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/domain/security.ts</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.approvals.kind.directory-administrator" datatype="html">
+        <source>An administrator role for a directory group</source>
+        <target>دور مسؤول لمجموعة من الدليل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/domain/security.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.title" datatype="html">
+        <source>Company directory</source>
+        <target>دليل الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.lead" datatype="html">
+        <source> Your Microsoft Entra ID or Okta adds and removes your staff in Harmony (SCIM). You give each of its groups a role here; its members hold exactly that. </source>
+        <target>يضيف Microsoft Entra ID أو Okta لديك موظفيك ويزيلهم في Harmony (SCIM). تعطي كل مجموعة من مجموعاته دوراً هنا؛ ويحمل أعضاؤها هذا الدور بالضبط.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">5,10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.secret.title" datatype="html">
+        <source> Copy these now: Harmony shows the secret only this once </source>
+        <target>انسخها الآن: يعرض Harmony السر هذه المرة فقط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">16,19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.scim-url" datatype="html">
+        <source>Address (Tenant URL)</source>
+        <target>العنوان (Tenant URL)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">19,21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">119,121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.copy" datatype="html">
+        <source> Copy </source>
+        <target>نسخ</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">27,30</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">38,41</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">49,52</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">60,63</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">71,74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.token-url" datatype="html">
+        <source>Token address (OAuth)</source>
+        <target>عنوان الرمز (OAuth)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">30,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.client-id" datatype="html">
+        <source>Client id</source>
+        <target>معرّف العميل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">41,43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">123,125</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.secret" datatype="html">
+        <source>Client secret</source>
+        <target>سر العميل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">52,54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.secret-token" datatype="html">
+        <source>Secret token (Okta, or Entra without OAuth)</source>
+        <target>الرمز السري (Okta، أو Entra بدون OAuth)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">63,65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.copied" datatype="html">
+        <source> I copied them </source>
+        <target>نسختها</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">83,86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.try-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">96,99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.loading" datatype="html">
+        <source>Loading…</source>
+        <target>جارٍ التحميل…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">100,101</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.connection" datatype="html">
+        <source>Connection</source>
+        <target>الاتصال</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">104,105</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.on" datatype="html">
+        <source>On</source>
+        <target>مفعّل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">108,109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.off" datatype="html">
+        <source>Off</source>
+        <target>متوقف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">110,111</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.state" datatype="html">
+        <source>Directory</source>
+        <target>الدليل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">111,114</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.people" datatype="html">
+        <source>People</source>
+        <target>الأشخاص</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">115,118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.secret-made" datatype="html">
+        <source>Secret made</source>
+        <target>تاريخ إنشاء السر</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">127,128</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.new-secret" datatype="html">
+        <source> Make a new secret </source>
+        <target>إنشاء سر جديد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">139,141</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.switch-off" datatype="html">
+        <source> Switch off </source>
+        <target>إيقاف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">150,153</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.switch-on" datatype="html">
+        <source> Switch on </source>
+        <target>تفعيل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">161,165</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.groups" datatype="html">
+        <source>Groups</source>
+        <target>المجموعات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">168,169</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.groups.lead" datatype="html">
+        <source> A group without a role gives nothing. A person in several groups holds every role they give. </source>
+        <target>المجموعة بلا دور لا تعطي شيئاً. الشخص الموجود في عدة مجموعات يحمل كل دور تعطيه.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">173,175</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.groups.none" datatype="html">
+        <source> No group yet: your directory pushes them on its next cycle. </source>
+        <target>لا مجموعة بعد: يرسلها دليلك في دورته التالية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">177,180</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.members" datatype="html">
+        <source>Members</source>
+        <target>الأعضاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">192,194</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.role" datatype="html">
+        <source>Role</source>
+        <target>الدور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">198,200</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">221,222</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.where" datatype="html">
+        <source>Where</source>
+        <target>أين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">204,206</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">230,231</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.change" datatype="html">
+        <source> Change </source>
+        <target>تغيير</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">215,217</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.no-role-option" datatype="html">
+        <source> No role (gives nothing) </source>
+        <target>بلا دور (لا تعطي شيئاً)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">224,226</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.every-hotel-option" datatype="html">
+        <source> Every hotel </source>
+        <target>كل الفنادق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">233,235</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.save" datatype="html">
+        <source> Save </source>
+        <target>حفظ</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">252,254</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.cancel" datatype="html">
+        <source> Cancel </source>
+        <target>إلغاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">260,262</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.none" datatype="html">
+        <source> No company directory is connected. Open the connection, then give its address and secret to your Microsoft Entra ID or Okta. </source>
+        <target>لا يوجد دليل شركة متصل. افتح الاتصال، ثم أعطِ عنوانه وسره إلى Microsoft Entra ID أو Okta لديك.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">272,275</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.open" datatype="html">
+        <source> Open the connection </source>
+        <target>فتح الاتصال</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">284,287</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.new-secret.heading" datatype="html">
+        <source>Make a new secret?</source>
+        <target>إنشاء سر جديد؟</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">292,293</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.new-secret.ask" datatype="html">
+        <source>The old secret and every token made from it stop working now. Your directory is refused until you give it the new one.</source>
+        <target>يتوقف السر القديم وكل رمز صُنع منه عن العمل الآن. يُرفض دليلك حتى تعطيه السر الجديد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">294,295</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.new-secret.go" datatype="html">
+        <source>Make a new secret</source>
+        <target>إنشاء سر جديد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">296,297</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.new-secret.stay" datatype="html">
+        <source>Not now</source>
+        <target>ليس الآن</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.html</context>
+          <context context-type="linenumber">299,300</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.no-role" datatype="html">
+        <source>No role: gives nothing</source>
+        <target>بلا دور: لا تعطي شيئاً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.ts</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.every-hotel" datatype="html">
+        <source>Every hotel</source>
+        <target>كل الفنادق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.ts</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.toast.opened" datatype="html">
+        <source>The connection is open. Copy the secret now.</source>
+        <target>الاتصال مفتوح. انسخ السر الآن.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.ts</context>
+          <context context-type="linenumber">126</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.toast.new-secret" datatype="html">
+        <source>A new secret is made. Copy it now.</source>
+        <target>أُنشئ سر جديد. انسخه الآن.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.ts</context>
+          <context context-type="linenumber">137</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.toast.on" datatype="html">
+        <source>The company directory is on.</source>
+        <target>دليل الشركة مفعّل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.ts</context>
+          <context context-type="linenumber">147</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.toast.off" datatype="html">
+        <source>The company directory is off.</source>
+        <target>دليل الشركة متوقف.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.ts</context>
+          <context context-type="linenumber">148</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.toast.copied" datatype="html">
+        <source>Copied.</source>
+        <target>نُسخ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.ts</context>
+          <context context-type="linenumber">156</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.copy-failed" datatype="html">
+        <source>The browser did not allow copying. Select the text and copy it.</source>
+        <target>لم يسمح المتصفح بالنسخ. حدّد النص وانسخه.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.ts</context>
+          <context context-type="linenumber">159</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.toast.mapped" datatype="html">
+        <source>Saved. Its members&apos; access follows now.</source>
+        <target>حُفظ. صلاحيات أعضائها تتبع ذلك الآن.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/directory-page.ts</context>
+          <context context-type="linenumber">187</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.title" datatype="html">
+        <source>Invitations</source>
+        <target>الدعوات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.lead" datatype="html">
+        <source> People who have not chosen their password yet. A link works for 24 hours. </source>
+        <target>أشخاص لم يختاروا كلمة المرور بعد. يعمل الرابط 24 ساعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">5,9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.try-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">20,23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.loading" datatype="html">
+        <source>Loading…</source>
+        <target>جارٍ التحميل…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">24,26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.none" datatype="html">
+        <source>No invitation is waiting.</source>
+        <target>لا دعوة بانتظار الرد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">26,28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.sent-by" datatype="html">
+        <source>Sent by</source>
+        <target>أرسلها</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">45,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.sent" datatype="html">
+        <source>Sent</source>
+        <target>أُرسلت</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">49,51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.expired" datatype="html">
+        <source>Expired</source>
+        <target>انتهت صلاحيتها</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">53,55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.link" datatype="html">
+        <source>Link</source>
+        <target>الرابط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">57,59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.resend" datatype="html">
+        <source> Send again </source>
+        <target>إرسال مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">68,70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.cancel" datatype="html">
+        <source> Cancel </source>
+        <target>إلغاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">78,81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.cancel.heading" datatype="html">
+        <source>Cancel this invitation?</source>
+        <target>إلغاء هذه الدعوة؟</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">88,89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.cancel.ask" datatype="html">
+        <source>The link stops working. The account stays; you can send a new invitation later.</source>
+        <target>يتوقف الرابط عن العمل. يبقى الحساب؛ ويمكنك إرسال دعوة جديدة لاحقاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">90,91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.cancel.go" datatype="html">
+        <source>Cancel the invitation</source>
+        <target>إلغاء الدعوة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">92,93</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.cancel.stay" datatype="html">
+        <source>Keep it</source>
+        <target>الإبقاء عليها</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.html</context>
+          <context context-type="linenumber">95,96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.toast.resent" datatype="html">
+        <source>A new link is on its way; the old one no longer works.</source>
+        <target>رابط جديد في طريقه؛ الرابط القديم لم يعد يعمل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.toast.cancelled" datatype="html">
+        <source>Invitation cancelled.</source>
+        <target>أُلغيت الدعوة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/invitations-page.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.approvals.toast.sent" datatype="html">
+        <source>Sent for approval: a second administrator decides.</source>
+        <target>أُرسل للموافقة: يقرر مسؤول ثانٍ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/pending-approval.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.directory" datatype="html">
+        <source> This person comes from your company directory: their name, state and roles change there, through the directory&apos;s groups. </source>
+        <target>هذا الشخص من دليل شركتك: يتغير اسمه وحالته وأدواره هناك، عبر مجموعات الدليل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">31,35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-ins" datatype="html">
+        <source>Sign-ins</source>
+        <target>مرات تسجيل الدخول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">527,528</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-ins.none" datatype="html">
+        <source>No sign-in recorded yet.</source>
+        <target>لم يُسجَّل أي دخول بعد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">532,534</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-ins.started" datatype="html">
+        <source>Started</source>
+        <target>البداية</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">545,547</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-ins.two-step-yes" datatype="html">
+        <source>Yes</source>
+        <target>نعم</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">550,551</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-ins.two-step-no" datatype="html">
+        <source>No</source>
+        <target>لا</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">552,553</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-ins.two-step" datatype="html">
+        <source>Two-step</source>
+        <target>التحقق بخطوتين</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">553,555</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.sign-ins.open" datatype="html">
+        <source>Still signed in</source>
+        <target>ما زال مسجّل الدخول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">560,563</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.directory.page-title" datatype="html">
+        <source>Company directory</source>
+        <target>دليل الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/routes.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.invitations.page-title" datatype="html">
+        <source>Invitations</source>
+        <target>الدعوات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/routes.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.page-title" datatype="html">
+        <source>Approvals and rules</source>
+        <target>الموافقات والقواعد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/routes.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.title" datatype="html">
+        <source>Approvals and rules</source>
+        <target>الموافقات والقواعد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.lead" datatype="html">
+        <source> Rules that protect your accounts: changes that need a second administrator, and accounts left unused. </source>
+        <target>قواعد تحمي حساباتك: تغييرات تحتاج مسؤولاً ثانياً، وحسابات متروكة دون استخدام.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">5,10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.try-again" datatype="html">
+        <source> Try again </source>
+        <target>حاول مجدداً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">21,24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.approvals" datatype="html">
+        <source>Approvals</source>
+        <target>الموافقات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">27,28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.on" datatype="html">
+        <source>On</source>
+        <target>مفعّلة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">31,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.off" datatype="html">
+        <source>Off</source>
+        <target>متوقفة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">33,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.second-administrator" datatype="html">
+        <source>Second administrator</source>
+        <target>مسؤول ثانٍ</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">34,37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.approvals.lead" datatype="html">
+        <source> When on, giving an administrator role, a two-step exception, merging two accounts and switching company sign-in off wait for a second administrator. The person who asked cannot approve their own request. </source>
+        <target>عند تفعيلها، ينتظر إعطاء دور مسؤول، والاستثناء من التحقق بخطوتين، ودمج حسابين، وإيقاف الدخول بحساب الشركة موافقة مسؤول ثانٍ. لا يستطيع صاحب الطلب الموافقة على طلبه.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">38,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.approvals.switch-off" datatype="html">
+        <source> Switch off </source>
+        <target>إيقاف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">52,55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.approvals.switch-on" datatype="html">
+        <source> Switch on </source>
+        <target>تفعيل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">63,67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.waiting" datatype="html">
+        <source>Waiting for approval</source>
+        <target>بانتظار الموافقة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">68,70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.waiting.none" datatype="html">
+        <source>Nothing is waiting.</source>
+        <target>لا شيء بالانتظار.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">74,76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.asked-by" datatype="html">
+        <source>Asked by</source>
+        <target>طلبه</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">93,95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.asked-at" datatype="html">
+        <source>Asked</source>
+        <target>وقت الطلب</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">97,99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.approve" datatype="html">
+        <source> Approve </source>
+        <target>موافقة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">108,110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.reject" datatype="html">
+        <source> Reject </source>
+        <target>رفض</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">118,120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.inactive" datatype="html">
+        <source>Inactive accounts</source>
+        <target>الحسابات غير النشطة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">127,128</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.inactive.lead" datatype="html">
+        <source> An account nobody signed in to for this many days is suspended at night; an administrator can turn it back on. People from your company directory follow the directory instead. </source>
+        <target>الحساب الذي لم يسجّل أحد الدخول إليه هذا العدد من الأيام يُوقَف ليلاً؛ ويستطيع مسؤول إعادة تفعيله. أما الأشخاص القادمون من دليل شركتك فيتبعون الدليل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">129,132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.inactive.days" datatype="html">
+        <source>Days (1 to 90)</source>
+        <target>الأيام (من 1 إلى 90)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">133,136</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.inactive.save" datatype="html">
+        <source> Save </source>
+        <target>حفظ</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">150,153</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.loading" datatype="html">
+        <source>Loading…</source>
+        <target>جارٍ التحميل…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">156,158</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.toast.approvals-on" datatype="html">
+        <source>Approvals are on.</source>
+        <target>الموافقات مفعّلة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.ts</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.toast.approvals-off" datatype="html">
+        <source>Approvals are off.</source>
+        <target>الموافقات متوقفة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.ts</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.toast.approved" datatype="html">
+        <source>Approved: the change is done.</source>
+        <target>تمت الموافقة: نُفّذ التغيير.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.ts</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.toast.rejected" datatype="html">
+        <source>Rejected: nothing changed.</source>
+        <target>رُفض: لم يتغير شيء.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.toast.days-saved" datatype="html">
+        <source>Saved.</source>
+        <target>حُفظ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.ts</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.more" datatype="html">
+        <source>Sign-in and security</source>
+        <target>الدخول والأمان</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">21,24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.directory" datatype="html">
+        <source>Company directory</source>
+        <target>دليل الشركة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">34,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.invitations" datatype="html">
+        <source>Invitations</source>
+        <target>الدعوات</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">41,45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.users.security-rules" datatype="html">
+        <source>Approvals and rules</source>
+        <target>الموافقات والقواعد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/users-page.html</context>
+          <context context-type="linenumber">48,52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00129" datatype="html">
+        <source>This person already chose a password; there is no invitation to send or cancel.</source>
+        <target>اختار هذا الشخص كلمة المرور بالفعل؛ لا دعوة لإرسالها أو إلغائها.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00130" datatype="html">
+        <source>No invitation is waiting for this person.</source>
+        <target>لا دعوة بانتظار هذا الشخص.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00131" datatype="html">
+        <source>Sent for approval: a second administrator decides.</source>
+        <target>أُرسل للموافقة: يقرر مسؤول ثانٍ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">115</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00132" datatype="html">
+        <source>You asked for this change, so another administrator must decide it.</source>
+        <target>أنت طلبت هذا التغيير، لذا يجب أن يقرره مسؤول آخر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00133" datatype="html">
+        <source>This request was already decided.</source>
+        <target>قُرر هذا الطلب من قبل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00134" datatype="html">
+        <source>The account changed after the request was made, so the request is void. Ask again.</source>
+        <target>تغيّر الحساب بعد تقديم الطلب، لذا أُلغي الطلب. اطلب مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00135" datatype="html">
+        <source>That request no longer exists.</source>
+        <target>هذا الطلب لم يعد موجوداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00136" datatype="html">
+        <source>An account cannot be merged into itself.</source>
+        <target>لا يمكن دمج حساب في نفسه.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00137" datatype="html">
+        <source>One of the two accounts is closed or already merged.</source>
+        <target>أحد الحسابين مغلق أو مدموج بالفعل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00138" datatype="html">
+        <source>This person comes from your company directory: change them there.</source>
+        <target>هذا الشخص من دليل شركتك: غيّره هناك.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00139" datatype="html">
+        <source>The company directory is already connected.</source>
+        <target>دليل الشركة متصل بالفعل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00140" datatype="html">
+        <source>No company directory is connected.</source>
+        <target>لا يوجد دليل شركة متصل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00141" datatype="html">
+        <source>That directory group no longer exists.</source>
+        <target>مجموعة الدليل هذه لم تعد موجودة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.11001" datatype="html">
+        <source>Which request? Reload the page and try again.</source>
+        <target>أي طلب؟ أعد تحميل الصفحة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">126</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.11002" datatype="html">
+        <source>Choose the account to keep and the account to merge into it.</source>
+        <target>اختر الحساب الذي يبقى والحساب الذي يُدمج فيه.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">127</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.11101" datatype="html">
+        <source>Which group? Reload the page and try again.</source>
+        <target>أي مجموعة؟ أعد تحميل الصفحة وحاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">128</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.11102" datatype="html">
+        <source>Choose a hotel or a hotel group, not both.</source>
+        <target>اختر فندقاً أو مجموعة فنادق، لا الاثنين معاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.11103" datatype="html">
+        <source>A hotel or a hotel group needs a role.</source>
+        <target>الفندق أو مجموعة الفنادق تحتاج دوراً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">130</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.11104" datatype="html">
+        <source>Choose 1 to 90 days.</source>
+        <target>اختر من 1 إلى 90 يوماً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00044" datatype="html">
+        <source>That password is not right.</source>
+        <target>كلمة المرور هذه غير صحيحة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00047" datatype="html">
+        <source>Too many wrong tries: wait a few minutes, then try again.</source>
+        <target>محاولات خاطئة كثيرة: انتظر بضع دقائق، ثم حاول مجدداً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00084" datatype="html">
+        <source>This change needs you to confirm it is you first.</source>
+        <target>هذا التغيير يحتاج أن تؤكد هويتك أولاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">139</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.confirm.title" datatype="html">
+        <source> Confirm it is you </source>
+        <target>أكّد هويتك</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/confirm-identity-dialog.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.confirm.company" datatype="html">
+        <source> This change needs you to confirm it is you. Your company signs you in, and confirming with it is not on this screen yet: ask an administrator who signs in with a Harmony password. </source>
+        <target>هذا التغيير يحتاج أن تؤكد هويتك. شركتك هي التي تسجّل دخولك، والتأكيد عبرها غير متاح في هذه الشاشة بعد: اطلب ذلك من مسؤول يسجّل الدخول بكلمة مرور Harmony.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/confirm-identity-dialog.html</context>
+          <context context-type="linenumber">13,17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.confirm.close" datatype="html">
+        <source> Close </source>
+        <target>إغلاق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/confirm-identity-dialog.html</context>
+          <context context-type="linenumber">18,21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.confirm.lead" datatype="html">
+        <source> This change needs you to confirm it is you. Type your password; it counts for 5 minutes. </source>
+        <target>هذا التغيير يحتاج أن تؤكد هويتك. اكتب كلمة المرور؛ يبقى التأكيد صالحاً 5 دقائق.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/confirm-identity-dialog.html</context>
+          <context context-type="linenumber">23,25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.confirm.password" datatype="html">
+        <source>Password</source>
+        <target>كلمة المرور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/confirm-identity-dialog.html</context>
+          <context context-type="linenumber">27,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.confirm.cancel" datatype="html">
+        <source> Cancel </source>
+        <target>إلغاء</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/confirm-identity-dialog.html</context>
+          <context context-type="linenumber">44,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.confirm.go" datatype="html">
+        <source> Confirm </source>
+        <target>تأكيد</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/confirm-identity-dialog.html</context>
+          <context context-type="linenumber">52,55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.confirm.password-required" datatype="html">
+        <source>Type your password.</source>
+        <target>اكتب كلمة المرور.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/confirm-identity-dialog.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

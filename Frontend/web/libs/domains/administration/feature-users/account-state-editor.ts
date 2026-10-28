@@ -14,7 +14,8 @@ import { FormField, form, maxLength, required, submit } from '@angular/forms/sig
 import { UsersStore } from '@harmony/administration/data-access';
 import { UserAccount } from '@harmony/administration/domain';
 import { errorMessage, messageOf } from '@harmony/platform/errors';
-import { ApiResult, IntentKey, newIntentKey } from '@harmony/platform/http';
+import { ApiResult, IntentKey } from '@harmony/platform/http';
+import { IdentityConfirmation } from '@harmony/platform/session';
 
 /** The writes that take a reason: suspension can be undone, termination is final, exemption goes on the two-step list. */
 export type AccountAction = 'suspend' | 'terminate' | 'exempt';
@@ -76,6 +77,7 @@ export class AccountStateEditor {
   readonly cancelled = output();
 
   private readonly store = inject(UsersStore);
+  private readonly confirmation = inject(IdentityConfirmation);
   private readonly reasonBox = viewChild.required<ElementRef<HTMLInputElement>>('reasonBox');
   private readonly model = signal({ reason: '' });
   private readonly writers: Readonly<Record<AccountAction, Writer>> = {
@@ -107,9 +109,11 @@ export class AccountStateEditor {
     event.preventDefault();
     void submit(this.form, async (field) => {
       this.problem.set(null);
-      // The key is this press's own: a retry inside the call reuses it, a new press is a new intent.
+      // The key is this press's own: a retry inside the call reuses it, a new press is a new intent; after
+      // "confirm it is you" the change goes once more with a new key.
       const write = this.writers[this.mode()];
-      const result = await write(this.user(), field().value().reason.trim(), newIntentKey());
+      const reason = field().value().reason.trim();
+      const result = await this.confirmation.run((intent) => write(this.user(), reason, intent));
       return this.settle(result, field);
     });
   }

@@ -1,0 +1,10 @@
+/* The invitations waiting for a first password, as prototype rows. Tokens only. */
+.irow {
+  grid-template-columns: minmax(220px, 1fr) 160px 160px 160px 200px;
+}
+.row-act {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s2);
+  min-width: 0;
+}

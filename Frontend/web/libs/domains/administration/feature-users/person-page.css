@@ -37,7 +37,8 @@
 .krow {
   grid-template-columns: minmax(200px, 1.4fr) 220px 220px 120px;
 }
-.erow {
+.erow,
+.nrow {
   grid-template-columns: minmax(220px, 1.6fr) 220px 160px 160px;
 }
 .arow {
@@ -71,6 +72,7 @@
   .lrow,
   .krow,
   .erow,
+  .nrow,
   .arow,
   .grow {
     grid-template-columns: minmax(0, 1fr) 140px;
@@ -80,6 +82,7 @@
   .lrow .row-act,
   .krow .row-act,
   .erow .obj,
+  .nrow .obj,
   .arow .row-act,
   .grow .row-act,
   .grow .s-why {

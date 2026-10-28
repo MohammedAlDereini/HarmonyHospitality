@@ -1,0 +1,306 @@
+<header class="page-head">
+  <div>
+    <h1 i18n="@@administration.directory.title">Company directory</h1>
+    <p class="lead" i18n="@@administration.directory.lead">
+      Your Microsoft Entra ID or Okta adds and removes your staff in Harmony (SCIM). You give each
+      of its groups a role here; its members hold exactly that.
+    </p>
+  </div>
+</header>
+@if (problem(); as text) {
+  <p class="empty" role="alert">{{ text }}</p>
+}
+@if (store.secret(); as shown) {
+  <section class="part secret" aria-labelledby="secret-heading" data-secret role="alert">
+    <h2 id="secret-heading" i18n="@@administration.directory.secret.title">
+      Copy these now: Harmony shows the secret only this once
+    </h2>
+    <dl class="pairs">
+      <dt i18n="@@administration.directory.scim-url">Address (Tenant URL)</dt>
+      <dd>
+        <code dir="ltr">{{ shown.scimUrl }}</code
+        >&ngsp;<button
+          type="button"
+          class="act"
+          (click)="copy(shown.scimUrl)"
+          i18n="@@administration.directory.copy"
+        >
+          Copy
+        </button>
+      </dd>
+      <dt i18n="@@administration.directory.token-url">Token address (OAuth)</dt>
+      <dd>
+        <code dir="ltr">{{ shown.tokenUrl }}</code
+        >&ngsp;<button
+          type="button"
+          class="act"
+          (click)="copy(shown.tokenUrl)"
+          i18n="@@administration.directory.copy"
+        >
+          Copy
+        </button>
+      </dd>
+      <dt i18n="@@administration.directory.client-id">Client id</dt>
+      <dd>
+        <code dir="ltr">{{ shown.clientId }}</code
+        >&ngsp;<button
+          type="button"
+          class="act"
+          (click)="copy(shown.clientId)"
+          i18n="@@administration.directory.copy"
+        >
+          Copy
+        </button>
+      </dd>
+      <dt i18n="@@administration.directory.secret">Client secret</dt>
+      <dd>
+        <code dir="ltr" data-secret-value>{{ shown.secret }}</code
+        >&ngsp;<button
+          type="button"
+          class="act"
+          (click)="copy(shown.secret)"
+          i18n="@@administration.directory.copy"
+        >
+          Copy
+        </button>
+      </dd>
+      <dt i18n="@@administration.directory.secret-token">
+        Secret token (Okta, or Entra without OAuth)
+      </dt>
+      <dd>
+        <code dir="ltr">{{ shown.secretToken }}</code
+        >&ngsp;<button
+          type="button"
+          class="act"
+          (click)="copy(shown.secretToken)"
+          i18n="@@administration.directory.copy"
+        >
+          Copy
+        </button>
+      </dd>
+    </dl>
+    <div class="acts">
+      <button
+        type="button"
+        class="btn primary"
+        data-act="copied"
+        (click)="store.forgetSecret()"
+        i18n="@@administration.directory.copied"
+      >
+        I copied them
+      </button>
+    </div>
+  </section>
+}
+@if (store.problem(); as text) {
+  <p class="empty" role="alert">
+    {{ text }}&ngsp;<button
+      type="button"
+      class="btn"
+      (click)="store.reload()"
+      i18n="@@administration.directory.try-again"
+    >
+      Try again
+    </button>
+  </p>
+} @else if (store.loading() && store.connection() === null) {
+  <p class="empty" role="status" i18n="@@administration.directory.loading">Loading…</p>
+} @else if (store.connection(); as connection) {
+  <section class="part" aria-labelledby="connection-heading" data-connection>
+    <div class="sec-h">
+      <h2 id="connection-heading" i18n="@@administration.directory.connection">Connection</h2>
+      <div class="obj" [attr.data-s]="connection.isEnabled ? 'ok' : null">
+        @if (connection.isEnabled) {
+          <b i18n="@@administration.directory.on">On</b>
+        } @else {
+          <b i18n="@@administration.directory.off">Off</b>
+        }
+        <span i18n="@@administration.directory.state">Directory</span>
+      </div>
+      <div class="obj">
+        <b class="num">{{ connection.people }}</b>
+        <span i18n="@@administration.directory.people">People</span>
+      </div>
+    </div>
+    <dl class="pairs">
+      <dt i18n="@@administration.directory.scim-url">Address (Tenant URL)</dt>
+      <dd>
+        <code dir="ltr">{{ connection.scimUrl }}</code>
+      </dd>
+      <dt i18n="@@administration.directory.client-id">Client id</dt>
+      <dd>
+        <code dir="ltr">{{ connection.clientId }}</code>
+      </dd>
+      <dt i18n="@@administration.directory.secret-made">Secret made</dt>
+      <dd class="num">{{ when(connection.secretIssuedAtUtc) }}</dd>
+    </dl>
+    <div class="acts" *hrIfAllowed="manageUsers">
+      <button
+        type="button"
+        class="btn"
+        data-act="new-secret"
+        (click)="newSecret()"
+        [disabled]="busy()"
+        i18n="@@administration.directory.new-secret"
+      >
+        Make a new secret
+      </button>
+      @if (connection.isEnabled) {
+        <button
+          type="button"
+          class="btn"
+          data-act="switch-off"
+          (click)="switchTo(false)"
+          [disabled]="busy()"
+          i18n="@@administration.directory.switch-off"
+        >
+          Switch off
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="btn primary"
+          data-act="switch-on"
+          (click)="switchTo(true)"
+          [disabled]="busy()"
+          i18n="@@administration.directory.switch-on"
+        >
+          Switch on
+        </button>
+      }
+    </div>
+  </section>
+  <section class="part" aria-labelledby="groups-heading" data-groups>
+    <h2 id="groups-heading">
+      <span i18n="@@administration.directory.groups">Groups</span>&ngsp;<span class="num">{{
+        store.groups().length
+      }}</span>
+    </h2>
+    <p class="line" i18n="@@administration.directory.groups.lead">
+      A group without a role gives nothing. A person in several groups holds every role they give.
+    </p>
+    @if (store.groups().length === 0) {
+      <p class="line" i18n="@@administration.directory.groups.none">
+        No group yet: your directory pushes them on its next cycle.
+      </p>
+    } @else {
+      <div class="rows" role="list">
+        @for (group of store.groups(); track group.id) {
+          <div class="srow grow" role="listitem" data-group>
+            <div class="s-who">
+              <div class="s-nm">
+                <b
+                  ><bdi>{{ group.displayName }}</bdi></b
+                >
+              </div>
+            </div>
+            <div class="obj">
+              <b class="num">{{ group.members }}</b>
+              <span i18n="@@administration.directory.members">Members</span>
+            </div>
+            <div class="obj">
+              <b
+                ><bdi>{{ roleOf(group) }}</bdi></b
+              >
+              <span i18n="@@administration.directory.role">Role</span>
+            </div>
+            <div class="obj">
+              <b
+                ><bdi>{{ whereOf(group) }}</bdi></b
+              >
+              <span i18n="@@administration.directory.where">Where</span>
+            </div>
+            <div class="row-act" *hrIfAllowed="assignRoles">
+              <button
+                type="button"
+                class="btn"
+                data-act="map-group"
+                (click)="startMapping(group)"
+                [attr.aria-expanded]="mapping() === group.id"
+                i18n="@@administration.directory.change"
+              >
+                Change
+              </button>
+            </div>
+          </div>
+          @if (mapping() === group.id) {
+            <form class="editor" (submit)="saveMapping($event, group)" novalidate data-map-editor>
+              <label for="map-role" i18n="@@administration.directory.role">Role</label>
+              <select id="map-role" class="field" [formField]="form.roleId">
+                <option value="" i18n="@@administration.directory.no-role-option">
+                  No role (gives nothing)
+                </option>
+                @for (role of roles.roles(); track role.id) {
+                  <option [value]="role.id">{{ roleLabel(role.id) }}</option>
+                }
+              </select>
+              <label for="map-where" i18n="@@administration.directory.where">Where</label>
+              <select id="map-where" class="field" [formField]="form.where">
+                <option value="" i18n="@@administration.directory.every-hotel-option">
+                  Every hotel
+                </option>
+                @for (hotel of hotels.list(); track hotel.id) {
+                  <option [value]="hotelChoice(hotel.id)">{{ hotelLabel(hotel.id) }}</option>
+                }
+                @for (choice of store.groupChoices(); track choice.id) {
+                  <option [value]="groupChoice(choice.id)">{{ choiceLabel(choice.id) }}</option>
+                }
+              </select>
+              @if (mapProblem(); as text) {
+                <p class="field-error" role="alert">{{ text }}</p>
+              }
+              <div class="acts">
+                <button
+                  type="submit"
+                  class="btn primary"
+                  [disabled]="busy()"
+                  i18n="@@administration.directory.save"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  class="btn"
+                  (click)="mapping.set(null)"
+                  i18n="@@administration.directory.cancel"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          }
+        }
+      </div>
+    }
+  </section>
+} @else {
+  <section class="part" data-closed>
+    <p class="line" i18n="@@administration.directory.none">
+      No company directory is connected. Open the connection, then give its address and secret to
+      your Microsoft Entra ID or Okta.
+    </p>
+    <div class="acts" *hrIfAllowed="manageUsers">
+      <button
+        type="button"
+        class="btn primary"
+        data-act="open"
+        (click)="open()"
+        [disabled]="busy()"
+        i18n="@@administration.directory.open"
+      >
+        Open the connection
+      </button>
+    </div>
+  </section>
+}
+<hr-confirm-dialog
+  #secretDialog
+  i18n-heading="@@administration.directory.new-secret.heading"
+  heading="Make a new secret?"
+  i18n-message="@@administration.directory.new-secret.ask"
+  message="The old secret and every token made from it stop working now. Your directory is refused until you give it the new one."
+  i18n-go="@@administration.directory.new-secret.go"
+  go="Make a new secret"
+  i18n-stay="@@administration.directory.new-secret.stay"
+  stay="Not now"
+/>

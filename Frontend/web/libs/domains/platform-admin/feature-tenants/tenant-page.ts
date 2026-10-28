@@ -19,6 +19,7 @@ import { ApiResult, newIntentKey } from '@harmony/platform/http';
 import { Drawer, Toasts } from '@harmony/ui/overlays';
 import { Tone } from '@harmony/ui/primitives';
 import { CompanyLoginPanel } from './company-login-panel';
+import { DirectoryPanel } from './directory-panel';
 import { ReasonForm } from './reason-form';
 import { SubscriptionEditor } from './subscription-editor';
 import { TenantEditor } from './tenant-editor';
@@ -53,6 +54,7 @@ const headings: Readonly<Record<Opened, string>> = {
     SubscriptionEditor,
     Drawer,
     CompanyLoginPanel,
+    DirectoryPanel,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tenant-page.html',

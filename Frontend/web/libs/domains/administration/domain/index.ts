@@ -30,3 +30,13 @@ export type {
   CompanyProvider,
   SignInMethod,
 } from './company-login';
+export type {
+  ApprovalRequest,
+  CustomerRules,
+  DirectoryConnection,
+  DirectoryGroup,
+  DirectorySecret,
+  Invitation,
+  SessionRecord,
+} from './security';
+export { MAX_INACTIVITY_DAYS, approvalKindName } from './security';
