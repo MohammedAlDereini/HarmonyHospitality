@@ -246,6 +246,12 @@ From the security review of 2026-10-12. None of these can be done or proven on a
 5. **Pinned builds** (parked 2026-10-16): `Backend\Directory.Build.props` with `RestorePackagesWithLockFile`, one
    `packages.lock.json` per project committed, new framework versions taken with `dotnet restore --force-evaluate`;
    and the framework's `pack.yml` actions pinned to commit hashes instead of `@v4` tags.
+6. **Redis keeps what it is given** (stage F, 27 Oct): the receipt gate's "request X is done, here is its answer" notes
+   live in Redis. Turn on saving to disk (`appendonly yes`, AOF) so a restart keeps them, and `maxmemory-policy
+   noeviction` so a full memory refuses new data instead of silently dropping notes. Without both, a repeated request
+   after a Redis restart or under memory pressure runs twice.
+7. **The company directory's door** (stage E): route `https://identity.<domain>/scim/*` from the front door to Identity
+   (Entra's provisioning service and Okta call it from the internet); TLS 1.2 or later.
 
 **Decided not to change (2026-10-16).** The request body limit stays at Kestrel's default (30 MB) on Identity and the BFF:
 one setting for good, not revisited as payloads grow. The validators bound every field (the largest, a passkey credential,

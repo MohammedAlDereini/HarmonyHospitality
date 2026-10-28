@@ -12,6 +12,9 @@ public static class DependenciesConfigurator
     public static void AddApplicationService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddValidations(configuration);
+
+        // Stage E: how a company directory person's access follows their groups (shared by the SCIM and admin doors).
+        services.AddScoped<Harmony.Identity.Handler.Commands.DirectoryModule.DirectoryAccess>();
     }
 
     public static void ConfigureApplicationSettings(this IConfigurationBuilder configurationBuilder, IHostEnvironment hostingEnvironment)

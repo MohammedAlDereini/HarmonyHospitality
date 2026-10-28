@@ -16,6 +16,8 @@ public class UserAccountModel
     public List<Guid> RoleIds { get; set; } = new();
     public AdministrativeState State { get; set; }
     public string? StateReason { get; set; }
+    /// <summary>Stage E: the company directory owns this person (name, state and roles change only there).</summary>
+    public bool IsDirectoryManaged { get; set; }
     public int SecurityVersion { get; set; }
     public DateTime CreatedDate { get; set; }
     public string CreatedBy { get; set; } = null!;

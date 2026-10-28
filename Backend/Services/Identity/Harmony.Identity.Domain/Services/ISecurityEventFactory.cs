@@ -12,4 +12,7 @@ public interface ISecurityEventFactory
 {
     /// <param name="detail">One short fact the action needs (which passkey, which proof); null for most actions.</param>
     SecurityAuditEvent Create(User user, string action, string? detail = null);
+
+    /// <summary>The same, with a named actor that is not a person (the company directory).</summary>
+    SecurityAuditEvent CreateBy(User user, string action, string actor, string? detail = null);
 }

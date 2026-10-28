@@ -61,4 +61,13 @@ public interface IUserAccountRepository : IRepository<User>
     /// would leave the tenant with nobody in charge.
     /// </summary>
     public Task<bool> SoleAdministratorRoleAsync(Guid roleId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Stage E's nightly rule: the customer's active accounts with no sign-in since the cutoff (never signed in: made
+    /// before it), tracked. Left out: the company directory's people and the holders of the super role.
+    /// </summary>
+    public Task<IReadOnlyList<User>> DormantAsync(Guid tenantId, DateTimeOffset cutoff, int take, CancellationToken cancellationToken);
+
+    /// <summary>The accounts a directory connection owns, in any state, tracked.</summary>
+    public Task<IReadOnlyList<User>> OfDirectoryAsync(Guid connectionId, CancellationToken cancellationToken);
 }

@@ -122,9 +122,9 @@
   <header>
     <span class="eyebrow">REMY &#183; Identity, with Platform merged in</span>
     <h1>The final entity relationship diagram</h1>
-    <p class="sub">All fifty-eight tables of the rebuilt Identity service. Ten readable cluster views, then the whole schema at full size &mdash; the reference data, the organisation tables, the standards registry, and every table Identity already had.</p>
+    <p class="sub">All forty-seven tables of the rebuilt Identity service. Ten readable cluster views, then the whole schema at full size &mdash; the reference data, the organisation tables, the standards registry, and every table Identity already had.</p>
     <div class="counts">
-      <div><b>58</b><span>tables</span></div>
+      <div><b>47</b><span>tables</span></div>
       <div><b>10</b><span>clusters</span></div>
       <div><b>10</b><span>reference tables, kept through the API</span></div>
       <div><b>2</b><span>dropped</span></div>
@@ -301,6 +301,8 @@ erDiagram
     int Tier
     date OnboardedOn
     date ExportWindowEndsOn
+    bit ApprovalsRequired "stage D switch"
+    int InactivityDays "1 to 90, PCI DSS 8.2.6"
   }
 
   Properties {
@@ -541,6 +543,8 @@ erDiagram
     bit IsServicePrincipal
     bit IsMfaEnrolled
     uniqueidentifier SupersededByUserAccountId FK
+    uniqueidentifier ProvisioningConnectionId FK "set: the directory owns them"
+    nvarchar DirectoryExternalId "SCIM externalId"
   }
   RoleAssignments {
     uniqueidentifier Id PK
@@ -753,7 +757,7 @@ erDiagram
 
   <!-- ============ 6 APPROVALS ============ -->
   <section>
-    <h2>Cluster seven <em>&#183; 8 tables</em></h2>
+    <h2>Cluster seven <em>&#183; 7 tables</em></h2>
     <h3>Approvals and audit</h3>
     <p class="lede">Nothing dangerous happens on one person's say-so.</p>
 
@@ -793,11 +797,6 @@ erDiagram
     uniqueidentifier TenantId FK
     uniqueidentifier ProposedUserAccountId FK
   }
-  QuarantineReleases {
-    uniqueidentifier Id PK
-    uniqueidentifier TenantId FK
-    uniqueidentifier MakerCheckerRequestId FK
-  }
   SecurityOperations {
     uniqueidentifier Id PK
     uniqueidentifier TenantId FK
@@ -822,7 +821,6 @@ erDiagram
   StepUpAuthorizations ||--o{ MakerCheckerRequests : "proved by"
   MakerCheckerRequests ||--o{ MakerCheckerExecutions : "executed as"
   MakerCheckerRequests ||--o{ MakerCheckerExpectedVersions : "guarded by"
-  MakerCheckerRequests ||--o{ QuarantineReleases : "releases"
   MakerCheckerExecutions ||--o{ MakerCheckerExecutionItems : "changed"
   UserAccounts ||--o{ MakerCheckerExecutionItems : "affected in"
   UserAccounts ||--o{ MakerCheckerExecutions : "approved by"
@@ -835,9 +833,9 @@ erDiagram
 
   <!-- ============ 7 SYNC ============ -->
   <section>
-    <h2>Cluster eight <em>&#183; 12 tables</em></h2>
+    <h2>Cluster eight <em>&#183; 3 tables</em></h2>
     <h3>Directory sync</h3>
-    <p class="lede">The largest cluster. Pulling staff out of a hotel's directory is not a nightly script &mdash; it is a resumable, leased, fenced, paged, auditable job, and every one of those words is a table.</p>
+    <p class="lede">Redrawn on 27 October 2026. The hotel's directory (Microsoft Entra ID, Okta) pushes staff and groups to Harmony over SCIM 2.0 and runs the sync itself, with its own log &mdash; the way Mews and OPERA Cloud take them. Harmony keeps the door, the groups with the role each one gives, and who is in them. The group is the gate.</p>
 
     <div class="frame">
 <div class="zoomable">
@@ -845,150 +843,96 @@ erDiagram
 erDiagram
   ProvisioningConnections {
     uniqueidentifier Id PK
-    uniqueidentifier TenantId FK
-    uniqueidentifier FederatedAuthorityId FK
+    uniqueidentifier TenantId FK "UK: one per customer"
+    char ClientId UK
+    binary SecretHash "SHA-256, the secret shown once"
+    datetimeoffset SecretIssuedAtUtc "older tokens die"
     bit IsEnabled
-    nvarchar Schedule
   }
-  ApprovedProvisioningGroups {
+  DirectoryGroups {
     uniqueidentifier Id PK
     uniqueidentifier TenantId FK
-    uniqueidentifier ConnectionId FK
-    nvarchar DirectoryGroupId "the allowlist"
-    nvarchar MapsToRoleCode
+    uniqueidentifier ProvisioningConnectionId FK
+    nvarchar DisplayName "UK in the connection"
+    nvarchar ExternalId "UK when sent"
+    uniqueidentifier RoleId FK "null: gives nothing"
+    uniqueidentifier PropertyId FK "one hotel"
+    uniqueidentifier PropertyGroupId FK "or one hotel group"
   }
-  DirectoryGroupMemberships {
+  DirectoryGroupMembers {
     uniqueidentifier Id PK
     uniqueidentifier TenantId FK
-    uniqueidentifier ConnectionId FK
-    nvarchar MemberSubject
-  }
-  DirectorySyncRuns {
-    uniqueidentifier Id PK
-    uniqueidentifier TenantId FK
-    uniqueidentifier ConnectionId FK
-    bigint RunNumber
-    int Outcome
-  }
-  DirectorySyncRunItems {
-    uniqueidentifier Id PK
-    uniqueidentifier TenantId FK
-    uniqueidentifier RunId FK
-    uniqueidentifier ConnectionId FK
-    uniqueidentifier SupersededByItemId FK
-    int Action "created changed held"
-  }
-  DirectorySyncRunStreams {
-    uniqueidentifier Id PK
-    uniqueidentifier TenantId FK
-    uniqueidentifier RunId FK
-    uniqueidentifier ConnectionId FK
-    uniqueidentifier ApprovedProvisioningGroupId FK
-    uniqueidentifier DirectorySyncStreamStateId FK
-  }
-  DirectorySyncRunPages {
-    uniqueidentifier Id PK
-    uniqueidentifier TenantId FK
-    uniqueidentifier RunId FK
-    uniqueidentifier RunStreamId FK
-    int PageNumber
-  }
-  DirectorySyncStreamStates {
-    uniqueidentifier Id PK
-    uniqueidentifier TenantId FK
-    uniqueidentifier ConnectionId FK
-    uniqueidentifier ApprovedProvisioningGroupId FK
-    nvarchar DeltaToken "resume point"
-  }
-  DirectorySyncRunSequence {
-    uniqueidentifier TenantId PK
-    bigint Next
-  }
-  ProvisioningLeases {
-    uniqueidentifier Id PK
-    uniqueidentifier TenantId FK
-    uniqueidentifier ConnectionId FK
-    datetimeoffset ExpiresAtUtc
-  }
-  ProvisioningFencingSequence {
-    uniqueidentifier TenantId PK
-    uniqueidentifier ConnectionId FK
-    bigint Token
-  }
-  MigrationAmbiguities {
-    uniqueidentifier Id PK
-    uniqueidentifier TenantId FK
-    uniqueidentifier UserAccountId FK
-    int State "waiting on a human"
-  }
-  FederatedAuthorities {
-    uniqueidentifier Id PK
+    uniqueidentifier DirectoryGroupId FK
+    uniqueidentifier UserAccountId FK "UK with the group"
   }
   UserAccounts {
     uniqueidentifier Id PK
+    uniqueidentifier ProvisioningConnectionId FK
+    nvarchar DirectoryExternalId
+  }
+  Roles {
+    uniqueidentifier Id PK
+  }
+  Properties {
+    uniqueidentifier Id PK
+  }
+  PropertyGroups {
+    uniqueidentifier Id PK
   }
 
-  FederatedAuthorities ||--o{ ProvisioningConnections : "synced from"
-  ProvisioningConnections ||--o{ ApprovedProvisioningGroups : "allows only"
-  ProvisioningConnections ||--o{ DirectoryGroupMemberships : "read back"
-  ProvisioningConnections ||--o{ DirectorySyncRuns : "ran"
-  ProvisioningConnections ||--o{ DirectorySyncRunItems : "touched"
-  ProvisioningConnections ||--o{ DirectorySyncRunStreams : "streamed"
-  ProvisioningConnections ||--o{ DirectorySyncStreamStates : "cursor for"
-  ProvisioningConnections ||--o{ ProvisioningLeases : "locked by"
-  ProvisioningConnections ||--o{ ProvisioningFencingSequence : "fenced by"
-  DirectorySyncRuns ||--o{ DirectorySyncRunItems : "processed"
-  DirectorySyncRuns ||--o{ DirectorySyncRunStreams : "opened"
-  DirectorySyncRuns ||--o{ DirectorySyncRunPages : "fetched"
-  DirectorySyncRunStreams ||--o{ DirectorySyncRunPages : "page of"
-  DirectorySyncRunItems |o--o{ DirectorySyncRunItems : "superseded by"
-  ApprovedProvisioningGroups ||--o{ DirectorySyncRunStreams : "for group"
-  ApprovedProvisioningGroups ||--o{ DirectorySyncStreamStates : "for group"
-  DirectorySyncStreamStates ||--o{ DirectorySyncRunStreams : "resumed from"
-  DirectorySyncRunSequence ||--o{ DirectorySyncRuns : "numbers"
-  UserAccounts ||--o{ MigrationAmbiguities : "could not match"
+  ProvisioningConnections ||--o{ DirectoryGroups : "pushed"
+  ProvisioningConnections |o--o{ UserAccounts : "owns"
+  DirectoryGroups ||--o{ DirectoryGroupMembers : "contains"
+  UserAccounts ||--o{ DirectoryGroupMembers : "member of"
+  Roles |o--o{ DirectoryGroups : "given by"
+  Properties |o--o{ DirectoryGroups : "at"
+  PropertyGroups |o--o{ DirectoryGroups : "across"
 </pre>
 </div>
+    </div>
+
+    <div class="callout good">
+      <h4>Why twelve tables became three</h4>
+      <p>The first draft pulled staff out of Microsoft Graph, so Harmony had to run the job: runs, run items, streams, pages, delta bookmarks, a run sequence, leases and fencing tokens. Every standard (SCIM 2.0, the OpenID IPSIE profile) and both reference vendors push instead: the directory runs the cycle (Entra every 40 minutes), retries, and keeps the provisioning log. A conflict, such as an e-mail of another customer, goes back to the directory as a SCIM 409 the hotel sees in its own log, so <code>MigrationAmbiguities</code> has no job either. Each change is in the security trail, which names the directory as the actor.</p>
+      <p>Two rules taken from Mews: the e-mail is the person's key and never changes through SCIM; and a directory person stays read-only in Harmony (name, state, roles) until the platform removes the connection on purpose. A role is never handed out by hand to them: it follows their groups. People who signed in nowhere for the customer's <code>InactivityDays</code> (90 unless fewer) are suspended by a nightly job, except the directory's people (their directory decides) and the platform's break-glass administrator.</p>
     </div>
   </section>
 
   <!-- ============ 8 PLUMBING ============ -->
   <section>
-    <h2>Cluster nine <em>&#183; 3 tables</em></h2>
+    <h2>Cluster nine <em>&#183; 2 tables</em></h2>
     <h3>Plumbing</h3>
-    <p class="lede">Present identically in both databases today, which is why the merge nets fifty rather than fifty-three.</p>
+    <p class="lede">Built on 27 October 2026 (stage F) from the framework's own parts: its outbox table, written in Identity's own save, and its request table as the inbox. Request keys (the receipt gate) stay in Redis.</p>
 
     <div class="frame">
 <div class="zoomable">
 <pre class="mermaid">
 erDiagram
-  OutboxMessages {
-    uniqueidentifier Id PK
+  OutboxContainerEntries {
+    int Id PK "send order"
     uniqueidentifier TenantId
-    nvarchar Type
-    nvarchar Status
-    datetimeoffset PublishedAtUtc
+    nvarchar Application
+    nvarchar ReferenceId "the message id"
+    nvarchar Status "Pending Failed Completed"
+    int Attempts "set aside at 10"
+    nvarchar Payload
+    datetime2 ModifiedDate "Completed kept 7 days"
   }
   InboxMessages {
-    nvarchar MessageId PK
-    nvarchar Consumer PK
+    uniqueidentifier Id PK "hash of receiver and message id"
+    nvarchar Name "the receiver"
+    datetime2 Time "kept 14 days"
     uniqueidentifier TenantId
-    datetimeoffset ProcessedAtUtc
-  }
-  RequestIdempotency {
-    nvarchar Key PK
-    uniqueidentifier TenantId
-    nvarchar ResponseHash
   }
 </pre>
 </div>
     </div>
-    <p style="margin-top:16px"><code>OutboxMessages</code> is what makes the whole estate work without synchronous calls: events are written in the same transaction as the data that caused them, then published. A tenant is never created without the event that tells the other forty-five services about it.</p>
+    <p style="margin-top:16px"><code>OutboxContainerEntries</code> (schema <code>Outbox</code>, created by the framework's installer at startup) is what makes the whole estate work without synchronous calls: Identity writes each event in the same save as the data that caused it; the framework's job sends the rows in order, one sender at a time, waits for RabbitMQ's confirm, retries with a growing wait and sets a row aside after 10 tries (the health check says so). A receiver writes its <code>InboxMessages</code> mark in its own save, so a repeat is skipped. <code>RequestIdempotency</code> is not a table: the receipt gate keeps request keys in Redis (saved to disk, never evicted: later.md L1b).</p>
   </section>
 
   <!-- ============ FULL ============ -->
   <section>
-    <h2>All of it <em>&#183; 58 tables</em></h2>
+    <h2>All of it <em>&#183; 47 tables</em></h2>
     <h3>The whole schema</h3>
     <p class="lede">Full size &mdash; use the zoom and scroll inside the frame. Reading it top to bottom is not the point; the point is seeing how much of the graph converges on four tables.</p>
 
@@ -1058,36 +1002,21 @@ erDiagram
   StepUpAuthorizations ||--o{ MakerCheckerRequests : "proved by"
   MakerCheckerRequests ||--o{ MakerCheckerExecutions : "executed"
   MakerCheckerRequests ||--o{ MakerCheckerExpectedVersions : "guarded"
-  MakerCheckerRequests ||--o{ QuarantineReleases : "releases"
   MakerCheckerExecutions ||--o{ MakerCheckerExecutionItems : "changed"
   UserAccounts ||--o{ MakerCheckerExecutionItems : "affected"
   UserAccounts ||--o{ MakerCheckerExecutions : "approved by"
   UserAccounts ||--o{ MergeApprovals : "proposed"
   UserAccounts ||--o{ SecurityAuditEvents : "acted"
 
-  FederatedAuthorities ||--o{ ProvisioningConnections : "synced from"
-  ProvisioningConnections ||--o{ ApprovedProvisioningGroups : "allows"
-  ProvisioningConnections ||--o{ DirectoryGroupMemberships : "read back"
-  ProvisioningConnections ||--o{ DirectorySyncRuns : "ran"
-  ProvisioningConnections ||--o{ DirectorySyncRunItems : "touched"
-  ProvisioningConnections ||--o{ DirectorySyncRunStreams : "streamed"
-  ProvisioningConnections ||--o{ DirectorySyncStreamStates : "cursor"
-  ProvisioningConnections ||--o{ ProvisioningLeases : "locked"
-  ProvisioningConnections ||--o{ ProvisioningFencingSequence : "fenced"
-  DirectorySyncRuns ||--o{ DirectorySyncRunItems : "processed"
-  DirectorySyncRuns ||--o{ DirectorySyncRunStreams : "opened"
-  DirectorySyncRuns ||--o{ DirectorySyncRunPages : "fetched"
-  DirectorySyncRunStreams ||--o{ DirectorySyncRunPages : "page of"
-  DirectorySyncRunItems |o--o{ DirectorySyncRunItems : "superseded"
-  ApprovedProvisioningGroups ||--o{ DirectorySyncRunStreams : "for group"
-  ApprovedProvisioningGroups ||--o{ DirectorySyncStreamStates : "for group"
-  DirectorySyncStreamStates ||--o{ DirectorySyncRunStreams : "resumed"
-  DirectorySyncRunSequence ||--o{ DirectorySyncRuns : "numbers"
-  UserAccounts ||--o{ MigrationAmbiguities : "unmatched"
+  Tenants ||--o| ProvisioningConnections : "one directory"
+  ProvisioningConnections ||--o{ DirectoryGroups : "pushed"
+  ProvisioningConnections |o--o{ UserAccounts : "owns"
+  DirectoryGroups ||--o{ DirectoryGroupMembers : "contains"
+  UserAccounts ||--o{ DirectoryGroupMembers : "member of"
+  Roles |o--o{ DirectoryGroups : "given by"
 
-  Tenants ||--o{ OutboxMessages : "stamped"
+  Tenants ||--o{ OutboxContainerEntries : "stamped"
   Tenants ||--o{ InboxMessages : "stamped"
-  Tenants ||--o{ RequestIdempotency : "stamped"
 </pre>
       </div>
     </div>
@@ -1117,7 +1046,7 @@ erDiagram
 
     <div class="callout">
       <h4>Where to start</h4>
-      <p><strong>Organisation and Currencies first</strong> &mdash; money and law before anything else, because retrofitting a tax regime after real folios exist means migrating money. Then <code>UserAccounts</code> (ten tables reference it), <code>FederatedAuthorities</code> (every login path starts there), and <code>ProvisioningConnections</code> (seven tables, and the hardest to retrofit).</p>
+      <p><strong>Organisation and Currencies first</strong> &mdash; money and law before anything else, because retrofitting a tax regime after real folios exist means migrating money. Then <code>UserAccounts</code> (ten tables reference it), <code>FederatedAuthorities</code> (every login path starts there), and <code>ProvisioningConnections</code> (the company directory's door: three tables since the SCIM redraw).</p>
       <p>The migration traps, in order of how quietly they fail: <code>NameAr</code> on the group, <code>ThemeReference</code> on the details, <code>IsActive</code>. Each is a working feature that disappears without an error.</p>
     </div>
   </section>

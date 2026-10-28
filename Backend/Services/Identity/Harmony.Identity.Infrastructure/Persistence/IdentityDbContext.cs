@@ -1,6 +1,11 @@
 ﻿using Harmony.Core.BuildingBlocks;
+using Harmony.Core.BuildingBlocks.Domain.Abstractions;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
+using Harmony.Core.Models;
+using Harmony.Core.Outbox;
+using Harmony.Core.Outbox.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.ConfigModule;
+using Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule;
 using Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule;
 using Harmony.Identity.Domain.Entities.Aggregates.IdentityLinkModule;
 using Harmony.Identity.Domain.Entities.Aggregates.EnrolmentModule;
@@ -19,7 +24,9 @@ using Harmony.Identity.Domain.Entities.Aggregates.PropertyModule;
 using Harmony.Identity.Domain.Entities.Aggregates.RevocationModule;
 using Harmony.Identity.Domain.Entities.Aggregates.TenantModule;
 using Harmony.Identity.Domain.Entities.Reference;
+using Harmony.Identity.Infrastructure.Messaging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Harmony.Identity.Infrastructure.Persistence;
 
@@ -76,6 +83,15 @@ public sealed class IdentityDbContext : DbBaseContext
     public DbSet<RevocationGapTombstone> RevocationGapTombstones { get; set; }
     public DbSet<MakerCheckerRequest> MakerCheckerRequests { get; set; }
     public DbSet<MergeApproval> MergeApprovals { get; set; }
+    public DbSet<ProvisioningConnection> ProvisioningConnections { get; set; }
+    public DbSet<DirectoryGroup> DirectoryGroups { get; set; }
+    public DbSet<DirectoryGroupMember> DirectoryGroupMembers { get; set; }
+
+    /// <summary>Stage F: the inbox, the framework's request table under the ERD's name (see InboxRepository).</summary>
+    public DbSet<ClientRequest> InboxMessages { get; set; }
+
+    // The domain events already written to the outbox by this context: a save called again never writes one twice.
+    private readonly HashSet<IDomainEvent> eventsInOutbox = new(ReferenceEqualityComparer.Instance);
 
     /// <summary>
     /// A save that bumps a SecurityVersion also writes the revocation feed (see <see cref="RevocationFeedWriter"/>). Both
@@ -83,6 +99,9 @@ public sealed class IdentityDbContext : DbBaseContext
     /// </summary>
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        // Stage F: the events other services must hear about join this same save (the transactional outbox).
+        IdentityOutbox.Stage(this, this.eventsInOutbox);
+
         if (!RevocationFeedWriter.HasBumps(this))
         {
             return await base.SaveChangesAsync(cancellationToken);
@@ -115,6 +134,18 @@ public sealed class IdentityDbContext : DbBaseContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);
         modelBuilder.ApplySeedingConfiguration();
+
+        // Stage F, the inbox: the framework's request table, as the ERD's InboxMessages.
+        var inbox = new DbIdempotencyOptions();
+        inbox.ConfigureIdempotency("InboxMessages");
+        modelBuilder.ApplyIdempotencyConfiguration(inbox);
+        modelBuilder.Entity<ClientRequest>().HasIndex(m => m.Time).HasDatabaseName("IX_InboxMessages_Time");
+
+        // Stage F, the outbox: with messaging on, the framework's outbox table joins this context (its installer owns it).
+        if (this.ContextServices?.GetService<IOutboxSettings>() is { } outbox)
+        {
+            modelBuilder.ApplyTransactionalOutbox(outbox.OutboxSchemaName(this.ContextServices.GetService<AppInfo>()?.Name ?? "Identity"));
+        }
         base.OnModelCreating(modelBuilder);
     }
 

@@ -59,6 +59,15 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
     /// </summary>
     public bool PasswordSignIn { get; private set; }
 
+    /// <summary>
+    /// The company directory that owns this person (stage E); null for the people the customer's administrators keep in
+    /// Harmony. While set, the name, the state and the roles change only through the directory.
+    /// </summary>
+    public Guid? ProvisioningConnectionId { get; private set; }
+
+    /// <summary>The person's id in the company directory (SCIM externalId), exactly as the directory sent it.</summary>
+    public string? DirectoryExternalId { get; private set; }
+
     public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
 
     /// <summary>Roles at one hotel or one group. Changed only through AssignRole / EndAssignment.</summary>
@@ -70,6 +79,8 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
     public bool CanSignIn => State == AdministrativeState.Active;
 
     public bool IsTwoStepExempt => TwoStepExemptReason is not null;
+
+    public bool IsDirectoryManaged => ProvisioningConnectionId is not null;
 
     public Guid TenantId { get; private set; }
     public DateTime CreatedDate { get; private set; }
@@ -214,6 +225,46 @@ public sealed class User : IdentityUser<Guid>, IBaseEntity, IAuditableEntity, IM
 
         SupersededByUserAccountId = keptId;
         Terminate(reason);
+    }
+
+    /// <summary>From now on the company directory owns this person (a new one, or one the directory took over by e-mail).</summary>
+    public void ManageFromDirectory(Guid connectionId, string? externalId)
+    {
+        AssertNotTerminated();
+        if (connectionId == Guid.Empty)
+        {
+            throw new ArgumentException("A directory connection is required.", nameof(connectionId));
+        }
+
+        ProvisioningConnectionId = connectionId;
+        DirectoryExternalId = IdentityText.Blank(externalId);
+    }
+
+    /// <summary>The directory's id for the person changed.</summary>
+    public void IdentifyInDirectory(string? externalId) => DirectoryExternalId = IdentityText.Blank(externalId);
+
+    /// <summary>The name the directory sends. A name is not in the token, so nothing is killed.</summary>
+    public void Rename(string displayName)
+    {
+        AssertNotTerminated();
+        DisplayName = IdentityText.DisplayName(displayName);
+    }
+
+    /// <summary>The connection was removed on purpose: the customer's administrators keep this person in Harmony again.</summary>
+    public void LeaveDirectory()
+    {
+        ProvisioningConnectionId = null;
+        DirectoryExternalId = null;
+    }
+
+    /// <summary>
+    /// The directory deleted the person (RFC 7644 3.6): terminated, and the user name freed so the same e-mail can be a
+    /// new account later. The row, the e-mail and the trail stay; nothing is hard-deleted.
+    /// </summary>
+    public void DeleteFromDirectory(string reason)
+    {
+        Terminate(reason);
+        UserName = $"{Id:N}.deleted";
     }
 
     /// <summary>The account holds exactly these roles afterwards: missing ones are added, others removed.</summary>

@@ -19,6 +19,7 @@ namespace Harmony.Identity.Handler.Queries.UserAccountModule.List
             RoleIds = a.UserRoles.Select(r => r.RoleId).ToList(),
             State = a.State,
             StateReason = a.StateReason,
+            IsDirectoryManaged = a.ProvisioningConnectionId != null,
             SecurityVersion = a.SecurityVersion,
             CreatedDate = a.CreatedDate,
             CreatedBy = a.CreatedBy,

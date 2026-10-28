@@ -27,6 +27,12 @@ public class AssignRoleCommandHandler : AccessCommandHandlerBase, IRequestHandle
             return Fail<Guid>(BusinessErrorCodes.Identity.UserAccount.NotFound);
         }
 
+        // Stage E: the company directory owns this person's state and roles (IPSIE AL2, the Mews rule).
+        if (user.IsDirectoryManaged)
+        {
+            return Fail<Guid>(BusinessErrorCodes.Identity.Directory.DirectoryManaged);
+        }
+
         if (await RankRules.RefusalAsync(this.UserAccounts, this.CallContext, user, cancellationToken) is { } refusal)
         {
             return Fail<Guid>(refusal);

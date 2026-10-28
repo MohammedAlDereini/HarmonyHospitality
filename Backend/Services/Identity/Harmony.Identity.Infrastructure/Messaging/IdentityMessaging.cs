@@ -9,11 +9,12 @@ using Microsoft.Extensions.Logging;
 namespace Harmony.Identity.Infrastructure.Messaging;
 
 /// <summary>
-/// Identity's messaging, made of the framework's own parts (design: outbox/inbox, "use the framework as is"): the event
-/// bus on RabbitMQ; events collected during a command and published after it; a failed publish kept in the database
-/// outbox (schema Outbox, table OutboxContainerEntries) and retried by its Quartz jobs; the idempotent publisher and
-/// consumer (the inbox) on Redis locks. On when the settings carry an EventBusSettings section; Program refuses to
-/// start in Production without one, so events are never silently dropped there.
+/// Identity's messaging, made of the framework's own parts ("use the framework as is"): the event bus on RabbitMQ with
+/// publisher confirms, and the database outbox (schema Outbox, table OutboxContainerEntries). Stage F: Identity writes its
+/// events into that table in the same save as the data (IdentityOutbox); the framework's job sends them in order and marks
+/// them sent once RabbitMQ confirmed them. Receivers skip repeats through the inbox (IInboxRepository). On when the
+/// settings carry an EventBusSettings section; Program refuses to start in Production without one, so events are never
+/// silently dropped there. Off: no outbox table, nothing is written or sent.
 /// </summary>
 public static class IdentityMessaging
 {
@@ -30,7 +31,6 @@ public static class IdentityMessaging
     {
         if (!IsOn(configuration))
         {
-            services.AddScoped<IIntegrationEventPublisher, SilentIntegrationEventPublisher>();
             return services;
         }
 
@@ -47,7 +47,6 @@ public static class IdentityMessaging
             database.AddBusFailedOutbox(FailedOutboxEvery);
         }));
 
-        services.AddScoped<IIntegrationEventPublisher, EventBusIntegrationEventPublisher>();
         return services;
     }
 }

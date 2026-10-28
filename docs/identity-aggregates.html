@@ -121,7 +121,7 @@
 
   <header>
     <span class="eyebrow">REMY &#183; Identity rebuild &#183; domain layout</span>
-    <h1>The same 58 tables, ordered as code</h1>
+    <h1>The same 47 tables, ordered as code</h1>
     <p class="sub">The ERD groups tables into clusters so a reader can take them in. That is a documentation device. This page regroups the identical set into <strong>aggregates</strong> &mdash; transaction boundaries &mdash; and puts them in the order they should be written. Follow the folder convention <code>Remy.Folio.Domain</code> already uses: <code>Aggregates/&lt;Name&gt;Module/</code>, holding the root, the children it owns, and its events.</p>
     <div class="counts">
       <div><b>20</b><span>aggregate modules</span></div>
@@ -187,10 +187,8 @@ flowchart LR
   U --> SA[SecurityAuditModule]
   T --> C[ConfigModule]
   G --> C
-  FA --> PC[ProvisioningConnectionModule]
-  PC --> DR[DirectorySyncRunModule]
-  PC --> SS[StreamStateModule]
-  U --> AM[MigrationAmbiguityModule]
+  T --> PC[DirectoryModule]
+  U --> PC
 </pre>
     </div>
     <p style="margin-top:16px"><strong>Everything flows out of Tenant.</strong> Nothing points back into it, which is why it is written first and why getting its columns wrong is expensive.</p>
@@ -486,7 +484,7 @@ flowchart LR
 
     <div class="wave">
       <div class="whead"><span class="wn">4.2</span><span class="wt">MakerCheckerModule</span>
-        <span class="wd">five tables, one lifecycle, one transaction</span></div>
+        <span class="wd">four tables, one lifecycle, one transaction</span></div>
       <div class="mod">
         <h4>Aggregates/MakerCheckerModule/</h4>
         <p class="why">The biggest aggregate in the service, and correctly so. Raising, guarding, approving, executing and recording what was touched must all be atomic &mdash; a half-executed approval is unauditable.</p>
@@ -495,14 +493,12 @@ flowchart LR
 <b>MakerCheckerExecution.cs</b>
 <b>ExecutionItem.cs</b>
 <b>ExpectedVersion.cs</b>
-<b>QuarantineRelease.cs</b>
 <b>MakerCheckerEvents.cs</b>
 <b>RequestState.cs</b>         enum</pre></div>
           <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>MakerCheckerRequests</b>
 <b>MakerCheckerExecutions</b>
 <b>MakerCheckerExecutionItems</b>
-<b>MakerCheckerExpectedVersions</b>
-<b>QuarantineReleases</b></pre></div>
+<b>MakerCheckerExpectedVersions</b></pre></div>
         </div>
         <p class="inv"><b>Invariants:</b> the checker is never the maker. The maker held a live step-up when raising it. If any expected version no longer matches, the request is void rather than applied &mdash; it was reviewed against something that has since moved.</p>
       </div>
@@ -567,76 +563,21 @@ flowchart LR
     </div>
 
     <div class="wave">
-      <div class="whead"><span class="wn">5.2</span><span class="wt">ProvisioningConnectionModule</span>
-        <span class="wd">seven tables point at this root</span></div>
+      <div class="whead"><span class="wn">5.2</span><span class="wt">DirectoryModule</span>
+        <span class="wd">the company directory pushes; Harmony keeps the door and the groups</span></div>
       <div class="mod">
-        <h4>Aggregates/ProvisioningConnectionModule/</h4>
-        <p class="why">The connection owns its allowlist, the membership it last read, its lease and its fencing token. All four are meaningless without it and all four change with it.</p>
+        <h4>Aggregates/DirectoryModule/</h4>
+        <p class="why">Redrawn on 27 October 2026 for SCIM 2.0 push, the way Mews and OPERA Cloud take staff from Microsoft Entra ID and Okta. The directory runs the cycle and keeps the log, so the pull-only runs, streams, leases, fencing and delta tokens are gone, and a conflict is a SCIM 409 the directory shows instead of a <code>MigrationAmbiguity</code>. Two roots: the connection (one per customer, the secret kept only as a hash) and each group with its members and the role it gives.</p>
         <div class="grid2">
-          <div class="box"><span class="bl">Files</span><pre class="files"><b>ProvisioningConnection.cs</b>
-<b>ApprovedProvisioningGroup.cs</b>
-<b>DirectoryGroupMembership.cs</b>
-<b>ProvisioningLease.cs</b>
-<b>FencingToken.cs</b>
-<b>ProvisioningEvents.cs</b></pre></div>
+          <div class="box"><span class="bl">Files</span><pre class="files"><b>ProvisioningConnection.cs</b>  root
+<b>DirectoryGroup.cs</b>          root, with DirectoryGroupMember</pre></div>
           <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>ProvisioningConnections</b>
-<b>ApprovedProvisioningGroups</b>
-<b>DirectoryGroupMemberships</b>
-<b>ProvisioningLeases</b>
-<b>ProvisioningFencingSequence</b></pre></div>
+<b>DirectoryGroups</b>
+<b>DirectoryGroupMembers</b>
++ UserAccounts.ProvisioningConnectionId, DirectoryExternalId
++ Tenants.InactivityDays</pre></div>
         </div>
-        <p class="inv"><b>Invariant:</b> one live lease per connection, and the fencing token increases on every lease. A worker that stalls and wakes up late carries an old token and must be refused &mdash; this is the hardest thing in the service to retrofit, so write it now rather than later.</p>
-      </div>
-    </div>
-
-    <div class="wave">
-      <div class="whead"><span class="wn">5.3</span><span class="wt">DirectorySyncRunModule</span>
-        <span class="wd">one execution and everything it touched</span></div>
-      <div class="mod">
-        <h4>Aggregates/DirectorySyncRunModule/</h4>
-        <div class="grid2">
-          <div class="box"><span class="bl">Files</span><pre class="files"><b>DirectorySyncRun.cs</b>   root
-<b>SyncRunItem.cs</b>
-<b>SyncRunStream.cs</b>
-<b>SyncRunPage.cs</b>
-<b>SyncRunSequence.cs</b>
-<b>SyncRunEvents.cs</b></pre></div>
-          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>DirectorySyncRuns</b>
-<b>DirectorySyncRunItems</b>
-<b>DirectorySyncRunStreams</b>
-<b>DirectorySyncRunPages</b>
-<b>DirectorySyncRunSequence</b></pre></div>
-        </div>
-        <p class="inv"><b>Invariant:</b> a run holds the fencing token it started with and every write checks it. A finished run is immutable.</p>
-      </div>
-    </div>
-
-    <div class="wave">
-      <div class="whead"><span class="wn">5.4</span><span class="wt">StreamStateModule</span>
-        <span class="wd">outlives the runs that use it</span></div>
-      <div class="mod">
-        <h4>Aggregates/StreamStateModule/</h4>
-        <p class="why">The delta token per group. Separate from the run because it <b>survives</b> the run &mdash; that is the whole reason the second sync reads changes instead of the entire directory.</p>
-        <div class="grid2">
-          <div class="box"><span class="bl">Files</span><pre class="files"><b>DirectorySyncStreamState.cs</b>
-<b>DeltaToken.cs</b>        value object
-<b>StreamStateEvents.cs</b></pre></div>
-          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>DirectorySyncStreamStates</b></pre></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="wave">
-      <div class="whead"><span class="wn">5.5</span><span class="wt">MigrationAmbiguityModule</span>
-        <span class="wd">held for a human</span></div>
-      <div class="mod">
-        <h4>Aggregates/MigrationAmbiguityModule/</h4>
-        <div class="grid2">
-          <div class="box"><span class="bl">Files</span><pre class="files"><b>MigrationAmbiguity.cs</b>
-<b>AmbiguityEvents.cs</b></pre></div>
-          <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>MigrationAmbiguities</b></pre></div>
-        </div>
-        <p class="inv"><b>Invariant:</b> it is never resolved automatically. A directory user matching two accounts is held, not guessed &mdash; guessing merges two real people.</p>
+        <p class="inv"><b>Invariants:</b> the group is the gate &mdash; a directory person holds exactly what their groups give (a role at one hotel, one hotel group, or every hotel), worked out again whenever a group, its role or the person changes; nothing is handed out by hand. The e-mail never changes through SCIM. A directory person is read-only in Harmony until the platform removes the connection on purpose. A new secret kills the old one and every token made from it at once.</p>
       </div>
     </div>
   </section>
@@ -662,7 +603,7 @@ message bus has already leaked.</pre>
 
     <div class="note green">
       <b>The order, in one line</b>
-      <p>Reference &#8594; Tenant &#8594; Property &#8594; PropertyGroup &#8594; Membership &#8594; Role &#8594; UserAccount &#8594; FederatedAuthority &#8594; IdentityLink &#8594; Enrolment &#8594; Session &#8594; StepUp &#8594; Revocation &#8594; MakerChecker &#8594; MergeApproval &#8594; SecurityAudit &#8594; Config &#8594; ProvisioningConnection &#8594; DirectorySyncRun &#8594; StreamState &#8594; MigrationAmbiguity</p>
+      <p>Reference &#8594; Tenant &#8594; Property &#8594; PropertyGroup &#8594; Membership &#8594; Role &#8594; UserAccount &#8594; FederatedAuthority &#8594; IdentityLink &#8594; Enrolment &#8594; Session &#8594; StepUp &#8594; Revocation &#8594; MakerChecker &#8594; MergeApproval &#8594; SecurityAudit &#8594; Config &#8594; Directory</p>
     </div>
   </section>
 

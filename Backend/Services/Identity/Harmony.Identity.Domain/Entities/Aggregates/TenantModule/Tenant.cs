@@ -19,6 +19,7 @@ public sealed partial class Tenant : AggregateRoot<Guid>, IAuditableEntity, ICon
     public const int ExternalIdentifierMaxLength = 64;
     public const int MinTier = 1;
     public const int MaxTier = 5;
+    public const int MaxInactivityDays = 90;
 
     private Tenant()
     {
@@ -60,6 +61,12 @@ public sealed partial class Tenant : AggregateRoot<Guid>, IAuditableEntity, ICon
     /// Off by default.
     /// </summary>
     public bool ApprovalsRequired { get; private set; }
+
+    /// <summary>
+    /// Days without a sign-in before a nightly job suspends an account (stage E, PCI DSS 8.2.6): 90 unless the customer's
+    /// administrator chose fewer. People of the company directory are left to it.
+    /// </summary>
+    public int InactivityDays { get; private set; } = MaxInactivityDays;
 
     /// <summary>The contract, as lines: a hotel's module with its counts, or a chain-wide module. Changed only through Subscribe and Unsubscribe.</summary>
     public ICollection<TenantSubscription> Subscriptions { get; private set; } = new List<TenantSubscription>();
@@ -128,6 +135,13 @@ public sealed partial class Tenant : AggregateRoot<Guid>, IAuditableEntity, ICon
     {
         AssertNotTerminated();
         ApprovalsRequired = required;
+    }
+
+    /// <summary>Stricter than 90 days is the customer's choice; longer never is.</summary>
+    public void SuspendWhenInactiveFor(int days)
+    {
+        AssertNotTerminated();
+        InactivityDays = days is >= 1 and <= MaxInactivityDays ? days : throw new ArgumentOutOfRangeException(nameof(days));
     }
 
     /// <summary>Nobody in it signs in until it is reinstated. Suspending twice is a no-op.</summary>

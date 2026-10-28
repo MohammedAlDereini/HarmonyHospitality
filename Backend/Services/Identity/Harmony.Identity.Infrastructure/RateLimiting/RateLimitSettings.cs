@@ -39,6 +39,12 @@ public sealed class RateLimitSettings
     /// <summary>Passkey calls given back to the person every minute, up to the burst.</summary>
     public int PasskeyPerMinute { get; set; } = 10;
 
+    /// <summary>Stage E: calls one company directory may make at once (Entra's first full cycle comes in a burst).</summary>
+    public int DirectoryBurst { get; set; } = 100;
+
+    /// <summary>Calls given back to the directory every second, up to the burst (IPSIE: at least 25 a second).</summary>
+    public int DirectoryPerSecond { get; set; } = 50;
+
     /// <summary>Every number 1 or more (.NET's limiters refuse 0 too, but only at the first request); the window at most an hour.</summary>
     public static bool IsValid(RateLimitSettings settings)
         => settings.SignInBurst >= 1
@@ -48,5 +54,7 @@ public sealed class RateLimitSettings
             && settings.ResetPasswordBurst >= 1
             && settings.ResetPasswordPerMinute >= 1
             && settings.PasskeyBurst >= 1
-            && settings.PasskeyPerMinute >= 1;
+            && settings.PasskeyPerMinute >= 1
+            && settings.DirectoryBurst >= 1
+            && settings.DirectoryPerSecond >= 1;
 }

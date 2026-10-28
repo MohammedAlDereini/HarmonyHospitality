@@ -168,4 +168,20 @@ public static class SecurityAuditActions
 
     /// <summary>Two accounts of one person: written on both; the merged one is terminated, never deleted.</summary>
     public const string AccountMerged = "account.merged";
+
+    /// <summary>Stage E: the company directory took over an account Harmony already had (same e-mail, same customer).</summary>
+    public const string DirectoryTookOver = "directory.took-over";
+
+    /// <summary>The customer's directory connection: opened, its secret replaced, switched on or off, removed (on the caller).</summary>
+    public const string DirectoryConnectionOpened = "directory.connection-opened";
+    public const string DirectorySecretReplaced = "directory.secret-replaced";
+    public const string DirectorySwitchedOn = "directory.switched-on";
+    public const string DirectorySwitchedOff = "directory.switched-off";
+    public const string DirectoryConnectionRemoved = "directory.connection-removed";
+
+    /// <summary>A directory group was given a role (or none); the detail names the group (on the caller).</summary>
+    public const string DirectoryGroupMapped = "directory.group-mapped";
+
+    /// <summary>The customer's days-without-sign-in rule changed; the detail is the number (on the caller).</summary>
+    public const string InactivityDaysSet = "tenant.inactivity-days-set";
 }

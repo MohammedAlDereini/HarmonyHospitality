@@ -42,6 +42,20 @@ public sealed class SecurityEventFactory : ISecurityEventFactory
             detail);
     }
 
+    public SecurityAuditEvent CreateBy(User user, string action, string actor, string? detail = null)
+    {
+        var request = this.http.HttpContext;
+        return SecurityAuditEvent.Record(
+            user.TenantId,
+            user.Id,
+            action,
+            actor,
+            AddressOf(request),
+            request is null ? null : DeviceLabel.From(request.Request.Headers.UserAgent),
+            DateTimeOffset.UtcNow,
+            detail);
+    }
+
     /// <summary>The caller's address as the server saw it (behind a proxy this is the proxy until forwarded headers are on).</summary>
     private static string? AddressOf(HttpContext? request)
     {

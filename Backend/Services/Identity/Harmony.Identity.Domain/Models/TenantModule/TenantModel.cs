@@ -33,6 +33,12 @@ public class TenantModel
     /// <summary>True for the platform's own row (us): the console shows it apart and offers no suspend.</summary>
     public bool IsPlatform { get; set; }
 
+    /// <summary>Stage D: risky changes wait for a second administrator.</summary>
+    public bool ApprovalsRequired { get; set; }
+
+    /// <summary>Stage E: days without a sign-in before an account is suspended (1 to 90).</summary>
+    public int InactivityDays { get; set; }
+
     public DateTime CreatedDate { get; set; }
 
     public string CreatedBy { get; set; } = null!;

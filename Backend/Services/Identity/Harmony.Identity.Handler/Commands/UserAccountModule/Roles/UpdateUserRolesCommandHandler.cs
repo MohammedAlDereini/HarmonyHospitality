@@ -39,6 +39,12 @@ public class UpdateUserRolesCommandHandler : IRequestHandler<UpdateUserRolesComm
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
         }
 
+        // Stage E: the company directory owns this person's state and roles (IPSIE AL2, the Mews rule).
+        if (user.IsDirectoryManaged)
+        {
+            return Fail(BusinessErrorCodes.Identity.Directory.DirectoryManaged);
+        }
+
         // The rank rules: nobody shapes their own roles, and nobody touches an account standing above them.
         var callerId = RankRules.CallerId(this.callContext);
         if (callerId == user.Id)

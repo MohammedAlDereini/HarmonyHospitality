@@ -22,6 +22,8 @@ internal static class TenantProjections
         OnboardedOn = e.OnboardedOn,
         ExportWindowEndsOn = e.ExportWindowEndsOn,
         IsPlatform = e.Id == platformTenantId,
+        ApprovalsRequired = e.ApprovalsRequired,
+        InactivityDays = e.InactivityDays,
         CreatedDate = e.CreatedDate,
         CreatedBy = e.CreatedBy,
         ModifiedDate = e.ModifiedDate,

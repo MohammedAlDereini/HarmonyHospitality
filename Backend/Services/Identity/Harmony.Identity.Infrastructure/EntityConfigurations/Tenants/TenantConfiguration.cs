@@ -10,7 +10,8 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
 {
     public void Configure(EntityTypeBuilder<Tenant> builder)
     {
-        builder.ToTable("Tenants");
+        builder.ToTable("Tenants", table =>
+            table.HasCheckConstraint("CK_Tenants_InactivityDays", $"[InactivityDays] BETWEEN 1 AND {Tenant.MaxInactivityDays}"));
 
         builder.HasKey(e => e.Id);
         builder.Ignore(e => e.DomainEvents);
@@ -30,6 +31,7 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
         builder.Property(e => e.StatusReason).HasMaxLength(500);
         builder.Property(e => e.Tier).IsRequired();
         builder.Property(e => e.OnboardedOn).IsRequired();
+        builder.Property(e => e.InactivityDays).IsRequired().HasDefaultValue(Tenant.MaxInactivityDays);
 
         builder.Ignore(e => e.IsActive);
 

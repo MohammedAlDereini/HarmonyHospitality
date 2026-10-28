@@ -87,6 +87,17 @@ public class UserAccountConfiguration : IEntityTypeConfiguration<User>
 
         builder.Ignore(e => e.CanSignIn);
         builder.Ignore(e => e.IsTwoStepExempt);
+        builder.Ignore(e => e.IsDirectoryManaged);
+
+        // Stage E: the company directory that owns the person, and the person's id there (unique inside the directory).
+        // A connection is removed only after its people are handed back to the customer's administrators.
+        builder.Property(e => e.DirectoryExternalId).HasMaxLength(256);
+        builder.HasOne<Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.ProvisioningConnection>().WithMany()
+            .HasForeignKey(e => e.ProvisioningConnectionId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasIndex(e => new { e.ProvisioningConnectionId, e.DirectoryExternalId })
+            .IsUnique()
+            .HasFilter("[ProvisioningConnectionId] IS NOT NULL AND [DirectoryExternalId] IS NOT NULL")
+            .HasDatabaseName("UX_UserAccounts_Directory_ExternalId");
 
         // One e-mail is one person on the whole platform (decided 2026-10-16): the sign-in page has no tenant field, so an
         // address must name exactly one account wherever it lives. A person who works for two tenants is a later ticket

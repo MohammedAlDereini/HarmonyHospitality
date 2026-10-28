@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Harmony.Identity.Infrastructure.EntityConfigurations.Approvals;
 
-/// <summary>ERD cluster seven: the approval aggregate (five tables) and the merge record.</summary>
+/// <summary>ERD cluster seven: the approval aggregate (four tables) and the merge record.</summary>
 public class MakerCheckerRequestConfiguration : IEntityTypeConfiguration<MakerCheckerRequest>
 {
     public void Configure(EntityTypeBuilder<MakerCheckerRequest> builder)
@@ -27,7 +27,6 @@ public class MakerCheckerRequestConfiguration : IEntityTypeConfiguration<MakerCh
 
         builder.HasMany(e => e.Executions).WithOne().HasForeignKey(e => e.RequestId).OnDelete(DeleteBehavior.Cascade);
         builder.HasMany(e => e.ExpectedVersions).WithOne().HasForeignKey(e => e.RequestId).OnDelete(DeleteBehavior.Cascade);
-        builder.HasMany(e => e.QuarantineReleases).WithOne().HasForeignKey(e => e.MakerCheckerRequestId).OnDelete(DeleteBehavior.Cascade);
         builder.HasOne<User>().WithMany().HasForeignKey(e => e.RequestedByUserAccountId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<User>().WithMany().HasForeignKey(e => e.TargetUserAccountId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<User>().WithMany().HasForeignKey(e => e.DecidedByUserAccountId).OnDelete(DeleteBehavior.Restrict);
@@ -68,17 +67,6 @@ public class MakerCheckerExpectedVersionConfiguration : IEntityTypeConfiguration
         builder.ToTable("MakerCheckerExpectedVersions");
         builder.HasKey(e => e.Id);
         builder.HasIndex(e => new { e.RequestId, e.UserAccountId }).IsUnique().HasDatabaseName("UX_MakerCheckerExpectedVersions_Request_Account");
-        builder.HasOne<User>().WithMany().HasForeignKey(e => e.UserAccountId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<Tenant>().WithMany().HasForeignKey(e => e.TenantId).OnDelete(DeleteBehavior.Restrict);
-    }
-}
-
-public class QuarantineReleaseConfiguration : IEntityTypeConfiguration<QuarantineRelease>
-{
-    public void Configure(EntityTypeBuilder<QuarantineRelease> builder)
-    {
-        builder.ToTable("QuarantineReleases");
-        builder.HasKey(e => e.Id);
         builder.HasOne<User>().WithMany().HasForeignKey(e => e.UserAccountId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<Tenant>().WithMany().HasForeignKey(e => e.TenantId).OnDelete(DeleteBehavior.Restrict);
     }

@@ -22,6 +22,35 @@ namespace Harmony.Identity.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ClientRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Name");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("Time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("Time")
+                        .HasDatabaseName("IX_InboxMessages_Time");
+
+                    b.ToTable("InboxMessages", (string)null);
+                });
+
             modelBuilder.Entity("Harmony.Core.BuildingBlocks.Infrastructure.SeedingHistoryRecord", b =>
                 {
                     b.Property<string>("SeedTypeName")
@@ -171,6 +200,177 @@ namespace Harmony.Identity.Infrastructure.Migrations
 
                             t.HasCheckConstraint("CK_ConfigValues_TenantScope", "[Scope] <> 1 OR [ScopeId] = [TenantId]");
                         });
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.DirectoryGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ExternalId")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("PropertyGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PropertyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProvisioningConnectionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("PropertyGroupId");
+
+                    b.HasIndex("PropertyId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("ProvisioningConnectionId", "DisplayName")
+                        .IsUnique()
+                        .HasDatabaseName("UX_DirectoryGroups_Connection_Name");
+
+                    b.HasIndex("ProvisioningConnectionId", "ExternalId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_DirectoryGroups_Connection_ExternalId")
+                        .HasFilter("[ExternalId] IS NOT NULL");
+
+                    b.ToTable("DirectoryGroups", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_DirectoryGroups_OneScope", "[PropertyId] IS NULL OR [PropertyGroupId] IS NULL");
+
+                            t.HasCheckConstraint("CK_DirectoryGroups_ScopeHasRole", "[RoleId] IS NOT NULL OR ([PropertyId] IS NULL AND [PropertyGroupId] IS NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.DirectoryGroupMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DirectoryGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UserAccountId")
+                        .HasDatabaseName("IX_DirectoryGroupMembers_Account");
+
+                    b.HasIndex("DirectoryGroupId", "UserAccountId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_DirectoryGroupMembers_Group_Account");
+
+                    b.ToTable("DirectoryGroupMembers", (string)null);
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.ProvisioningConnection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .IsUnicode(false)
+                        .HasColumnType("char(32)")
+                        .IsFixedLength();
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<byte[]>("SecretHash")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("binary(32)")
+                        .IsFixedLength();
+
+                    b.Property<DateTimeOffset>("SecretIssuedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_ProvisioningConnections_ClientId");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("TenantId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_ProvisioningConnections_Tenant");
+
+                    b.ToTable("ProvisioningConnections", (string)null);
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.EnrolmentModule.LocalStaffEnrolment", b =>
@@ -865,32 +1065,6 @@ namespace Harmony.Identity.Infrastructure.Migrations
 
                             t.HasCheckConstraint("CK_MakerCheckerRequests_State", "[State] IN (N'Pending', N'Approved', N'Rejected', N'Void')");
                         });
-                });
-
-            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.MakerCheckerModule.QuarantineRelease", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("MakerCheckerRequestId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserAccountId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MakerCheckerRequestId");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("UserAccountId");
-
-                    b.ToTable("QuarantineReleases", (string)null);
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.MergeApprovalModule.MergeApproval", b =>
@@ -1891,6 +2065,11 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
+                    b.Property<int>("InactivityDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(90);
+
                     b.Property<string>("LegalNameAr")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -1939,7 +2118,10 @@ namespace Harmony.Identity.Infrastructure.Migrations
 
                     b.HasIndex("DefaultCurrency");
 
-                    b.ToTable("Tenants", (string)null);
+                    b.ToTable("Tenants", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Tenants_InactivityDays", "[InactivityDays] BETWEEN 1 AND 90");
+                        });
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.TenantSubscription", b =>
@@ -2167,6 +2349,10 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DirectoryExternalId")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -2229,6 +2415,9 @@ namespace Harmony.Identity.Infrastructure.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<Guid?>("ProvisioningConnectionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -2295,6 +2484,11 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.HasIndex("Issuer", "Subject")
                         .IsUnique()
                         .HasDatabaseName("UX_UserAccounts_Issuer_Subject");
+
+                    b.HasIndex("ProvisioningConnectionId", "DirectoryExternalId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_UserAccounts_Directory_ExternalId")
+                        .HasFilter("[ProvisioningConnectionId] IS NOT NULL AND [DirectoryExternalId] IS NOT NULL");
 
                     b.HasIndex("TenantId", "NormalizedEmail")
                         .HasDatabaseName("IX_UserAccounts_Tenant_Email");
@@ -3098,6 +3292,66 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.DirectoryGroup", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyGroupModule.PropertyGroup", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.PropertyModule.Property", null)
+                        .WithMany()
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.ProvisioningConnection", null)
+                        .WithMany()
+                        .HasForeignKey("ProvisioningConnectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.RoleModule.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.DirectoryGroupMember", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.DirectoryGroup", null)
+                        .WithMany("Members")
+                        .HasForeignKey("DirectoryGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.ProvisioningConnection", b =>
+                {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.EnrolmentModule.LocalStaffEnrolment", b =>
                 {
                     b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule.FederatedAuthority", null)
@@ -3344,27 +3598,6 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.MakerCheckerModule.QuarantineRelease", b =>
-                {
-                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.MakerCheckerModule.MakerCheckerRequest", null)
-                        .WithMany("QuarantineReleases")
-                        .HasForeignKey("MakerCheckerRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.TenantModule.Tenant", null)
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserAccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -3943,6 +4176,11 @@ namespace Harmony.Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", b =>
                 {
+                    b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.ProvisioningConnection", null)
+                        .WithMany()
+                        .HasForeignKey("ProvisioningConnectionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule.User", null)
                         .WithMany()
                         .HasForeignKey("SupersededByUserAccountId")
@@ -4061,6 +4299,11 @@ namespace Harmony.Identity.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.DirectoryModule.DirectoryGroup", b =>
+                {
+                    b.Navigation("Members");
+                });
+
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.FederatedAuthorityModule.FederatedAuthority", b =>
                 {
                     b.Navigation("Domains");
@@ -4081,8 +4324,6 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.Navigation("Executions");
 
                     b.Navigation("ExpectedVersions");
-
-                    b.Navigation("QuarantineReleases");
                 });
 
             modelBuilder.Entity("Harmony.Identity.Domain.Entities.Aggregates.PermissionModule.Permission", b =>

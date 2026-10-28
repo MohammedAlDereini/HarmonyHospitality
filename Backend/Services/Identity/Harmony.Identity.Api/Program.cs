@@ -92,6 +92,13 @@ public partial class Program
             using var scope = app.Services.CreateScope();
             await scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.MigrateAsync();
             await scope.ServiceProvider.GetRequiredService<DataProtectionKeysDbContext>().Database.MigrateAsync();
+
+            // Stage F: with messaging on, Identity writes its events into the framework's outbox table in its own saves,
+            // so the table must exist before the first save.
+            if (Harmony.Identity.Infrastructure.Messaging.IdentityMessaging.IsOn(app.Configuration))
+            {
+                Harmony.Core.Outbox.Extension.EnsureOutboxInstalled(app.Services);
+            }
         }
 
         static async Task ConfigureCacheSeedingAsync(WebApplication app)
@@ -119,7 +126,8 @@ public partial class Program
             app.Use((context, next) =>
             {
                 context.Response.Headers.XContentTypeOptions = "nosniff";
-                if (context.Request.Path.StartsWithSegments("/api"))
+                // The company directory's SCIM door (stage E) answers about people too: never stored either.
+                if (context.Request.Path.StartsWithSegments("/api") || context.Request.Path.StartsWithSegments("/scim"))
                 {
                     context.Response.Headers.CacheControl = "no-store";
                 }

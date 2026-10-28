@@ -1,6 +1,7 @@
 using Harmony.Core.BuildingBlocks.Infrastructure;
 using Harmony.Core.BuildingBlocks.Infrastructure.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.RoleModule;
+using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Infrastructure.Persistence;
@@ -136,4 +137,36 @@ public class UserAccountRepository : BaseRepository<User>, IUserAccountRepositor
 
     public Task<bool> HoldsAnyTenantWideRoleAsync(Guid userId, CancellationToken cancellationToken)
         => this.context.UserRoles.AnyAsync(r => r.UserId == userId, cancellationToken);
+
+    // A sign-in that counts: every successful way in the trail has, beside the sign-in records of stage B (the trail goes
+    // back further than the records do).
+    private static readonly string[] SignedIn =
+    [
+        SecurityAuditActions.SignInPasswordOnly, SecurityAuditActions.SignInTwoStep, SecurityAuditActions.SignInEmailLink,
+        SecurityAuditActions.SignInAfterSetup, SecurityAuditActions.SignInPasskey, SecurityAuditActions.SignInCompany,
+    ];
+
+    public async Task<IReadOnlyList<User>> DormantAsync(Guid tenantId, DateTimeOffset cutoff, int take, CancellationToken cancellationToken)
+    {
+        var made = cutoff.UtcDateTime;
+        var superRoles = this.context.Roles.IgnoreQueryFilters([QueryFilterNames.Tenant]).Where(r => r.IsSuperRole).Select(r => r.Id);
+        var sessions = this.context.OperatorSessions.IgnoreQueryFilters([QueryFilterNames.Tenant]).Where(s => s.TenantId == tenantId && s.StartedAtUtc >= cutoff);
+        var trail = this.context.SecurityAuditEvents.IgnoreQueryFilters([QueryFilterNames.Tenant]).Where(e => e.TenantId == tenantId && e.OccurredAtUtc >= cutoff && SignedIn.Contains(e.Action));
+
+        return await this.context.UserAccounts
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .Where(u => u.TenantId == tenantId && u.State == AdministrativeState.Active && u.ProvisioningConnectionId == null && !u.IsServicePrincipal)
+            .Where(u => u.CreatedDate < made)
+            .Where(u => !u.UserRoles.Any(r => superRoles.Contains(r.RoleId)))
+            .Where(u => !sessions.Any(s => s.UserAccountId == u.Id) && !trail.Any(e => e.UserAccountId == u.Id))
+            .OrderBy(u => u.CreatedDate)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<User>> OfDirectoryAsync(Guid connectionId, CancellationToken cancellationToken)
+        => await this.context.UserAccounts
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .Where(u => u.ProvisioningConnectionId == connectionId)
+            .ToListAsync(cancellationToken);
 }

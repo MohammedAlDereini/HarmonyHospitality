@@ -24,7 +24,6 @@ public class MakerCheckerRequestRepository : BaseRepository<MakerCheckerRequest>
         => this.context.Set<MakerCheckerRequest>()
             .Include(r => r.ExpectedVersions)
             .Include(r => r.Executions).ThenInclude(e => e.Items)
-            .Include(r => r.QuarantineReleases)
             .AsSplitQuery()
             .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
 

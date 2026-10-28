@@ -20,13 +20,15 @@ internal sealed class DataRetentionCleanupService : IDataRetentionCleanupService
     private readonly IUserDeviceRepository devices;
     private readonly Harmony.Identity.Domain.Repositories.IOperatorSessionRepository sessionRecords;
     private readonly Harmony.Identity.Domain.Repositories.IStepUpAuthorizationRepository proofs;
+    private readonly Harmony.Identity.Domain.Repositories.IInboxRepository inbox;
     private readonly DataRetentionSettings settings;
     private readonly ILogger<DataRetentionCleanupService> logger;
 
-    public DataRetentionCleanupService(ISecurityAuditEventRepository trail, IUserDeviceRepository devices, Harmony.Identity.Domain.Repositories.IOperatorSessionRepository sessionRecords, Harmony.Identity.Domain.Repositories.IStepUpAuthorizationRepository proofs, IOptions<DataRetentionSettings> options, ILogger<DataRetentionCleanupService> logger)
+    public DataRetentionCleanupService(ISecurityAuditEventRepository trail, IUserDeviceRepository devices, Harmony.Identity.Domain.Repositories.IOperatorSessionRepository sessionRecords, Harmony.Identity.Domain.Repositories.IStepUpAuthorizationRepository proofs, Harmony.Identity.Domain.Repositories.IInboxRepository inbox, IOptions<DataRetentionSettings> options, ILogger<DataRetentionCleanupService> logger)
     {
         this.sessionRecords = sessionRecords;
         this.proofs = proofs;
+        this.inbox = inbox;
         this.trail = trail;
         this.devices = devices;
         this.settings = options.Value;
@@ -41,6 +43,8 @@ internal sealed class DataRetentionCleanupService : IDataRetentionCleanupService
         // Stage B: ended session records live as long as the trail; spent confirmations a day.
         await DrainAsync(cutoff => this.sessionRecords.DeleteEndedBeforeAsync(cutoff, this.settings.DeleteBatchSize, cancellationToken), now.AddMonths(-this.settings.SecurityTrailMonths));
         await DrainAsync(cutoff => this.proofs.DeleteExpiredBeforeAsync(cutoff, this.settings.DeleteBatchSize, cancellationToken), now.AddDays(-1));
+        // Stage F: inbox marks live 14 days, longer than the outbox keeps a sent event (7), so a late repeat still finds its mark.
+        await DrainAsync(cutoff => this.inbox.DeleteOlderThanAsync(cutoff, this.settings.DeleteBatchSize, cancellationToken), now.AddDays(-14));
 
         this.logger.LogInformation(
             "Data retention cleanup done: {Trail} trail row(s) past {TrailMonths} months and {Devices} device(s) unseen {DeviceDays} days removed.",

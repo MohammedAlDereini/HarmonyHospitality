@@ -318,6 +318,12 @@ public static class DependenciesConfigurator
         services.AddHostedService<Harmony.Identity.Infrastructure.BackgroundServices.RevocationFeed.RevocationCompactionService>();
         // Stage D: risky changes wait for a second administrator when the customer requires approvals.
         services.TryAddScoped<IApprovalGate, Harmony.Identity.Infrastructure.Approvals.ApprovalGate>();
+        // Stage E: the company directory's door (SCIM 2.0) and the nightly inactivity rule.
+        services.TryAddScoped<IDirectoryCredentials, Harmony.Identity.Infrastructure.Provisioning.DirectoryCredentials>();
+        services.TryAddScoped<IInactivitySuspension, Harmony.Identity.Infrastructure.BackgroundServices.Inactivity.InactivitySuspension>();
+        services.AddHostedService<Harmony.Identity.Infrastructure.BackgroundServices.Inactivity.InactivitySuspensionService>();
+        // Stage F: the inbox a receiver of other services' events writes in its own save.
+        services.TryAddScoped<Harmony.Identity.Domain.Repositories.IInboxRepository, InboxRepository>();
 
         // Item 5: the real caller address (X-Forwarded-For), believed only from the front doors the settings list.
         services.AddOptions<TrustedProxySettings>()

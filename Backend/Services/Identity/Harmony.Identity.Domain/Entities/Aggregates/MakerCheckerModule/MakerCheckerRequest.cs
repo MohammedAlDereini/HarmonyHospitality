@@ -59,8 +59,6 @@ public sealed class MakerCheckerRequest : AggregateRoot<Guid>, IAuditableEntity,
 
     public ICollection<MakerCheckerExpectedVersion> ExpectedVersions { get; private set; } = new List<MakerCheckerExpectedVersion>();
 
-    public ICollection<QuarantineRelease> QuarantineReleases { get; private set; } = new List<QuarantineRelease>();
-
     public DateTime CreatedDate { get; private set; }
 
     public string CreatedBy { get; private set; } = null!;
@@ -120,9 +118,6 @@ public sealed class MakerCheckerRequest : AggregateRoot<Guid>, IAuditableEntity,
             DecidedAtUtc = now.ToUniversalTime();
         }
     }
-
-    /// <summary>A quarantined person let in by this approval (stage E).</summary>
-    public void Release(Guid userAccountId) => QuarantineReleases.Add(QuarantineRelease.Of(TenantId, Id, userAccountId));
 
     private void Decide(Guid checkerId, DateTimeOffset now, RequestState outcome)
     {

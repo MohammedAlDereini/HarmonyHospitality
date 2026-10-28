@@ -76,20 +76,3 @@ public sealed class MakerCheckerExpectedVersion : BaseEntity<Guid>, IMultiTenant
     internal static MakerCheckerExpectedVersion Of(Guid tenantId, Guid requestId, Guid userAccountId, int version)
         => new() { TenantId = tenantId, RequestId = requestId, UserAccountId = userAccountId, ExpectedVersion = version };
 }
-
-/// <summary>A quarantined person let in by an approval (the ERD's QuarantineReleases; used by stage E's directory sync).</summary>
-public sealed class QuarantineRelease : BaseEntity<Guid>, IMultiTenantEntity
-{
-    private QuarantineRelease()
-    {
-    }
-
-    public Guid TenantId { get; private set; }
-
-    public Guid MakerCheckerRequestId { get; private set; }
-
-    public Guid UserAccountId { get; private set; }
-
-    internal static QuarantineRelease Of(Guid tenantId, Guid requestId, Guid userAccountId)
-        => new() { TenantId = tenantId, MakerCheckerRequestId = requestId, UserAccountId = userAccountId };
-}

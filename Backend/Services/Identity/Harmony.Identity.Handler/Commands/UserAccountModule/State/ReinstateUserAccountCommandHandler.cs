@@ -27,6 +27,12 @@ public class ReinstateUserAccountCommandHandler : UserAccountCommandHandlerBase,
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
         }
 
+        // Stage E: the company directory owns this person's state and roles (IPSIE AL2, the Mews rule).
+        if (user.IsDirectoryManaged)
+        {
+            return Fail(BusinessErrorCodes.Identity.Directory.DirectoryManaged);
+        }
+
 
         // The rank rule: a target standing above the caller is not theirs to reinstate. (A suspended or terminated
         // account has no live session, so the caller's-own-account case cannot arise here.)

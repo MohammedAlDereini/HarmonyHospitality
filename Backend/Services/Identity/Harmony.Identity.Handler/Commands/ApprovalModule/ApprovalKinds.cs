@@ -1,6 +1,7 @@
 namespace Harmony.Identity.Handler.Commands.ApprovalModule;
 
 using Harmony.Identity.Handler.Commands.CompanyLoginModule.Switch;
+using Harmony.Identity.Handler.Commands.DirectoryModule;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Access;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Merge;
 using Harmony.Identity.Handler.Commands.UserAccountModule.Roles;
@@ -18,6 +19,7 @@ public static class ApprovalKinds
     public const string AccountMerge = "account.merge";
     public const string CompanyLoginOff = "company-login.switch-off";
     public const string ApprovalsOff = "approvals.switch-off";
+    public const string DirectoryAdministratorGroup = "directory.administrator-group";
 
     public static Type? CommandOf(string kind) => kind switch
     {
@@ -27,6 +29,7 @@ public static class ApprovalKinds
         AccountMerge => typeof(MergeAccountsCommand),
         CompanyLoginOff => typeof(SwitchCompanyLoginCommand),
         ApprovalsOff => typeof(SetApprovalsRequiredCommand),
+        DirectoryAdministratorGroup => typeof(MapDirectoryGroupCommand),
         _ => null,
     };
 }

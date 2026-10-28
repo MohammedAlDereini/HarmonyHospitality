@@ -27,6 +27,12 @@ public class SuspendUserAccountCommandHandler : UserAccountCommandHandlerBase, I
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
         }
 
+        // Stage E: the company directory owns this person's state and roles (IPSIE AL2, the Mews rule).
+        if (user.IsDirectoryManaged)
+        {
+            return Fail(BusinessErrorCodes.Identity.Directory.DirectoryManaged);
+        }
+
 
         // The rank rules: an admin door never serves the caller's own account, and never a target standing above the caller.
         if (await RankRules.RefusalAsync(this.userAccounts, this.callContext, user, cancellationToken) is { } refusal)

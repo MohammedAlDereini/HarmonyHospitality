@@ -27,6 +27,12 @@ public static class RateLimitPolicies
     /// <summary>The passkey doors behind a session (a challenge, an answer, a proof of identity): counted per PERSON, not per address.</summary>
     public const string Passkeys = "passkeys";
 
+    /// <summary>
+    /// Stage E: the company directory's SCIM and token doors, counted per directory (the client id every bearer value and
+    /// token request starts with), else per address. IPSIE asks for at least 25 requests a second; Entra's first cycle is a burst.
+    /// </summary>
+    public const string Directory = "directory";
+
     /// <summary>The sign-in family's refusal page (Pages/Account/TooManyTries), where a refused sign-in send is redirected.</summary>
     public const string RefusalPage = "/account/toomanytries";
 
@@ -61,6 +67,15 @@ public static class RateLimitPolicies
                 options.AddPolicy(Passkeys, context => IsSend(context.Request.Method)
                     ? Bucket(PersonOf(context), limits.PasskeyBurst, limits.PasskeyPerMinute)
                     : RateLimitPartition.GetNoLimiter("read"));
+
+                // Reads count too: a directory's whole cycle is reads and writes alike.
+                options.AddPolicy(Directory, context => RateLimitPartition.GetTokenBucketLimiter(DirectoryOf(context), _ => new TokenBucketRateLimiterOptions
+                {
+                    TokenLimit = limits.DirectoryBurst,
+                    TokensPerPeriod = limits.DirectoryPerSecond,
+                    ReplenishmentPeriod = TimeSpan.FromSeconds(1),
+                    QueueLimit = 0,
+                }));
             });
 
         return services;
@@ -96,6 +111,15 @@ public static class RateLimitPolicies
     internal static string PersonOf(HttpContext context)
         => context.User.FindFirst("sub")?.Value is { Length: > 0 } subject ? "sub:" + subject : CallerOf(context.Connection.RemoteIpAddress);
 
+    /// <summary>The directory behind a call: the client id its bearer value or its token request names, else the caller's address.</summary>
+    internal static string DirectoryOf(HttpContext context)
+    {
+        var header = context.Request.Headers.Authorization.ToString();
+        var bearer = header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) ? header[7..].Trim() : null;
+        var clientId = Harmony.Identity.Infrastructure.Provisioning.DirectoryCredentials.ClientIdOf(bearer);
+        return clientId is not null ? "client:" + clientId : CallerOf(context.Connection.RemoteIpAddress);
+    }
+
     /// <summary>A send counts; opening a page (GET), HEAD and the browser's CORS check (OPTIONS) never do.</summary>
     internal static bool IsSend(string method)
         => !(HttpMethods.IsGet(method) || HttpMethods.IsHead(method) || HttpMethods.IsOptions(method));
@@ -117,6 +141,16 @@ public static class RateLimitPolicies
         }
 
         http.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        if (http.Request.Path.StartsWithSegments("/scim"))
+        {
+            await http.Response.WriteAsJsonAsync(
+                new { schemas = new[] { "urn:ietf:params:scim:api:messages:2.0:Error" }, status = "429", detail = "Too many requests: wait and try again." },
+                (System.Text.Json.JsonSerializerOptions?)null,
+                "application/scim+json",
+                cancellationToken);
+            return;
+        }
+
         await http.Response.WriteAsJsonAsync(
             new { errors = new[] { new { code = BusinessErrorCodes.Identity.UserAccount.TooManyAttempts } } },
             cancellationToken);

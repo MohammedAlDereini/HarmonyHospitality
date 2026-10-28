@@ -67,6 +67,12 @@ public class MergeAccountsCommandHandler : UserAccountCommandHandlerBase, IReque
             return Fail(BusinessErrorCodes.Identity.UserAccount.NotFound);
         }
 
+        // Stage E: an account the company directory owns is ended by the directory, never merged away here.
+        if (merged.IsDirectoryManaged)
+        {
+            return Fail(BusinessErrorCodes.Identity.Directory.DirectoryManaged);
+        }
+
         if (kept.State == AdministrativeState.Terminated || merged.State == AdministrativeState.Terminated || kept.SupersededByUserAccountId is not null)
         {
             return Fail(BusinessErrorCodes.Identity.Approval.MergeNotActive);
