@@ -1,0 +1,14 @@
+# The Aspire dashboard, standalone: Microsoft's developer tool that shows the traces, metrics and logs every Harmony
+# service sends over OTLP (TelemetrySettings:OtlpEndpoint = http://localhost:4317). A developer tool, not a production
+# monitor: it keeps nothing on disk and forgets everything when it stops. Local only: both ports are bound to this PC
+# and the sign-in token is off, which must never be done on a server.
+#   docker compose -f infra/aspire-dashboard/docker-compose.yml up -d      then open http://localhost:18888
+services:
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:13.6.2
+    container_name: harmony-aspire-dashboard
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+    ports:
+      - "127.0.0.1:18888:18888"
+      - "127.0.0.1:4317:18889"

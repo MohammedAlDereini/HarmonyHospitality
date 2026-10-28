@@ -252,6 +252,11 @@ From the security review of 2026-10-12. None of these can be done or proven on a
    after a Redis restart or under memory pressure runs twice.
 7. **The company directory's door** (stage E): route `https://identity.<domain>/scim/*` from the front door to Identity
    (Entra's provisioning service and Okta call it from the internet); TLS 1.2 or later.
+8. **Where the traces go** (28 Oct): every service sends traces and metrics over OTLP to `TelemetrySettings:OtlpEndpoint`
+   (empty on a server until this is done, so nothing is sent). Point it at the collector of the chosen monitor (Azure
+   Monitor's OTLP door, or an OpenTelemetry Collector in front of Grafana or Elastic); set `TraceSampleRatio` below 1
+   once the volume asks for it. The Aspire dashboard (infra/aspire-dashboard) is a developer tool for this PC only:
+   it keeps nothing and is never deployed.
 
 **Decided not to change (2026-10-16).** The request body limit stays at Kestrel's default (30 MB) on Identity and the BFF:
 one setting for good, not revisited as payloads grow. The validators bound every field (the largest, a passkey credential,

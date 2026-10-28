@@ -48,5 +48,8 @@
         }
       ]
     }
+  },
+  "TelemetrySettings": {
+    "OtlpEndpoint": "http://localhost:4317"
   }
 }

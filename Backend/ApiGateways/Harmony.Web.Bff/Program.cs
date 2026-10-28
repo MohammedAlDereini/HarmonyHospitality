@@ -23,6 +23,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using StackExchange.Redis;
 using Yarp.ReverseProxy.Configuration;
+using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -172,6 +173,9 @@ builder.Services.AddReverseProxy()
                     // Development only: the local dev certificate; production keeps full validation.
                     ? new HttpClientConfig { DangerousAcceptAnyServerCertificate = true }
                     : null,
+                // A proxied call waits this long for the API, in all (YARP's own default is 100 s): the same 30 s the
+                // framework gives every HttpClient. YARP never retries, by design: the browser holds the intent key and retries.
+                HttpRequest = new ForwarderRequestConfig { ActivityTimeout = TimeSpan.FromSeconds(30) },
             },
         ])
     .AddTransforms(transforms =>
