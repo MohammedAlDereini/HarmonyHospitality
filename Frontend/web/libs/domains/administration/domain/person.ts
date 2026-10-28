@@ -16,6 +16,8 @@ export interface Device {
   readonly lastSeenUtc: string;
   readonly lastAddress: string | null;
   readonly signedIn: boolean;
+  /** When the person trusted this browser (the new-device gate); null: not trusted. */
+  readonly trustedAtUtc: string | null;
 }
 
 /** One line of GET /api/UserAccount/{id}/passkeys (UserPasskeyModel); only what the screen shows. */

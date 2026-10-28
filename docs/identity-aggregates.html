@@ -250,7 +250,8 @@ flowchart LR
 <b>TenantEvents.cs</b>
 <b>TenantStatus.cs</b>      enum</pre></div>
           <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>Tenants</b>
-<b>TenantSubscriptions</b></pre></div>
+<b>TenantSubscriptions</b>
++ Tenants.TrustedDevicesRequired (L16, off by default)</pre></div>
         </div>
         <p class="inv"><b>Invariant:</b> only an active tenant's subscription changes; one line per hotel and module (chain-wide: per module), so a second subscription to the same thing updates the line instead of adding a twin; a hotel line carries rooms, a chain-wide line carries none. Two checks need other tables and so live in the handler: the module's <code>Level</code> must match the line (Property-level modules on hotel lines, Tenant-level on chain-wide lines), and the hotel must belong to this tenant. Its physical <code>TotalRooms</code> may exceed the rooms licensed on its line: the gap is flagged and trailed, never refused (Mews; Opera makes the two equal). Every change is published to the shared cache the way role permissions are, so the other services see it at once.</p>
       </div>
@@ -357,7 +358,8 @@ flowchart LR
 <b>SecurityVersion.cs</b>   value object</pre></div>
           <div class="box"><span class="bl">Tables</span><pre class="tbls"><b>UserAccounts</b>
 <b>RoleAssignments</b>
-<b>AccessGrants</b></pre></div>
+<b>AccessGrants</b>
++ UserDevices.TrustedAtUtc (L16)</pre></div>
         </div>
         <p class="inv"><b>Invariants:</b> a role assignment is scoped to one property or one group, never both and never neither &mdash; make that a value object so it cannot be constructed wrong. A grantor may not assign a role above their own privilege level. And <code>SecurityVersion</code> only ever increases; that single rule is what the entire revocation design rests on.</p>
       </div>

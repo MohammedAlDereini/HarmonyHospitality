@@ -45,6 +45,15 @@ public static class SecurityAuditActions
     public const string SignInAfterSetup = "sign-in.after-two-step-setup";
     public const string SignInPasskey = "sign-in.passkey";
 
+    /// <summary>A sign-in from an untrusted browser waits for the person's "Trust device" (L16).</summary>
+    public const string SignInNewDeviceHeld = "sign-in.new-device-held";
+
+    /// <summary>The person pressed "Trust device" in the e-mail.</summary>
+    public const string DeviceTrusted = "device.trusted";
+
+    /// <summary>The customer's administrator switched the new-device gate on or off.</summary>
+    public const string TrustedDevicesSet = "tenant.trusted-devices-set";
+
     // Rows written before BFF step 5 may still carry "sign-in.password-grant" and "sign-in.password-grant-two-step":
     // the old web app's grant, gone with step 5. The trail keeps them as history; nothing writes them any more.
 

@@ -95,6 +95,11 @@ public sealed class TwoStepModel : PageModel
                 return await SignInSession.HoldForPasswordChangeAsync(this, this.forced, result.User, "mfa", SecurityAuditActions.SignInTwoStep, this.ReturnUrl);
             }
 
+            if (await SignInSession.HoldForNewDeviceAsync(this, result.User!, "mfa", SecurityAuditActions.SignInTwoStep, this.ReturnUrl) is { } gate)
+            {
+                return gate;
+            }
+
             var signedIn = await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");
             await this.mediator.Send(
                 new RecordSignInCommand { UserId = result.User!.Id, TrailAction = SecurityAuditActions.SignInTwoStep, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },
@@ -110,6 +115,11 @@ public sealed class TwoStepModel : PageModel
             {
                 // The first send already put the sign-in on hold in this browser; this copy just follows it.
                 return this.RedirectToPage("ChangePassword", new { this.ReturnUrl });
+            }
+
+            if (await SignInSession.MustWaitForNewDeviceAsync(this, result.User!))
+            {
+                return this.RedirectToPage("NewDevice", new { this.ReturnUrl });
             }
 
             await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");

@@ -47,6 +47,10 @@ public class SignOutDeviceCommandHandler : UserAccountCommandHandlerBase, IReque
             return Fail(BusinessErrorCodes.Identity.UserAccount.DeviceNotFound);
         }
 
+        // Mews: removing a device signs it out and it must be trusted again (L16).
+
+        device.Distrust();
+
         if (device.SessionId is not null)
         {
             await this.SessionService.EndOneAsync(user.Id, device.SessionId, cancellationToken);

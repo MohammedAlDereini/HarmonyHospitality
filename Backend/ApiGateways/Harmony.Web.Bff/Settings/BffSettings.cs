@@ -35,6 +35,14 @@ public sealed class BffSettings
     /// <summary>PEM file holding the EC P-256 PRIVATE key this host signs client assertions with.</summary>
     public string ClientPrivateKeyPath { get; set; } = null!;
 
+    /// <summary>
+    /// PEM file holding the EC P-256 PRIVATE key this host proves possession with (DPoP, RFC 9449): every token Identity
+    /// issues to this host is bound to it, and every call to the API carries a proof signed by it. A separate key from the
+    /// client key on purpose: losing one must not cost the other. Replacing it ends every session (their tokens are bound
+    /// to the old key); do it in a quiet hour.
+    /// </summary>
+    public string DPoPPrivateKeyPath { get; set; } = null!;
+
     public string[] Scopes { get; set; } = ["openid", "profile", "harmony.profile", "harmony", "offline_access"];
 
     /// <summary>The session cookie. __Host- is load-bearing: the browser itself enforces Secure + Path=/ + no Domain.</summary>
@@ -104,6 +112,8 @@ public sealed class BffSettings
             && System.Text.RegularExpressions.Regex.IsMatch(settings.Name, "^[A-Za-z][A-Za-z0-9]{1,31}$")
             && !string.IsNullOrWhiteSpace(settings.ClientPrivateKeyPath)
             && File.Exists(settings.ClientPrivateKeyPath)
+            && !string.IsNullOrWhiteSpace(settings.DPoPPrivateKeyPath)
+            && File.Exists(settings.DPoPPrivateKeyPath)
             && settings.Scopes.Length > 0
             && settings.CookieName.StartsWith("__Host-", StringComparison.Ordinal)
             && settings.SessionIdleMinutes is >= 5 and <= 720

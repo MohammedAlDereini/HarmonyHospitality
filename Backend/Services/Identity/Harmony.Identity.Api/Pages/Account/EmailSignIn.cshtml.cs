@@ -73,6 +73,11 @@ public sealed class EmailSignInModel : PageModel
             return await SignInSession.HoldForPasswordChangeAsync(this, this.forced, user, "mfa", SecurityAuditActions.SignInEmailLink, this.ReturnUrl);
         }
 
+        if (await SignInSession.HoldForNewDeviceAsync(this, user, "mfa", SecurityAuditActions.SignInEmailLink, this.ReturnUrl) is { } gate)
+        {
+            return gate;
+        }
+
         var signedIn = await SignInSession.SignInAsync(this.HttpContext, user, "mfa");
         await this.mediator.Send(
             new RecordSignInCommand { UserId = user.Id, TrailAction = SecurityAuditActions.SignInEmailLink, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },

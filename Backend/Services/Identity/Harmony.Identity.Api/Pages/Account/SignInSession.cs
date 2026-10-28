@@ -27,6 +27,9 @@ internal static class SignInSession
     /// <summary>Marks this browser as a device (4b): a random key, kept 400 days (the longest a browser allows). Only its hash is stored.</summary>
     public const string DeviceCookie = "__Host-harmony-device";
 
+    /// <summary>The secret of a sign-in waiting for the person to trust this browser (L16).</summary>
+    private const string NewDeviceCookie = "__Host-harmony-new-device";
+
     /// <summary>
     /// How a passkey sign-in is named in the token's amr (RFC 8176): "swk", proof of possession of a key (the attestation
     /// is not verified, so a hardware key is never claimed), and "mfa", because the person also verified themselves on the
@@ -153,6 +156,38 @@ internal static class SignInSession
 
     public static void ReleasePasswordChange(HttpResponse response)
         => response.Cookies.Delete(PasswordChangeCookie, SecondStepOptions(null));
+
+    public static void HoldNewDevice(HttpResponse response, string secret)
+        => response.Cookies.Append(NewDeviceCookie, secret, SetupOptions(NewDeviceApproval.Lifetime));
+
+    public static string? NewDevice(HttpRequest request) => request.Cookies[NewDeviceCookie];
+
+    public static void ReleaseNewDevice(HttpResponse response)
+        => response.Cookies.Delete(NewDeviceCookie, SetupOptions(null));
+
+    /// <summary>
+    /// The Mews gate (L16), from every way a person proves who they are locally: when the customer requires trusted
+    /// devices and this browser is not one, the sign-in goes on hold (proved, not signed in), the person gets the mail,
+    /// and the NewDevice page waits. Null: no gate, the page signs the person in as before. The approval service is
+    /// taken from the request so the six pages stay one line each.
+    /// </summary>
+    public static async Task<IActionResult?> HoldForNewDeviceAsync(PageModel page, User user, string method, string trailAction, string? returnUrl, string? detail = null)
+    {
+        var approvals = page.HttpContext.RequestServices.GetRequiredService<NewDeviceApproval>();
+        var deviceKey = EnsureDeviceKey(page.HttpContext);
+        if (!await approvals.MustWaitAsync(user, deviceKey, page.HttpContext.RequestAborted))
+        {
+            return null;
+        }
+
+        var secret = await approvals.HoldAsync(user, deviceKey, method, trailAction, detail, page.HttpContext.RequestAborted);
+        HoldNewDevice(page.Response, secret);
+        return page.RedirectToPage("NewDevice", new { returnUrl });
+    }
+
+    /// <summary>The doubled send of a sign-in already on hold for this browser: back to the waiting page, nothing held twice.</summary>
+    public static Task<bool> MustWaitForNewDeviceAsync(PageModel page, User user)
+        => page.HttpContext.RequestServices.GetRequiredService<NewDeviceApproval>().MustWaitAsync(user, EnsureDeviceKey(page.HttpContext), page.HttpContext.RequestAborted);
 
     /// <summary>
     /// The same pause from every way a person proves who they are: the sign-in goes on hold with how it was proved and

@@ -24,6 +24,7 @@ internal static class TenantProjections
         IsPlatform = e.Id == platformTenantId,
         ApprovalsRequired = e.ApprovalsRequired,
         InactivityDays = e.InactivityDays,
+        TrustedDevicesRequired = e.TrustedDevicesRequired,
         CreatedDate = e.CreatedDate,
         CreatedBy = e.CreatedBy,
         ModifiedDate = e.ModifiedDate,

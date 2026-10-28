@@ -10,12 +10,17 @@ import {
   myTenantPath,
   pendingApprovalsPath,
   rejectPath,
+  trustedDevicesPath,
 } from './security-rules-store';
 
 const ACCEPTED = 202;
 const MOST_DAYS = 90;
 const FEWER_DAYS = 30;
-const rules: CustomerRules = { approvalsRequired: true, inactivityDays: MOST_DAYS };
+const rules: CustomerRules = {
+  approvalsRequired: true,
+  inactivityDays: MOST_DAYS,
+  trustedDevicesRequired: false,
+};
 const merge: ApprovalRequest = {
   id: 'q1',
   kind: 'account.merge',
@@ -66,7 +71,7 @@ describe('SecurityRulesStore', () => {
     expect(store.problem()).toBeNull();
   });
 
-  it('approve, reject, approvals and days: one PUT each with the key; success reads both again', async () => {
+  it('approve, reject, approvals, days and devices: one PUT each with the key; success reads both again', async () => {
     await settle();
     answerReads();
     await settle();
@@ -89,6 +94,9 @@ describe('SecurityRulesStore', () => {
     });
     await answered(store.setInactivityDays(FEWER_DAYS, newIntentKey()), inactivityDaysPath, {
       days: FEWER_DAYS,
+    });
+    await answered(store.setTrustedDevices(true, newIntentKey()), trustedDevicesPath, {
+      required: true,
     });
     expect(store.waiting()).toEqual([]);
   });

@@ -1,0 +1,19 @@
+@page
+@model NewDeviceModel
+@{
+    ViewData["Title"] = "New device";
+}
+<meta http-equiv="refresh" content="5" />
+<h1>New device</h1>
+<p class="lead">This browser is new to your account. We sent an e-mail to <strong>@Model.Email</strong>: open it and press <strong>Trust device</strong>. This page continues by itself.</p>
+@if (Model.Resent)
+{
+    <p class="notice" role="status">A new e-mail is on its way; the earlier link no longer works.</p>
+}
+<form method="post" asp-page-handler="Resend">
+    <input type="hidden" asp-for="ReturnUrl" />
+    <button type="submit" data-busy="Sending…">Send the e-mail again</button>
+</form>
+<p class="links">
+    <a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">That was not me: start again</a>
+</p>

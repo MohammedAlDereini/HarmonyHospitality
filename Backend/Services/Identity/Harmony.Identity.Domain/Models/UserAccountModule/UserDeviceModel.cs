@@ -11,4 +11,7 @@ public class UserDeviceModel
 
     /// <summary>True while the sign-in session last opened on this device is still open.</summary>
     public bool SignedIn { get; set; }
+
+    /// <summary>When the person trusted this browser; null: not trusted.</summary>
+    public DateTimeOffset? TrustedAtUtc { get; set; }
 }

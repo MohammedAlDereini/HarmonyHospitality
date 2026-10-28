@@ -225,6 +225,9 @@
                   ><bdi>{{ device.label }}</bdi></b
                 >
                 <span dir="ltr">{{ device.lastAddress ?? '' }}</span>
+                @if (device.trustedAtUtc !== null) {
+                  <span data-trusted i18n="@@administration.person.devices.trusted">Trusted</span>
+                }
               </div>
             </div>
             <div class="obj">

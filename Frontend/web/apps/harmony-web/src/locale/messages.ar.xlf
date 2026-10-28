@@ -5670,6 +5670,86 @@
           <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="administration.person.devices.trusted" datatype="html">
+        <source>Trusted</source>
+        <target>موثوق</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.html</context>
+          <context context-type="linenumber">229,232</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.devices" datatype="html">
+        <source>New devices</source>
+        <target>الأجهزة الجديدة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">128,129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.devices.on" datatype="html">
+        <source>On</source>
+        <target>مفعّل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">132,133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.devices.off" datatype="html">
+        <source>Off</source>
+        <target>متوقف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">134,135</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.devices.state" datatype="html">
+        <source>Trust first</source>
+        <target>الثقة أولاً</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">135,138</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.devices.lead" datatype="html">
+        <source> When on, a sign-in from a browser the person has not trusted waits until they press &quot;Trust device&quot; in the e-mail Harmony sends them. People who sign in with their company account are not asked: their company checks the device. </source>
+        <target>عند التفعيل، ينتظر تسجيل الدخول من متصفح لم يوثّقه الشخص حتى يضغط «الوثوق بالجهاز» في البريد الذي يرسله Harmony. من يسجّل الدخول بحساب الشركة لا يُسأل: شركته تتحقق من الجهاز.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">139,143</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.devices.switch-off" datatype="html">
+        <source> Switch off </source>
+        <target>إيقاف</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">153,156</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.devices.switch-on" datatype="html">
+        <source> Switch on </source>
+        <target>تفعيل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.html</context>
+          <context context-type="linenumber">164,168</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.toast.devices-on" datatype="html">
+        <source>New browsers must be trusted first.</source>
+        <target>يجب الوثوق بالمتصفحات الجديدة أولاً.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.ts</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.rules.toast.devices-off" datatype="html">
+        <source>New browsers sign in without a trust step.</source>
+        <target>تسجّل المتصفحات الجديدة الدخول دون خطوة الوثوق.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

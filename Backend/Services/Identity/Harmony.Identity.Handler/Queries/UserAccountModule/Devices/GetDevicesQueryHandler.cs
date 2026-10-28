@@ -51,6 +51,7 @@ public class GetDevicesQueryHandler : IRequestHandler<GetDevicesQuery, CallRespo
             LastSeenUtc = d.LastSeenUtc,
             LastAddress = d.LastAddress,
             SignedIn = d.SessionId is not null && open.Contains(d.SessionId),
+            TrustedAtUtc = d.TrustedAtUtc,
         }).ToList();
 
         return CallResponseBuilder.CreateResponse<List<UserDeviceModel>>(eCallResponseStatus.Success).HasData(list);

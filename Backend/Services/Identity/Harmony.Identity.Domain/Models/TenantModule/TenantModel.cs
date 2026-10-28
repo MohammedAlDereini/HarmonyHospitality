@@ -39,6 +39,9 @@ public class TenantModel
     /// <summary>Stage E: days without a sign-in before an account is suspended (1 to 90).</summary>
     public int InactivityDays { get; set; }
 
+    /// <summary>A sign-in from an untrusted browser waits for the person's "Trust device" (L16).</summary>
+    public bool TrustedDevicesRequired { get; set; }
+
     public DateTime CreatedDate { get; set; }
 
     public string CreatedBy { get; set; } = null!;

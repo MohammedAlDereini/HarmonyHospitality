@@ -123,6 +123,49 @@
       </div>
     }
   </section>
+  <section class="part" aria-labelledby="devices-heading" data-devices>
+    <div class="sec-h">
+      <h2 id="devices-heading" i18n="@@administration.rules.devices">New devices</h2>
+      <div class="obj" [attr.data-s]="rules.trustedDevicesRequired ? 'ok' : null">
+        @if (rules.trustedDevicesRequired) {
+          <b i18n="@@administration.rules.devices.on">On</b>
+        } @else {
+          <b i18n="@@administration.rules.devices.off">Off</b>
+        }
+        <span i18n="@@administration.rules.devices.state">Trust first</span>
+      </div>
+    </div>
+    <p class="line" i18n="@@administration.rules.devices.lead">
+      When on, a sign-in from a browser the person has not trusted waits until they press "Trust
+      device" in the e-mail Harmony sends them. People who sign in with their company account are
+      not asked: their company checks the device.
+    </p>
+    <div class="acts" *hrIfAllowed="manageUsers">
+      @if (rules.trustedDevicesRequired) {
+        <button
+          type="button"
+          class="btn"
+          data-act="devices-off"
+          (click)="switchTrustedDevices(false)"
+          [disabled]="busy()"
+          i18n="@@administration.rules.devices.switch-off"
+        >
+          Switch off
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="btn primary"
+          data-act="devices-on"
+          (click)="switchTrustedDevices(true)"
+          [disabled]="busy()"
+          i18n="@@administration.rules.devices.switch-on"
+        >
+          Switch on
+        </button>
+      }
+    </div>
+  </section>
   <section class="part" aria-labelledby="inactive-heading" data-inactive>
     <h2 id="inactive-heading" i18n="@@administration.rules.inactive">Inactive accounts</h2>
     <p class="line" i18n="@@administration.rules.inactive.lead">

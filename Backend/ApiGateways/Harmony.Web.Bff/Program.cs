@@ -108,6 +108,9 @@ builder.Services.AddDataProtection()
     .ProtectKeysWithCertificate(X509Certificate2.CreateFromPemFile(dataProtectionSettings.CertificatePath));
 
 builder.Services.AddSingleton<ClientAssertionFactory>();
+// DPoP (RFC 9449): the proof key, and the handler that signs a proof onto every token call and bound API call.
+builder.Services.AddSingleton<DPoPProofFactory>();
+builder.Services.AddTransient<DPoPProofHandler>();
 builder.Services.AddSingleton<RedisTicketStore>();
 builder.Services.AddSingleton<CookieOidcRefresher>();
 ConfigureAuthentication(builder);
@@ -124,7 +127,9 @@ builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDef
 builder.Services.AddHttpClient(CookieOidcRefresher.BackchannelClientName).ConfigurePrimaryHttpMessageHandler(() =>
     builder.Environment.IsDevelopment()
         ? new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
-        : new HttpClientHandler());
+        : new HttpClientHandler())
+    // The refresh is a token call: it carries a DPoP proof, so the new tokens stay bound to this host's key.
+    .AddHttpMessageHandler<DPoPProofHandler>();
 
 // Deny by default: an endpoint added tomorrow without a thought is BORN protected; the public doors below
 // say AllowAnonymous out loud.
@@ -206,14 +211,19 @@ builder.Services.AddReverseProxy()
             return ValueTask.CompletedTask;
         });
 
-        // The whole point of the BFF: the browser holds a cookie, the API receives a Bearer token — attached
-        // only when a session exists, already refreshed by the cookie refresher on this very request.
+        // The whole point of the BFF: the browser holds a cookie, the API receives the session's token — attached
+        // only when a session exists, already refreshed by the cookie refresher on this very request. The token is
+        // bound to this host's DPoP key, so it travels under the DPoP scheme with a fresh proof for this very method
+        // and address (RFC 9449 §7); copied anywhere else, it is refused.
         transforms.AddRequestTransform(async context =>
         {
             var accessToken = await context.HttpContext.GetTokenAsync("access_token");
             if (!string.IsNullOrEmpty(accessToken))
             {
-                context.ProxyRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                var proofs = context.HttpContext.RequestServices.GetRequiredService<DPoPProofFactory>();
+                var address = new Uri(context.DestinationPrefix.TrimEnd('/') + context.Path.Value);
+                context.ProxyRequest.Headers.Authorization = new AuthenticationHeaderValue(DPoPProofFactory.HeaderName, accessToken);
+                context.ProxyRequest.Headers.TryAddWithoutValidation(DPoPProofFactory.HeaderName, proofs.Create(context.ProxyRequest.Method, address, accessToken));
             }
         });
     });
@@ -644,6 +654,10 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
                 var assertions = context.HttpContext.RequestServices.GetRequiredService<ClientAssertionFactory>();
                 context.ProtocolMessage.ClientAssertionType = ClientAssertionFactory.AssertionType;
                 context.ProtocolMessage.ClientAssertion = assertions.Create(settings.Authority);
+
+                // The code itself is bound to the DPoP key (RFC 9449 §10): only this host can redeem it.
+                var proofs = context.HttpContext.RequestServices.GetRequiredService<DPoPProofFactory>();
+                context.ProtocolMessage.SetParameter("dpop_jkt", proofs.Thumbprint);
                 return Task.CompletedTask;
             };
             options.Events.OnAuthorizationCodeReceived = context =>
@@ -664,6 +678,12 @@ static void ConfigureAuthentication(WebApplicationBuilder builder)
                 };
             }
         });
+
+    // Redeeming the code is a token call too: it leaves through the DPoP handler, wrapped around whatever handler the
+    // environment chose above, so the first tokens of a session are bound to this host's key from the start.
+    builder.Services.AddOptions<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme)
+        .Configure<DPoPProofFactory>((options, proofs) =>
+            options.BackchannelHttpHandler = new DPoPProofHandler(proofs) { InnerHandler = options.BackchannelHttpHandler ?? new HttpClientHandler() });
 }
 
 /// <summary>What the top-level statements need as members: the asset-name pattern the static file caching reads.</summary>

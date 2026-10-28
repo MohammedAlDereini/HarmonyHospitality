@@ -113,6 +113,11 @@ public static class IdentityServerResources
         ClientSecrets = [.. publicKeys.Select(jwk => new Secret { Type = IdentityServerConstants.SecretTypes.JsonWebKey, Value = jwk })],
         RequireClientSecret = true,
 
+        // DPoP (RFC 9449, later.md L3): every token for this client is bound to the key the BFF proves it holds; a
+        // copy taken from a log, a proxy or a memory dump is refused by every API without that key. The proof's own
+        // freshness is its iat (Duende's default mode, 5 minutes of skew); no server nonce round trip.
+        RequireDPoP = true,
+
         AllowedGrantTypes = GrantTypes.Code,
         RequirePkce = true,
         AllowPlainTextPkce = false,

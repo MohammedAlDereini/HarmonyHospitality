@@ -158,6 +158,11 @@ public sealed class TwoStepSetupModel : PageModel
             return this.Page();
         }
 
+        if (await SignInSession.HoldForNewDeviceAsync(this, result.User!, "mfa", SecurityAuditActions.SignInAfterSetup, this.ReturnUrl) is { } gate)
+        {
+            return gate;
+        }
+
         var signedIn = await SignInSession.SignInAsync(this.HttpContext, result.User!, "mfa");
         await this.mediator.Send(
             new RecordSignInCommand { UserId = result.User!.Id, TrailAction = SecurityAuditActions.SignInAfterSetup, DeviceKey = signedIn.DeviceKey, SessionId = signedIn.SessionId },

@@ -82,6 +82,17 @@ export class SecurityRulesPage {
     }
   }
 
+  protected async switchTrustedDevices(on: boolean): Promise<void> {
+    const result = await this.run(this.store.setTrustedDevices(on, newIntentKey()));
+    if (result.kind === 'ok')
+      this.toasts.show(
+        on
+          ? $localize`:@@administration.rules.toast.devices-on:New browsers must be trusted first.`
+          : $localize`:@@administration.rules.toast.devices-off:New browsers sign in without a trust step.`,
+      );
+    else this.problem.set(messageOf(result));
+  }
+
   protected async approve(request: ApprovalRequest): Promise<void> {
     const result = await this.run(this.store.approve(request, newIntentKey()));
     if (result.kind === 'ok')

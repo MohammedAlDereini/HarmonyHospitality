@@ -8,6 +8,7 @@
   "BffSettings": {
     "Authority": "https://identity.harmony.local",
     "ClientPrivateKeyPath": "/run/secrets/web-bff-client-key.pem",
+    "DPoPPrivateKeyPath": "/run/secrets/web-bff-dpop-key.pem",
     "ApiDestination": "https://identity.harmony.local",
     "PasskeyEnrollUrl": "https://app.harmony.local/account/security",
     "PasskeyManageUrl": "https://app.harmony.local/account/security"

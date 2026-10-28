@@ -243,6 +243,7 @@ public static class DependenciesConfigurator
         services.TryAddScoped<SecondFactorCheck>();
         services.TryAddScoped<TwoStepSetup>();
         services.TryAddScoped<EmailSignIn>();
+        services.TryAddScoped<NewDeviceApproval>();
         services.TryAddScoped<ForcedPasswordChange>();
 
         // Item 6: passkeys. The sign-in half on the pages, the registration half behind the API (the challenge held server-side).

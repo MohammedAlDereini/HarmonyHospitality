@@ -32,6 +32,7 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
         builder.Property(e => e.Tier).IsRequired();
         builder.Property(e => e.OnboardedOn).IsRequired();
         builder.Property(e => e.InactivityDays).IsRequired().HasDefaultValue(Tenant.MaxInactivityDays);
+        builder.Property(e => e.TrustedDevicesRequired).IsRequired().HasDefaultValue(false);
 
         builder.Ignore(e => e.IsActive);
 

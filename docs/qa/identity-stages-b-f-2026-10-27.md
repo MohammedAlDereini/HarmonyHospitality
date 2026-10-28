@@ -75,5 +75,20 @@ Proof:
 - [x] `Harmony.TestEnv\s67\resilience-check` 4/4 against a stand-in server: a GET answered 503 twice comes back 200 on the third try; a POST answered 503 is handed back once, never retried; a first answer of 11 s is cut at the 10 s attempt and the fast retry wins (12.3 s in all); every answer too slow is given up at 30.0 s (TimeoutRejectedException).
 - [x] the local stack with the dashboard: one person-page call is one trace of 7 spans over 2 services, `WebBff GET /api/{**rest}` -> `HTTP GET 200` -> `Identity GET api/UserAccount/{id:guid}` -> four SQL SELECTs with their times (one at 772 ms, to look at); the metrics pages list ASP.NET Core, Kestrel, System.Net.Http and runtime meters with P50/P90/P99 per method and status.
 - [x] framework tests: MediatR 98, Identity 15, BuildingBlocks 8 green; the two old UnitTest projects (Cache, FileStorage) fail before and after this change for want of an `applicationSettings.json` with a real Redis and blob store (not touched).
-- [ ] full regression with telemetry on (tag TEL)
+- [~] full regression with telemetry on (tag TEL): stopped by the user at 31 of 40 suites, every one green (s66 to s35); the one full regression runs once, after DPoP (L3) and trusted devices (L16), before the push
 
+## After telemetry: DPoP (L3) and trusted devices (L16), 28 October
+
+The last two of the four parked decisions, built on "close this all in one go". Both in `docs/later.md` under their items.
+
+- **DPoP (L3):** Identity requires a proof from both BFF clients (`RequireDPoP`), every token carries `cnf.jkt`; the BFF signs an ES256 proof per token call and per proxied API call (`DPoPProofFactory`, `DPoPProofHandler`, the `dpop_jkt` on PAR, the nonce retry); the API side is our own `DPoPProofValidator` in `Harmony.Core.Identity` (about 150 lines; Duende's JwtBearer package is not confirmed under the Community Edition), wired into the framework's bearer handler, with the `WWW-Authenticate` answer naming `DPoP` and the algorithms. Keys: `secrets/web-bff-dpop-key.pem` and `secrets/console-bff-dpop-key.pem` for the local run (production: `/run/secrets/...`), tracked the way the local client keys are.
+- **Trusted devices (L16):** `Tenants.TrustedDevicesRequired` (off by default, `PUT /api/UserAccount/TrustedDevices`), `UserDevices.TrustedAtUtc`, migration `20261028074800_TrustedDevices`; the hold before `SignInAsync` in every sign-in page (password, passkey, two-step, two-step setup, e-mail link, password change); `/account/newdevice` waits and finishes the sign-in, `/account/trustdevice?token=` spends the one-use link from "Harmony security: trust this device to sign in"; company sign-ins never held; Sign out device also distrusts. Web: the "New devices" switch under Approvals and rules, the Trusted mark on device rows (10 Arabic units added).
+- **Test harness:** every suite now sends DPoP (`helpers.ps1`, `page-sign-in.ps1`: the proof on token calls and API calls, `dpop_jkt` on PAR, the newdevice turn, the straight-in path for a browser that still holds its Identity session, `PsForgetSession`); s68 and s69 added to the runner.
+
+Proof:
+- [x] `s68\tests\e2e\dpop-e2e.ps1` 14/14 (the token door: no proof refused, a proof per request, the refresh bound by the client key per RFC 9449 section 5; the API: a Bearer token with `cnf` refused, a wrong key, a wrong method, a wrong address, a stale proof, a replayed `jti`, a wrong `ath`, the header's wording)
+- [x] the gate `s56` 44/44 through the BFF with DPoP on (api-s68)
+- [x] `s69\tests\e2e\trusted-devices-e2e.ps1` 8/8 (off by default straight in; on: a new browser waits, the mail, the link trusts it and the sign-in finishes, one held and one trusted; the same browser again straight in; the link once; a made-up token refused; the administrator's sign-out distrusts and the browser waits again; off again straight in; ViewUsers alone cannot touch the switch)
+- [x] web: `pnpm run check` clean (1897 units, 0 boundary violations, 0 style problems), `ng test` 257/257, en and ar builds 420 kB initial
+- [x] framework: Identity tests 15/15 with the validator
+- [ ] full regression (tag FINAL on api-s69): running

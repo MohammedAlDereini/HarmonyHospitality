@@ -57,6 +57,7 @@ const laptop: Device = {
   lastSeenUtc: '2026-10-24T09:00:00Z',
   lastAddress: '10.0.0.5',
   signedIn: true,
+  trustedAtUtc: null,
 };
 const key: Passkey = {
   id: 'k1',
@@ -253,7 +254,7 @@ describe('PersonPage', () => {
     await settle();
   });
 
-  it('names the account to the store, shows who they are, their roles ticked, devices, passkeys and the trail', () => {
+  it('names the account to the store, shows who they are, their roles ticked, devices, passkeys and the trail', async () => {
     expect(store.opened).toEqual(['u5']);
     expect(text('.person h1')).toBe('Rana Qasem');
     expect(text('[data-two-step] b')).toBe('Not set');
@@ -262,6 +263,10 @@ describe('PersonPage', () => {
     );
     expect(page.querySelector<HTMLInputElement>('input[data-role="MANAGER"]')?.checked).toBe(false);
     expect(text('.drow .s-nm b')).toBe('Chrome on Windows');
+    expect(page.querySelector('.drow [data-trusted]')).toBeNull();
+    store.deviceRows.set([{ ...laptop, trustedAtUtc: '2026-10-24T08:00:00Z' }]);
+    await settle();
+    expect(text('.drow [data-trusted]')).toBe('Trusted');
     expect(text('.krow .s-nm b')).toBe('Work laptop');
     expect(text('.erow .s-nm b')).toBe('account.created');
     expect(text('[data-session] .s-nm b')).toBe('Microsoft');

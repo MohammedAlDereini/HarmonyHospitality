@@ -68,6 +68,12 @@ public sealed partial class Tenant : AggregateRoot<Guid>, IAuditableEntity, ICon
     /// </summary>
     public int InactivityDays { get; private set; } = MaxInactivityDays;
 
+    /// <summary>
+    /// The Mews gate (later.md L16): a sign-in from a browser the account has not trusted waits until the person presses
+    /// "Trust device" in the e-mail. Off by default; people the company signs in are never gated (their company checks).
+    /// </summary>
+    public bool TrustedDevicesRequired { get; private set; }
+
     /// <summary>The contract, as lines: a hotel's module with its counts, or a chain-wide module. Changed only through Subscribe and Unsubscribe.</summary>
     public ICollection<TenantSubscription> Subscriptions { get; private set; } = new List<TenantSubscription>();
 
@@ -138,6 +144,11 @@ public sealed partial class Tenant : AggregateRoot<Guid>, IAuditableEntity, ICon
     }
 
     /// <summary>Stricter than 90 days is the customer's choice; longer never is.</summary>
+    public void RequireTrustedDevices(bool required)
+    {
+        TrustedDevicesRequired = required;
+    }
+
     public void SuspendWhenInactiveFor(int days)
     {
         AssertNotTerminated();

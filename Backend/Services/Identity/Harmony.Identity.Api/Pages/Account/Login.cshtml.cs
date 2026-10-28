@@ -188,6 +188,11 @@ public sealed class LoginModel : PageModel
                 return await SignInSession.HoldForPasswordChangeAsync(this, this.forced, result.User, "pwd", SecurityAuditActions.SignInPasswordOnly, this.ReturnUrl);
             }
 
+            if (await SignInSession.HoldForNewDeviceAsync(this, result.User!, "pwd", SecurityAuditActions.SignInPasswordOnly, this.ReturnUrl) is { } gate)
+            {
+                return gate;
+            }
+
             // On the exception list: signed in with the password alone, and the session says so ("pwd").
             var signedIn = await SignInSession.SignInAsync(this.HttpContext, result.User!, "pwd");
             await this.mediator.Send(
@@ -310,6 +315,11 @@ public sealed class LoginModel : PageModel
             if (result.User!.MustChangePassword)
             {
                 return await SignInSession.HoldForPasswordChangeAsync(this, this.forced, result.User, string.Join(',', SignInSession.PasskeyMethods), SecurityAuditActions.SignInPasskey, this.ReturnUrl, result.PasskeyName);
+            }
+
+            if (await SignInSession.HoldForNewDeviceAsync(this, result.User!, string.Join(',', SignInSession.PasskeyMethods), SecurityAuditActions.SignInPasskey, this.ReturnUrl, result.PasskeyName) is { } gate)
+            {
+                return gate;
             }
 
             // The trail line names the key that signed in (OWASP: record which credential was used), never the key itself.

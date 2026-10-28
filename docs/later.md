@@ -385,6 +385,9 @@ Docker network such as `"172.18.0.0/16"`):
 ---
 
 ## L3. DPoP: tokens that only work for the server that holds them
+**Decided 2026-10-28: A, build it now**, in the framework once, before the first PMS service (Duende's licence covers it; Redis serves the one-use check, so L4 is no blocker). Duende's validation package under the same licence, or about 150 lines of ours: the user chooses at build time.
+
+**Built 2026-10-28 (s68 14/14, the gate s56 44/44 through the BFF with DPoP on).** Identity: `RequireDPoP = true` on both BFF clients, so a token request without a proof is refused at the door and every access and refresh token carries `cnf.jkt`. BFF: an ES256 key per host (`DPoPPrivateKeyPath`, a PEM file beside the client key), a proof on every token call (with Duende's `use_dpop_nonce` retry) and on every proxied API call (`Authorization: DPoP <token>` + `DPoP` header), `dpop_jkt` on PAR. API: our own validator in the framework (`DPoPProofValidator`, about 150 lines: header, `typ dpop+jwt`, public JWK, signature, thumbprint = `cnf.jkt`, `htm`, `htu`, `iat` within 60 s, `ath`, one use of `jti`) wired into the framework's bearer handler; a token with `cnf` sent as plain Bearer is refused, and the `WWW-Authenticate` answer names `DPoP` and the algorithms. Not Duende's `Duende.AspNetCore.Authentication.JwtBearer`: its licence is not confirmed under the Community Edition. Left for later: the `jti` one-use cache is in-process per instance (Redis when L4 lands); SignalR hubs still take the query-string token without a proof (a DPoP-aware hub token when the first hub ships).
 
 **Parked:** 2026-10-05, while building the web BFF client (change 1.2).
 
@@ -568,6 +571,7 @@ Either way, card numbers never touch Harmony: terminals encrypt to the processor
 ---
 
 ## L7. Leaked-password check: a paid supplier if a customer asks
+**Decided 2026-10-28: A, keep HIBP.** A supplier changes only when a customer asks; one class and its settings.
 
 **Parked:** 2026-10-07, after the password blocklist (3b).
 
@@ -734,6 +738,9 @@ client and CORS; the sign-in pages keep `[EnableRateLimiting]`, and only the BFF
 ---
 
 ## L16. Trusted devices and approving new sign-ins
+**Decided 2026-10-28: A, the Mews gate, about 2 days.** A sign-in from an unknown browser waits at a "new device" screen until the person presses Trust device in the e-mail; the browser is then trusted and listed; removing it signs it out. Per customer, off by default (Mews: off until the admin switches it on); people who sign in with their company account are skipped (their company checks the device). No number matching: the proof is the mailbox, not a tap on another phone. Mews and OPERA checked 2026-10-28: Mews gates with the e-mail click; OPERA only remembers a device for 1 to 180 days after a second factor (a convenience we do not copy).
+
+**Built 2026-10-28 (s69 8/8).** `Tenants.TrustedDevicesRequired` (off by default; `PUT /api/UserAccount/TrustedDevices` with ManageUsers, trail line `tenant.trusted-devices-set`), `UserDevices.TrustedAtUtc`. With the switch on, every password, passkey, two-step, e-mail-link and password-change sign-in from a browser the account has not trusted stops at `/account/newdevice` (trail line `sign-in.new-device-held`, the hold in Redis for 15 minutes) and the person gets "Harmony security: trust this device to sign in" with a one-use link to `/account/trustdevice`; the waiting page refreshes itself and finishes the sign-in once the link was opened (trail line `device.trusted`). Company sign-ins are never held. An administrator's Sign out device also distrusts it. The web app shows the switch under Approvals and rules ("New devices") and a Trusted mark on the person's device rows.
 
 **Parked:** 2026-10-08, after item 5.
 
@@ -795,6 +802,7 @@ that code and shows the prove-yourself dialog. Guard first: Create user, UpdateR
 ---
 
 ## L19. Graded enforcement: mask sensitive data instead of refusing
+**Decided 2026-10-28: B, with the first PMS service.** The "reduced sight" mark on the session and the masked fields land together where the first guest data is; the mark alone does nothing in Identity, which holds staff, not guests.
 
 **Parked:** 2026-10-09, from the Mews deep-dive.
 

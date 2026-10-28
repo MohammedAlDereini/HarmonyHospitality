@@ -1,0 +1,14 @@
+@page
+@model TrustDeviceModel
+@{
+    ViewData["Title"] = "Trust device";
+}
+<h1>Trust device</h1>
+@if (Model.Device is not null)
+{
+    <p class="lead">Done: <strong>@Model.Device</strong> is trusted for your account. Go back to the tab where you were signing in; it continues by itself.</p>
+}
+else
+{
+    <p class="error" role="alert">This link is not valid any more: it was already used, it is older than 15 minutes, or it was never ours. Start the sign-in again to get a new one.</p>
+}

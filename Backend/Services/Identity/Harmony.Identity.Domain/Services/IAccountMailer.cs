@@ -35,4 +35,7 @@ public interface IAccountMailer
 
     /// <summary>"A new sign-in to your account": the browser, the address and the time. Never throws, like the alerts above.</summary>
     Task SendNewDeviceAlertAsync(User user, string device, string? address, DateTimeOffset at, CancellationToken cancellationToken);
+
+    /// <summary>The Mews gate (L16): the sign-in waits until the person opens this link and trusts the browser.</summary>
+    Task SendNewDeviceApprovalAsync(User user, string device, string? address, DateTimeOffset at, string link, CancellationToken cancellationToken);
 }

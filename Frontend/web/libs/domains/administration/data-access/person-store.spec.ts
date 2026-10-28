@@ -64,6 +64,7 @@ const laptop: Device = {
   lastSeenUtc: '2026-10-24T09:00:00Z',
   lastAddress: '10.0.0.5',
   signedIn: true,
+  trustedAtUtc: null,
 };
 const webSession: SessionRecord = {
   startedAtUtc: '2026-10-24T08:00:00Z',

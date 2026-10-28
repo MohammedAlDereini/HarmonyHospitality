@@ -10,6 +10,7 @@
     "CookieName": "__Host-Http-harmony-console",
     "Authority": "https://localhost:5000",
     "ClientPrivateKeyPath": "D:/PMS System/Harmony/secrets/console-bff-client-key.pem",
+    "DPoPPrivateKeyPath": "D:/PMS System/Harmony/secrets/console-bff-dpop-key.pem",
     "ApiDestination": "https://localhost:5000"
   },
   "ApiDocs": {

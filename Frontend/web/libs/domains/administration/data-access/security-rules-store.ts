@@ -11,6 +11,7 @@ export const approvePath = '/api/Approval/Approve';
 export const rejectPath = '/api/Approval/Reject';
 export const approvalsRequiredPath = '/api/Approval/Required';
 export const inactivityDaysPath = '/api/Directory/InactivityDays';
+export const trustedDevicesPath = '/api/UserAccount/TrustedDevices';
 
 /**
  * The customer's security rules (stages D and E): approvals on or off with the changes waiting for a second
@@ -53,6 +54,11 @@ export class SecurityRulesStore {
 
   setInactivityDays(days: number, intent: IntentKey): Promise<ApiResult<unknown>> {
     return this.write(inactivityDaysPath, { days }, intent);
+  }
+
+  /** The new-device gate on or off: a sign-in from an untrusted browser waits for the person's e-mail click. */
+  setTrustedDevices(required: boolean, intent: IntentKey): Promise<ApiResult<unknown>> {
+    return this.write(trustedDevicesPath, { required }, intent);
   }
 
   private async write(path: string, body: unknown, intent: IntentKey): Promise<ApiResult<unknown>> {

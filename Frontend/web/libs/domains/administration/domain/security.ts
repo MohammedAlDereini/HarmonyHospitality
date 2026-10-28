@@ -15,6 +15,8 @@ export interface CustomerRules {
   readonly approvalsRequired: boolean;
   /** Days without a sign-in before an account is suspended: 1 to 90. */
   readonly inactivityDays: number;
+  /** The Mews gate: a sign-in from an untrusted browser waits for "Trust device" in the e-mail. */
+  readonly trustedDevicesRequired: boolean;
 }
 
 /** The longest the inactivity rule may wait (PCI DSS 8.2.6): a customer may choose fewer days, never more. */

@@ -29,6 +29,7 @@ class FakeStore {
   readonly rules = signal<CustomerRules | null>({
     approvalsRequired: true,
     inactivityDays: MOST_DAYS,
+    trustedDevicesRequired: false,
   });
   readonly waiting = signal<readonly ApprovalRequest[]>([merge]);
   readonly loading = signal(false);
@@ -52,6 +53,10 @@ class FakeStore {
   }
   setInactivityDays(days: number): Promise<ApiResult<unknown>> {
     this.calls.push(`days:${String(days)}`);
+    return Promise.resolve(this.answer);
+  }
+  setTrustedDevices(on: boolean): Promise<ApiResult<unknown>> {
+    this.calls.push(`devices:${String(on)}`);
     return Promise.resolve(this.answer);
   }
 }
@@ -140,6 +145,15 @@ describe('SecurityRulesPage', () => {
     page.querySelector<HTMLFormElement>('[data-inactive] form')?.requestSubmit();
     await settle();
     expect(store.calls).toEqual(['days:30']);
+  });
+
+  it('new devices: off is shown; Switch on is one press; a refusal is worded', async () => {
+    expect(texts('[data-devices] .sec-h .obj b')).toEqual(['Off']);
+    store.answer = { kind: 'refused', status: ACCEPTED, codes: ['00073'] };
+    click('[data-act="devices-on"]');
+    await settle();
+    expect(store.calls).toEqual(['devices:true']);
+    expect(texts('.empty[role="alert"]').length).toBe(1);
   });
 
   it('without ManageUsers: nothing to press or type', async () => {

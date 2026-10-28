@@ -2107,6 +2107,11 @@ namespace Harmony.Identity.Infrastructure.Migrations
                     b.Property<int>("Tier")
                         .HasColumnType("int");
 
+                    b.Property<bool>("TrustedDevicesRequired")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code")
@@ -2529,6 +2534,9 @@ namespace Harmony.Identity.Infrastructure.Migrations
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("TrustedAtUtc")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserAccountId")
                         .HasColumnType("uniqueidentifier");

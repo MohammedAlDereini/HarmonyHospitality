@@ -58,6 +58,7 @@ export {
   myTenantPath,
   pendingApprovalsPath,
   rejectPath,
+  trustedDevicesPath,
 } from './security-rules-store';
 export {
   DirectoryStore,

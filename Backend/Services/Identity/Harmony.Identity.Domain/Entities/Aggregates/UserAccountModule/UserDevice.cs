@@ -44,6 +44,11 @@ public sealed class UserDevice : BaseEntity<Guid>, IMultiTenantEntity
     /// <summary>The Identity sign-in session last opened on this device; null when none is known.</summary>
     public string? SessionId { get; private set; }
 
+    /// <summary>When the person pressed "Trust device" for this browser; null: not trusted (L16).</summary>
+    public DateTimeOffset? TrustedAtUtc { get; private set; }
+
+    public bool IsTrusted => TrustedAtUtc is not null;
+
     public static UserDevice First(Guid tenantId, Guid userAccountId, string keyHash, string label, string? address, string? sessionId, DateTimeOffset at)
     {
         if (userAccountId == Guid.Empty)
@@ -70,6 +75,18 @@ public sealed class UserDevice : BaseEntity<Guid>, IMultiTenantEntity
     /// <summary>What is stored for a device key: its SHA-256, 64 hex characters.</summary>
     public static string HashOf(string deviceKey)
         => Convert.ToHexString(SHA256.HashData(Encoding.ASCII.GetBytes(deviceKey)));
+
+    /// <summary>The person pressed "Trust device" for this browser: its sign-ins no longer wait.</summary>
+    public void Trust(DateTimeOffset at)
+    {
+        TrustedAtUtc ??= at;
+    }
+
+    /// <summary>Signed out by an administrator (Mews: removing a device): the next sign-in from it waits again.</summary>
+    public void Distrust()
+    {
+        TrustedAtUtc = null;
+    }
 
     /// <summary>Another sign-in from this browser: what it looks like, where it came from, and its new session.</summary>
     public void SeenAgain(string label, string? address, string? sessionId, DateTimeOffset at)

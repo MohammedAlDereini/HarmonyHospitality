@@ -151,6 +151,23 @@ public sealed class AccountMailer : IAccountMailer
         }
     }
 
+    public async Task SendNewDeviceApprovalAsync(User user, string device, string? address, DateTimeOffset at, string link, CancellationToken cancellationToken)
+    {
+        var body =
+            $"Hello {user.DisplayName},\n\n" +
+            "Someone is signing in to your Harmony account from a device it has not trusted before:\n" +
+            $"  {device}\n" +
+            $"  from {address ?? "an unknown address"}\n" +
+            $"  at {at.UtcDateTime:yyyy-MM-dd HH:mm} UTC\n\n" +
+            "If it is you, trust the device and the sign-in continues by itself:\n" +
+            $"  {link}\n\n" +
+            "The link works once, for 15 minutes.\n" +
+            "If it is not you, do nothing: nobody gets in. Then change your password and tell your administrator.\n";
+
+        // A lost mail is the person's wait, not a security hole: the sign-in stays held. Still the mailer's error to see.
+        await this.SendAsync(user, "Harmony security: trust this device to sign in", body, cancellationToken);
+    }
+
     private async Task SendAsync(User user, string subject, string body, CancellationToken cancellationToken)
     {
         var message = new NotificationEmailMessage

@@ -235,6 +235,16 @@ public class UserAccountController(IMediator mediator, ICallResponseManager call
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 
+    /// <summary>The Mews gate (L16) on or off for the caller's customer: a sign-in from an untrusted browser waits for "Trust device".</summary>
+    [HttpPut("[action]")]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ManageUsers)]
+    public async Task<IActionResult> TrustedDevices([FromBody] SetTrustedDevicesRequiredCommand command)
+    {
+        var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
     /// <summary>An admin signs a person out of one device; that device is forgotten.</summary>
     [HttpPut("[action]")]
     [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]

@@ -18,6 +18,7 @@ public class UserDeviceConfiguration : IEntityTypeConfiguration<UserDevice>
         builder.Property(e => e.Label).IsRequired().HasMaxLength(UserDevice.LabelMaxLength);
         builder.Property(e => e.LastAddress).HasMaxLength(UserDevice.AddressMaxLength);
         builder.Property(e => e.SessionId).HasMaxLength(UserDevice.SessionIdMaxLength);
+        builder.Ignore(e => e.IsTrusted);
 
         // A device belongs to its account; removing the device never touches the account.
         builder.HasOne<User>().WithMany().HasForeignKey(e => e.UserAccountId).OnDelete(DeleteBehavior.Cascade);
