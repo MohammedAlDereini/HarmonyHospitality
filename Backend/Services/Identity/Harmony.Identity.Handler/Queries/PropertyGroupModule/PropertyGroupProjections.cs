@@ -8,7 +8,7 @@ namespace Harmony.Identity.Handler.Queries.PropertyGroupModule;
 
 internal static class PropertyGroupProjections
 {
-    /// <summary>The group row as the reads show it; the precedence reads as its one column.</summary>
+    /// <summary>The group row as the reads show it, with the brand's columns when it carries them; the precedence reads as its one column.</summary>
     public static readonly Expression<Func<PropertyGroup, PropertyGroupModel>> Model = e => new PropertyGroupModel
     {
         Id = e.Id,
@@ -26,21 +26,19 @@ internal static class PropertyGroupProjections
         CreatedBy = e.CreatedBy,
         ModifiedDate = e.ModifiedDate,
         ModifiedBy = e.ModifiedBy,
+        Brand = e.Brand == null
+            ? null
+            : new BrandDetailModel
+            {
+                ThemeReference = e.Brand.ThemeReference,
+                LogoFileId = e.Brand.LogoFileId,
+                WebsiteUrl = e.Brand.WebsiteUrl,
+                FranchisorName = e.Brand.FranchisorName,
+                AgreementStartsOn = e.Brand.AgreementStartsOn,
+                AgreementEndsOn = e.Brand.AgreementEndsOn,
+                RoyaltyPercent = e.Brand.RoyaltyPercent,
+            },
     };
-
-    /// <summary>The brand's own columns, or null when the group carries none.</summary>
-    public static readonly Expression<Func<PropertyGroup, BrandDetailModel?>> Brand = e => e.Brand == null
-        ? null
-        : new BrandDetailModel
-        {
-            ThemeReference = e.Brand.ThemeReference,
-            LogoFileId = e.Brand.LogoFileId,
-            WebsiteUrl = e.Brand.WebsiteUrl,
-            FranchisorName = e.Brand.FranchisorName,
-            AgreementStartsOn = e.Brand.AgreementStartsOn,
-            AgreementEndsOn = e.Brand.AgreementEndsOn,
-            RoyaltyPercent = e.Brand.RoyaltyPercent,
-        };
 
     /// <summary>A group's memberships with the hotel named, current ones first, then by hotel code, newest first.</summary>
     public static IQueryable<PropertyGroupMemberModel> MembersOf(IQueryable<PropertyGroupMember> members, IQueryable<Property> properties, Guid groupId)

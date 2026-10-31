@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Harmony.Core.Abstractions;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Models.UserAccountModule;
 using Harmony.Identity.Domain.Repositories;
@@ -28,10 +29,16 @@ namespace Harmony.Identity.Handler.Queries.UserAccountModule.List
         };
 
         private readonly IUserAccountRepository userAccounts;
+        private readonly IOperatorSessionRepository sessions;
+        private readonly IUserDeviceRepository devices;
+        private readonly ICallContext callContext;
 
-        public GetPagedUserAccountsQueryHandler(IUserAccountRepository userAccounts)
+        public GetPagedUserAccountsQueryHandler(IUserAccountRepository userAccounts, IOperatorSessionRepository sessions, IUserDeviceRepository devices, ICallContext callContext)
         {
             this.userAccounts = userAccounts;
+            this.sessions = sessions;
+            this.devices = devices;
+            this.callContext = callContext;
         }
 
         public async Task<CallResponse<PagedResult<UserAccountModel>>> Handle(GetPagedUserAccountsQuery request, CancellationToken cancellationToken)
@@ -43,7 +50,18 @@ namespace Harmony.Identity.Handler.Queries.UserAccountModule.List
                 keyword.IsNotNullOrEmpty() && keyword!.Length >= 2,
                 a => a.UserName!.Contains(keyword!) || a.DisplayName.Contains(keyword!) || (a.Email != null && a.Email.Contains(keyword!)));
 
+            query = query.WhereIf(request.State.HasValue, a => a.State == request.State!.Value);
+            query = query.WhereIf(request.RoleId.HasValue, a => a.UserRoles.Any(r => r.RoleId == request.RoleId!.Value));
+            var twoStep = request.TwoStep?.Trim().ToLowerInvariant();
+            query = query.WhereIf(twoStep == "on", a => a.TwoFactorEnabled && a.TwoStepExemptReason == null);
+            query = query.WhereIf(twoStep == "off", a => !a.TwoFactorEnabled && a.TwoStepExemptReason == null);
+            query = query.WhereIf(twoStep == "exempt", a => a.TwoStepExemptReason != null);
+
             var pagedResult = await query.Select(Projection).GetPagedResultAsync(request, true, cancellationToken);
+            if (Guid.TryParse(this.callContext.TenantId(), out var tenantId))
+            {
+                await AccountSignIns.DescribeAsync(pagedResult.Results, tenantId, this.sessions, this.devices, cancellationToken);
+            }
 
             return CallResponseBuilder.CreateResponse<PagedResult<UserAccountModel>>(eCallResponseStatus.Success).HasData(pagedResult);
         }

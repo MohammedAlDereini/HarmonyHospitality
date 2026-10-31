@@ -1,35 +1,145 @@
 ﻿@page
+@using Harmony.Identity.Api.Pages.Account
 @model LoginModel
 @{
-    ViewData["Title"] = "Sign in";
+    var frame = ConsoleFrame.Of(ViewData);
+    ViewData["Title"] = frame is null ? "Sign in" : "Sign in to the console";
 }
 
-<h1>Sign in</h1>
-<p class="lead">Your work e-mail and password. If your company signs you in with Microsoft or Google, your e-mail is enough.</p>
-<form method="post">
-    <input type="hidden" asp-for="ReturnUrl" />
-    <label asp-for="Email">E-mail</label>
-    <input asp-for="Email" type="email" autocomplete="username" autofocus required />
-    <label asp-for="Password">Password</label>
-    <input asp-for="Password" type="password" autocomplete="current-password" />
-    @if (Model.Error is not null)
+@if (frame is not null && Model.Refused is { } refused)
+{
+    @* C12b: the credential passed, but this console is for the platform's own people. Said here, on Identity's page,
+       never sent back to the client as an error; the reference is in the account's trail. *@
+    <div class="tone" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /><path d="m9 9 6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </div>
+    <h1>This console is for Harmony platform staff</h1>
+    <p class="lead">
+        @if (refused.TenantName is not null)
+        {
+            <text>Your account belongs to @refused.TenantName. </text>
+        }
+        Everything you need is in the Harmony web app.
+    </p>
+    <div class="identity">
+        <span class="person" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M8 8a2.67 2.67 0 1 0 0-5.33A2.67 2.67 0 0 0 8 8Z" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /><path d="M2.67 14a5.33 5.33 0 0 1 10.66 0" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </span>
+        <span class="who">@refused.Email</span>
+        <a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Change</a>
+    </div>
+    @if (refused.WebAppUrl.Length > 0)
     {
-        <p class="error" role="alert">@Model.Error</p>
+        <a class="button" href="@refused.WebAppUrl">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M9.33 2.67h4v4m0-4-6 6M12 9.33v4H2.67V4h4" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            Open the Harmony web app
+        </a>
     }
-    <button type="submit" data-busy="Signing in…">Sign in</button>
-</form>
-@* Passkeys: shown by sign-in.js only in a browser that can use them. The script asks this page for the challenge
-   (the PasskeyOptions handler), the browser's authenticator signs it, and the answer is sent as this form. *@
-<form method="post" asp-page-handler="Passkey" id="passkey-form" data-options="@Url.Page("Login", "PasskeyOptions", new { Model.ReturnUrl })" hidden>
-    <input type="hidden" asp-for="ReturnUrl" />
-    <input type="hidden" name="CredentialJson" id="passkey-credential" />
-    <p class="or">or</p>
-    <button type="button" class="secondary" id="passkey-button">Sign in with a passkey</button>
-    <p class="error" role="alert" id="passkey-error" hidden></p>
-    @if (Model.UnknownCredentialId is not null)
-    {
-        @* A key this server no longer knows: the script hands it to the browser, so the device stops offering it. *@
-        <span id="passkey-unknown" data-rp-id="@Model.RpId" data-credential-id="@Model.UnknownCredentialId" hidden></span>
-    }
-</form>
-<p class="links"><a href="@Model.ForgotPasswordUrl">Forgot your password?</a></p>
+    <a class="button secondary" asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Sign in with another account</a>
+    <div class="help">
+        <span class="text">
+            Think you should have access?
+            <span class="sub">Ask the platform team · reference <span class="mono">@refused.Reference</span></span>
+        </span>
+        <button type="button" class="secondary copy" id="copy-reference" data-copy="@refused.Reference" data-done="Copied">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.33" y="5.33" width="8" height="8" rx="1.33" stroke="currentColor" stroke-width="1.46" /><path d="M10.67 5.33V4a1.33 1.33 0 0 0-1.34-1.33H4A1.33 1.33 0 0 0 2.67 4v5.33A1.33 1.33 0 0 0 4 10.67h1.33" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" /></svg>
+            Copy
+        </button>
+    </div>
+}
+else if (frame is not null)
+{
+    @* C12: the e-mail first. A company e-mail goes to the company's sign-in from here; any other asks for the password
+       on the next step. The one form posts both, so a browser that fills both at once is served the same. *@
+    <h1>Sign in to the console</h1>
+    <p class="lead">Use your Harmony work account.</p>
+    <form method="post">
+        <input type="hidden" asp-for="ReturnUrl" />
+        @if (Model.AskPassword)
+        {
+            <input type="hidden" asp-for="Email" />
+            <div class="identity">
+                <span class="person" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 8a2.67 2.67 0 1 0 0-5.33A2.67 2.67 0 0 0 8 8Z" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /><path d="M2.67 14a5.33 5.33 0 0 1 10.66 0" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                </span>
+                <span class="who">@Model.Email</span>
+                <a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Change</a>
+            </div>
+            <label asp-for="Password">Password</label>
+            <input asp-for="Password" type="password" autocomplete="current-password" autofocus required />
+            @if (Model.Error is not null)
+            {
+                <p class="error" role="alert">@Model.Error</p>
+            }
+            <button type="submit" data-busy="Signing in…">Sign in</button>
+        }
+        else
+        {
+            <label asp-for="Email">Work e-mail</label>
+            <input asp-for="Email" type="email" autocomplete="username" autofocus required />
+            @if (Model.Error is not null)
+            {
+                <p class="error" role="alert">@Model.Error</p>
+            }
+            <button type="submit" data-busy="One moment…">
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.33 8h9.34M8.67 4l4 4-4 4" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Continue
+            </button>
+        }
+    </form>
+    @* Passkeys: shown by sign-in.js only in a browser that can use them. The script asks this page for the challenge
+       (the PasskeyOptions handler), the browser's authenticator signs it, and the answer is sent as this form. *@
+    <form method="post" asp-page-handler="Passkey" id="passkey-form" data-options="@Url.Page("Login", "PasskeyOptions", new { Model.ReturnUrl })" hidden>
+        <input type="hidden" asp-for="ReturnUrl" />
+        <input type="hidden" name="CredentialJson" id="passkey-credential" />
+        <p class="or">or</p>
+        <button type="button" class="secondary" id="passkey-button">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3.33" y="7.33" width="9.33" height="6.33" rx="1.33" stroke="currentColor" stroke-width="1.46" /><path d="M5.33 7.33V5.33a2.67 2.67 0 0 1 5.34 0v2" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" /></svg>
+            Sign in with a passkey
+        </button>
+        <p class="error" role="alert" id="passkey-error" hidden></p>
+        @if (Model.UnknownCredentialId is not null)
+        {
+            <span id="passkey-unknown" data-rp-id="@Model.RpId" data-credential-id="@Model.UnknownCredentialId" hidden></span>
+        }
+    </form>
+    <p class="links">
+        <a href="@Model.ForgotPasswordUrl">Forgot password</a>
+        @if (frame.HelpUrl.Length > 0)
+        {
+            <a href="@frame.HelpUrl">Can't sign in?</a>
+        }
+    </p>
+}
+else
+{
+    <h1>Sign in</h1>
+    <p class="lead">Your work e-mail and password. If your company signs you in with Microsoft or Google, your e-mail is enough.</p>
+    <form method="post">
+        <input type="hidden" asp-for="ReturnUrl" />
+        <label asp-for="Email">E-mail</label>
+        <input asp-for="Email" type="email" autocomplete="username" autofocus required />
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" type="password" autocomplete="current-password" />
+        @if (Model.Error is not null)
+        {
+            <p class="error" role="alert">@Model.Error</p>
+        }
+        <button type="submit" data-busy="Signing in…">Sign in</button>
+    </form>
+    @* Passkeys: shown by sign-in.js only in a browser that can use them. The script asks this page for the challenge
+       (the PasskeyOptions handler), the browser's authenticator signs it, and the answer is sent as this form. *@
+    <form method="post" asp-page-handler="Passkey" id="passkey-form" data-options="@Url.Page("Login", "PasskeyOptions", new { Model.ReturnUrl })" hidden>
+        <input type="hidden" asp-for="ReturnUrl" />
+        <input type="hidden" name="CredentialJson" id="passkey-credential" />
+        <p class="or">or</p>
+        <button type="button" class="secondary" id="passkey-button">Sign in with a passkey</button>
+        <p class="error" role="alert" id="passkey-error" hidden></p>
+        @if (Model.UnknownCredentialId is not null)
+        {
+            @* A key this server no longer knows: the script hands it to the browser, so the device stops offering it. *@
+            <span id="passkey-unknown" data-rp-id="@Model.RpId" data-credential-id="@Model.UnknownCredentialId" hidden></span>
+        }
+    </form>
+    <p class="links"><a href="@Model.ForgotPasswordUrl">Forgot your password?</a></p>
+}

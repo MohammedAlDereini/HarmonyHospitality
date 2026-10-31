@@ -1,4 +1,4 @@
-﻿using Harmony.Core.Models;
+using Harmony.Core.Models;
 using Harmony.Identity.Domain.Models.TenantModule;
 using Harmony.Identity.Handler.Commands.TenantModule.Administrator;
 using Harmony.Identity.Handler.Commands.TenantModule.Create;
@@ -9,6 +9,7 @@ using Harmony.Identity.Handler.Commands.TenantModule.Subscriptions.Unsubscribe;
 using Harmony.Identity.Handler.Queries.TenantModule.Detail;
 using Harmony.Identity.Handler.Queries.TenantModule.List;
 using Harmony.Identity.Handler.Queries.TenantModule.Mine;
+using Harmony.Identity.Handler.Queries.TenantModule.Summary;
 
 namespace Harmony.Identity.Api.Controllers;
 
@@ -89,6 +90,16 @@ public class TenantController(IMediator mediator, ICallResponseManager callRespo
     public async Task<IActionResult> Unsubscribe([FromBody] UnsubscribeCommand command)
     {
         var response = await this.Mediator.Send(command);
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
+    /// <summary>The customers in numbers for the console's home: counts, countries, the last twelve months, what ends soon.</summary>
+    [HttpGet("summary")]
+    [ProducesResponseType(typeof(TenantSummaryModel), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewTenants)]
+    public async Task<IActionResult> Summary()
+    {
+        var response = await this.Mediator.Send(new GetTenantSummaryQuery());
         return await this.CallResponseManager.AsActionResultAsync(response);
     }
 

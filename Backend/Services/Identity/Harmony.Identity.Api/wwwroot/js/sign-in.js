@@ -179,3 +179,25 @@
         PublicKeyCredential.signalUnknownCredential({ rpId: unknown.dataset.rpId, credentialId: unknown.dataset.credentialId }).catch(() => undefined);
     }
 })();
+
+// The refusal card's Copy (console frame, C12b): the reference goes to the clipboard, the button says so for a moment.
+// Nothing here builds markup, so the strict policy and Trusted Types stay on.
+(() => {
+    'use strict';
+
+    const button = document.getElementById('copy-reference');
+    if (!button || !navigator.clipboard) {
+        return;
+    }
+
+    const label = button.textContent;
+    button.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(button.dataset.copy || '');
+            button.textContent = button.dataset.done || label;
+            window.setTimeout(() => { button.textContent = label; }, 1500);
+        } catch {
+            // The browser refused the clipboard: the reference stays readable beside the button.
+        }
+    });
+})();

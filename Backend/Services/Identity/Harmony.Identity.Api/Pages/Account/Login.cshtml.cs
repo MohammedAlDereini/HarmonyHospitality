@@ -2,11 +2,13 @@
 using Duende.IdentityServer.Services;
 using Harmony.Identity.Domain.Entities.Aggregates.SecurityAuditModule;
 using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
+using Harmony.Identity.Domain.Repositories;
 using Harmony.Identity.Domain.Services;
 using Harmony.Identity.Handler.Commands.UserAccountModule.SecurityTrail;
 using Harmony.Identity.Handler.Queries.CompanyLoginModule;
 using Harmony.Identity.Infrastructure.CompanyLogin;
 using Harmony.Identity.Infrastructure.IdentityServer;
+using Harmony.Identity.Infrastructure.IdentityServer.Yarp;
 using Harmony.Identity.Infrastructure.IdentityServer.SignIn;
 using Harmony.Identity.Infrastructure.RateLimiting;
 using Harmony.Identity.Infrastructure.Tenants;
@@ -14,6 +16,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 
@@ -66,6 +70,8 @@ public sealed class LoginModel : PageModel
     private readonly IMediator mediator;
     private readonly IOptions<IdentityPasskeyOptions> passkeyOptions;
     private readonly IOptions<PlatformTenantSettings> platformTenant;
+    private readonly IOptions<WebBffSettings> webBff;
+    private readonly ITenantRepository tenants;
 
     public LoginModel(
         IIdentityServerInteractionService interaction,
@@ -79,8 +85,12 @@ public sealed class LoginModel : PageModel
         IIssuerNameService issuer,
         IMediator mediator,
         IOptions<IdentityPasskeyOptions> passkeyOptions,
-        IOptions<PlatformTenantSettings> platformTenant)
+        IOptions<PlatformTenantSettings> platformTenant,
+        IOptions<WebBffSettings> webBff,
+        ITenantRepository tenants)
     {
+        this.webBff = webBff;
+        this.tenants = tenants;
         this.passkeyOptions = passkeyOptions;
         this.platformTenant = platformTenant;
         this.interaction = interaction;
@@ -111,6 +121,12 @@ public sealed class LoginModel : PageModel
     public string? Error { get; private set; }
 
     public string? ForgotPasswordUrl { get; private set; }
+
+    /// <summary>The console's second step: the e-mail is known, the password is asked for (C12).</summary>
+    public bool AskPassword { get; private set; }
+
+    /// <summary>Set when a platform-only client refused a hotel account after its credential passed (C12b).</summary>
+    public RefusedView? Refused { get; private set; }
 
     /// <summary>
     /// Set when a refused answer named a passkey nobody holds any more (removed here, still on the device): the page's
@@ -153,10 +169,16 @@ public sealed class LoginModel : PageModel
             return this.Challenge(this.CompanyChallenge(route), route.AuthenticationScheme);
         }
 
+        var console = IdentityServerResources.IsPlatformOnly(request.Client);
+        this.AskPassword = console && !string.IsNullOrWhiteSpace(this.Email);
         if (string.IsNullOrEmpty(this.Password))
         {
             this.ForgotPasswordUrl = ForgotPasswordOf(request);
-            this.Error = "Enter your password.";
+            if (!this.AskPassword)
+            {
+                this.Error = console ? "Enter your work e-mail." : "Enter your password.";
+            }
+
             return this.Page();
         }
 
@@ -174,9 +196,17 @@ public sealed class LoginModel : PageModel
             && result.Status is PasswordCheckStatus.Accepted or PasswordCheckStatus.SecondFactorRequired or PasswordCheckStatus.Exempt
             && !PlatformOnly.Admits(request.Client, result.User, this.platformTenant.Value.TenantId))
         {
-            await this.mediator.Send(new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = SecurityAuditActions.SignInPlatformOnly }, this.HttpContext.RequestAborted);
+            var reference = Convert.ToHexString(RandomNumberGenerator.GetBytes(4));
+            await this.mediator.Send(
+                new RecordSecurityEventCommand { UserId = result.User.Id, TrailAction = SecurityAuditActions.SignInPlatformOnly, Detail = $"reference {reference} · client {request.Client.ClientId}" },
+                this.HttpContext.RequestAborted);
             this.ForgotPasswordUrl = ForgotPasswordOf(request);
             this.Error = PlatformOnly.Message;
+            var tenantName = await this.tenants.Query()
+                .Where(t => t.Id == result.User.TenantId)
+                .Select(t => t.LegalNameEn)
+                .FirstOrDefaultAsync(this.HttpContext.RequestAborted);
+            this.Refused = new RefusedView(this.Email ?? string.Empty, tenantName, reference, this.webBff.Value.Origins.FirstOrDefault() ?? string.Empty);
             return this.Page();
         }
 
@@ -376,4 +406,7 @@ public sealed class LoginModel : PageModel
         var address = await this.issuer.GetCurrentAsync(this.HttpContext.RequestAborted);
         return address.TrimEnd('/') + path;
     }
+
+    /// <summary>What the refusal card says (C12b): who was refused, whose account it is, the reference the platform team can find in the trail, where hotel teams go.</summary>
+    public sealed record RefusedView(string Email, string? TenantName, string Reference, string WebAppUrl);
 }

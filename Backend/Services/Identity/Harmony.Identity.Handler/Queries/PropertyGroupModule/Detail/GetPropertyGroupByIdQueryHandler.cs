@@ -40,7 +40,6 @@ public class GetPropertyGroupByIdQueryHandler : IRequestHandler<GetPropertyGroup
             return Refuse(BusinessErrorCodes.Identity.PropertyGroup.NotFound);
         }
 
-        model.Brand = await this.groups.QueryAcrossTenants().Where(g => g.Id == model.Id).Select(PropertyGroupProjections.Brand).FirstOrDefaultAsync(cancellationToken);
         model.Members = await PropertyGroupProjections.MembersOf(this.members.QueryAcrossTenants(), this.properties.QueryAcrossTenants(), model.Id).ToListAsync(cancellationToken);
         model.CurrentMembers = model.Members.Count(m => m.IsCurrent);
 

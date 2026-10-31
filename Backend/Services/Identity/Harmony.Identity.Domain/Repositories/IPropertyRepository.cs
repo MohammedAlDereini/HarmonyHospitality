@@ -26,6 +26,9 @@ public interface IPropertyRepository : IRepository<Property>
     /// <summary>One of the caller's hotels with its contacts, tracked, for a change to the list.</summary>
     Task<Property?> FindWithContactsAsync(Guid id, CancellationToken cancellationToken);
 
+    /// <summary>A customer's hotel reached from outside the wall, tracked, for the platform's change; null when unknown.</summary>
+    Task<Property?> FindAcrossTenantsAsync(Guid id, CancellationToken cancellationToken);
+
     /// <summary>Every customer's hotels, untracked, for the console's reads.</summary>
     IQueryable<Property> QueryAcrossTenants();
 }

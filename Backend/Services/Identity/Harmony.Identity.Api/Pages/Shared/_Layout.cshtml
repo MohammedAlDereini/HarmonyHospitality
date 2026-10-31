@@ -1,6 +1,11 @@
 <!DOCTYPE html>
-@* The sign-in family: one card in the middle, the same look as the web app. One script of ours (one send per page),
-   allowed only by this response's nonce; no inline script anywhere. *@
+@using Harmony.Identity.Api.Pages.Account
+@* The sign-in family. The web app's pages: one card in the middle, the same look as the web app. The console's pages
+   (a platform-only client asked): the console frame, a brand panel beside the card (platform console design, C12).
+   One script of ours (one send per page), allowed only by this response's nonce; no inline script anywhere. *@
+@{
+    var frame = ConsoleFrame.Of(ViewData);
+}
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -9,19 +14,91 @@
     <link rel="stylesheet" href="~/css/sign-in.css" asp-append-version="true" />
     <script src="~/js/sign-in.js" asp-append-version="true" nonce="@SignInPageHeadersAttribute.Nonce(Context)" defer></script>
 </head>
-<body>
-    <main class="centered">
-        <div class="card">
-            <div class="brand">
-                <svg class="lockup" xmlns="http://www.w3.org/2000/svg" viewBox="0 -3 359.333 46" role="img" aria-label="HARMONY">
-                    <g transform="translate(0 -3) scale(1.917)">
-                        <path fill="currentColor" d="M0 0 L5.5 0 L5.5 6 L0 6 Z M0 12 L5.5 12 L5.5 24 L0 24 Z M15.5 0 L21 0 L21 12 L15.5 12 Z M15.5 18 L21 18 L21 24 L15.5 24 Z M0 7 L14.5 7 L14.5 11 L0 11 Z M6.5 13 L21 13 L21 17 L6.5 17 Z" />
-                    </g>
-                    <path fill="currentColor" fill-rule="evenodd" d="M61.333 0 L67.133 0 L67.133 40 L61.333 40 Z M85.533 0 L91.333 0 L91.333 40 L85.533 40 Z M67.133 17.4 L85.533 17.4 L85.533 22.6 L67.133 22.6 Z M100.333 40 L114.333 0 L121.333 0 L135.333 40 L128.976 40 L117.833 8.163 L106.69 40 Z M114.6 17.4 L121.066 17.4 L122.886 22.6 L112.78 22.6 Z M144.333 0 L150.133 0 L150.133 40 L144.333 40 Z M150.133 0 L159.933 0 A11.3 11.3 0 0 1 159.933 22.6 L150.133 22.6 L150.133 17.4 L159.533 17.4 A6.1 6.1 0 0 0 159.533 5.2 L150.133 5.2 Z M155.833 22.6 L162.765 22.6 L172.833 40 L165.901 40 Z M183.333 40 L183.333 0 L189.824 0 L202.833 31.538 L215.843 0 L222.333 0 L222.333 40 L216.533 40 L216.533 14.061 L205.833 40 L199.833 40 L189.133 14.061 L189.133 40 Z M232.833 20 A20.5 20.5 0 1 0 273.833 20 A20.5 20.5 0 1 0 232.833 20 Z M239.033 20 A14.3 15 0 1 1 267.633 20 A14.3 15 0 1 1 239.033 20 Z M284.333 40 L284.333 0 L291.331 0 L309.533 30.334 L309.533 0 L315.333 0 L315.333 40 L308.336 40 L290.133 9.666 L290.133 40 Z M324.333 0 L331.476 0 L341.833 16.032 L352.19 0 L359.333 0 L344.733 22.6 L344.733 40 L338.933 40 L338.933 22.6 Z" />
-                </svg>
+<body class="@(frame is null ? "" : "console")">
+    @if (frame is null)
+    {
+        <main class="centered">
+            <div class="card">
+                <div class="brand">
+                    <partial name="_Lockup" />
+                </div>
+                @RenderBody()
             </div>
-            @RenderBody()
-        </div>
-    </main>
+        </main>
+    }
+    else
+    {
+        <main class="split">
+            <aside class="panel">
+                <div class="lockup-row">
+                    <partial name="_Lockup" />
+                    <span class="divider" aria-hidden="true"></span>
+                    <span class="product">Console</span>
+                </div>
+                <div class="grow" aria-hidden="true"></div>
+                <div class="door" aria-hidden="true">
+                    <img src="~/img/console/lit-door.svg" alt="" width="100" height="120" />
+                </div>
+                <div class="statement">
+                    <h2>Platform console</h2>
+                    <p>For Harmony platform staff: tenants, hotels, subscriptions, reference data, health. Hotel teams use the Harmony web app.</p>
+                </div>
+                <div class="grow" aria-hidden="true"></div>
+                <ul class="status">
+                    <li>
+                        <svg class="ok" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /><path d="m5.33 8.33 1.8 1.8L10.67 6.4" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        <span>All sign-in services are running · @frame.NowUtc.ToString("HH:mm") UTC</span>
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2l5 2v3.67C13 10.67 10.87 13.07 8 14c-2.87-.93-5-3.33-5-6.33V4l5-2Z" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /><path d="m5.87 8 1.46 1.47 2.94-2.94" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        @if (frame.TwoStepExceptions == 0)
+                        {
+                            <span>Two-step is required for every platform person</span>
+                        }
+                        else
+                        {
+                            <span>Two-step is required; @frame.TwoStepExceptions on the platform's exception list</span>
+                        }
+                    </li>
+                    @if (frame.PlatformContact.Length > 0)
+                    {
+                        <li>
+                            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /><path d="M6.4 6.27a1.67 1.67 0 1 1 2.27 1.6c-.4.2-.67.6-.67 1.07v.4" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /><path d="M8 11.33h.01" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" /></svg>
+                            <span>@frame.PlatformContact</span>
+                        </li>
+                    }
+                </ul>
+                <p class="fine">
+                    Identity @frame.Version
+                    @if (frame.PrivacyUrl.Length > 0)
+                    {
+                        <text> · </text><a href="@frame.PrivacyUrl">Privacy</a>
+                    }
+                    @if (frame.TermsUrl.Length > 0)
+                    {
+                        <text> · </text><a href="@frame.TermsUrl">Terms of use</a>
+                    }
+                </p>
+                <img class="arcade" src="~/img/console/arcade-band.svg" alt="" aria-hidden="true" />
+            </aside>
+            <section class="stage">
+                <div class="stage-top">
+                    @if (frame.HelpUrl.Length > 0)
+                    {
+                        <a class="ghost" href="@frame.HelpUrl">
+                            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /><path d="M6.4 6.27a1.67 1.67 0 1 1 2.27 1.6c-.4.2-.67.6-.67 1.07v.4" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" stroke-linejoin="round" /><path d="M8 11.33h.01" stroke="currentColor" stroke-width="1.46" stroke-linecap="round" /></svg>
+                            Help
+                        </a>
+                    }
+                </div>
+                <div class="stage-centre">
+                    <div class="card console-card">
+                        @RenderBody()
+                    </div>
+                </div>
+                <p class="stage-foot">Signing in on a shared machine? Sign out when you leave; sessions end after 12 hours regardless.</p>
+            </section>
+        </main>
+    }
 </body>
 </html>

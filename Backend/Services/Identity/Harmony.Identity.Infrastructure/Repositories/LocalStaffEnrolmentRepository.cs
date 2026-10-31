@@ -40,6 +40,11 @@ public class LocalStaffEnrolmentRepository : BaseRepository<LocalStaffEnrolment>
             .ToListAsync(cancellationToken);
     }
 
+    public IQueryable<LocalStaffEnrolment> QueryAcrossTenants()
+    {
+        return this.Rows().AsNoTracking();
+    }
+
     private IQueryable<LocalStaffEnrolment> Rows()
     {
         return this.context.LocalStaffEnrolments.IgnoreQueryFilters([QueryFilterNames.Tenant]);

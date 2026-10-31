@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.RateLimiting;
 using Harmony.Core.DI;
 using Harmony.Web.Bff.ApiDocs;
+using Harmony.Web.Bff.Health;
 using Harmony.Web.Bff.Authentication;
 using Harmony.Web.Bff.Pages;
 using Harmony.Web.Bff.Security;
@@ -386,6 +387,9 @@ app.MapGet("/bff/flags", (IOptions<ReleaseSettings> release, HttpContext http) =
         flags = settings.Flags.ToDictionary(flag => flag.Key, flag => settings.IsOn(flag.Value), StringComparer.Ordinal),
     });
 });
+
+// Identity's health for the platform console: platform people only, read inside the network (see PlatformHealthDoor).
+app.MapGet(PlatformHealthDoor.Path, PlatformHealthDoor.GetAsync).AllowAnonymous();
 
 // What the web app measured: see TelemetryDoor for what keeps it harmless.
 app.MapPost(TelemetryDoor.Path, TelemetryDoor.ReceiveAsync).RequireRateLimiting(TelemetryDoor.RateLimitPolicy);

@@ -34,6 +34,18 @@ public class GetPagedPropertiesQuery : BasePaginationQueryRequest<CallResponse<P
     /// <summary>Only active (or only inactive) hotels. Null: all.</summary>
     public bool? IsActive { get; set; }
 
+    /// <summary>Only hotels in this country (ISO code). Null: all.</summary>
+    public string? CountryCode { get; set; }
+
+    /// <summary>Only hotels of this type (reference code). Null: all.</summary>
+    public string? PropertyTypeCode { get; set; }
+
+    /// <summary>"Active" (open to business today), "Opening" (active, opens later), "Closed" (inactive or past its closing day). Null: all.</summary>
+    public string? State { get; set; }
+
+    /// <summary>Only hotels declaring more rooms than they license today (the toggle on C4).</summary>
+    public bool AboveLicenceOnly { get; set; }
+
     public class GetPagedPropertiesQueryValidator : AbstractValidator<GetPagedPropertiesQuery>
     {
         public GetPagedPropertiesQueryValidator()

@@ -10,13 +10,29 @@ namespace Harmony.Identity.Handler.Queries.TenantModule.Detail;
 public class GetTenantByIdQueryHandler : IRequestHandler<GetTenantByIdQuery, CallResponse<TenantModel>>
 {
     private readonly ITenantRepository tenants;
+    private readonly IPropertyRepository properties;
+    private readonly IUserAccountRepository userAccounts;
+    private readonly ILocalStaffEnrolmentRepository enrolments;
+    private readonly IOperatorSessionRepository sessions;
     private readonly ICallContext callContext;
     private readonly TimeProvider clock;
     private readonly Guid platformTenantId;
 
-    public GetTenantByIdQueryHandler(ITenantRepository tenants, ICallContext callContext, IOptions<PlatformTenantSettings> platform, TimeProvider clock)
+    public GetTenantByIdQueryHandler(
+        ITenantRepository tenants,
+        IPropertyRepository properties,
+        IUserAccountRepository userAccounts,
+        ILocalStaffEnrolmentRepository enrolments,
+        IOperatorSessionRepository sessions,
+        ICallContext callContext,
+        IOptions<PlatformTenantSettings> platform,
+        TimeProvider clock)
     {
         this.tenants = tenants;
+        this.properties = properties;
+        this.userAccounts = userAccounts;
+        this.enrolments = enrolments;
+        this.sessions = sessions;
         this.callContext = callContext;
         this.clock = clock;
         this.platformTenantId = platform.Value.TenantId;
@@ -47,6 +63,8 @@ public class GetTenantByIdQueryHandler : IRequestHandler<GetTenantByIdQuery, Cal
             .Select(PropertyProjections.Line)
             .ToListAsync(cancellationToken);
         PropertyProjections.MarkHeld(model.Subscriptions, DateOnly.FromDateTime(this.clock.GetUtcNow().UtcDateTime));
+        // The page's head and cards (C3): hotels, rooms, modules, people, and the administrator with the last sign-in.
+        await TenantCompany.DescribeAsync([model], true, this.clock.GetUtcNow(), this.tenants, this.properties, this.userAccounts, this.enrolments, this.sessions, cancellationToken);
 
         return CallResponseBuilder.CreateResponse<TenantModel>(eCallResponseStatus.Success).HasData(model);
     }

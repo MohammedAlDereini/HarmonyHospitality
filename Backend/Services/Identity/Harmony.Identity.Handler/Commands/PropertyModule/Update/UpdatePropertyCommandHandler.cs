@@ -10,9 +10,10 @@ using Harmony.Identity.Infrastructure.Tenants;
 using Microsoft.Extensions.Options;
 
 /// <summary>
-/// The hotel's own door: the wall finds the hotel (another customer's is 00092, no hint), the aggregate takes the
-/// change, the trail is written on the acting person, one save. A room count that moved above the licence is flagged
-/// in the trail, never refused (Mews).
+/// The hotel's own door and the console's: inside the wall the filter finds the hotel (another customer's is not
+/// found, no hint); the platform reaches a customer's hotel from outside the wall. The aggregate takes the change,
+/// the trail is written on the acting person, one save. A room count that moved above the licence is flagged in the
+/// trail, never refused (Mews).
 /// </summary>
 public class UpdatePropertyCommandHandler : TenantCommandHandlerBase, IRequestHandler<UpdatePropertyCommand, CallResponse>
 {
@@ -36,7 +37,9 @@ public class UpdatePropertyCommandHandler : TenantCommandHandlerBase, IRequestHa
 
     public async Task<CallResponse> Handle(UpdatePropertyCommand command, CancellationToken cancellationToken)
     {
-        var property = await this.properties.FindAsync(command.Id, cancellationToken);
+        var property = this.CallerIsPlatform
+            ? await this.properties.FindAcrossTenantsAsync(command.Id, cancellationToken)
+            : await this.properties.FindAsync(command.Id, cancellationToken);
         if (property is null)
         {
             return Fail(BusinessErrorCodes.Identity.Property.NotFound);

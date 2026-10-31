@@ -52,4 +52,26 @@ public class TenantModel
 
     /// <summary>The customer's contract as lines, hotel lines and chain-wide ones. Filled on the detail read only.</summary>
     public List<SubscriptionLineModel> Subscriptions { get; set; } = [];
+
+    /// <summary>The customer's hotels, in every state (the list only).</summary>
+    public int Hotels { get; set; }
+
+    /// <summary>Rooms the customer's active hotels declare, summed (the list only).</summary>
+    public int RoomsInUse { get; set; }
+
+    /// <summary>Rooms licensed today: each hotel's largest held line, summed (the list only).</summary>
+    public int LicensedRooms { get; set; }
+
+    /// <summary>The module codes with an enabled line, each once, in order (the list only).</summary>
+    public List<string> ModuleCodes { get; set; } = [];
+
+    /// <summary>The customer's people, how many of them keep a password, how many are on the two-step exception list (the list and the detail).</summary>
+    public int People { get; set; }
+
+    public int PeopleWithPassword { get; set; }
+
+    public int TwoStepExceptions { get; set; }
+
+    /// <summary>The account holding the customer's ADMINISTRATOR role and where its invitation stands; null when there is none (the list and the detail).</summary>
+    public TenantAdministratorModel? Administrator { get; set; }
 }

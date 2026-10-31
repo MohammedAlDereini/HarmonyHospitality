@@ -8,6 +8,9 @@ public interface IUserAccountRepository : IRepository<User>
 {
     public IQueryable<User> Query();
 
+    /// <summary>Every tenant's accounts, read only, for the platform console's names beside the trail.</summary>
+    public IQueryable<User> QueryAcrossTenants();
+
     /// <summary>The account with its roles, tracked, for a roles change.</summary>
     public Task<User?> GetWithRolesAsync(Guid id, CancellationToken cancellationToken);
 

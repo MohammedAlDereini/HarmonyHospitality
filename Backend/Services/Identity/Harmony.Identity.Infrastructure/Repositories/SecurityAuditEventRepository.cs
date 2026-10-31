@@ -22,6 +22,13 @@ public class SecurityAuditEventRepository : BaseRepository<SecurityAuditEvent>, 
         return this.context.SecurityAuditEvents.AsNoTracking();
     }
 
+    public IQueryable<SecurityAuditEvent> QueryAcrossTenants()
+    {
+        return this.context.SecurityAuditEvents
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .AsNoTracking();
+    }
+
     public async Task<int> DeleteOlderThanAsync(DateTimeOffset cutoffUtc, int batchSize, CancellationToken cancellationToken)
     {
         // The cleanup serves every tenant, so the tenant filter is lifted - or the job would happily delete nothing.

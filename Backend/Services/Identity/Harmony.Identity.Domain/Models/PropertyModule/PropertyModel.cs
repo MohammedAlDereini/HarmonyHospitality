@@ -92,6 +92,12 @@ public class PropertyModel
     /// <summary>TotalRooms above LicensedRooms: flagged for finance, never refused. Detail only.</summary>
     public bool RoomsAboveLicence { get; set; }
 
+    /// <summary>The customer's code, for the platform-wide list (C4).</summary>
+    public string? TenantCode { get; set; }
+
+    /// <summary>Module codes with an enabled line for this hotel, its own and the customer's chain-wide ones, each once (the list).</summary>
+    public List<string> ModuleCodes { get; set; } = [];
+
     /// <summary>This hotel's lines. Detail only.</summary>
     public List<SubscriptionLineModel> Subscriptions { get; set; } = [];
 

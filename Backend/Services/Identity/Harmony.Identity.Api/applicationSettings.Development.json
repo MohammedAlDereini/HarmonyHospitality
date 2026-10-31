@@ -55,8 +55,8 @@
       "PreviousClientPublicKeyPaths": []
     },
     "Web": {
-      "ResetPasswordUrl": "https://localhost:5173/account/reset-password?email={email}&token={token}",
-      "InvitationUrl": "https://localhost:5173/account/set-password?email={email}&token={token}"
+      "ResetPasswordUrl": "https://localhost:5210/account/reset-password?email={email}&token={token}",
+      "InvitationUrl": "https://localhost:5210/account/set-password?email={email}&token={token}"
     },
     "Platform": {
       "Issuer": "https://localhost:5000",

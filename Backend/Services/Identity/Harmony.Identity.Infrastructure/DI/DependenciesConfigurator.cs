@@ -284,6 +284,10 @@ public static class DependenciesConfigurator
             .Validate(settings => !settings.IsPresent || settings.PreviousClientPublicKeyPaths.All(path => BffClientSettings.ReadPublicJwk(path) is not null), $"{ConsoleBffSettings.Section}:PreviousClientPublicKeyPaths must each name a PEM file holding an EC P-256 public key, and no private key.")
             .ValidateOnStart();
 
+        // The console's sign-in frame: optional words and links; empty values leave the line out.
+        services.AddOptions<SignInPagesSettings>()
+            .Bind(configuration.GetSection(SignInPagesSettings.Section));
+
         services.TryAddScoped<IAccountMailer, AccountMailer>();
         services.AddOptions<WebLinkSettings>()
             .Bind(configuration.GetSection(WebLinkSettings.Section))

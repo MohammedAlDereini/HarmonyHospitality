@@ -23,6 +23,13 @@ public sealed class SignInPageHeadersAttribute : ResultFilterAttribute
     public static string Nonce(HttpContext context)
         => context.Items[NonceKey] as string ?? string.Empty;
 
+    /// <summary>A sign-in request from a platform-only client is drawn in the console's frame (C12).</summary>
+    public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
+    {
+        await ConsoleFrame.AttachAsync(context);
+        await base.OnResultExecutionAsync(context, next);
+    }
+
     public override void OnResultExecuting(ResultExecutingContext context)
     {
         if (context.Result is PageResult)

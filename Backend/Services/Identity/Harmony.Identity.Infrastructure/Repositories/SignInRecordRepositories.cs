@@ -43,6 +43,17 @@ public class OperatorSessionRepository : BaseRepository<OperatorSession>, IOpera
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyDictionary<Guid, DateTimeOffset>> LatestStartsAsync(Guid tenantId, IReadOnlyCollection<Guid> userAccountIds, CancellationToken cancellationToken)
+    {
+        var rows = await this.Rows()
+            .AsNoTracking()
+            .Where(s => s.TenantId == tenantId && userAccountIds.Contains(s.UserAccountId))
+            .GroupBy(s => s.UserAccountId)
+            .Select(g => new { g.Key, Latest = g.Max(s => s.StartedAtUtc) })
+            .ToListAsync(cancellationToken);
+        return rows.ToDictionary(r => r.Key, r => r.Latest);
+    }
+
     public async Task<IReadOnlyList<OperatorSession>> OpenBatchAsync(int take, CancellationToken cancellationToken)
     {
         return await this.Rows().Where(s => s.EndedAtUtc == null).OrderBy(s => s.StartedAtUtc).Take(take).ToListAsync(cancellationToken);

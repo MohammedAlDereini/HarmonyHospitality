@@ -9,4 +9,7 @@ public class RecordSecurityEventCommand : BaseCommandRequest<CallResponse>
     public Guid UserId { get; init; }
 
     public string TrailAction { get; init; } = null!;
+
+    /// <summary>Words kept with the row, when the event has some: a reference, a reason.</summary>
+    public string? Detail { get; init; }
 }

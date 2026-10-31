@@ -16,6 +16,9 @@ public interface IOperatorSessionRepository : IRepository<OperatorSession>
     /// <summary>The account's newest sessions, untracked.</summary>
     Task<IReadOnlyList<OperatorSession>> LatestOfAccountAsync(Guid tenantId, Guid userAccountId, int take, CancellationToken cancellationToken);
 
+    /// <summary>When each of these accounts last started a session; accounts that never did are absent.</summary>
+    Task<IReadOnlyDictionary<Guid, DateTimeOffset>> LatestStartsAsync(Guid tenantId, IReadOnlyCollection<Guid> userAccountIds, CancellationToken cancellationToken);
+
     /// <summary>A batch of open rows, oldest first, tracked: what the closing job compares with Duende's live sessions.</summary>
     Task<IReadOnlyList<OperatorSession>> OpenBatchAsync(int take, CancellationToken cancellationToken);
 

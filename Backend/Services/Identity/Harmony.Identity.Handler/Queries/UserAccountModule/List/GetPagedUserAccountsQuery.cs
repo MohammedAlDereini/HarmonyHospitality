@@ -1,3 +1,4 @@
+using Harmony.Identity.Domain.Entities.Aggregates.UserAccountModule;
 using Harmony.Identity.Domain.Models.UserAccountModule;
 
 namespace Harmony.Identity.Handler.Queries.UserAccountModule.List
@@ -23,6 +24,15 @@ namespace Harmony.Identity.Handler.Queries.UserAccountModule.List
         }
 
         public string? SearchText { get; set; }
+
+        /// <summary>Only accounts in this state. Null: every state.</summary>
+        public AdministrativeState? State { get; set; }
+
+        /// <summary>"on": two-step set up; "off": not set up; "exempt": on the exception list. Null: everyone.</summary>
+        public string? TwoStep { get; set; }
+
+        /// <summary>Only accounts holding this role. Null: every role.</summary>
+        public Guid? RoleId { get; set; }
 
         public class GetPagedUserAccountsQueryValidator : AbstractValidator<GetPagedUserAccountsQuery>
         {

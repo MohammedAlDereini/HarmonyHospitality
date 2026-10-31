@@ -19,6 +19,10 @@ public class UserAccountModel
     /// <summary>Stage E: the company directory owns this person (name, state and roles change only there).</summary>
     public bool IsDirectoryManaged { get; set; }
     public int SecurityVersion { get; set; }
+    /// <summary>The newest sign-in Identity recorded; null when the person never signed in.</summary>
+    public DateTimeOffset? LastSignInUtc { get; set; }
+    /// <summary>The device seen last ("Windows · Edge 130"); null when none was.</summary>
+    public string? LastSignInDevice { get; set; }
     public DateTime CreatedDate { get; set; }
     public string CreatedBy { get; set; } = null!;
     public DateTime? ModifiedDate { get; set; }

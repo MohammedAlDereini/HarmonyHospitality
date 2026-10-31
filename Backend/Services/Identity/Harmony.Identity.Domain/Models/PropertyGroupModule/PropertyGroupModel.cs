@@ -28,7 +28,7 @@ public class PropertyGroupModel
     /// <summary>Hotels in the group today (open periods). On the list and the detail.</summary>
     public int CurrentMembers { get; set; }
 
-    /// <summary>The brand's own columns; null unless the type is Brand and a detail was given. Detail only.</summary>
+    /// <summary>The brand's own columns; null unless the type is Brand and a detail was given. Lists carry it too: the console shows the agreement beside the group.</summary>
     public BrandDetailModel? Brand { get; set; }
 
     /// <summary>Every membership, current first, then by hotel code. Detail only.</summary>

@@ -1,4 +1,4 @@
-﻿using Harmony.Core.Models;
+using Harmony.Core.Models;
 using Harmony.Identity.Domain.Models.PropertyModule;
 using Harmony.Identity.Handler.Commands.PropertyModule.Contacts;
 using Harmony.Identity.Handler.Commands.PropertyModule.Create;
@@ -6,6 +6,7 @@ using Harmony.Identity.Handler.Commands.PropertyModule.Update;
 using Harmony.Identity.Handler.Queries.PropertyModule.Detail;
 using Harmony.Identity.Handler.Queries.PropertyModule.List;
 using Harmony.Identity.Handler.Queries.PropertyModule.Mine;
+using Harmony.Identity.Handler.Queries.PropertyModule.Summary;
 
 namespace Harmony.Identity.Api.Controllers;
 
@@ -27,6 +28,16 @@ public class PropertyController(IMediator mediator, ICallResponseManager callRes
     }
 
     /// <summary>The hotels, one customer's or everyone's, paged; the rows only, no lines.</summary>
+    /// <summary>The hotels in numbers for the console's home: counts, openings, rooms declared against rooms licensed.</summary>
+    [HttpGet("summary")]
+    [ProducesResponseType(typeof(PropertySummaryModel), (int)HttpStatusCode.OK)]
+    [RequirePermission(PermissionEnum.ViewTenants)]
+    public async Task<IActionResult> Summary()
+    {
+        var response = await this.Mediator.Send(new GetPropertySummaryQuery());
+        return await this.CallResponseManager.AsActionResultAsync(response);
+    }
+
     [HttpPost("get-all")]
     [ProducesResponseType(typeof(PagedResult<PropertyModel>), (int)HttpStatusCode.OK)]
     [RequirePermission(PermissionEnum.ViewTenants)]

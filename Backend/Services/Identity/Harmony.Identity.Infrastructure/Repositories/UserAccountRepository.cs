@@ -30,6 +30,13 @@ public class UserAccountRepository : BaseRepository<User>, IUserAccountRepositor
         return this.context.UserAccounts.AsNoTracking();
     }
 
+    public IQueryable<User> QueryAcrossTenants()
+    {
+        return this.context.UserAccounts
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .AsNoTracking();
+    }
+
     public async Task<IReadOnlyList<User>> FindByUserNameAcrossTenantsAsync(string normalizedUserName, CancellationToken cancellationToken)
     {
         return await this.context.UserAccounts

@@ -32,6 +32,18 @@ public class GetPagedTenantsQuery : BasePaginationQueryRequest<CallResponse<Page
     /// <summary>Only tenants in this status. Null: all.</summary>
     public TenantStatus? Status { get; set; }
 
+    /// <summary>Only tenants in one of these statuses (the console's status facet). Empty or null: all.</summary>
+    public TenantStatus[]? Statuses { get; set; }
+
+    /// <summary>Only this tier. Null: all.</summary>
+    public int? Tier { get; set; }
+
+    /// <summary>Only this country (ISO code). Null: all.</summary>
+    public string? CountryCode { get; set; }
+
+    /// <summary>Only tenants with an enabled line for this module. Null: all.</summary>
+    public string? ModuleCode { get; set; }
+
     public class GetPagedTenantsQueryValidator : AbstractValidator<GetPagedTenantsQuery>
     {
         public GetPagedTenantsQueryValidator()

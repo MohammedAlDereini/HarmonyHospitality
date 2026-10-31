@@ -62,3 +62,68 @@ form + form button { margin-top: 10px; }
 /* sign-in.js: after the first send the page waits for the answer. */
 button[aria-disabled="true"], button[aria-disabled="true"]:hover { opacity: 0.7; cursor: progress; background: var(--shell); }
 button.secondary[aria-disabled="true"], button.secondary[aria-disabled="true"]:hover { background: var(--surface); }
+
+/* The console's frame (platform console design, C12): a 480px brand panel, the card in the middle of the rest.
+   Colours are the console's tokens (libs/ui/tokens/console.css), written out because this page loads no app CSS. */
+body.console { background: #fafbfc; }
+.split { min-height: 100vh; display: grid; grid-template-columns: 480px 1fr; }
+.panel { position: relative; background: var(--shell); color: var(--shell-ink); padding: 40px 40px 76px; display: flex; flex-direction: column; gap: 20px; overflow: hidden; }
+.panel .lockup-row { display: flex; align-items: center; gap: 10px; height: 100px; }
+.panel .lockup { height: 20px; width: auto; display: block; color: var(--shell-ink); }
+.panel .divider { width: 1px; height: 18px; background: #2a3744; }
+.panel .product { font-size: 13px; line-height: 18px; color: #9ca8b3; }
+.panel .grow { flex: 1; }
+.panel .door img { display: block; width: 100px; height: 120px; object-fit: cover; object-position: top; }
+.panel h2 { margin: 0; font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -0.28px; color: var(--shell-ink); }
+.panel .statement p { margin: 8px 0 0; max-width: 380px; font-size: 14px; line-height: 20px; color: #9ca8b3; }
+.panel .status { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 13px; line-height: 18px; color: #9ca8b3; }
+.panel .status li { display: flex; align-items: center; gap: 8px; }
+.panel .status svg { flex: none; width: 16px; height: 16px; }
+.panel .status .ok { color: #2e9445; }
+.panel .fine { margin: 0 0 72px; font-size: 12px; line-height: 16px; color: #9ca8b3; }
+.panel .fine a { color: inherit; }
+.panel .arcade { position: absolute; inset-inline: 0; bottom: 0; width: 100%; height: 48px; display: block; }
+.stage { display: flex; flex-direction: column; min-height: 100vh; }
+.stage-top { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; min-height: 68px; }
+.stage-centre { flex: 1; display: grid; place-items: center; padding: 0 24px; }
+.stage-foot { margin: 0; padding: 20px 24px; text-align: center; font-size: 12px; line-height: 16px; color: #5f6b7c; }
+.ghost { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 6px; color: var(--ink); text-decoration: none; font-weight: 500; font-size: 14px; }
+.ghost:hover { background: #ebeef2; }
+.ghost svg { width: 16px; height: 16px; }
+
+.console-card { max-width: 440px; padding: 40px; border-radius: 12px; border-color: #d3d9e1; box-shadow: 0 1px 1px rgba(13, 18, 24, 0.04), 0 1px 2px rgba(13, 18, 24, 0.06); }
+.console-card h1 { font-size: 22px; line-height: 28px; letter-spacing: -0.5px; margin: 0 0 8px; }
+.console-card .lead { font-size: 13px; line-height: 18px; color: #5f6b7c; margin: 0 0 20px; }
+.console-card label { font-size: 12px; line-height: 16px; font-weight: 500; color: #5f6b7c; margin: 0 0 4px; }
+.console-card input { height: 36px; padding: 0 12px; border-radius: 6px; border-color: #d3d9e1; }
+.console-card button, .console-card a.button { box-sizing: border-box; height: 36px; padding: 0 14px; margin: 20px 0 0; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; font-size: 14px; line-height: 20px; text-decoration: none; }
+.console-card a.button.secondary { background: var(--surface); color: var(--ink); border: 1px solid #d3d9e1; }
+.console-card button svg, .console-card a.button svg { width: 16px; height: 16px; flex: none; }
+.console-card .or { display: flex; align-items: center; gap: 12px; margin: 20px 0 0; font-size: 12px; line-height: 16px; color: #5f6b7c; }
+.console-card .or::before, .console-card .or::after { content: ""; flex: 1; height: 1px; background: #d3d9e1; }
+.console-card #passkey-form button { margin-top: 20px; }
+.console-card .links { display: flex; justify-content: space-between; gap: 12px; margin: 20px 0 0; font-size: 13px; line-height: 18px; }
+.console-card .links a { color: #5e5345; }
+.console-card .identity { display: flex; align-items: center; gap: 12px; padding: 8px 12px; margin: 0 0 16px; border: 1px solid #d3d9e1; border-radius: 999px; background: #f4f6f8; font-size: 13px; line-height: 18px; }
+.console-card .identity .person { flex: none; width: 24px; height: 24px; border-radius: 999px; background: #ebeef2; display: grid; place-items: center; color: #5f6b7c; }
+.console-card .identity .person svg { width: 16px; height: 16px; }
+.console-card .identity .who { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.console-card .identity a { color: #5e5345; white-space: nowrap; }
+.console-card .tone { width: 48px; height: 48px; border-radius: 999px; background: #fff3ea; color: #e8762b; display: grid; place-items: center; margin: 0 0 20px; }
+.console-card .tone svg { width: 24px; height: 24px; }
+.console-card .help { display: flex; align-items: center; gap: 12px; margin: 20px 0 0; padding: 20px 0 0; border-top: 1px solid #e1e5eb; font-size: 13px; line-height: 18px; }
+.console-card .help .text { flex: 1; min-width: 0; }
+.console-card .help .sub { display: block; font-size: 12px; line-height: 16px; color: #5f6b7c; }
+.console-card .help button { width: auto; margin: 0; background: transparent; color: var(--ink); border-color: transparent; }
+.console-card .help button:hover { background: #ebeef2; }
+.console-card .error { margin: 12px 0 0; }
+
+@media (max-width: 960px) {
+  .split { grid-template-columns: 1fr; }
+  .panel { padding: 24px 24px 64px; gap: 12px; }
+  .panel .lockup-row { height: auto; }
+  .panel .door, .panel .grow { display: none; }
+  .panel .fine { margin-bottom: 0; }
+  .stage { min-height: auto; }
+  .console-card { padding: 28px; }
+}

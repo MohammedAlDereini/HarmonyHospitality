@@ -57,6 +57,13 @@ public class PropertyRepository : BaseRepository<Property>, IPropertyRepository
         return await this.context.Properties.Include(p => p.Contacts).FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
+    public async Task<Property?> FindAcrossTenantsAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await this.context.Properties
+            .IgnoreQueryFilters([QueryFilterNames.Tenant])
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+    }
+
     public IQueryable<Property> QueryAcrossTenants()
     {
         return this.context.Properties

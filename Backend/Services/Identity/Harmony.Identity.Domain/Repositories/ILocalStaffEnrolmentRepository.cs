@@ -11,4 +11,7 @@ public interface ILocalStaffEnrolmentRepository : IRepository<LocalStaffEnrolmen
 
     /// <summary>The customer's invitations still Pending (open or expired), newest first, untracked.</summary>
     Task<IReadOnlyList<LocalStaffEnrolment>> PendingOfTenantAsync(Guid tenantId, CancellationToken cancellationToken);
+
+    /// <summary>Every customer's invitations, untracked, for a platform read that names the accounts it wants.</summary>
+    IQueryable<LocalStaffEnrolment> QueryAcrossTenants();
 }

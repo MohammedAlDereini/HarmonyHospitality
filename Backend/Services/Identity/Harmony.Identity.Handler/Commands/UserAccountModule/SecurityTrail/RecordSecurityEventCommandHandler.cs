@@ -22,7 +22,7 @@ public class RecordSecurityEventCommandHandler : IRequestHandler<RecordSecurityE
         var user = await this.userAccounts.FindByIdAcrossTenantsAsync(command.UserId, cancellationToken)
             ?? throw new InvalidOperationException($"Account {command.UserId} cannot be found for its security event.");
 
-        await this.auditEvents.AddAsync(this.securityEvents.Create(user, command.TrailAction), cancellationToken);
+        await this.auditEvents.AddAsync(this.securityEvents.Create(user, command.TrailAction, command.Detail), cancellationToken);
         await this.auditEvents.SaveChangesAsync(cancellationToken);
 
         return CallResponseBuilder.CreateResponse(eCallResponseStatus.Success);
