@@ -2,11 +2,17 @@
   <div class="fields">
     <div class="f">
       <label for="prop-tenant" i18n="@@platform-admin.properties.field.tenant">Tenant</label>
-      <select id="prop-tenant" #firstBox class="field" [formField]="form.tenantId">
+      <select
+        id="prop-tenant"
+        #firstBox
+        class="field"
+        [formField]="form.tenantId"
+        [attr.aria-invalid]="form.tenantId().touched() && form.tenantId().invalid() ? 'true' : null"
+      >
         <option value="" i18n="@@platform-admin.properties.field.tenant.choose">
           Choose a tenant
         </option>
-        @for (tenant of tenants.rows(); track tenant.id) {
+        @for (tenant of tenantChoices(); track tenant.id) {
           <option [value]="tenant.id">{{ tenantLabel(tenant) }}</option>
         }
       </select>
@@ -27,6 +33,7 @@
         autocomplete="off"
         dir="ltr"
         [formField]="form.code"
+        [attr.aria-invalid]="form.code().touched() && form.code().invalid() ? 'true' : null"
       />
       @if (form.code().touched() && form.code().errors().length > 0) {
         <p id="prop-code-error" class="field-error" role="alert">
@@ -48,6 +55,7 @@
         lang="en"
         dir="ltr"
         [formField]="form.nameEn"
+        [attr.aria-invalid]="form.nameEn().touched() && form.nameEn().invalid() ? 'true' : null"
       />
       @if (form.nameEn().touched() && form.nameEn().errors().length > 0) {
         <p class="field-error" role="alert">
@@ -69,6 +77,7 @@
         lang="ar"
         dir="rtl"
         [formField]="form.nameAr"
+        [attr.aria-invalid]="form.nameAr().touched() && form.nameAr().invalid() ? 'true' : null"
       />
       @if (form.nameAr().touched() && form.nameAr().errors().length > 0) {
         <p class="field-error" role="alert">
@@ -80,7 +89,14 @@
     </div>
     <div class="f">
       <label for="prop-type" i18n="@@platform-admin.properties.field.type">Property type</label>
-      <select id="prop-type" class="field" [formField]="form.propertyTypeCode">
+      <select
+        id="prop-type"
+        class="field"
+        [formField]="form.propertyTypeCode"
+        [attr.aria-invalid]="
+          form.propertyTypeCode().touched() && form.propertyTypeCode().invalid() ? 'true' : null
+        "
+      >
         <option value="" i18n="@@platform-admin.properties.field.choose">Choose</option>
         @for (row of types.rows(); track code(row)) {
           <option [value]="code(row)">{{ label(row) }}</option>
@@ -96,7 +112,12 @@
     </div>
     <div class="f">
       <label for="prop-city" i18n="@@platform-admin.properties.field.city">City</label>
-      <select id="prop-city" class="field" [formField]="form.cityId">
+      <select
+        id="prop-city"
+        class="field"
+        [formField]="form.cityId"
+        [attr.aria-invalid]="form.cityId().touched() && form.cityId().invalid() ? 'true' : null"
+      >
         <option value="" i18n="@@platform-admin.properties.field.choose">Choose</option>
         @for (row of cities.rows(); track code(row)) {
           <option [value]="code(row)">{{ label(row) }}</option>
@@ -119,7 +140,13 @@
         autocomplete="off"
         dir="auto"
         [formField]="form.addressLine"
+        [attr.aria-invalid]="
+          form.addressLine().touched() && form.addressLine().invalid() ? 'true' : null
+        "
       />
+      @if (form.addressLine().touched() && form.addressLine().errors().length > 0) {
+        <p class="field-error" role="alert">{{ form.addressLine().errors()[0]?.message }}</p>
+      }
     </div>
     <div class="f">
       <label for="prop-postal" i18n="@@platform-admin.properties.field.postal">Postal code</label>
@@ -130,11 +157,21 @@
         autocomplete="off"
         dir="ltr"
         [formField]="form.postalCode"
+        [attr.aria-invalid]="
+          form.postalCode().touched() && form.postalCode().invalid() ? 'true' : null
+        "
       />
     </div>
     <div class="f">
       <label for="prop-currency" i18n="@@platform-admin.properties.field.currency">Currency</label>
-      <select id="prop-currency" class="field" [formField]="form.defaultCurrency">
+      <select
+        id="prop-currency"
+        class="field"
+        [formField]="form.defaultCurrency"
+        [attr.aria-invalid]="
+          form.defaultCurrency().touched() && form.defaultCurrency().invalid() ? 'true' : null
+        "
+      >
         <option value="" i18n="@@platform-admin.properties.field.choose">Choose</option>
         @for (row of currencies.rows(); track code(row)) {
           <option [value]="code(row)">{{ code(row) }} · {{ label(row) }}</option>
@@ -150,7 +187,16 @@
     </div>
     <div class="f">
       <label for="prop-language" i18n="@@platform-admin.properties.field.language">Language</label>
-      <select id="prop-language" class="field" [formField]="form.defaultLanguageCode">
+      <select
+        id="prop-language"
+        class="field"
+        [formField]="form.defaultLanguageCode"
+        [attr.aria-invalid]="
+          form.defaultLanguageCode().touched() && form.defaultLanguageCode().invalid()
+            ? 'true'
+            : null
+        "
+      >
         <option value="" i18n="@@platform-admin.properties.field.choose">Choose</option>
         @for (row of languages.rows(); track code(row)) {
           <option [value]="code(row)">{{ code(row) }} · {{ label(row) }}</option>
@@ -173,6 +219,9 @@
         inputmode="numeric"
         dir="ltr"
         [formField]="form.totalRooms"
+        [attr.aria-invalid]="
+          form.totalRooms().touched() && form.totalRooms().invalid() ? 'true' : null
+        "
       />
       @if (form.totalRooms().touched() && form.totalRooms().errors().length > 0) {
         <p class="field-error" role="alert">
@@ -193,13 +242,25 @@
         autocomplete="off"
         dir="ltr"
         [formField]="form.externalIdentifier"
+        [attr.aria-invalid]="
+          form.externalIdentifier().touched() && form.externalIdentifier().invalid() ? 'true' : null
+        "
       />
     </div>
     <div class="f">
       <label for="prop-legal" i18n="@@platform-admin.properties.field.legal"
         >Legal environment</label
       >
-      <select id="prop-legal" class="field" [formField]="form.legalEnvironmentCode">
+      <select
+        id="prop-legal"
+        class="field"
+        [formField]="form.legalEnvironmentCode"
+        [attr.aria-invalid]="
+          form.legalEnvironmentCode().touched() && form.legalEnvironmentCode().invalid()
+            ? 'true'
+            : null
+        "
+      >
         <option value="" i18n="@@platform-admin.properties.field.choose">Choose</option>
         @for (row of legal(); track code(row)) {
           <option [value]="code(row)">{{ label(row) }}</option>
@@ -217,7 +278,14 @@
     </div>
     <div class="f">
       <label for="prop-tax" i18n="@@platform-admin.properties.field.tax">Tax environment</label>
-      <select id="prop-tax" class="field" [formField]="form.taxEnvironmentCode">
+      <select
+        id="prop-tax"
+        class="field"
+        [formField]="form.taxEnvironmentCode"
+        [attr.aria-invalid]="
+          form.taxEnvironmentCode().touched() && form.taxEnvironmentCode().invalid() ? 'true' : null
+        "
+      >
         <option value="" i18n="@@platform-admin.properties.field.choose">Choose</option>
         @for (row of tax(); track code(row)) {
           <option [value]="code(row)">{{ label(row) }}</option>
@@ -235,7 +303,16 @@
       <label for="prop-accounting" i18n="@@platform-admin.properties.field.accounting"
         >Accounting environment</label
       >
-      <select id="prop-accounting" class="field" [formField]="form.accountingEnvironmentCode">
+      <select
+        id="prop-accounting"
+        class="field"
+        [formField]="form.accountingEnvironmentCode"
+        [attr.aria-invalid]="
+          form.accountingEnvironmentCode().touched() && form.accountingEnvironmentCode().invalid()
+            ? 'true'
+            : null
+        "
+      >
         <option value="" i18n="@@platform-admin.properties.field.choose">Choose</option>
         @for (row of accounting(); track code(row)) {
           <option [value]="code(row)">{{ label(row) }}</option>
@@ -256,7 +333,17 @@
       <label for="prop-accommodation" i18n="@@platform-admin.properties.field.accommodation"
         >Accommodation environment</label
       >
-      <select id="prop-accommodation" class="field" [formField]="form.accommodationEnvironmentCode">
+      <select
+        id="prop-accommodation"
+        class="field"
+        [formField]="form.accommodationEnvironmentCode"
+        [attr.aria-invalid]="
+          form.accommodationEnvironmentCode().touched() &&
+          form.accommodationEnvironmentCode().invalid()
+            ? 'true'
+            : null
+        "
+      >
         <option value="" i18n="@@platform-admin.properties.field.choose">Choose</option>
         @for (row of accommodation(); track code(row)) {
           <option [value]="code(row)">{{ label(row) }}</option>
@@ -277,7 +364,13 @@
       <label for="prop-starts" i18n="@@platform-admin.properties.field.starts-on"
         >Subscription starts on</label
       >
-      <input id="prop-starts" class="field" type="date" [formField]="form.startsOn" />
+      <input
+        id="prop-starts"
+        class="field"
+        type="date"
+        [formField]="form.startsOn"
+        [attr.aria-invalid]="form.startsOn().touched() && form.startsOn().invalid() ? 'true' : null"
+      />
       @if (form.startsOn().touched() && form.startsOn().errors().length > 0) {
         <p class="field-error" role="alert">
           @for (error of form.startsOn().errors(); track error.kind) {
@@ -288,7 +381,14 @@
     </div>
     <div class="f">
       <label for="prop-module" i18n="@@platform-admin.properties.field.module">First module</label>
-      <select id="prop-module" class="field" [formField]="form.moduleCode">
+      <select
+        id="prop-module"
+        class="field"
+        [formField]="form.moduleCode"
+        [attr.aria-invalid]="
+          form.moduleCode().touched() && form.moduleCode().invalid() ? 'true' : null
+        "
+      >
         <option value="" i18n="@@platform-admin.properties.field.choose">Choose</option>
         @for (row of modules.rows(); track code(row)) {
           <option [value]="code(row)">{{ code(row) }} · {{ label(row) }}</option>

@@ -13,7 +13,7 @@ import { messageOf } from '@harmony/platform/errors';
 import { newIntentKey } from '@harmony/platform/http';
 import { Icon } from '@harmony/ui/icons';
 import { ConfirmDialog, Drawer, Toasts } from '@harmony/ui/overlays';
-import { PageActionsTemplate } from '@harmony/ui/shell';
+import { PageActionsTemplate, PageHead } from '@harmony/ui/shell';
 import { PermissionsEditor } from './permissions-editor';
 import { RoleEditor } from './role-editor';
 import { privilegeLabel } from './wording';
@@ -46,6 +46,7 @@ interface OtherName {
     PermissionsEditor,
     Drawer,
     ConfirmDialog,
+    PageHead,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './roles-page.html',

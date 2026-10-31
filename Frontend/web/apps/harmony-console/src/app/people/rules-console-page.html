@@ -1,0 +1,237 @@
+<div class="c-page">
+  <hr-people-head current="rules" />
+
+  @if (problem(); as text) {
+    <p class="c-msg" data-s="stop" role="alert">{{ text }}</p>
+  }
+
+  @if (store.problem(); as text) {
+    <section class="c-card">
+      <div class="c-empty" role="alert">
+        <span class="ring"><hr-icon name="critical" size="20" /></span>
+        <b>{{ text }}</b>
+        <button
+          type="button"
+          class="btn"
+          (click)="store.reload()"
+          i18n="@@administration.rules.try-again"
+        >
+          Try again
+        </button>
+      </div>
+    </section>
+  } @else if (store.rules(); as rules) {
+    <div class="c-grid three cards">
+      <section class="c-card" data-approvals>
+        <div class="c-card-h">
+          <h3 i18n="@@administration.rules.approvals">Approvals</h3>
+          <span class="chip" [attr.data-s]="rules.approvalsRequired ? 'ok' : null"
+            ><span class="dot"></span>
+            @if (rules.approvalsRequired) {
+              <ng-container i18n="@@administration.rules.on">On</ng-container>
+            } @else {
+              <ng-container i18n="@@administration.rules.off">Off</ng-container>
+            }
+          </span>
+        </div>
+        <div class="c-card-b rule">
+          <label class="c-switch">
+            <input
+              type="checkbox"
+              #approvalsBox
+              data-act="approvals"
+              [checked]="rules.approvalsRequired"
+              [disabled]="busy() || !mayManage()"
+              (change)="switchApprovals(approvalsBox.checked)"
+            />
+            <span class="vh" i18n="@@administration.rules.second-administrator"
+              >Second administrator</span
+            >
+          </label>
+          <div class="t">
+            <b i18n="@@administration.console.rules.approvals.title"
+              >A second administrator must approve</b
+            >
+            <span i18n="@@administration.console.rules.approvals.text"
+              >Giving an administrator role, a two-step exception, merging two accounts and
+              switching company sign-in off wait for another administrator. The asker cannot approve
+              their own request.</span
+            >
+          </div>
+        </div>
+      </section>
+      <section class="c-card" data-devices>
+        <div class="c-card-h">
+          <h3 i18n="@@administration.rules.devices">New devices</h3>
+          <span class="chip" [attr.data-s]="rules.trustedDevicesRequired ? 'ok' : null"
+            ><span class="dot"></span>
+            @if (rules.trustedDevicesRequired) {
+              <ng-container i18n="@@administration.rules.devices.on">On</ng-container>
+            } @else {
+              <ng-container i18n="@@administration.rules.devices.off">Off</ng-container>
+            }
+          </span>
+        </div>
+        <div class="c-card-b rule">
+          <label class="c-switch">
+            <input
+              type="checkbox"
+              #devicesBox
+              data-act="devices"
+              [checked]="rules.trustedDevicesRequired"
+              [disabled]="busy() || !mayManage()"
+              (change)="switchTrustedDevices(devicesBox.checked)"
+            />
+            <span class="vh" i18n="@@administration.rules.devices.state">Trust first</span>
+          </label>
+          <div class="t">
+            <b i18n="@@administration.console.rules.devices.title"
+              >Trust a browser before it signs in</b
+            >
+            <span i18n="@@administration.console.rules.devices.text"
+              >A sign-in from an untrusted browser waits until the person presses “Trust device” in
+              the e-mail. Company accounts are not asked: their company checks the device.</span
+            >
+          </div>
+        </div>
+      </section>
+      <section class="c-card" data-inactive>
+        <div class="c-card-h">
+          <h3 i18n="@@administration.rules.inactive">Inactive accounts</h3>
+        </div>
+        <div class="c-card-b">
+          <p class="note" i18n="@@administration.console.rules.inactive.text">
+            An account nobody signed in to for this many days is suspended at night; an
+            administrator can turn it back on. Directory people follow the directory instead.
+          </p>
+          @if (mayManage()) {
+            <form class="days" (submit)="saveDays($event)" novalidate>
+              <label for="inactive-days" i18n="@@administration.rules.inactive.days"
+                >Days (1 to 90)</label
+              >
+              <div class="row">
+                <input id="inactive-days" class="field num" type="number" [formField]="form.days" />
+                <button
+                  type="submit"
+                  class="btn"
+                  [disabled]="busy()"
+                  i18n="@@administration.rules.inactive.save"
+                >
+                  Save
+                </button>
+              </div>
+              @if (form.days().touched() && form.days().errors().length > 0) {
+                <p class="field-error" role="alert">{{ form.days().errors()[0]?.message }}</p>
+              }
+            </form>
+          } @else {
+            <dl class="c-facts">
+              <dt i18n="@@administration.rules.inactive.days">Days (1 to 90)</dt>
+              <dd class="num">{{ rules.inactivityDays }}</dd>
+            </dl>
+          }
+        </div>
+      </section>
+    </div>
+
+    <section class="c-card" data-waiting>
+      <div class="c-card-h">
+        <h3>
+          <ng-container i18n="@@administration.rules.waiting">Waiting for approval</ng-container
+          >&ngsp;<span class="chip"><span class="dot"></span>{{ store.waiting().length }}</span>
+        </h3>
+      </div>
+      @if (store.waiting().length === 0) {
+        <div class="c-card-b">
+          <p class="note" i18n="@@administration.rules.waiting.none">Nothing is waiting.</p>
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table class="data waiting">
+            <thead>
+              <tr>
+                <th scope="col" i18n="@@administration.console.rules.column.request">Request</th>
+                <th scope="col" i18n="@@administration.rules.asked-by">Asked by</th>
+                <th scope="col" i18n="@@administration.rules.asked-at">Asked</th>
+                <th scope="col" class="acts" *hrIfAllowed="manageUsers">
+                  <span class="vh" i18n="@@administration.console.rules.column.actions"
+                    >Actions</span
+                  >
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (request of store.waiting(); track request.id) {
+                <tr class="wrow" data-request>
+                  <td class="tenant">
+                    <span class="nm">{{ kindOf(request) }}</span>
+                    @if (request.target; as target) {
+                      &ngsp;<span class="sub"
+                        ><ng-container i18n="@@administration.console.rules.for">for</ng-container
+                        >&ngsp;<bdi>{{ target }}</bdi></span
+                      >
+                    }
+                  </td>
+                  <td class="muted">
+                    <bdi>{{ request.requestedBy ?? '—' }}</bdi>
+                  </td>
+                  <td class="muted num">{{ stamp(request.raisedAtUtc) }}</td>
+                  <td class="acts" *hrIfAllowed="manageUsers">
+                    <button
+                      type="button"
+                      class="btn solid"
+                      data-act="approve"
+                      [disabled]="busy()"
+                      (click)="approve(request)"
+                    >
+                      <hr-icon name="check" size="16" />
+                      <span i18n="@@administration.rules.approve">Approve</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn"
+                      data-act="reject"
+                      [disabled]="busy()"
+                      (click)="reject(request)"
+                      i18n="@@administration.rules.reject"
+                    >
+                      Reject
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <section class="c-card" data-enforced>
+      <div class="c-card-h">
+        <h3 i18n="@@administration.console.rules.enforced">
+          Enforced by Identity, not editable here
+        </h3>
+      </div>
+      <div class="c-card-b">
+        <dl class="c-facts">
+          <dt i18n="@@administration.console.rules.enforced.password">Password</dt>
+          <dd i18n="@@administration.console.rules.enforced.password.text">
+            12 characters, one symbol, no context words, not in a breach list (HIBP)
+          </dd>
+          <dt i18n="@@administration.console.rules.enforced.limits">Rate limits</dt>
+          <dd i18n="@@administration.console.rules.enforced.limits.text">
+            per address and per account; trusted proxies listed in settings
+          </dd>
+          <dt i18n="@@administration.console.rules.enforced.tokens">Tokens</dt>
+          <dd i18n="@@administration.console.rules.enforced.tokens.text">
+            DPoP-bound; the console refuses hotel accounts (sign-in.platform-only-refused)
+          </dd>
+        </dl>
+      </div>
+    </section>
+  } @else {
+    <section class="c-card">
+      <p class="c-state-h" role="status" i18n="@@administration.rules.loading">Loading…</p>
+    </section>
+  }
+</div>

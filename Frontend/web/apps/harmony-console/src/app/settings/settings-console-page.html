@@ -1,0 +1,158 @@
+<div class="c-page">
+  <hr-page-head i18n-title="@@administration.settings.title" title="Settings">
+    <p class="lead" slot="lead" i18n="@@administration.console.settings.lead">
+      Platform scope · {{ total() }} registered settings · resolution: property › group › tenant ›
+      platform default
+    </p>
+    <a slot="actions" class="btn" routerLink="/reference/settings">
+      <hr-icon name="external" size="16" />
+      <span i18n="@@administration.console.settings.registry">Open settings registry</span>
+    </a>
+    <button
+      slot="actions"
+      *hrIfAllowed="manageTenants"
+      type="button"
+      class="btn solid"
+      data-act="save-changes"
+      [disabled]="changes() === 0 || saving()"
+      (click)="save()"
+    >
+      <span i18n="@@administration.console.settings.save">Save changes</span>
+    </button>
+  </hr-page-head>
+
+  @if (problem(); as text) {
+    <p class="c-msg" data-s="stop" role="alert">{{ text }}</p>
+  }
+  @if (changes(); as changes) {
+    <div class="c-msg" data-s="warn" role="status" data-changes>
+      <hr-icon class="ic" name="attention" size="18" />
+      <span i18n="@@administration.console.settings.changes">{changes, plural,
+        =1 {1 default changed and not saved yet.}
+        other {{{ changes }} defaults changed and not saved yet.}
+      }</span>
+      <button
+        type="button"
+        class="btn ghost"
+        data-act="discard"
+        (click)="discard()"
+        i18n="@@administration.console.settings.discard"
+      >
+        Discard
+      </button>
+    </div>
+  }
+
+  @if (loading() && settings().length === 0) {
+    <section class="c-card">
+      <p class="c-state-h" role="status" i18n="@@administration.settings.loading">Loading…</p>
+    </section>
+  } @else if (settings().length === 0) {
+    <section class="c-card">
+      <div class="c-empty">
+        <span class="ring"><hr-icon name="settings" size="20" /></span>
+        <b i18n="@@administration.console.settings.none">No setting is registered yet</b>
+        <p i18n="@@administration.console.settings.none-hint">
+          A service registers its keys in the settings registry; the defaults appear here.
+        </p>
+      </div>
+    </section>
+  } @else {
+    <div class="columns">
+      <nav
+        class="c-card groups"
+        i18n-aria-label="@@administration.console.settings.sections"
+        aria-label="Sections"
+      >
+        @for (section of sections(); track section.service) {
+          <button
+            type="button"
+            [attr.aria-current]="current()?.service === section.service ? 'page' : null"
+            (click)="choose(section)"
+          >
+            <hr-icon name="settings" size="16" />
+            <span class="t" dir="ltr">{{ section.service }}</span>
+            <span class="n">{{ section.count }}</span>
+          </button>
+        }
+      </nav>
+
+      @if (current(); as current) {
+        <section class="c-card settings">
+          <div class="c-card-h">
+            <div class="two">
+              <h3 dir="ltr">{{ current.service }}</h3>
+              <span class="sub" i18n="@@administration.console.settings.section.lead"
+                >Apply to every tenant that has not set its own value · a tenant, a group or a hotel
+                may set its own</span
+              >
+            </div>
+          </div>
+          @for (setting of shown(); track setting.key) {
+            <div
+              class="row"
+              [class.changed]="changed(setting)"
+              [attr.data-key]="setting.key"
+              [class.inactive]="!setting.isActive"
+            >
+              <div class="text">
+                <b dir="ltr">{{ setting.key }}</b>
+                <span class="sub" dir="ltr">{{ note(setting) }}</span>
+              </div>
+              <span class="chip"
+                ><span class="dot"></span
+                ><ng-container i18n="@@administration.console.settings.default"
+                  >platform default</ng-container
+                ></span
+              >
+              @if (setting.dataType === 'bool') {
+                <label class="c-switch">
+                  <input
+                    type="checkbox"
+                    #onBox
+                    [checked]="isOn(setting)"
+                    [disabled]="!mayManage() || saving()"
+                    (change)="toggle(setting, onBox.checked)"
+                  />
+                  <span class="vh">{{ setting.key }}</span>
+                </label>
+              } @else if (setting.dataType === 'int' || setting.dataType === 'decimal') {
+                <input
+                  class="field num"
+                  type="number"
+                  [attr.step]="setting.dataType === 'decimal' ? 'any' : '1'"
+                  [attr.aria-label]="setting.key"
+                  [value]="valueOf(setting)"
+                  [disabled]="!mayManage() || saving()"
+                  (input)="type(setting, numberBox.value)"
+                  #numberBox
+                />
+              } @else if (setting.dataType === 'time') {
+                <input
+                  class="field"
+                  type="time"
+                  [attr.aria-label]="setting.key"
+                  [value]="valueOf(setting)"
+                  [disabled]="!mayManage() || saving()"
+                  (input)="type(setting, timeBox.value)"
+                  #timeBox
+                />
+              } @else {
+                <input
+                  class="field"
+                  type="text"
+                  dir="ltr"
+                  [attr.aria-label]="setting.key"
+                  [value]="valueOf(setting)"
+                  [disabled]="!mayManage() || saving()"
+                  (input)="type(setting, textBox.value)"
+                  #textBox
+                />
+              }
+            </div>
+          }
+        </section>
+      }
+    </div>
+  }
+</div>

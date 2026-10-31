@@ -31,6 +31,14 @@ const ritz: Tenant = {
   onboardedOn: '2026-10-24',
   isPlatform: false,
   subscriptions: [],
+  hotels: 0,
+  roomsInUse: 0,
+  licensedRooms: 0,
+  moduleCodes: [],
+  people: 0,
+  peopleWithPassword: 0,
+  twoStepExceptions: 0,
+  administrator: null,
 };
 const draft: TenantDraft = {
   code: 'bluenile',
@@ -77,7 +85,11 @@ describe('TenantsStore', () => {
       pageNumber: 1,
       pageSize: TENANTS_PAGE_SIZE,
       searchText: null,
-      status: null,
+      sortOrder: [{ memberName: 'CreatedDate', sortOrder: 2 }],
+      statuses: ['Active', 'Suspended'],
+      tier: null,
+      countryCode: null,
+      moduleCode: null,
     });
     request.flush({ data: { results: [ritz], totalCount: TOTAL } });
     await settle();
@@ -86,11 +98,11 @@ describe('TenantsStore', () => {
     store.goTo(SECOND_PAGE);
     await settle();
     http.expectOne(tenantsPath).flush({ data: { results: [], totalCount: TOTAL } });
-    store.showStatus(TenantStatus.suspended);
+    store.showStatuses([TenantStatus.suspended]);
     await settle();
     expect(http.expectOne(tenantsPath).request.body).toMatchObject({
       pageNumber: 1,
-      status: 'Suspended',
+      statuses: ['Suspended'],
     });
   });
 

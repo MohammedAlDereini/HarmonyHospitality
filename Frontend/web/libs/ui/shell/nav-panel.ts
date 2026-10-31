@@ -63,8 +63,21 @@ export class NavPanel {
     if (this.opened) this.searchBox().nativeElement.focus();
   }
 
-  /** Enter goes to the first place shown; ArrowDown moves into the results. */
+  /**
+   * Enter goes to the first place shown; ArrowDown moves into the results; Escape clears a search, and closes the
+   * panel when there is nothing to clear (a search box swallows Escape itself, so the popover would not see it).
+   */
   protected onSearchKey(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      if (this.query() !== '') {
+        this.query.set('');
+        this.searchBox().nativeElement.value = '';
+      } else {
+        this.close();
+      }
+      return;
+    }
     if (event.key === 'ArrowDown') {
       event.preventDefault();
       this.host.querySelector<HTMLElement>('a.ni')?.focus();

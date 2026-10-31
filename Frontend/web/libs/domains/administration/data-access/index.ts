@@ -1,3 +1,4 @@
+export type { AccountCensus } from './users-store';
 export {
   USERS_PAGE_SIZE,
   UsersStore,

@@ -1,0 +1,190 @@
+<div class="c-page">
+  <hr-people-head current="invitations" />
+
+  <form class="c-filters" (submit)="onSearch($event, search.value)">
+    <div class="search">
+      <hr-icon class="ic" name="find" size="16" />
+      <label class="vh" for="invitations-search" i18n="@@administration.console.invitations.search"
+        >Search</label
+      >
+      <input
+        id="invitations-search"
+        #search
+        class="field"
+        type="search"
+        autocomplete="off"
+        dir="auto"
+        i18n-placeholder="@@administration.console.invitations.search-placeholder"
+        placeholder="Search name or e-mail"
+        [value]="this.search()"
+      />
+    </div>
+    <hr-facet
+      i18n-label="@@administration.console.invitations.facet.link"
+      label="Link"
+      [options]="linkOptions"
+      [value]="linkValue()"
+      (valueChange)="onLink($event)"
+    />
+    <button type="submit" class="btn ghost" i18n="@@administration.console.invitations.find">
+      Find
+    </button>
+    <span class="count" i18n="@@administration.console.invitations.count"
+      >{store.rows().length, plural,
+        =0 {nothing waiting}
+        =1 {1 waiting}
+        other {{{ store.rows().length }} waiting}
+      }
+      · by sent</span
+    >
+  </form>
+
+  @if (problem(); as text) {
+    <p class="c-msg" data-s="stop" role="alert">{{ text }}</p>
+  }
+
+  <section class="c-card">
+    @if (store.problem(); as text) {
+      <div class="c-empty" role="alert">
+        <span class="ring"><hr-icon name="critical" size="20" /></span>
+        <b>{{ text }}</b>
+        <button
+          type="button"
+          class="btn"
+          (click)="store.reload()"
+          i18n="@@administration.invitations.try-again"
+        >
+          Try again
+        </button>
+      </div>
+    } @else if (store.loading() && store.rows().length === 0) {
+      <p class="c-state-h" role="status" i18n="@@administration.invitations.loading">Loading…</p>
+    } @else if (rows().length === 0 && store.rows().length > 0) {
+      <div class="c-empty">
+        <span class="ring"><hr-icon name="mail" size="20" /></span>
+        <b i18n="@@administration.console.invitations.none-match">No invitation matches</b>
+        <p i18n="@@administration.console.invitations.none-match-hint">
+          Widen the link facet, or clear the search.
+        </p>
+      </div>
+    } @else if (rows().length === 0) {
+      <div class="c-empty">
+        <span class="ring"><hr-icon name="mail" size="20" /></span>
+        <b i18n="@@administration.console.invitations.none">No invitation is waiting</b>
+        <p i18n="@@administration.console.invitations.none-hint">
+          New person sends one; a link works for 24 hours.
+        </p>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="data invitations">
+          <thead>
+            <tr>
+              <th scope="col" i18n="@@administration.console.invitations.column.person">Person</th>
+              <th scope="col" i18n="@@administration.invitations.sent-by">Sent by</th>
+              <th scope="col" i18n="@@administration.invitations.sent">Sent</th>
+              <th scope="col" i18n="@@administration.invitations.link">Link</th>
+              <th scope="col" i18n="@@administration.console.invitations.column.role">
+                Role on arrival
+              </th>
+              <th scope="col">
+                <span class="vh" i18n="@@administration.console.invitations.column.actions"
+                  >Actions</span
+                >
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (invitation of rows(); track invitation.id) {
+              <tr class="irow" data-invitation>
+                <td class="tenant">
+                  <span class="nm"
+                    ><bdi>{{ invitation.displayName }}</bdi></span
+                  >
+                  &ngsp;<span class="sub" dir="ltr"
+                    ><bdi>{{ invitation.email ?? '' }}</bdi></span
+                  >
+                </td>
+                <td class="muted">
+                  <bdi>{{ invitation.sentBy ?? '—' }}</bdi>
+                </td>
+                <td class="muted num">{{ stamp(invitation.sentAtUtc) }}</td>
+                <td class="num">
+                  @if (invitation.isExpired) {
+                    <span class="chip" data-s="warn"
+                      ><span class="dot"></span>{{ linkWord(invitation) }}</span
+                    >
+                  } @else {
+                    <span class="muted">{{ linkWord(invitation) }}</span>
+                  }
+                </td>
+                <td class="muted">
+                  <bdi>{{ roleOnArrival(invitation) }}</bdi>
+                </td>
+                <td class="acts">
+                  <ng-container *hrIfAllowed="manageUsers">
+                    <button
+                      #more
+                      type="button"
+                      class="btn icon"
+                      [attr.popovertarget]="'invitation-menu-' + invitation.id"
+                      i18n-aria-label="@@administration.console.invitations.more"
+                      aria-label="More actions"
+                    >
+                      <hr-icon name="more" size="16" />
+                    </button>
+                    <div
+                      class="row-menu"
+                      popover
+                      [id]="'invitation-menu-' + invitation.id"
+                      [hrPopAt]="more"
+                      role="menu"
+                    >
+                      <button
+                        type="button"
+                        role="menuitem"
+                        data-act="resend"
+                        [disabled]="busy()"
+                        (click)="resend(invitation)"
+                        i18n="@@administration.invitations.resend"
+                      >
+                        Send again
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        data-act="cancel"
+                        [disabled]="busy()"
+                        (click)="cancel(invitation)"
+                        i18n="@@administration.invitations.cancel"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </ng-container>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="c-foot">
+        <span i18n="@@administration.console.invitations.foot"
+          >{{ rows().length }} of {{ store.rows().length }}</span
+        >
+      </div>
+    }
+  </section>
+
+  <hr-confirm-dialog
+    #cancelDialog
+    i18n-heading="@@administration.invitations.cancel.heading"
+    heading="Cancel this invitation?"
+    i18n-message="@@administration.invitations.cancel.ask"
+    message="The link stops working. The account stays; you can send a new invitation later."
+    i18n-go="@@administration.invitations.cancel.go"
+    go="Cancel the invitation"
+    i18n-stay="@@administration.invitations.cancel.stay"
+    stay="Keep it"
+  />
+</div>

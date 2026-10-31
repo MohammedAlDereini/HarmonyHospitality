@@ -1,13 +1,10 @@
-<header class="page-head">
-  <div>
-    <h1 i18n="@@administration.company-login.title">Company login</h1>
-    <p class="lead" i18n="@@administration.company-login.lead">
-      Your staff sign in with their company's Microsoft or Google account: they type their work
-      e-mail and Harmony sends them to the company. You choose the e-mail domains and who keeps a
-      Harmony password.
-    </p>
-  </div>
-</header>
+<hr-page-head i18n-title="@@administration.company-login.title" title="Company login">
+  <p class="lead" slot="lead" i18n="@@administration.company-login.lead">
+    Your staff sign in with their company's Microsoft or Google account: they type their work e-mail
+    and Harmony sends them to the company. You choose the e-mail domains and who keeps a Harmony
+    password.
+  </p>
+</hr-page-head>
 @if (problem(); as text) {
   <p class="empty" role="alert">{{ text }}</p>
 }

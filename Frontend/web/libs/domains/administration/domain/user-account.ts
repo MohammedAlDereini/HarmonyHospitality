@@ -22,12 +22,22 @@ export interface UserAccount {
   readonly isDirectoryManaged: boolean;
   /** As Identity sends it; shown in the property's zone. */
   readonly createdDate: string;
+  /** The newest sign-in, as Identity recorded it; null when the person never signed in. */
+  readonly lastSignInUtc: string | null;
+  /** The device that was seen last ("Windows · Edge 130"); null when none was. */
+  readonly lastSignInDevice: string | null;
   /** The roles the account holds. */
   readonly roleIds: readonly string[];
 }
 
+/** The Two-step facet's three answers. */
+export type TwoStepFilter = 'on' | 'off' | 'exempt';
+
 /** What the list is filtered by; page is 1-based. */
 export interface UserFilters {
   readonly search: string;
+  readonly state: AccountState | null;
+  readonly twoStep: TwoStepFilter | null;
+  readonly roleId: string | null;
   readonly page: number;
 }

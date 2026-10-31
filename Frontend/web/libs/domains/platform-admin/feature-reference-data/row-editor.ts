@@ -75,6 +75,8 @@ export class RowEditor implements OnInit {
   readonly table = input.required<ReferenceTable>();
   /** The row being changed, or null for a new one. */
   readonly row = input<ReferenceRow | null>(null);
+  /** What a new row starts with, by field key: the page's current scope (the chosen lookup category). */
+  readonly defaults = input<Readonly<Record<string, string>>>({});
   readonly done = output();
   readonly cancelled = output();
 
@@ -92,8 +94,12 @@ export class RowEditor implements OnInit {
     const texts: Record<string, string> = {};
     const flags: Record<string, boolean> = {};
     this.table().fields.forEach((field) => {
-      if (field.kind === 'checkbox') flags[field.key] = row?.[field.key] === true;
-      else texts[field.key] = asText(row?.[field.key]);
+      // A new row is active unless the person retires it; every other flag starts off.
+      if (field.kind === 'checkbox')
+        flags[field.key] = row === null ? field.key === 'isActive' : row[field.key] === true;
+      else
+        texts[field.key] =
+          row === null ? (this.defaults()[field.key] ?? '') : asText(row[field.key]);
     });
     return { texts, flags };
   });
@@ -112,7 +118,9 @@ export class RowEditor implements OnInit {
           const at = path.texts[field.key];
           if (at === undefined) return;
           if (field.required === true)
-            required(at, { message: wording(field.isKey === true ? '10401' : '10406') });
+            required(at, {
+              message: wording(field.requiredCode ?? (field.isKey === true ? '10401' : '10406')),
+            });
           if (field.maxLength !== undefined)
             maxLength(at, field.maxLength, { message: wording('10407') });
           if (field.pattern !== undefined)

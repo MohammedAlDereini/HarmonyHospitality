@@ -14,6 +14,7 @@ import {
   REFERENCE_PAGE_SIZE,
   ReferenceFilters,
   ReferenceStore,
+  TableCount,
   TableRows,
 } from '@harmony/platform-admin/data-access';
 import {
@@ -23,16 +24,20 @@ import {
   ReferenceRow,
   ReferenceTable,
 } from '@harmony/platform-admin/domain';
+import { RouterLink } from '@angular/router';
 import { AccessStore, Permission } from '@harmony/platform/access';
 import { messageOf } from '@harmony/platform/errors';
 import { newIntentKey } from '@harmony/platform/http';
 import { SortOrder } from '@harmony/shared/domain';
-import { AriaSort, Pager, SortButton, ariaSort } from '@harmony/ui/data';
+import { AriaSort, Facet, FacetOption, Pager, SortButton, ariaSort } from '@harmony/ui/data';
 import { Icon } from '@harmony/ui/icons';
 import { ConfirmDialog, Drawer, Toasts } from '@harmony/ui/overlays';
-import { PageActionsTemplate } from '@harmony/ui/shell';
+import { PageHead } from '@harmony/ui/shell';
 import { RowEditor } from './row-editor';
-import { tableByKey } from './tables';
+import { tableByKey, tables } from './tables';
+
+/** A table read per category is never counted as a whole. */
+const scopedCount: TableCount = { total: signal('scoped') };
 
 /** What the drawer holds: a row being changed, or null for a new one. */
 interface Editing {
@@ -46,6 +51,17 @@ const asText = (
   return Array.isArray(value) ? value.join(', ') : String(value);
 };
 const capital = (text: string): string => text.charAt(0).toLocaleUpperCase() + text.slice(1);
+/** Only active rows, until the switch includes the inactive ones. */
+const ACTIVE_ONLY = 'true';
+const stampFormat: Intl.DateTimeFormatOptions = {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+  timeZone: 'UTC',
+};
 
 /**
  * One reference table the way the platform app showed it (architecture 6, platform-admin): the title and what the
@@ -55,7 +71,7 @@ const capital = (text: string): string => text.charAt(0).toLocaleUpperCase() + t
  */
 @Component({
   selector: 'hr-reference-table-page',
-  imports: [Icon, PageActionsTemplate, RowEditor, Pager, SortButton, Drawer, ConfirmDialog],
+  imports: [RouterLink, Icon, Facet, RowEditor, Pager, SortButton, Drawer, ConfirmDialog, PageHead],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './reference-table-page.html',
   styleUrl: './reference-table-page.css',
@@ -71,6 +87,16 @@ export class ReferenceTablePage {
   private readonly confirm = viewChild.required(ConfirmDialog);
 
   protected readonly pageSize = REFERENCE_PAGE_SIZE;
+  /** Every table with its live count: the rail on the left. */
+  protected readonly rail = tables.map((table) => ({
+    table,
+    count: table.scopedBy === undefined ? this.store.count(table.controller) : scopedCount,
+  }));
+  private readonly locale = $localize.locale ?? 'en';
+  private readonly stamps = new Intl.DateTimeFormat(
+    this.locale === 'en' ? 'en-GB' : this.locale,
+    stampFormat,
+  );
   protected readonly description = computed<ReferenceTable | null>(() => tableByKey(this.table()));
   protected readonly rows = computed<TableRows | null>(() => {
     const description = this.description();
@@ -81,6 +107,12 @@ export class ReferenceTablePage {
   /** Lookup values: the categories to choose from. */
   protected readonly categories = this.store.choices('LookupCategory');
   protected readonly category = signal('');
+  /** A new row of a scoped table starts in the category the list shows. */
+  protected readonly newRowDefaults = computed<Readonly<Record<string, string>>>(() => {
+    const scopedBy = this.description()?.scopedBy;
+    const id = this.category();
+    return scopedBy !== undefined && id !== '' ? { [scopedBy]: id } : {};
+  });
   protected readonly mayManage = computed(() => {
     const description = this.description();
     if (description === null) return false;
@@ -93,9 +125,40 @@ export class ReferenceTablePage {
   protected readonly actionProblem = signal<string | null>(null);
   /** The filters as typed, until Apply. */
   protected readonly draft = signal<ReferenceFilters>({});
+  /** Something narrows the list beyond the starting view (active rows only is that view, not a filter). */
   protected readonly hasFilters = computed(() =>
-    Object.values(this.rows()?.filters() ?? {}).some((value) => value !== ''),
+    Object.entries(this.rows()?.filters() ?? {}).some(([key, value]) =>
+      key === 'isActive' ? value !== ACTIVE_ONLY : value !== '',
+    ),
   );
+  /** The switch is on when inactive rows are not filtered out. */
+  protected readonly includeInactive = computed(
+    () => (this.draft()['isActive'] ?? '') !== ACTIVE_ONLY,
+  );
+  /** Every row the table holds, whatever the filters say; the filtered total until the count is known. */
+  protected readonly allCount = computed(() => {
+    const description = this.description();
+    if (description === null) return 0;
+    if (description.scopedBy !== undefined) return this.rows()?.total() ?? 0;
+    const total = this.store.count(description.controller).total();
+    return typeof total === 'number' ? total : (this.rows()?.total() ?? 0);
+  });
+  protected readonly searchPlaceholder = computed(() => {
+    const description = this.description();
+    const what = description === null ? '' : description.title.toLocaleLowerCase();
+    return $localize`:@@platform-admin.reference.search-in:Search ${what}:TABLE:`;
+  });
+  /** The column the rows are sorted by, in words; '' when Identity's default order stands unnamed. */
+  protected readonly sortedBy = computed(() => {
+    const description = this.description();
+    const sort = this.rows()?.sort() ?? null;
+    if (description === null || sort === null) return '';
+    return (
+      description.columns
+        .find((column) => column.sort === sort.memberName)
+        ?.label.toLocaleLowerCase() ?? ''
+    );
+  });
   protected readonly keyColumn = computed(() => {
     const description = this.description();
     if (description === null) return '';
@@ -110,9 +173,10 @@ export class ReferenceTablePage {
   protected readonly drawerHeading = computed(() => {
     const description = this.description();
     if (description === null) return '';
-    return this.editing()?.row === null || this.editing()?.row === undefined
+    const row = this.editing()?.row ?? null;
+    return row === null
       ? this.addLabel()
-      : $localize`:@@platform-admin.reference.edit-one:Edit ${description.singular}:SINGULAR:`;
+      : $localize`:@@platform-admin.reference.edit-named:Edit ${description.singular}:SINGULAR: · ${this.name(row)}:NAME:`;
   });
   protected readonly drawerLead = computed(() =>
     this.editing()?.row === null || this.editing()?.row === undefined
@@ -139,7 +203,12 @@ export class ReferenceTablePage {
         this.editing.set(null);
         this.category.set('');
         this.actionProblem.set(null);
-        this.draft.set(rows?.filters() ?? {});
+        const known = rows?.filters() ?? {};
+        const hasState = description?.filters.some((filter) => filter.key === 'isActive') ?? false;
+        const starting =
+          hasState && known['isActive'] === undefined ? { ...known, isActive: ACTIVE_ONLY } : known;
+        this.draft.set(starting);
+        if (starting !== known) rows?.query({ filters: starting });
         const lookups = new Map<string, OptionRows>();
         description?.filters.forEach((filter) => {
           const from = filter.optionsFrom;
@@ -199,9 +268,45 @@ export class ReferenceTablePage {
     this.rows()?.query({ filters: this.draft() });
   }
 
+  /** Back to the starting view: no text, no facet, active rows only where the table knows a state. */
   protected clearFilters(): void {
-    this.draft.set({});
-    this.rows()?.query({ filters: {} });
+    const hasState =
+      this.description()?.filters.some((filter) => filter.key === 'isActive') ?? false;
+    const starting: ReferenceFilters = hasState ? { isActive: ACTIVE_ONLY } : {};
+    this.draft.set(starting);
+    this.rows()?.query({ filters: starting });
+  }
+
+  /** A select or lookup filter as facet choices (the empty "All" choice is the facet's own Any). */
+  protected facetOptions(filter: ReferenceFilter): readonly FacetOption[] {
+    return this.filterOptions(filter)
+      .filter((option) => option.value !== '')
+      .map((option) => ({ value: option.value, label: option.label }));
+  }
+
+  protected facetValue(filter: ReferenceFilter): readonly string[] {
+    const value = this.draft()[filter.key] ?? '';
+    return value === '' ? [] : [value];
+  }
+
+  /** A facet applies at once. */
+  protected onFacet(filter: ReferenceFilter, values: readonly string[]): void {
+    this.draft.update((draft) => ({ ...draft, [filter.key]: values[0] ?? '' }));
+    this.rows()?.query({ filters: this.draft() });
+  }
+
+  protected toggleInactive(include: boolean): void {
+    this.draft.update((draft) => ({ ...draft, isActive: include ? '' : ACTIVE_ONLY }));
+    this.rows()?.query({ filters: this.draft() });
+  }
+
+  /** "14 Sep 2026 10:22 UTC · Sara Al-Harbi" when Identity says who changed the row last; '' otherwise. */
+  protected audit(row: ReferenceRow): string {
+    const changed = row['modifiedDate'] ?? row['createdDate'];
+    if (typeof changed !== 'string' || changed === '') return '';
+    const by = row['modifiedBy'] ?? row['createdBy'];
+    const when = `${this.stamps.format(new Date(changed.endsWith('Z') || changed.includes('+') ? changed : `${changed}Z`))} UTC`;
+    return typeof by === 'string' && by !== '' ? `${when} · ${by}` : when;
   }
 
   protected filterOptions(filter: ReferenceFilter): readonly ReferenceOption[] {

@@ -153,7 +153,12 @@ export class TenantEditor {
     this.countries.load();
     this.currencies.load();
     afterNextRender(() => {
-      this.firstBox().nativeElement.focus();
+      // Editing locks the code: the first field the person can change takes focus instead.
+      const code = this.firstBox().nativeElement;
+      const first = code.readOnly
+        ? (code.form?.querySelector<HTMLElement>('input:not([readonly]), select') ?? code)
+        : code;
+      first.focus();
     });
   }
 

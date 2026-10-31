@@ -8,11 +8,12 @@ const MIN_HEIGHT = 160;
 /**
  * Places a native popover menu under the button that opened it (the prototype's popAt), reading the page's
  * direction so it hangs from the button's start edge, and mirrors the open state onto the button's aria-expanded.
- * The browser does the rest: top layer, Escape, light dismiss, focus back to the button.
+ * The browser does the rest: top layer, Escape, light dismiss, focus back to the button. A window resize while
+ * the menu is open places it again, so it keeps hanging from the button.
  */
 @Directive({
   selector: '[popover][hrPopAt]',
-  host: { '(toggle)': 'onToggle($event)' },
+  host: { '(toggle)': 'onToggle($event)', '(window:resize)': 'onResize()' },
 })
 export class PopAt {
   /** The button that opens this menu. */
@@ -25,6 +26,23 @@ export class PopAt {
     const anchor = this.hrPopAt();
     anchor?.setAttribute('aria-expanded', String(open));
     if (open && anchor !== undefined) this.place(anchor);
+    if (open) this.focusFirstItem();
+  }
+
+  protected onResize(): void {
+    const anchor = this.hrPopAt();
+    if (anchor !== undefined && this.pop.matches(':popover-open')) this.place(anchor);
+  }
+
+  /** The menu button pattern: an open menu holds focus on its first item; Escape or a choice gives it back. */
+  private focusFirstItem(): void {
+    const first = this.pop.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])');
+    if (first === null) return;
+    const window = this.document.defaultView;
+    if (window === null) return;
+    window.requestAnimationFrame(() => {
+      first.focus();
+    });
   }
 
   private place(anchor: HTMLElement): void {

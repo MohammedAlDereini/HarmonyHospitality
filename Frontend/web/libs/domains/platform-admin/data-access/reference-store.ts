@@ -63,9 +63,9 @@ export interface OptionRows {
   load(scope?: Readonly<Record<string, unknown>>): void;
 }
 
-/** How many rows a table holds, for the overview tiles; null until known, 'denied' when the door refuses. */
+/** How many rows a table holds, for the overview tiles; null until known, 'denied' when the door refuses, 'scoped' for a table that is only read per category. */
 export interface TableCount {
-  readonly total: Signal<number | 'denied' | null>;
+  readonly total: Signal<number | 'denied' | 'scoped' | null>;
 }
 
 /** A filter value as Identity reads it: "true"/"false" become flags, anything else stays text. */

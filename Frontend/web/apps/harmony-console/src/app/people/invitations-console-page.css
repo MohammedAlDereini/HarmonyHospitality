@@ -1,0 +1,58 @@
+/* The platform's invitations (platform console design, C19): the page language is console-ui.css; only the row's own parts live here. */
+table.invitations td.tenant .nm {
+  display: block;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+table.invitations td.tenant .sub {
+  display: block;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+table.invitations td.muted,
+table.invitations .muted {
+  color: var(--ink-3);
+}
+table.invitations td.acts {
+  width: 40px;
+  text-align: end;
+}
+.row-menu {
+  margin: 0;
+  padding: 6px;
+  min-width: 180px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-surface, 8px);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-overlay);
+  display: none;
+  flex-direction: column;
+}
+.row-menu:popover-open {
+  display: flex;
+}
+.row-menu button {
+  display: block;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--radius-control, 6px);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: start;
+  cursor: pointer;
+}
+.row-menu button:hover {
+  background: var(--sunk);
+}
+.row-menu button:disabled {
+  color: var(--ink-4);
+  cursor: default;
+}

@@ -1,12 +1,9 @@
-<header class="page-head">
-  <div>
-    <h1 i18n="@@administration.rules.title">Approvals and rules</h1>
-    <p class="lead" i18n="@@administration.rules.lead">
-      Rules that protect your accounts: changes that need a second administrator, and accounts left
-      unused.
-    </p>
-  </div>
-</header>
+<hr-page-head i18n-title="@@administration.rules.title" title="Approvals and rules">
+  <p class="lead" slot="lead" i18n="@@administration.rules.lead">
+    Rules that protect your accounts: changes that need a second administrator, and accounts left
+    unused.
+  </p>
+</hr-page-head>
 @if (problem(); as text) {
   <p class="empty" role="alert">{{ text }}</p>
 }

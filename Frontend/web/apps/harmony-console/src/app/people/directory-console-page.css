@@ -1,0 +1,76 @@
+/* The platform's company directory (platform console design, C22): the page language is console-ui.css; the secret
+   bar, the groups rows and the drawer's form live here. */
+.c-msg .t {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.c-msg .t b {
+  color: var(--ink);
+}
+.c-msg.secret {
+  align-items: flex-start;
+}
+.c-msg.secret > .btn {
+  flex: none;
+  margin-inline-start: auto;
+}
+.c-msg .c-facts {
+  margin-block-start: var(--s2);
+}
+.c-msg .c-facts dd {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  flex-wrap: wrap;
+}
+code {
+  font-size: 12px;
+  word-break: break-all;
+}
+.note {
+  margin: 0 0 var(--s3);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+table.groups td.tenant .nm {
+  display: block;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+table.groups td.tenant .sub {
+  display: block;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+table.groups td.muted {
+  color: var(--ink-3);
+}
+table.groups td.acts {
+  width: 110px;
+  text-align: end;
+}
+.editor .f {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  margin-block-end: var(--s4);
+}
+.editor .f label {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.editor .acts {
+  display: flex;
+  gap: var(--s2);
+}
+.field-error {
+  margin: 0 0 var(--s3);
+  font-size: 12px;
+  color: var(--stop);
+}

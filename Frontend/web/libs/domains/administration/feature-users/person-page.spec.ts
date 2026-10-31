@@ -34,6 +34,8 @@ const rana: UserAccount = {
   displayName: 'Rana Qasem',
   twoFactorEnabled: false,
   twoStepExemptReason: null,
+  lastSignInUtc: null,
+  lastSignInDevice: null,
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',
@@ -296,6 +298,10 @@ describe('PersonPage', () => {
     expect(store.calls).toEqual(['roles:r1+r2:36']);
     expect(text('hr-role-assignment [role="alert"]')).toContain('above your own rank');
     expect(store.reloads).toBe(0);
+    // The refused box went back to what the account holds; the person ticks it again to retry.
+    expect(page.querySelector<HTMLInputElement>('input[data-role="MANAGER"]')?.checked).toBe(false);
+    click('input[data-role="MANAGER"]');
+    await settle();
     store.answer = { kind: 'ok', status: OK, data: undefined };
     click('[data-act="save-roles"]');
     await settle();

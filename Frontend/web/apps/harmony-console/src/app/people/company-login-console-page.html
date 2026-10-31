@@ -1,0 +1,258 @@
+<div class="c-page">
+  <hr-people-head current="company-login" />
+
+  <div class="c-msg" data-s="info" role="note">
+    <hr-icon class="ic" name="info" size="18" />
+    <div class="t">
+      <b i18n="@@administration.console.company-login.bar.title"
+        >Your staff sign in with their company account</b
+      >
+      <span i18n="@@administration.console.company-login.bar.text"
+        >They type their work e-mail and Harmony sends them to the company. You choose the e-mail
+        domains and who keeps a Harmony password.</span
+      >
+    </div>
+  </div>
+
+  @if (problem(); as text) {
+    <p class="c-msg" data-s="stop" role="alert">{{ text }}</p>
+  }
+
+  @if (store.problem(); as text) {
+    <section class="c-card">
+      <div class="c-empty" role="alert">
+        <span class="ring"><hr-icon name="critical" size="20" /></span>
+        <b>{{ text }}</b>
+        <button
+          type="button"
+          class="btn"
+          (click)="store.reload()"
+          i18n="@@administration.company-login.try-again"
+        >
+          Try again
+        </button>
+      </div>
+    </section>
+  } @else if (store.loading() && store.rows().length === 0) {
+    <section class="c-card">
+      <p class="c-state-h" role="status" i18n="@@administration.company-login.loading">
+        Reading the company login…
+      </p>
+    </section>
+  } @else {
+    <div class="c-grid wide-narrow providers">
+      @for (login of store.rows(); track login.id) {
+        <section class="c-card" data-login>
+          <div class="c-card-h">
+            <h3>{{ login.provider }}</h3>
+            <span class="chip" [attr.data-s]="login.isEnabled ? 'ok' : null"
+              ><span class="dot"></span>
+              @if (login.isEnabled) {
+                <ng-container i18n="@@administration.company-login.on">On</ng-container>
+              } @else {
+                <ng-container i18n="@@administration.company-login.off">Off</ng-container>
+              }
+            </span>
+            <span class="r" *hrIfAllowed="manageUsers">
+              @if (login.isEnabled) {
+                <button
+                  type="button"
+                  class="btn"
+                  data-act="switch-off"
+                  [disabled]="busy()"
+                  (click)="switchOff(login)"
+                  i18n="@@administration.company-login.switch-off"
+                >
+                  Switch off
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="btn solid"
+                  data-act="switch-on"
+                  [disabled]="busy()"
+                  (click)="switchOn(login)"
+                  i18n="@@administration.company-login.switch-on"
+                >
+                  Switch on
+                </button>
+              }
+            </span>
+          </div>
+          <div class="c-card-b">
+            <dl class="c-facts">
+              <dt i18n="@@administration.console.company-login.consent">Consent</dt>
+              <dd i18n="@@administration.console.company-login.consent.text">
+                Your company’s IT approves Harmony once, before the first sign-in
+              </dd>
+              @if (login.consentUrl; as consent) {
+                <dt i18n="@@administration.console.company-login.approval">Approval page</dt>
+                <dd>
+                  <a
+                    [href]="consent"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    dir="ltr"
+                    class="ext"
+                    >{{ consent }}<hr-icon name="external" size="12"
+                  /></a>
+                  <span class="muted">
+                    <ng-container i18n="@@administration.console.company-login.new-tab"
+                      >(opens in a new tab)</ng-container
+                    ></span
+                  >
+                </dd>
+              }
+              <dt i18n="@@administration.console.company-login.people">People using it</dt>
+              <dd class="num">{{ peopleOn(login) }}</dd>
+            </dl>
+          </div>
+          <div class="table-wrap">
+            <table class="data domains">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@administration.console.company-login.column.domain">
+                    E-mail domain
+                  </th>
+                  <th
+                    scope="col"
+                    class="num"
+                    i18n="@@administration.console.company-login.column.people"
+                  >
+                    People
+                  </th>
+                  <th scope="col" class="acts" *hrIfAllowed="manageUsers">
+                    <span class="vh" i18n="@@administration.console.company-login.column.actions"
+                      >Actions</span
+                    >
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (domain of login.domains; track domain) {
+                  <tr class="mrow" data-domain>
+                    <td dir="ltr">
+                      <bdi>{{ domain }}</bdi>
+                    </td>
+                    <td class="num muted">{{ peopleOnDomain(domain) }}</td>
+                    <td class="acts" *hrIfAllowed="manageUsers">
+                      <button
+                        type="button"
+                        class="btn ghost"
+                        data-act="remove-domain"
+                        [disabled]="busy()"
+                        (click)="removeDomain(login, domain)"
+                      >
+                        <hr-icon name="x" size="14" />
+                        <span i18n="@@administration.company-login.remove">Remove</span>
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td
+                      colspan="3"
+                      class="muted"
+                      i18n="@@administration.console.company-login.no-domain"
+                    >
+                      No domain yet: nobody is sent to the company.
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="c-card-b" *hrIfAllowed="manageUsers">
+            @if (adding() === login.id) {
+              <form class="add-domain" (submit)="addDomain($event, login)" novalidate>
+                <label for="new-domain" i18n="@@administration.company-login.domain">Domain</label>
+                <div class="row">
+                  <input
+                    id="new-domain"
+                    class="field"
+                    type="text"
+                    dir="ltr"
+                    autocomplete="off"
+                    i18n-placeholder="@@administration.company-login.domain-placeholder"
+                    placeholder="ritz.com"
+                    [formField]="form.domain"
+                  />
+                  <button
+                    type="submit"
+                    class="btn solid"
+                    [disabled]="busy()"
+                    i18n="@@administration.company-login.add"
+                  >
+                    Add domain
+                  </button>
+                  <button
+                    type="button"
+                    class="btn"
+                    (click)="adding.set(null)"
+                    i18n="@@administration.company-login.cancel"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                @if (domainProblem(); as text) {
+                  <p class="field-error" role="alert">{{ text }}</p>
+                } @else if (form.domain().touched() && form.domain().errors().length > 0) {
+                  <p class="field-error" role="alert">{{ form.domain().errors()[0]?.message }}</p>
+                }
+              </form>
+            } @else {
+              <button type="button" class="btn" data-act="add-domain" (click)="startAdding(login)">
+                <hr-icon name="plus" size="16" />
+                <span i18n="@@administration.company-login.add-go">Add a domain</span>
+              </button>
+            }
+          </div>
+        </section>
+      }
+      @for (provider of missing(); track provider) {
+        <section class="c-card not-added" data-missing>
+          <div class="c-card-h">
+            <h3>{{ provider }}</h3>
+            <span class="chip"
+              ><span class="dot"></span
+              ><ng-container i18n="@@administration.console.company-login.not-added"
+                >Not added</ng-container
+              ></span
+            >
+          </div>
+          <div class="c-card-b">
+            <p class="note" i18n="@@administration.console.company-login.not-added.text">
+              Harmony has not added {{ provider }} for this tenant. Adding a provider is a platform
+              action, done on the tenant's page; for our own tenant it is a step away.
+            </p>
+            @if (ownTenant(); as tenant) {
+              <a
+                *hrIfAllowed="manageUsers"
+                class="btn"
+                [routerLink]="['/tenants', tenant]"
+                [queryParams]="{ tab: 'company-login' }"
+              >
+                <hr-icon name="plus" size="16" />
+                <span i18n="@@administration.console.company-login.add-provider"
+                  >Add {{ provider }}</span
+                >
+              </a>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+
+  <hr-confirm-dialog
+    #onDialog
+    i18n-heading="@@administration.company-login.on.heading"
+    heading="Switch company sign-in on?"
+    i18n-message="@@administration.company-login.on.ask"
+    message="From their next sign-in, everyone with an e-mail on these domains signs in with the company account. People you kept on a Harmony password are not changed."
+    i18n-go="@@administration.company-login.on.go"
+    go="Switch on"
+    i18n-stay="@@administration.company-login.on.stay"
+    stay="Not now"
+  />
+</div>

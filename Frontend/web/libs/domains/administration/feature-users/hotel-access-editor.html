@@ -61,6 +61,11 @@
         </optgroup>
       }
     </select>
+    @if (hotels.list().length === 0 && person.groupRows().length === 0) {
+      <p class="hint" data-none i18n="@@administration.person.access.where.none">
+        Nothing to choose yet: this customer has no hotel and no group.
+      </p>
+    }
     <p class="hint" i18n="@@administration.person.access.where.hint">
       At a group, the role reaches every hotel in it, today and later.
     </p>

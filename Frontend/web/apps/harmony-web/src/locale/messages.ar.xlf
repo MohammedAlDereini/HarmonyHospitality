@@ -2839,8 +2839,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="ui.data.pager.rows" datatype="html">
-        <source>rows</source>
-        <target>صفوف</target>
+        <source>{VAR_PLURAL, plural, =1 {row} other {rows}}</source>
+        <target>{VAR_PLURAL, plural, =0 {صفوف} =1 {صف} =2 {صفان} few {صفوف} many {صفًا} other {صف}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">libs/ui/data/pager.ts</context>
           <context context-type="linenumber">20,22</context>
@@ -5748,6 +5748,662 @@
         <context-group purpose="location">
           <context context-type="sourcefile">libs/domains/administration/feature-users/security-rules-page.ts</context>
           <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.facet.any" datatype="html">
+        <source>any</source>
+        <target>أي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/facet.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ui.data.facet.clear" datatype="html">
+        <source>Any</source>
+        <target>أي</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/ui/data/facet.html</context>
+          <context context-type="linenumber">38,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10416" datatype="html">
+        <source>Choose the default currency.</source>
+        <target>اختر العملة الافتراضية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10417" datatype="html">
+        <source>The currency code is three letters.</source>
+        <target>رمز العملة ثلاثة أحرف.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10418" datatype="html">
+        <source>The subdivision code is the country, a dash and 1 to 3 letters or digits, like JO-AM.</source>
+        <target>رمز التقسيم هو رمز الدولة ثم شرطة ثم 1 إلى 3 أحرف أو أرقام، مثل JO-AM.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10419" datatype="html">
+        <source>Give the kind, like Governorate or Emirate.</source>
+        <target>اذكر النوع، مثل محافظة أو إمارة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10420" datatype="html">
+        <source>The kind is too long.</source>
+        <target>النوع طويل جدًا.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10421" datatype="html">
+        <source>Choose a time zone.</source>
+        <target>اختر منطقة زمنية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10422" datatype="html">
+        <source>The time zone is an IANA name like Asia/Amman.</source>
+        <target>المنطقة الزمنية اسم IANA مثل Asia/Amman.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10423" datatype="html">
+        <source>Latitude runs -90 to 90.</source>
+        <target>خط العرض من -90 إلى 90.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10424" datatype="html">
+        <source>Longitude runs -180 to 180.</source>
+        <target>خط الطول من -180 إلى 180.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10425" datatype="html">
+        <source>Give the name in its own language.</source>
+        <target>اذكر الاسم بلغته.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10426" datatype="html">
+        <source>The native name is too long: 128 characters at most.</source>
+        <target>الاسم الأصلي طويل جدًا: 128 حرفًا على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10427" datatype="html">
+        <source>Display order is zero or more.</source>
+        <target>ترتيب العرض صفر أو أكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10428" datatype="html">
+        <source>Give the time zone name, like Asia/Amman.</source>
+        <target>اذكر اسم المنطقة الزمنية، مثل Asia/Amman.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10429" datatype="html">
+        <source>Choose per hotel or whole customer.</source>
+        <target>اختر لكل فندق أو للعميل كله.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10701" datatype="html">
+        <source>Which group? Reload the page and try again.</source>
+        <target>أي مجموعة؟ أعد تحميل الصفحة وحاول مرة أخرى.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10702" datatype="html">
+        <source>Give the group a code.</source>
+        <target>اذكر رمزًا للمجموعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10703" datatype="html">
+        <source>The code is 2 to 32 letters, digits, dots, dashes or underscores.</source>
+        <target>الرمز من 2 إلى 32 حرفًا أو رقمًا أو نقطة أو شرطة أو شرطة سفلية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10704" datatype="html">
+        <source>Give the name in English.</source>
+        <target>اذكر الاسم بالإنجليزية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10705" datatype="html">
+        <source>The English name is too long: 128 characters at most.</source>
+        <target>الاسم الإنجليزي طويل جدًا: 128 حرفًا على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10706" datatype="html">
+        <source>Give the name in Arabic.</source>
+        <target>اذكر الاسم بالعربية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10707" datatype="html">
+        <source>The Arabic name is too long: 128 characters at most.</source>
+        <target>الاسم العربي طويل جدًا: 128 حرفًا على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10708" datatype="html">
+        <source>Choose a group type.</source>
+        <target>اختر نوع المجموعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10709" datatype="html">
+        <source>The description is too long: 500 characters at most.</source>
+        <target>الوصف طويل جدًا: 500 حرف على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10710" datatype="html">
+        <source>The external identifier is too long: 64 characters at most.</source>
+        <target>المعرّف الخارجي طويل جدًا: 64 حرفًا على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10711" datatype="html">
+        <source>Precedence is a whole number from 0 to 1000.</source>
+        <target>الأسبقية عدد صحيح من 0 إلى 1000.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10712" datatype="html">
+        <source>Display order is a whole number, zero or more.</source>
+        <target>ترتيب العرض عدد صحيح، صفر أو أكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10713" datatype="html">
+        <source>Choose a hotel.</source>
+        <target>اختر فندقًا.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10714" datatype="html">
+        <source>Which membership? Reload the page and try again.</source>
+        <target>أي عضوية؟ أعد تحميل الصفحة وحاول مرة أخرى.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10715" datatype="html">
+        <source>The theme reference is too long: 128 characters at most.</source>
+        <target>مرجع السمة طويل جدًا: 128 حرفًا على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10716" datatype="html">
+        <source>The website address is not valid.</source>
+        <target>عنوان الموقع غير صالح.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10717" datatype="html">
+        <source>The franchisor's name is too long: 128 characters at most.</source>
+        <target>اسم مانح الامتياز طويل جدًا: 128 حرفًا على الأكثر.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10718" datatype="html">
+        <source>The agreement cannot end before it starts.</source>
+        <target>لا يمكن أن تنتهي الاتفاقية قبل أن تبدأ.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10719" datatype="html">
+        <source>The royalty is a percentage from 0 to 100.</source>
+        <target>الإتاوة نسبة مئوية من 0 إلى 100.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.access.where.none" datatype="html">
+        <source>Nothing to choose yet: this customer has no hotel and no group.</source>
+        <target>لا شيء للاختيار بعد: ليس لهذا العميل فندق ولا مجموعة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/hotel-access-editor.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.two-step-reset" datatype="html">
+        <source>Two-step reset: the person sets it up again at the next sign-in.</source>
+        <target>أُعيد ضبط التحقق بخطوتين: يعدّه الشخص من جديد عند تسجيل الدخول التالي.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.exemption-ended" datatype="html">
+        <source>Exemption ended: two-step applies again.</source>
+        <target>انتهى الاستثناء: التحقق بخطوتين مطلوب من جديد.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.kept-password" datatype="html">
+        <source>Kept on a Harmony password.</source>
+        <target>أُبقي على كلمة مرور هارموني.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.company-sign-in" datatype="html">
+        <source>The company sign-in applies from the next sign-in.</source>
+        <target>يسري تسجيل دخول الشركة من تسجيل الدخول التالي.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.link-ended" datatype="html">
+        <source>Company link ended.</source>
+        <target>انتهى ربط حساب الشركة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.device-signed-out" datatype="html">
+        <source>Signed out of that device.</source>
+        <target>سُجّل الخروج من ذلك الجهاز.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.passkey-removed" datatype="html">
+        <source>Passkey removed.</source>
+        <target>أُزيل مفتاح المرور.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.role-ended" datatype="html">
+        <source>Role ended.</source>
+        <target>انتهى الدور.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="administration.person.toast.access-revoked" datatype="html">
+        <source>Access revoked.</source>
+        <target>أُلغي الوصول.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/domains/administration/feature-users/person-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00053" datatype="html">
+        <source>That link was already used or has expired. Ask for a new one.</source>
+        <target>استُخدم هذا الرابط من قبل أو انتهت صلاحيته. اطلب رابطًا جديدًا.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.forgot.page-title" datatype="html">
+        <source>Forgot your password</source>
+        <target>نسيت كلمة المرور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/session-routes.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.page-title-reset" datatype="html">
+        <source>Choose a new password</source>
+        <target>اختر كلمة مرور جديدة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/session-routes.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.page-title-set" datatype="html">
+        <source>Choose your password</source>
+        <target>اختر كلمة مرورك</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/session-routes.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.forgot.sent" datatype="html">
+        <source>Check your inbox</source>
+        <target>تحقق من بريدك</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/forgot-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.forgot.sent-text" datatype="html">
+        <source>If that address has an account, the mail is on its way. It can take a minute; the link works once.</source>
+        <target>إن كان لهذا العنوان حساب فالرسالة في طريقها. قد يستغرق ذلك دقيقة؛ الرابط يعمل مرة واحدة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/forgot-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.forgot.back" datatype="html">
+        <source>Back to sign in</source>
+        <target>العودة إلى تسجيل الدخول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/forgot-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.forgot.title" datatype="html">
+        <source>Forgot your password?</source>
+        <target>نسيت كلمة المرور؟</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/forgot-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.forgot.lead" datatype="html">
+        <source>Type your work e-mail. If it belongs to an account, a link to choose a new password is on its way; it works once and for a short while.</source>
+        <target>اكتب بريدك الإلكتروني في العمل. إن كان لحساب، فرابط اختيار كلمة مرور جديدة في طريقه إليك؛ يعمل مرة واحدة ولوقت قصير.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/forgot-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.forgot.email" datatype="html">
+        <source>Work e-mail</source>
+        <target>البريد الإلكتروني في العمل</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/forgot-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.forgot.send" datatype="html">
+        <source>Send the link</source>
+        <target>أرسل الرابط</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/forgot-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.forgot.email-required" datatype="html">
+        <source>Give your work e-mail.</source>
+        <target>اذكر بريدك الإلكتروني في العمل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/forgot-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.forgot.email-shape" datatype="html">
+        <source>That does not look like an email address.</source>
+        <target>لا يبدو هذا عنوان بريد إلكتروني.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/forgot-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.done" datatype="html">
+        <source>Your password is set</source>
+        <target>تم تعيين كلمة مرورك</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.done-text" datatype="html">
+        <source>Sign in with it now. Every earlier sign-in of this account has ended.</source>
+        <target>سجّل الدخول بها الآن. انتهى كل تسجيل دخول سابق لهذا الحساب.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.sign-in" datatype="html">
+        <source>Sign in</source>
+        <target>تسجيل الدخول</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.incomplete-title" datatype="html">
+        <source>This link is incomplete</source>
+        <target>هذا الرابط ناقص</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.incomplete" datatype="html">
+        <source>It carries no address or no token. Open the link from the mail again, or ask for a new one.</source>
+        <target>لا يحمل عنوانًا أو رمزًا. افتح الرابط من الرسالة مرة أخرى، أو اطلب رابطًا جديدًا.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.again" datatype="html">
+        <source>Ask for a new link</source>
+        <target>اطلب رابطًا جديدًا</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.title-set" datatype="html">
+        <source>Choose your password</source>
+        <target>اختر كلمة مرورك</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.title-reset" datatype="html">
+        <source>Choose a new password</source>
+        <target>اختر كلمة مرور جديدة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.new" datatype="html">
+        <source>New password</source>
+        <target>كلمة المرور الجديدة</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.note" datatype="html">
+        <source>At least 12 characters with one symbol, like - or ! (a space counts). A few words make a strong password.</source>
+        <target>12 حرفًا على الأقل مع رمز واحد، مثل - أو ! (المسافة تُحتسب). بضع كلمات تصنع كلمة مرور قوية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.repeat" datatype="html">
+        <source>Repeat it</source>
+        <target>كررها</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.save" datatype="html">
+        <source>Save the password</source>
+        <target>احفظ كلمة المرور</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.weak" datatype="html">
+        <source>At least 12 characters with one symbol, like - or ! (a space counts).</source>
+        <target>12 حرفًا على الأقل مع رمز واحد، مثل - أو ! (المسافة تُحتسب).</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.session.set-password.mismatch" datatype="html">
+        <source>The two passwords differ. Type the same one twice.</source>
+        <target>كلمتا المرور مختلفتان. اكتب الكلمة نفسها مرتين.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/session/set-password-page.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10621" datatype="html">
+        <source>Give the address.</source>
+        <target>اذكر العنوان.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00045" datatype="html">
+        <source>That password does not meet the rules: 12 characters at least, one of them a symbol.</source>
+        <target>كلمة المرور لا تستوفي القواعد: 12 حرفًا على الأقل، أحدها رمز.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00046" datatype="html">
+        <source>The new password is the same as the current one. Choose another.</source>
+        <target>كلمة المرور الجديدة هي نفسها الحالية. اختر غيرها.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00068" datatype="html">
+        <source>That password appeared in a known data breach. Choose another.</source>
+        <target>ظهرت كلمة المرور هذه في تسريب بيانات معروف. اختر غيرها.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.00069" datatype="html">
+        <source>That password contains your name or e-mail. Choose words unrelated to you.</source>
+        <target>تحتوي كلمة المرور على اسمك أو بريدك. اختر كلمات لا تتصل بك.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10305" datatype="html">
+        <source>Give the current password.</source>
+        <target>اذكر كلمة المرور الحالية.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10306" datatype="html">
+        <source>Give the new password.</source>
+        <target>اذكر كلمة المرور الجديدة.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10307" datatype="html">
+        <source>The new password is too short: 12 characters at least.</source>
+        <target>كلمة المرور الجديدة قصيرة جدًا: 12 حرفًا على الأقل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10313" datatype="html">
+        <source>Give the first password.</source>
+        <target>اذكر كلمة المرور الأولى.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="platform.errors.code.10314" datatype="html">
+        <source>The first password is too short: 12 characters at least.</source>
+        <target>كلمة المرور الأولى قصيرة جدًا: 12 حرفًا على الأقل.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">libs/platform/errors/error-messages.ts</context>
+          <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
     </body>

@@ -1,49 +1,106 @@
-/* One property: the header row, the address, the lines and contacts as tables (ui/data), the edit in the drawer. */
-.head h1 {
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 16px;
-}
-.head .obj {
-  margin-inline-start: var(--s4);
-}
-.code {
-  flex: none;
-  min-width: 2.5rem;
-  padding: 2px 8px;
-  border: 1px solid var(--rule-2);
-  border-radius: var(--radius-control);
+/* One hotel group (platform console design, C15). The page language is console-ui.css; only the head's own parts,
+   the hotels table's row and the drawer's forms live here. */
+.code-tile {
+  display: inline-grid;
+  place-items: center;
+  min-width: 56px;
+  height: 56px;
+  margin-inline-end: var(--s4);
+  padding: 0 10px;
+  border-radius: var(--radius-surface, 8px);
   background: var(--sunk);
-  font-size: 12px;
+  color: var(--ink-2);
+  font-size: 14px;
   font-weight: 700;
-  text-align: center;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
 }
-.line {
-  margin: 0;
-  padding: var(--s2) var(--s6);
+.after {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-inline-start: var(--s3);
+  vertical-align: middle;
+}
+.after .ar {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+.lead a {
+  color: inherit;
+}
+.note {
+  margin: 0 0 var(--s3);
   font-size: 13px;
+  line-height: 18px;
   color: var(--ink-2);
 }
-.acts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s2);
-  padding: var(--s2) var(--s6);
+.c-card.proposed {
+  border-style: dashed;
 }
-.part {
-  padding: var(--s3) 0 0;
-  border-block-start: 1px solid var(--rule);
+.c-card-h .r .btn {
+  flex: none;
 }
-.part h2 {
-  margin: 0 var(--s6) var(--s2);
+table.members td.tenant .nm {
+  display: block;
   font-size: 13px;
-  font-weight: 700;
-  color: var(--ink);
-}
-table.data td .nm {
+  line-height: 18px;
   font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
 }
-/* The edit form inside the drawer, like every other editor. */
+table.members td.tenant .nm:hover {
+  text-decoration: underline;
+}
+table.members td.tenant .sub {
+  display: block;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+table.members td.muted {
+  color: var(--ink-3);
+}
+table.members tr.past td {
+  color: var(--ink-4);
+}
+table.members td.acts {
+  width: 96px;
+  text-align: end;
+}
+.more-wrap {
+  display: inline-flex;
+}
+.row-menu {
+  margin: 0;
+  padding: 6px;
+  min-width: 180px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-surface, 8px);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-overlay);
+  display: none;
+  flex-direction: column;
+}
+.row-menu:popover-open {
+  display: flex;
+}
+.row-menu a {
+  display: block;
+  min-height: 32px;
+  padding: 6px 10px;
+  border-radius: var(--radius-control, 6px);
+  color: var(--ink);
+  font-size: 13px;
+  text-decoration: none;
+}
+.row-menu a:hover {
+  background: var(--sunk);
+}
+/* The edit and join forms inside the drawers, like every other editor. */
 .editor .fields {
   display: flex;
   flex-direction: column;
@@ -56,37 +113,32 @@ table.data td .nm {
   min-width: 0;
 }
 .editor .f label {
-  font-size: 0.9rem;
+  font-size: 12px;
   color: var(--ink-2);
 }
-.editor .f .field {
-  width: 100%;
-  min-width: 0;
+.editor .hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.editor .perm {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-size: 13px;
+}
+.editor .part-title {
+  margin: var(--s2) 0 0;
+  font-size: 13px;
+  font-weight: 700;
 }
 .editor .acts {
-  padding: var(--s4) 0 0;
-  margin-block-start: var(--s5);
-  border-block-start: 1px solid var(--rule);
+  display: flex;
+  gap: var(--s2);
+  margin-block-start: var(--s4);
 }
 .field-error {
   margin: 0;
   font-size: 12px;
   color: var(--stop);
-}
-.facts {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: var(--s1) var(--s4);
-  margin: 0;
-}
-.facts dt {
-  color: var(--ink-3);
-}
-.facts dd {
-  margin: 0;
-}
-.part-title {
-  margin: var(--s3) 0 0;
-  font-size: 0.95rem;
-  color: var(--ink-2);
 }

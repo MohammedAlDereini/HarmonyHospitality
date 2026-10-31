@@ -12,6 +12,7 @@ import { IdentityConfirmation } from '@harmony/platform/session';
 import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
 import { Toasts } from '@harmony/ui/overlays';
+import { PageHead } from '@harmony/ui/shell';
 import { sentForApproval, sentForApprovalToast } from './pending-approval';
 
 const dateAndTime: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'short' };
@@ -31,7 +32,7 @@ interface DaysDraft {
  */
 @Component({
   selector: 'hr-security-rules-page',
-  imports: [FormField, IfAllowed],
+  imports: [FormField, IfAllowed, PageHead],
   providers: [SecurityRulesStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './security-rules-page.html',

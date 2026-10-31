@@ -1,5 +1,6 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import {
   OptionRows,
   ReferenceFilters,
@@ -12,7 +13,7 @@ import { AccessStore } from '@harmony/platform/access';
 import { ApiResult, IntentKey } from '@harmony/platform/http';
 import { DESCENDING, SortOrder } from '@harmony/shared/domain';
 import { Toasts } from '@harmony/ui/overlays';
-import { PageActions } from '@harmony/ui/shell';
+import { PAGE_ACTIONS_IN_HEAD } from '@harmony/ui/shell';
 import { ReferenceTablePage } from './reference-table-page';
 
 const OK = 200;
@@ -77,6 +78,9 @@ class FakeStore {
     this.tables.set(controller, made);
     return made;
   }
+  count(controller: string): { total: ReturnType<typeof signal<number>> } {
+    return { total: signal(controller === 'Currency' ? 1 : 0) };
+  }
   choices(controller: string): OptionRows {
     return {
       rows: signal<readonly ReferenceRow[]>(controller === 'LookupCategory' ? [shifts] : []),
@@ -113,8 +117,10 @@ describe('ReferenceTablePage', () => {
     store = new FakeStore();
     TestBed.configureTestingModule({
       providers: [
+        provideRouter([]),
         { provide: ReferenceStore, useValue: store },
         { provide: AccessStore, useValue: { can: () => true } },
+        { provide: PAGE_ACTIONS_IN_HEAD, useValue: true },
       ],
     });
   });
@@ -122,7 +128,7 @@ describe('ReferenceTablePage', () => {
   it('reads the table on arrival as a real table: headers in words, the key bold, numbers right, state as a pill; sorting flips the column; the lead says what the table is for', async () => {
     await open('currencies');
     expect(store.tables.get('Currency')?.loads).toEqual([{}]);
-    expect(page.querySelector('.page-head .lead')?.textContent).toContain('currencies a hotel can');
+    expect(page.querySelector('.table-note')?.textContent).toContain('currencies a hotel can');
     expect(text('thead th')).toEqual([
       'Code',
       'English name',
@@ -141,34 +147,45 @@ describe('ReferenceTablePage', () => {
     ]);
     expect(page.querySelector('tbody td.key')?.textContent.trim()).toBe('JOD');
     expect(page.querySelector('tbody td.num')?.textContent.trim()).toBe('3');
-    expect(page.querySelector('tbody .pill.on')?.textContent.trim()).toBe('Active');
+    expect(page.querySelector('tbody .chip[data-s="ok"]')?.textContent.trim()).toBe('Active');
     expect(page.querySelector('thead th')?.getAttribute('aria-sort')).toBe('ascending');
     page.querySelector<HTMLButtonElement>('thead th .sort')?.click();
     await settle();
-    expect(store.tables.get('Currency')?.queries).toEqual([
-      { sort: { memberName: 'Code', sortOrder: DESCENDING } },
-    ]);
+    expect(store.tables.get('Currency')?.queries.at(-1)).toEqual({
+      sort: { memberName: 'Code', sortOrder: DESCENDING },
+    });
     expect(page.querySelector('[data-act="delete"]')).toBeNull();
-    expect(TestBed.inject(PageActions).template()).not.toBeNull();
+    expect(page.querySelector('.ph-acts [data-act="add"]')?.textContent.trim()).toBe(
+      'Add currency',
+    );
+    expect(page.querySelectorAll('nav.tables a').length).toBeGreaterThan(1);
   });
 
-  it('the toolbar filters: Apply sends what was typed, Clear empties it', async () => {
+  it('the toolbar filters: active rows only to start, Apply sends what was typed, the switch includes inactive rows, Clear returns to the start', async () => {
     await open('currencies');
+    expect(store.tables.get('Currency')?.queries).toEqual([{ filters: { isActive: 'true' } }]);
     const search = page.querySelector<HTMLInputElement>('[data-filter="searchText"]');
-    const state = page.querySelector<HTMLSelectElement>('[data-filter="isActive"]');
-    if (search === null || state === null) throw new Error('no filters');
+    const inactive = page.querySelector<HTMLInputElement>('[data-filter="isActive"]');
+    if (search === null || inactive === null) throw new Error('no filters');
+    expect(inactive.checked).toBe(false);
     search.value = 'din';
     search.dispatchEvent(new Event('input'));
-    state.value = 'true';
-    state.dispatchEvent(new Event('change'));
-    page.querySelector<HTMLFormElement>('form.toolbar')?.requestSubmit();
+    page.querySelector<HTMLFormElement>('form.c-filters')?.requestSubmit();
     await settle();
-    expect(store.tables.get('Currency')?.queries).toEqual([
-      { filters: { searchText: 'din', isActive: 'true' } },
-    ]);
-    page.querySelector<HTMLButtonElement>('.tacts .quiet')?.click();
+    expect(store.tables.get('Currency')?.queries.at(-1)).toEqual({
+      filters: { searchText: 'din', isActive: 'true' },
+    });
+    inactive.checked = true;
+    inactive.dispatchEvent(new Event('change'));
     await settle();
-    expect(store.tables.get('Currency')?.queries.at(-1)).toEqual({ filters: {} });
+    expect(store.tables.get('Currency')?.queries.at(-1)).toEqual({
+      filters: { searchText: 'din', isActive: '' },
+    });
+    page.querySelector<HTMLButtonElement>('[data-act="clear"]')?.click();
+    await settle();
+    // Clear is the starting view again: no text, active rows only; the switch follows.
+    expect(store.tables.get('Currency')?.queries.at(-1)).toEqual({ filters: { isActive: 'true' } });
+    expect(inactive.checked).toBe(false);
   });
 
   it('Edit opens the drawer with the row; the context bar action opens it for a new row', async () => {
@@ -179,7 +196,7 @@ describe('ReferenceTablePage', () => {
     page.querySelector<HTMLButtonElement>('[data-act="edit"]')?.click();
     await settle();
     expect(drawer.hasAttribute('open')).toBe(true);
-    expect(page.querySelector('.drawer-h h2')?.textContent).toBe('Edit currency');
+    expect(page.querySelector('.drawer-h h2')?.textContent).toBe('Edit currency · Jordanian dinar');
     expect(page.querySelector('.drawer-h .lead')?.textContent).toContain('cannot change');
     expect(page.querySelector('hr-row-editor [data-field="code"]')).not.toBeNull();
     page.querySelector<HTMLButtonElement>('.drawer-x')?.click();
@@ -202,7 +219,7 @@ describe('ReferenceTablePage', () => {
     chooser.dispatchEvent(new Event('change'));
     await settle();
     expect(store.tables.get('LookupValue')?.loads).toEqual([{ lookupCategoryId: 'c1' }]);
-    expect(page.querySelector('tbody .pill.off')?.textContent.trim()).toBe('Inactive');
+    expect(page.querySelector('tbody .chip')?.textContent.trim()).toBe('Inactive');
     page.querySelector<HTMLButtonElement>('[data-act="delete"]')?.click();
     await settle();
     const confirm = page.querySelector<HTMLDialogElement>('dialog.dlg');

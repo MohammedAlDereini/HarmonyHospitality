@@ -1,0 +1,343 @@
+<div class="c-page">
+  <hr-page-head i18n-title="@@platform-operations.sign-ins.title" title="Sign-ins and devices">
+    <p class="lead" slot="lead" i18n="@@platform-operations.sign-ins.lead">
+      All tenants · last 24 hours · UTC
+    </p>
+    <button slot="actions" type="button" class="btn" (click)="refresh()">
+      <hr-icon name="refresh" size="16" />
+      <span i18n="@@platform-operations.sign-ins.refresh">Refresh</span>
+    </button>
+    <button
+      slot="actions"
+      type="button"
+      class="btn"
+      (click)="exportCsv()"
+      [disabled]="store.rows().length === 0"
+    >
+      <hr-icon name="download" size="16" />
+      <span i18n="@@platform-operations.sign-ins.export">Export CSV</span>
+    </button>
+  </hr-page-head>
+
+  @if (countsProblem(); as problem) {
+    <div class="c-msg" data-s="warn" role="alert">
+      <hr-icon class="ic" name="attention" size="18" />
+      <div class="t">
+        <b i18n="@@platform-operations.sign-ins.counts-failed">The numbers could not be read</b
+        ><span>{{ problem }}</span>
+      </div>
+    </div>
+  } @else {
+    <div class="c-kpis">
+      @if (figures(); as figures) {
+        @for (figure of figures; track figure.label) {
+          <div class="c-kpi">
+            <span class="k">{{ figure.label }}</span>
+            <span class="v num">{{ figure.value }}</span>
+            <span class="d" [attr.data-s]="figure.delta > 0 ? 'ok' : null">
+              <hr-icon
+                [name]="figure.delta > 0 ? 'up' : figure.delta < 0 ? 'down' : 'flat'"
+                size="14"
+              />
+              <span>{{ deltaText(figure.delta) }} · {{ figure.note }}</span>
+            </span>
+          </div>
+        }
+      } @else {
+        @for (bone of skeleton.slice(0, 4); track $index) {
+          <div class="c-kpi" aria-hidden="true">
+            <span class="bone k"></span><span class="bone v"></span><span class="bone d"></span>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  <div class="c-grid wide-narrow">
+    <div class="left">
+      <form class="c-filters" (submit)="onSearch($event, search.value)">
+        <div class="search">
+          <hr-icon class="ic" name="find" size="16" />
+          <label class="vh" for="sign-ins-search" i18n="@@platform-operations.sign-ins.search"
+            >Search</label
+          >
+          <input
+            id="sign-ins-search"
+            #search
+            class="field"
+            type="search"
+            autocomplete="off"
+            dir="auto"
+            i18n-placeholder="@@platform-operations.sign-ins.search-placeholder"
+            placeholder="Person, device or address"
+            [value]="store.filters().search"
+          />
+        </div>
+        <div class="sel" [class.on]="outcome() !== ''">
+          <label class="vh" for="sign-ins-outcome" i18n="@@platform-operations.sign-ins.outcome"
+            >Outcome</label
+          >
+          <select
+            id="sign-ins-outcome"
+            #outcomeBox
+            class="field"
+            [value]="outcome()"
+            (change)="onOutcome(outcomeBox.value)"
+          >
+            <option value="" i18n="@@platform-operations.sign-ins.outcome.any">Outcome: any</option>
+            @for (choice of outcomes; track choice) {
+              <option [value]="choice">{{ outcomeName(choice) }}</option>
+            }
+          </select>
+          <hr-icon class="ic" name="chevron" size="14" />
+        </div>
+        <div class="sel" [class.on]="tenantValue() !== ''">
+          <label class="vh" for="sign-ins-tenant" i18n="@@platform-operations.sign-ins.tenant"
+            >Tenant</label
+          >
+          <select
+            id="sign-ins-tenant"
+            #tenantBox
+            class="field"
+            [value]="tenantValue()"
+            (change)="onTenant(tenantBox.value)"
+          >
+            <option value="" i18n="@@platform-operations.sign-ins.tenant.any">Tenant: any</option>
+            @for (choice of tenants.rows(); track choice.id) {
+              <option [value]="choice.id">{{ choice.code }} · {{ tenantName(choice) }}</option>
+            }
+          </select>
+          <hr-icon class="ic" name="chevron" size="14" />
+        </div>
+        <div class="sel" [class.on]="method() !== ''">
+          <label class="vh" for="sign-ins-method" i18n="@@platform-operations.sign-ins.method"
+            >Method</label
+          >
+          <select
+            id="sign-ins-method"
+            #methodBox
+            class="field"
+            [value]="method()"
+            (change)="onMethod(methodBox.value)"
+          >
+            <option value="" i18n="@@platform-operations.sign-ins.method.any">Method: any</option>
+            @for (choice of methods; track choice) {
+              <option [value]="choice">{{ methodName(choice) }}</option>
+            }
+          </select>
+          <hr-icon class="ic" name="chevron" size="14" />
+        </div>
+        <button type="submit" class="btn ghost" i18n="@@platform-operations.sign-ins.find">
+          Find
+        </button>
+        <span class="count" i18n="@@platform-operations.sign-ins.count"
+          >{{ store.rows().length }} of {{ store.total() }}</span
+        >
+      </form>
+
+      <section class="c-card">
+        @if (store.problem(); as problem) {
+          <div class="c-empty" role="alert">
+            <span class="ring"><hr-icon name="critical" size="20" /></span>
+            <b>{{ problem }}</b>
+            <button
+              type="button"
+              class="btn"
+              (click)="store.reload()"
+              i18n="@@platform-operations.sign-ins.try-again"
+            >
+              Try again
+            </button>
+          </div>
+        } @else if (store.loading() && store.rows().length === 0) {
+          <p class="c-state-h" role="status" i18n="@@platform-operations.sign-ins.loading">
+            Loading the sign-ins…
+          </p>
+          <div class="c-skel" aria-hidden="true">
+            @for (bone of skeleton; track $index) {
+              <div class="row">
+                <span class="bone w1"></span><span class="bone w3"></span
+                ><span class="bone w2"></span><span class="bone w2"></span>
+              </div>
+            }
+          </div>
+        } @else if (store.rows().length === 0) {
+          <div class="c-empty">
+            <span class="ring"><hr-icon name="signins" size="20" /></span>
+            <b i18n="@@platform-operations.sign-ins.none">No sign-ins match</b>
+            <p i18n="@@platform-operations.sign-ins.none-hint">
+              Clear a filter, or widen the search.
+            </p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data signins">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@platform-operations.sign-ins.column.when">When (UTC)</th>
+                  <th scope="col" i18n="@@platform-operations.sign-ins.column.person">Person</th>
+                  <th scope="col" i18n="@@platform-operations.sign-ins.column.method">Method</th>
+                  <th scope="col" i18n="@@platform-operations.sign-ins.column.place">
+                    Device · place
+                  </th>
+                  <th scope="col" i18n="@@platform-operations.sign-ins.column.outcome">Outcome</th>
+                  <th scope="col">
+                    <span class="vh" i18n="@@platform-operations.sign-ins.column.open">Open</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of store.rows(); track row.id) {
+                  <tr [attr.aria-selected]="selected()?.id === row.id">
+                    <td class="when">
+                      <span class="nm num">{{ time(row) }}</span
+                      ><span class="sub">{{ day(row) }}</span>
+                    </td>
+                    <td>
+                      <span class="who">
+                        <span
+                          class="c-av"
+                          [class.none]="row.userDisplayName === null"
+                          aria-hidden="true"
+                          >{{ initials(row) }}</span
+                        >
+                        <span class="two">
+                          <span class="nm"
+                            ><bdi>{{ row.userDisplayName ?? '' }}</bdi></span
+                          >
+                          <span class="sub" dir="ltr">{{ row.tenantCode ?? '' }}</span>
+                        </span>
+                      </span>
+                    </td>
+                    <td>{{ methodOf(row) }}</td>
+                    <td class="place">
+                      <bdi>{{ place(row) }}</bdi>
+                    </td>
+                    <td>
+                      <span class="chip" [attr.data-s]="tone(row)"
+                        ><span class="dot"></span>{{ outcomeOf(row) }}</span
+                      >
+                    </td>
+                    <td class="acts">
+                      <button
+                        type="button"
+                        class="btn icon"
+                        (click)="open(row)"
+                        i18n-aria-label="@@platform-operations.sign-ins.open"
+                        aria-label="Open sign-in"
+                      >
+                        <hr-icon name="chevron" size="14" [mirrored]="true" />
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="c-foot">
+            <span i18n="@@platform-operations.sign-ins.newest-first">Newest first</span>
+            <span class="spacer"></span>
+            <hr-pager
+              [page]="page()"
+              [pageSize]="pageSize"
+              [total]="store.total()"
+              [loading]="store.loading()"
+              (pageChange)="store.goTo($event)"
+            />
+          </div>
+        }
+      </section>
+    </div>
+
+    <aside class="rail">
+      <section class="c-card">
+        <div class="c-card-h">
+          <h2 i18n="@@platform-operations.sign-ins.sessions">Your sessions</h2>
+          @if (devices.signedIn() > 0) {
+            <span class="chip" data-s="ok"><span class="dot"></span>{{ devices.signedIn() }}</span>
+          }
+        </div>
+        @if (devices.problem(); as problem) {
+          <p class="c-state-h" role="alert">{{ problem }}</p>
+        } @else if (devices.rows().length === 0) {
+          <p class="c-state-h" i18n="@@platform-operations.sign-ins.sessions.none">
+            No browser is known yet.
+          </p>
+        } @else {
+          <ul class="sessions">
+            @for (device of devices.rows(); track device.id) {
+              <li>
+                <hr-icon
+                  [name]="device.signedIn ? 'done' : 'external'"
+                  size="18"
+                  [class.ok]="device.signedIn"
+                />
+                <span class="two">
+                  <span class="nm"
+                    ><bdi>{{ device.label }}</bdi></span
+                  >
+                  <span class="sub">
+                    <span dir="ltr">{{ device.lastAddress ?? '' }}</span>
+                    @if (device.trustedAtUtc !== null) {
+                      · <span i18n="@@platform-operations.sign-ins.sessions.trusted">trusted</span>
+                    }
+                    · <span class="num">{{ seen(device) }}</span>
+                  </span>
+                </span>
+                @if (device.signedIn) {
+                  <button
+                    type="button"
+                    class="btn ghost"
+                    (click)="signOut(device)"
+                    i18n="@@platform-operations.sign-ins.sessions.sign-out"
+                  >
+                    Sign out
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="c-card">
+        <div class="c-card-h">
+          <h2 i18n="@@platform-operations.sign-ins.policy">Platform sign-in policy</h2>
+        </div>
+        <dl class="c-facts policy">
+          <dt i18n="@@platform-operations.sign-ins.policy.two-step">Two-step</dt>
+          <dd i18n="@@platform-operations.sign-ins.policy.two-step.text">
+            Every person; a customer's administrator may list exceptions for shared desk accounts
+          </dd>
+          <dt i18n="@@platform-operations.sign-ins.policy.session">Session</dt>
+          <dd i18n="@@platform-operations.sign-ins.policy.session.text">
+            Access token 15 min · refresh 12 h absolute · console cookie 60 min idle, 12 h absolute
+          </dd>
+          <dt i18n="@@platform-operations.sign-ins.policy.trusted">Trusted device</dt>
+          <dd i18n="@@platform-operations.sign-ins.policy.trusted.text">
+            A gate each customer switches on: a sign-in from an unknown browser waits for "Trust
+            device" in the mail
+          </dd>
+          <dt i18n="@@platform-operations.sign-ins.policy.passwords">Passwords</dt>
+          <dd i18n="@@platform-operations.sign-ins.policy.passwords.text">
+            12 characters + a symbol · context words and breached passwords refused
+          </dd>
+          <dt i18n="@@platform-operations.sign-ins.policy.rate">Rate limits</dt>
+          <dd i18n="@@platform-operations.sign-ins.policy.rate.text">
+            Too many tries from one address: 429 with Retry-After
+          </dd>
+          <dt i18n="@@platform-operations.sign-ins.policy.tokens">Tokens</dt>
+          <dd i18n="@@platform-operations.sign-ins.policy.tokens.text">
+            Bound to the browser's key (DPoP) · a stolen token is useless elsewhere
+          </dd>
+        </dl>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<hr-drawer #drawer [heading]="selected()?.action ?? ''" (closed)="selected.set(null)">
+  @if (selected(); as event) {
+    <hr-trail-event-detail [event]="event" [ownTenant]="ownTenant()" />
+  }
+</hr-drawer>

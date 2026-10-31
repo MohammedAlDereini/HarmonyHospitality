@@ -50,6 +50,7 @@ const nameAr = (placeholder: string): ReferenceField => ({
   label: $localize`:@@platform-admin.reference.field.name-ar:Name (Arabic)`,
   kind: 'text',
   required: true,
+  requiredCode: '10408',
   maxLength: NAME_MAX_LENGTH,
   lang: 'ar',
   dir: 'rtl',
@@ -67,6 +68,7 @@ const countryCode = (hint: string): ReferenceField => ({
   label: $localize`:@@platform-admin.reference.field.country:Country`,
   kind: 'select',
   required: true,
+  requiredCode: '10404',
   createOnly: true,
   optionsFrom: { table: 'Country', value: 'code', label: 'nameEn' },
   hint,
@@ -94,6 +96,7 @@ const ownerService = (hint: string, placeholder: string): ReferenceField => ({
   label: $localize`:@@platform-admin.reference.field.owner-service:Owning service`,
   kind: 'text',
   required: true,
+  requiredCode: '10410',
   dir: 'ltr',
   hint,
   placeholder,
@@ -107,11 +110,12 @@ const descriptionField: ReferenceField = {
   optional: true,
   hint: $localize`:@@platform-admin.reference.hint.description:A sentence for the next administrator: what the rows are used for.`,
 };
-const lookupName = (hint: string): ReferenceField => ({
+const lookupName = (hint: string, requiredCode: string): ReferenceField => ({
   key: 'name',
   label: $localize`:@@platform-admin.reference.field.name:Name`,
   kind: 'text',
   required: true,
+  requiredCode,
   maxLength: LOOKUP_NAME_MAX_LENGTH,
   hint,
 });
@@ -223,6 +227,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.time-zone-id:Time zone`,
         kind: 'text',
         required: true,
+        requiredCode: '10428',
         isKey: true,
         dir: 'ltr',
         placeholder: 'Asia/Amman',
@@ -265,6 +270,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.name-native:Native name`,
         kind: 'text',
         required: true,
+        requiredCode: '10425',
         maxLength: NAME_MAX_LENGTH,
         placeholder: 'العربية',
         hint: $localize`:@@platform-admin.reference.hint.language-native:The name in the language itself, what a speaker reads when choosing it: العربية, Français, 日本語.`,
@@ -328,6 +334,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.dial-code:Phone dial code`,
         kind: 'text',
         required: true,
+        requiredCode: '10414',
         pattern: dialCode,
         patternCode: '10415',
         dir: 'ltr',
@@ -339,6 +346,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.default-currency:Default currency`,
         kind: 'select',
         required: true,
+        requiredCode: '10416',
         optionsFrom: { table: 'Currency', value: 'code', label: 'nameEn' },
         hint: $localize`:@@platform-admin.reference.hint.country-currency:What a hotel in this country prices in unless told otherwise. Add the currency first if it is not in the list.`,
       },
@@ -388,6 +396,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.kind:Kind`,
         kind: 'text',
         required: true,
+        requiredCode: '10419',
         placeholder: 'Governorate',
         hint: $localize`:@@platform-admin.reference.hint.subdivision-kind:What this level is called in that country: Governorate, Region, Emirate, State, Province.`,
       },
@@ -435,6 +444,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.time-zone:Time zone`,
         kind: 'select',
         required: true,
+        requiredCode: '10421',
         optionsFrom: { table: 'TimeZone', value: 'id', label: 'nameEn' },
         hint: $localize`:@@platform-admin.reference.hint.city-time-zone:The clock a hotel in this city runs on.`,
       },
@@ -500,6 +510,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.display-order:Display order`,
         kind: 'number',
         required: true,
+        requiredCode: '10427',
         dir: 'ltr',
         hint: $localize`:@@platform-admin.reference.hint.display-order:Position in lists: 1 shows first. Zero or more.`,
       },
@@ -594,6 +605,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.level:Sold per`,
         kind: 'select',
         required: true,
+        requiredCode: '10429',
         options: [
           {
             value: 'Property',
@@ -674,6 +686,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.regime-kind:Kind of regime`,
         kind: 'select',
         required: true,
+        requiredCode: '10403',
         createOnly: true,
         options: [
           {
@@ -749,6 +762,7 @@ export const tables: readonly ReferenceTable[] = [
     fields: [
       lookupName(
         $localize`:@@platform-admin.reference.hint.category-name:What the list is called where a screen offers it, like Guest title or Room feature.`,
+        '10102',
       ),
       descriptionField,
       isGlobal,
@@ -784,12 +798,14 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.category:Category`,
         kind: 'select',
         required: true,
+        requiredCode: '10106',
         createOnly: true,
         optionsFrom: { table: 'LookupCategory', value: 'id', label: 'name' },
         hint: $localize`:@@platform-admin.reference.hint.value-category:The list this value belongs to. Fixed once saved.`,
       },
       lookupName(
         $localize`:@@platform-admin.reference.hint.value-name:The words the screen shows, like Mr, Mrs or Sea view.`,
+        '10107',
       ),
       descriptionField,
       {
@@ -833,6 +849,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.setting-key:Key`,
         kind: 'text',
         required: true,
+        requiredCode: '10801',
         isKey: true,
         maxLength: KEY_MAX_LENGTH,
         pattern: settingKey,
@@ -854,6 +871,7 @@ export const tables: readonly ReferenceTable[] = [
         label: $localize`:@@platform-admin.reference.field.data-type:Data type`,
         kind: 'select',
         required: true,
+        requiredCode: '10805',
         createOnly: true,
         options: [
           {

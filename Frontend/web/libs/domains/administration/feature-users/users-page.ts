@@ -17,7 +17,7 @@ import { Pager } from '@harmony/ui/data';
 import { Icon } from '@harmony/ui/icons';
 import { Drawer, Toasts } from '@harmony/ui/overlays';
 import { Tone } from '@harmony/ui/primitives';
-import { PageActionsTemplate } from '@harmony/ui/shell';
+import { PageActionsTemplate, PageHead } from '@harmony/ui/shell';
 import { AccountCreator } from './account-creator';
 import { AccountAction, AccountStateEditor } from './account-state-editor';
 import { stateLabel, toneOf, twoStepLabel } from './account-wording';
@@ -58,6 +58,7 @@ const doneToast: Readonly<Record<AccountAction, string>> = {
     AccountStateEditor,
     Pager,
     Drawer,
+    PageHead,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './users-page.html',
@@ -65,6 +66,11 @@ const doneToast: Readonly<Record<AccountAction, string>> = {
 })
 export class UsersPage {
   protected readonly store = inject(UsersStore);
+
+  constructor() {
+    // Back from a person's page: the list is read again, so a change made there shows here.
+    if (this.store.rows().length > 0) this.store.reload();
+  }
   private readonly access = inject(AccessStore);
   private readonly context = inject(InstantFormatter);
   private readonly toasts = inject(Toasts);

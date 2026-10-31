@@ -1,4 +1,76 @@
-/* A reference table: the list styles come from ui/data; only the Arabic column keeps its own direction here. */
+/* One reference table (platform console design, C6): the rail of tables on the left, the table on the right. The
+   page language is console-ui.css; only the rail, the note and the drawer's audit line live here. */
+.columns {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: var(--s4);
+  align-items: start;
+}
+.tables {
+  display: flex;
+  flex-direction: column;
+  padding: var(--s2);
+}
+.tables a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: var(--radius-control, 6px);
+  color: var(--ink-2);
+  font-size: 13px;
+  text-decoration: none;
+}
+.tables a:hover {
+  background: var(--sunk);
+  color: var(--ink);
+}
+.tables a[aria-current='page'] {
+  background: var(--sunk);
+  color: var(--ink);
+  font-weight: 600;
+}
+.tables a .n {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.table-area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  min-width: 0;
+}
+.table-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
 table.data td [lang='ar'] {
   display: inline-block;
+}
+table.data td.acts {
+  text-align: end;
+  white-space: nowrap;
+}
+.audit {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: var(--s4) 0 0;
+  padding: var(--s3);
+  border-radius: var(--radius-surface, 8px);
+  background: var(--sunk);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.audit .num {
+  color: var(--ink);
+}
+@media (max-width: 960px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
 }

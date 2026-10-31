@@ -36,6 +36,9 @@ export interface Property {
   readonly isActive: boolean;
   readonly licensedRooms: number | null;
   readonly roomsAboveLicence: boolean;
+  /** The customer's code and the modules with a line, on the platform-wide list (C4). */
+  readonly tenantCode: string | null;
+  readonly moduleCodes: readonly string[];
   readonly subscriptions: readonly SubscriptionLine[];
   readonly contacts: readonly PropertyContact[];
 }
@@ -89,8 +92,16 @@ export interface PropertyUpdate {
 }
 
 /** What the property list is filtered by; page is 1-based. */
+/** A hotel's state as the list filters it: open today, opening later, or closed. */
+export type PropertyState = 'Active' | 'Opening' | 'Closed';
+
 export interface PropertyFilters {
   readonly tenantId: string | null;
   readonly search: string;
+  readonly countryCode: string | null;
+  readonly state: PropertyState | null;
+  readonly typeCode: string | null;
+  /** Only hotels declaring more rooms than they license today. */
+  readonly aboveLicence: boolean;
   readonly page: number;
 }

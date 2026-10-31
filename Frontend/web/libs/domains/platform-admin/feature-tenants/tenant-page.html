@@ -1,291 +1,700 @@
 @if (problem(); as problem) {
-  <p class="empty" role="alert">
-    {{ problem }}&ngsp;<button
-      type="button"
-      class="btn"
-      (click)="reload()"
-      i18n="@@platform-admin.tenant.try-again"
-    >
-      Try again
-    </button>
-  </p>
+  <div class="c-page">
+    <div class="c-empty" role="alert">
+      <span class="ring"><hr-icon name="critical" size="20" /></span>
+      <b>{{ problem }}</b>
+      <button type="button" class="btn" (click)="reload()" i18n="@@platform-admin.tenant.try-again">
+        Try again
+      </button>
+    </div>
+  </div>
 } @else if (tenant(); as tenant) {
-  <div class="sec-h head">
-    <span class="code num" dir="ltr">{{ tenant.code }}</span>
-    <h1>
-      <bdi>{{ name(tenant) }}</bdi>
-    </h1>
-    <div class="obj" [attr.data-s]="tone(tenant)">
-      <b data-status>{{ status(tenant) }}</b>
-      <span i18n="@@platform-admin.tenant.status">Status</span>
-    </div>
-    <div class="obj">
-      <b class="num">{{ tenant.tier }}</b>
-      <span i18n="@@platform-admin.tenant.tier">Tier</span>
-    </div>
-    <div class="obj">
-      <b dir="ltr">{{ tenant.countryCode ?? '' }} · {{ tenant.defaultCurrency ?? '' }}</b>
-      <span i18n="@@platform-admin.tenant.country-currency">Country · currency</span>
-    </div>
-    <div class="obj">
-      <b class="num">{{ tenant.onboardedOn }}</b>
-      <span i18n="@@platform-admin.tenant.onboarded">Onboarded</span>
-    </div>
-  </div>
-  @if (tenant.statusReason; as reason) {
-    <p class="line">
-      <span i18n="@@platform-admin.tenant.status-reason">Reason:</span>&ngsp;<bdi>{{ reason }}</bdi>
-    </p>
-  }
-  @if (actionProblem(); as text) {
-    <p class="empty" role="alert">{{ text }}</p>
-  }
-  @if (invited()) {
-    <p class="line" role="status" i18n="@@platform-admin.tenant.invited">
-      The invitation went out.
-    </p>
-  }
-  <div class="acts" *hrIfAllowed="manageTenants">
-    <button
-      type="button"
-      class="btn"
-      data-act="edit"
-      (click)="open('edit')"
-      [attr.aria-expanded]="opened() === 'edit'"
-      i18n="@@platform-admin.tenant.edit"
-    >
-      Edit
-    </button>
-    @if (isActive(tenant)) {
+  <div class="c-page tenant">
+    <hr-page-head [title]="tenant.legalNameEn">
+      <span slot="before-title" class="code-tile" dir="ltr">{{ tenant.code }}</span>
+      <span slot="after-title" class="after">
+        @if (tenant.legalNameAr) {
+          <span class="ar" lang="ar" dir="rtl">{{ tenant.legalNameAr }}</span>
+        }
+        <span class="chip" [attr.data-s]="statusTone(tenant)" data-status
+          ><span class="dot"></span>{{ status(tenant) }}</span
+        >
+        <span class="chip" i18n="@@platform-admin.tenant.tier-chip"
+          ><span class="dot"></span>Tier {{ tenant.tier }}</span
+        >
+      </span>
+      <p class="lead" slot="lead">
+        {{ countryName(tenant) }} · <span dir="ltr">{{ tenant.defaultCurrency ?? '' }}</span> ·
+        <ng-container i18n="@@platform-admin.tenant.meta.onboarded"
+          >onboarded {{ date(tenant.onboardedOn) }}</ng-container
+        >
+        @if (tenant.externalIdentifier; as external) {
+          ·
+          <ng-container i18n="@@platform-admin.tenant.meta.external">external id</ng-container
+          >&ngsp;<span dir="ltr">{{ external }}</span>
+        }
+        ·
+        <ng-container i18n="@@platform-admin.tenant.meta.hotels">{tenant.hotels, plural,
+          =1 {1 hotel}
+          other {{{ tenant.hotels }} hotels}
+        }</ng-container>
+        ·
+        <ng-container i18n="@@platform-admin.tenant.meta.rooms"
+          >{{ tenant.licensedRooms }} licensed rooms</ng-container
+        >
+        ·
+        <ng-container i18n="@@platform-admin.tenant.meta.people">{tenant.people, plural,
+          =1 {1 person}
+          other {{{ tenant.people }} people}
+        }</ng-container>
+      </p>
       <button
+        slot="actions"
+        *hrIfAllowed="manageTenants"
         type="button"
         class="btn"
-        data-act="suspend"
-        (click)="open('suspend')"
-        [attr.aria-expanded]="opened() === 'suspend'"
-        i18n="@@platform-admin.tenant.suspend"
+        data-act="edit"
+        (click)="open('edit')"
+        [attr.aria-expanded]="opened() === 'edit'"
       >
-        Suspend
+        <hr-icon name="pencil" size="16" />
+        <span i18n="@@platform-admin.tenant.edit">Edit</span>
       </button>
-    } @else if (isSuspended(tenant)) {
       <button
+        slot="actions"
+        *hrIfAllowed="manageTenants"
         type="button"
         class="btn"
-        data-act="reinstate"
-        (click)="reinstate(tenant)"
+        data-act="invite"
+        (click)="open('invite')"
+        [attr.aria-expanded]="opened() === 'invite'"
+      >
+        <hr-icon name="mail" size="16" />
+        <span i18n="@@platform-admin.tenant.invite">Invite administrator</span>
+      </button>
+      <button
+        slot="actions"
+        *hrIfAllowed="manageTenants"
+        type="button"
+        class="btn"
+        [attr.data-act]="isActive(tenant) ? 'suspend' : 'reinstate'"
+        [hidden]="!isActive(tenant) && !isSuspended(tenant)"
         [disabled]="busy()"
-        i18n="@@platform-admin.tenant.reinstate"
+        [attr.aria-expanded]="isActive(tenant) ? opened() === 'suspend' : null"
+        (click)="isActive(tenant) ? open('suspend') : reinstate(tenant)"
       >
-        Reinstate
+        @if (isActive(tenant)) {
+          <ng-container i18n="@@platform-admin.tenant.suspend">Suspend</ng-container>
+        } @else {
+          <ng-container i18n="@@platform-admin.tenant.reinstate">Reinstate</ng-container>
+        }
       </button>
-    }
-    <button
-      type="button"
-      class="btn"
-      data-act="invite"
-      (click)="open('invite')"
-      [attr.aria-expanded]="opened() === 'invite'"
-      i18n="@@platform-admin.tenant.invite"
-    >
-      Invite administrator
-    </button>
-    <a
-      class="btn"
-      [routerLink]="['/properties']"
-      [queryParams]="{ tenant: tenant.id }"
-      i18n="@@platform-admin.tenant.properties"
-    >
-      Properties
-    </a>
-  </div>
-  <section class="part" aria-labelledby="subscriptions-heading">
-    <h2 id="subscriptions-heading">
-      <span i18n="@@platform-admin.subscriptions.title">Subscriptions</span>&ngsp;<span
-        class="num"
-        >{{ tenant.subscriptions.length }}</span
-      >
-    </h2>
-    @if (tenant.subscriptions.length === 0) {
-      <p class="line" i18n="@@platform-admin.subscriptions.none">No module yet.</p>
-    } @else {
-      <div class="table-wrap">
-        <table class="data">
-          <thead>
-            <tr>
-              <th scope="col" i18n="@@platform-admin.subscriptions.column.module">Module</th>
-              <th scope="col" i18n="@@platform-admin.subscriptions.column.scope">Scope</th>
-              <th scope="col" i18n="@@platform-admin.subscriptions.column.state">State</th>
-              <th scope="col" i18n="@@platform-admin.subscriptions.column.period">Period</th>
-              <th scope="col" i18n="@@platform-admin.subscriptions.column.renewal">Renewal</th>
-              <th scope="col" class="acts">
-                <span class="vh" i18n="@@platform-admin.subscriptions.column.actions">Actions</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (line of tenant.subscriptions; track line.id) {
-              <tr class="lrow">
-                <td class="key" dir="ltr">{{ line.moduleCode }}</td>
-                <td>
-                  <span class="nm">{{ scopeOf(line) }}</span>
-                  @if (line.propertyId; as propertyId) {
-                    <span class="sub num" dir="ltr">{{ propertyId }}</span>
-                  }
-                </td>
-                <td>
-                  <span
-                    class="pill"
-                    [class.on]="line.isEnabled && !line.isHeld"
-                    [class.warn]="line.isHeld"
-                    [class.off]="!line.isEnabled"
-                    >{{ lineState(line) }}</span
-                  >
-                </td>
-                <td class="num">
-                  {{ line.startsOn }}
-                  @if (line.endsOn; as endsOn) {
-                    – {{ endsOn }}
-                  }
-                </td>
-                <td>
-                  @if (line.renewsAutomatically) {
-                    <ng-container i18n="@@platform-admin.subscriptions.renews.yes"
-                      >Renews</ng-container
-                    >
-                  } @else {
-                    <ng-container i18n="@@platform-admin.subscriptions.renews.no"
-                      >Fixed term</ng-container
-                    >
-                  }
-                </td>
-                <td class="acts">
-                  @if (line.isEnabled) {
-                    <button
-                      *hrIfAllowed="manageTenants"
-                      type="button"
-                      class="tlink"
-                      data-act="end-line"
-                      (click)="askEnd(line)"
-                      [attr.aria-expanded]="ending() === line.id"
-                      i18n="@@platform-admin.subscriptions.end"
-                    >
-                      End
-                    </button>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-    <div class="acts" *hrIfAllowed="manageTenants">
-      <button
-        type="button"
-        class="btn"
-        data-act="subscribe"
-        (click)="open('subscribe')"
-        [attr.aria-expanded]="opened() === 'subscribe'"
-        i18n="@@platform-admin.subscriptions.add"
-      >
-        Add module
-      </button>
-    </div>
-  </section>
-  <hr-company-login-panel [tenantId]="tenant.id" />
-  <hr-directory-panel [tenantId]="tenant.id" />
-  <hr-drawer #drawer [heading]="drawerHeading()" [lead]="drawerLead()" (closed)="drawerClosed()">
-    @if (opened() === 'edit') {
-      <hr-tenant-editor [tenant]="tenant" (done)="changed()" (cancelled)="drawer.close()" />
-    } @else if (opened() === 'suspend') {
-      <hr-reason-form
-        [label]="suspendLabel"
-        [placeholder]="suspendPlaceholder"
-        [go]="suspendGo"
-        [busy]="busy()"
-        [problem]="actionProblem()"
-        (submitted)="suspend(tenant, $event)"
-        (cancelled)="drawer.close()"
-      />
-    } @else if (opened() === 'invite') {
-      <form class="editor" (submit)="onInvite($event, tenant)" novalidate>
-        <div class="fields">
-          <div class="f">
-            <label for="invite-email" i18n="@@platform-admin.tenant.invite.email">Email</label>
-            <input
-              id="invite-email"
-              class="field"
-              type="email"
-              autocomplete="off"
-              dir="ltr"
-              [formField]="inviteForm.administratorEmail"
-            />
-            @if (
-              inviteForm.administratorEmail().touched() &&
-              inviteForm.administratorEmail().errors().length > 0
-            ) {
-              <p class="field-error" role="alert">
-                @for (error of inviteForm.administratorEmail().errors(); track error.kind) {
-                  <span>{{ error.message }}</span>
-                }
-              </p>
-            }
-          </div>
-          <div class="f">
-            <label for="invite-name" i18n="@@platform-admin.tenant.invite.name">Name</label>
-            <input
-              id="invite-name"
-              class="field"
-              type="text"
-              autocomplete="off"
-              dir="auto"
-              [formField]="inviteForm.administratorDisplayName"
-            />
-            @if (
-              inviteForm.administratorDisplayName().touched() &&
-              inviteForm.administratorDisplayName().errors().length > 0
-            ) {
-              <p class="field-error" role="alert">
-                @for (error of inviteForm.administratorDisplayName().errors(); track error.kind) {
-                  <span>{{ error.message }}</span>
-                }
-              </p>
-            }
-          </div>
-        </div>
-        <div class="acts">
-          <button
-            type="submit"
-            class="btn solid"
-            [disabled]="busy()"
-            i18n="@@platform-admin.tenant.invite.go"
-          >
-            Send invitation
-          </button>
+      <span slot="actions" *hrIfAllowed="manageTenants" class="more-wrap">
+        <button
+          #moreButton
+          type="button"
+          class="btn icon"
+          popovertarget="tenant-more"
+          i18n-aria-label="@@platform-admin.tenant.more"
+          aria-label="More actions"
+        >
+          <hr-icon name="more" size="16" />
+        </button>
+        <div class="row-menu" popover id="tenant-more" [hrPopAt]="moreButton" role="menu">
           <button
             type="button"
-            class="btn"
-            (click)="drawer.close()"
-            i18n="@@platform-admin.tenant.invite.cancel"
+            role="menuitem"
+            data-act="subscribe"
+            (click)="open('subscribe')"
+            i18n="@@platform-admin.subscriptions.add"
           >
-            Cancel
+            Add module
           </button>
+          <a
+            role="menuitem"
+            [routerLink]="['/properties']"
+            [queryParams]="{ tenant: tenant.id }"
+            i18n="@@platform-admin.tenant.properties"
+            >Properties</a
+          >
         </div>
-      </form>
-    } @else if (opened() === 'subscribe') {
-      <hr-subscription-editor [tenant]="tenant" (done)="changed()" (cancelled)="drawer.close()" />
-    } @else if (endingLine(tenant); as line) {
-      <hr-reason-form
-        [label]="unsubscribeLabel"
-        [placeholder]="unsubscribePlaceholder"
-        [go]="unsubscribeGo"
-        [busy]="busy()"
-        [problem]="actionProblem()"
-        (submitted)="endLine(tenant, line, $event)"
-        (cancelled)="drawer.close()"
+      </span>
+    </hr-page-head>
+
+    @if (tenant.statusReason; as reason) {
+      <p class="c-msg" [attr.data-s]="isSuspended(tenant) ? 'stop' : null">
+        <span i18n="@@platform-admin.tenant.status-reason">Reason:</span>&ngsp;<bdi>{{
+          reason
+        }}</bdi>
+      </p>
+    }
+    @if (actionProblem(); as text) {
+      <p class="c-msg" data-s="stop" role="alert">{{ text }}</p>
+    }
+    @if (invited()) {
+      <p class="c-msg" data-s="ok" role="status" i18n="@@platform-admin.tenant.invited">
+        The invitation went out.
+      </p>
+    }
+
+    <nav
+      class="c-tabs"
+      role="tablist"
+      i18n-aria-label="@@platform-admin.tenant.tabs"
+      aria-label="Sections"
+    >
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'overview'"
+        (click)="show('overview')"
+        i18n="@@platform-admin.tenant.tab.overview"
+      >
+        Overview
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'hotels'"
+        (click)="show('hotels')"
+      >
+        <ng-container i18n="@@platform-admin.tenant.tab.hotels">Hotels</ng-container>&ngsp;<span
+          class="n"
+          >· {{ hotels().length }}</span
+        >
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'groups'"
+        (click)="show('groups')"
+      >
+        <ng-container i18n="@@platform-admin.tenant.tab.groups">Groups</ng-container>&ngsp;<span
+          class="n"
+          >· {{ groupRows().length }}</span
+        >
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'subscriptions'"
+        (click)="show('subscriptions')"
+      >
+        <ng-container i18n="@@platform-admin.tenant.tab.subscriptions">Subscriptions</ng-container
+        >&ngsp;<span class="n">· {{ tenant.subscriptions.length }}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'company-login'"
+        (click)="show('company-login')"
+        i18n="@@platform-admin.tenant.tab.company-login"
+      >
+        Company login
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'directory'"
+        (click)="show('directory')"
+        i18n="@@platform-admin.tenant.tab.directory"
+      >
+        Directory
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'people'"
+        (click)="show('people')"
+      >
+        <ng-container i18n="@@platform-admin.tenant.tab.people">People</ng-container>&ngsp;<span
+          class="n"
+          >· {{ tenant.people }}</span
+        >
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'trail'"
+        (click)="show('trail')"
+        i18n="@@platform-admin.tenant.tab.trail"
+      >
+        Trail
+      </button>
+    </nav>
+
+    @if (current() === 'overview') {
+      <div class="c-grid three cards">
+        <section class="c-card">
+          <div class="c-card-h">
+            <h3 i18n="@@platform-admin.tenant.card.administrator">Administrator</h3>
+          </div>
+          <div class="c-card-b">
+            <div class="who">
+              <span class="c-av" [class.none]="tenant.administrator === null" aria-hidden="true">{{
+                initials(tenant)
+              }}</span>
+              <span class="two">
+                <span class="nm"
+                  ><bdi>{{ tenant.administrator?.displayName ?? '—' }}</bdi></span
+                >
+                <span class="sub" dir="ltr">{{ tenant.administrator?.email ?? '' }}</span>
+              </span>
+            </div>
+            <dl class="c-facts">
+              <dt i18n="@@platform-admin.tenant.fact.role">Role</dt>
+              <dd i18n="@@platform-admin.tenant.fact.role.value">
+                ADMINISTRATOR (system role, born with the tenant)
+              </dd>
+              <dt i18n="@@platform-admin.tenant.fact.two-step">Two-step</dt>
+              <dd>{{ twoStep(tenant) }}</dd>
+              <dt i18n="@@platform-admin.tenant.fact.last-sign-in">Last sign-in</dt>
+              <dd>{{ lastSignIn(tenant) }}</dd>
+              <dt i18n="@@platform-admin.tenant.fact.invitation">Invitation</dt>
+              <dd
+                [class.ok]="invitationTone(tenant) === 'ok'"
+                [attr.data-s]="invitationTone(tenant)"
+              >
+                {{ invitation(tenant) }}
+              </dd>
+            </dl>
+          </div>
+        </section>
+        <section class="c-card">
+          <div class="c-card-h">
+            <h3 i18n="@@platform-admin.tenant.card.subscription">Subscription</h3>
+            @if (renews(tenant)) {
+              <span class="chip" data-s="ok"
+                ><span class="dot"></span
+                ><ng-container i18n="@@platform-admin.tenant.renews-chip"
+                  >Renews</ng-container
+                ></span
+              >
+            }
+          </div>
+          <div class="c-card-b">
+            <dl class="c-facts">
+              <dt i18n="@@platform-admin.tenant.fact.tier">Tier</dt>
+              <dd i18n="@@platform-admin.tenant.fact.tier.value">
+                {{ tenant.tier }} of {{ maxTier }}
+              </dd>
+              <dt i18n="@@platform-admin.tenant.fact.licensed">Licensed rooms</dt>
+              <dd>{{ licence(tenant) }}</dd>
+              <dt i18n="@@platform-admin.tenant.fact.modules">Modules</dt>
+              <dd dir="ltr">{{ moduleSummary(tenant) }}</dd>
+              <dt i18n="@@platform-admin.tenant.fact.renewal">Next renewal</dt>
+              <dd>{{ renewal(tenant) }}</dd>
+              <dt i18n="@@platform-admin.tenant.fact.terminals">Terminals</dt>
+              <dd>{{ terminals(tenant) }}</dd>
+            </dl>
+          </div>
+        </section>
+        <section class="c-card">
+          <div class="c-card-h">
+            <h3 i18n="@@platform-admin.tenant.card.sign-in">How their people sign in</h3>
+            <span class="r">
+              <button
+                type="button"
+                class="tlink"
+                (click)="show('company-login')"
+                i18n="@@platform-admin.tenant.card.sign-in.open"
+              >
+                Company login
+              </button>
+            </span>
+          </div>
+          <div class="c-card-b">
+            <dl class="c-facts">
+              <dt i18n="@@platform-admin.tenant.fact.company-login">Company login</dt>
+              <dd>{{ companyLogin() }}</dd>
+              <dt i18n="@@platform-admin.tenant.fact.directory">Directory</dt>
+              <dd>{{ directoryLine() }}</dd>
+              <dt i18n="@@platform-admin.tenant.fact.two-step">Two-step</dt>
+              <dd>{{ twoStepLine(tenant) }}</dd>
+              <dt i18n="@@platform-admin.tenant.fact.passwords">Passwords</dt>
+              <dd>{{ passwordsLine(tenant) }}</dd>
+            </dl>
+          </div>
+        </section>
+      </div>
+      <ng-container *ngTemplateOutlet="lines; context: { $implicit: tenant }" />
+      <ng-container *ngTemplateOutlet="hotelsTable; context: { $implicit: tenant }" />
+      <hr-trail-card
+        [title]="trailTitle"
+        [rows]="trailRows()"
+        [problem]="trail.problem()"
+        [allParams]="{ tenant: tenant.id }"
+      />
+    } @else if (current() === 'hotels') {
+      <ng-container *ngTemplateOutlet="hotelsTable; context: { $implicit: tenant }" />
+    } @else if (current() === 'groups') {
+      <section class="c-card">
+        <div class="c-card-h">
+          <h3 i18n="@@platform-admin.tenant.groups.title">Groups</h3>
+          <span class="r"
+            ><a
+              [routerLink]="['/groups']"
+              [queryParams]="{ tenant: tenant.id }"
+              i18n="@@platform-admin.tenant.groups.open"
+              >Open groups</a
+            ></span
+          >
+        </div>
+        @if (groupRows().length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@platform-admin.tenant.groups.none">No hotel groups yet.</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@platform-admin.tenant.groups.column.group">Group</th>
+                  <th scope="col" i18n="@@platform-admin.tenant.groups.column.type">Type</th>
+                  <th scope="col" class="num" i18n="@@platform-admin.tenant.groups.column.hotels">
+                    Hotels
+                  </th>
+                  <th
+                    scope="col"
+                    class="num"
+                    i18n="@@platform-admin.tenant.groups.column.precedence"
+                  >
+                    Precedence
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (group of groupRows(); track group.id) {
+                  <tr>
+                    <td class="tenant">
+                      <a class="nm" [routerLink]="['/groups', group.id]"
+                        ><span dir="ltr">{{ group.code }}</span> · <bdi>{{ group.nameEn }}</bdi></a
+                      >
+                      <span class="sub"
+                        ><bdi lang="ar">{{ group.nameAr }}</bdi></span
+                      >
+                    </td>
+                    <td class="muted" dir="ltr">{{ group.typeCode }}</td>
+                    <td class="num">{{ group.currentMembers }}</td>
+                    <td class="num">{{ group.precedence }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    } @else if (current() === 'subscriptions') {
+      <ng-container *ngTemplateOutlet="lines; context: { $implicit: tenant }" />
+    } @else if (current() === 'company-login') {
+      <hr-company-login-panel [tenantId]="tenant.id" />
+    } @else if (current() === 'directory') {
+      <hr-directory-panel [tenantId]="tenant.id" />
+    } @else if (current() === 'people') {
+      <section class="c-card">
+        <div class="c-card-h"><h3 i18n="@@platform-admin.tenant.people.title">People</h3></div>
+        <div class="c-card-b">
+          <dl class="c-facts">
+            <dt i18n="@@platform-admin.tenant.people.total">People</dt>
+            <dd>{{ tenant.people }}</dd>
+            <dt i18n="@@platform-admin.tenant.fact.passwords">Passwords</dt>
+            <dd>{{ passwordsLine(tenant) }}</dd>
+            <dt i18n="@@platform-admin.tenant.fact.two-step">Two-step</dt>
+            <dd>{{ twoStepLine(tenant) }}</dd>
+          </dl>
+          <p class="note" i18n="@@platform-admin.tenant.people.note">
+            A customer's people are theirs: their administrator manages them in the Harmony web app.
+            The console sees the counts and the trail, never the list.
+          </p>
+        </div>
+      </section>
+    } @else if (current() === 'trail') {
+      <hr-trail-card
+        [title]="trailTitle"
+        [rows]="trailRows()"
+        [problem]="trail.problem()"
+        [allParams]="{ tenant: tenant.id }"
       />
     }
-  </hr-drawer>
+
+    <ng-template #lines let-tenant>
+      <section class="c-card">
+        <div class="c-card-h">
+          <h3>
+            <ng-container i18n="@@platform-admin.subscriptions.title"
+              >Subscription lines</ng-container
+            >&ngsp;<span class="chip"
+              ><span class="dot"></span>{{ tenant.subscriptions.length }}</span
+            >
+          </h3>
+          <span class="r">
+            <button
+              *hrIfAllowed="manageTenants"
+              type="button"
+              class="btn solid"
+              data-act="subscribe"
+              (click)="open('subscribe')"
+              [attr.aria-expanded]="opened() === 'subscribe'"
+            >
+              <hr-icon name="plus" size="16" />
+              <span i18n="@@platform-admin.subscriptions.add">Add module</span>
+            </button>
+          </span>
+        </div>
+        @if (tenant.subscriptions.length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@platform-admin.subscriptions.none">No module yet.</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data lines">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@platform-admin.subscriptions.column.module">Module</th>
+                  <th scope="col" i18n="@@platform-admin.subscriptions.column.scope">Scope</th>
+                  <th scope="col" i18n="@@platform-admin.subscriptions.column.state">State</th>
+                  <th scope="col" i18n="@@platform-admin.subscriptions.column.period">Period</th>
+                  <th scope="col" i18n="@@platform-admin.subscriptions.column.renewal">Renewal</th>
+                  <th scope="col" class="num" i18n="@@platform-admin.subscriptions.column.rooms">
+                    Rooms
+                  </th>
+                  <th
+                    scope="col"
+                    class="num"
+                    i18n="@@platform-admin.subscriptions.column.terminals"
+                  >
+                    Terminals
+                  </th>
+                  <th scope="col">
+                    <span class="vh" i18n="@@platform-admin.subscriptions.column.actions"
+                      >Actions</span
+                    >
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (line of tenant.subscriptions; track line.id) {
+                  <tr class="lrow">
+                    <td class="tenant key" dir="ltr">
+                      <span class="nm">{{ moduleName(line) }}</span>
+                      @if (moduleLevel(line); as level) {
+                        <span class="sub">{{ level }}</span>
+                      }
+                    </td>
+                    <td class="scope">
+                      <bdi>{{ scopeOf(line, tenant) }}</bdi>
+                    </td>
+                    <td>
+                      <span class="chip" [attr.data-s]="lineTone(line)"
+                        ><span class="dot"></span>{{ lineState(line) }}</span
+                      >
+                    </td>
+                    <td class="muted num">{{ period(line) }}</td>
+                    <td class="muted">
+                      @if (line.renewsAutomatically) {
+                        <ng-container i18n="@@platform-admin.subscriptions.renews.yes"
+                          >Renews</ng-container
+                        >
+                      } @else {
+                        <ng-container i18n="@@platform-admin.subscriptions.renews.no"
+                          >Fixed term</ng-container
+                        >
+                      }
+                    </td>
+                    <td class="num">{{ line.rooms ?? '—' }}</td>
+                    <td class="num">{{ line.terminals ?? '—' }}</td>
+                    <td class="acts">
+                      @if (line.isEnabled) {
+                        <button
+                          *hrIfAllowed="manageTenants"
+                          type="button"
+                          class="tlink"
+                          data-act="end-line"
+                          (click)="askEnd(line)"
+                          [attr.aria-expanded]="ending() === line.id"
+                          i18n="@@platform-admin.subscriptions.end"
+                        >
+                          End
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    </ng-template>
+
+    <ng-template #hotelsTable let-tenant>
+      <section class="c-card">
+        <div class="c-card-h">
+          <h3 i18n="@@platform-admin.tenant.hotels.title">Hotels</h3>
+          <span class="r"
+            ><a
+              [routerLink]="['/properties']"
+              [queryParams]="{ tenant: tenant.id }"
+              i18n="@@platform-admin.tenant.hotels.open"
+              >Open properties</a
+            ></span
+          >
+        </div>
+        @if (hotels().length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@platform-admin.tenant.hotels.none">No hotel yet.</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data hotels">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@platform-admin.tenant.hotels.column.hotel">Hotel</th>
+                  <th scope="col" i18n="@@platform-admin.tenant.hotels.column.city">City</th>
+                  <th scope="col" class="num" i18n="@@platform-admin.tenant.hotels.column.rooms">
+                    Rooms licensed · declared
+                  </th>
+                  <th scope="col" i18n="@@platform-admin.tenant.hotels.column.state">State</th>
+                  <th scope="col" i18n="@@platform-admin.tenant.hotels.column.opens">Opens</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (hotel of hotels(); track hotel.id) {
+                  <tr>
+                    <td class="tenant">
+                      <a class="nm" [routerLink]="['/properties', hotel.id]"
+                        ><span dir="ltr">{{ hotel.code }}</span> · <bdi>{{ hotel.nameEn }}</bdi></a
+                      >
+                      <span class="sub"
+                        ><bdi lang="ar">{{ hotel.nameAr }}</bdi></span
+                      >
+                    </td>
+                    <td class="muted">{{ cityOf(hotel) }}</td>
+                    <td class="num rooms">
+                      <span class="num">{{ hotelRooms(hotel) }}</span
+                      >&ngsp;
+                      @if (hotelOver(hotel); as over) {
+                        <span class="over">▲ {{ over }}</span>
+                      }
+                    </td>
+                    <td>
+                      <span class="chip" [attr.data-s]="hotelTone(hotel)"
+                        ><span class="dot"></span>{{ hotelState(hotel) }}</span
+                      >
+                    </td>
+                    <td class="muted num">{{ date(hotel.opensOn) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    </ng-template>
+
+    <hr-drawer #drawer [heading]="drawerHeading()" [lead]="drawerLead()" (closed)="drawerClosed()">
+      @if (opened() === 'edit') {
+        <hr-tenant-editor [tenant]="tenant" (done)="changed()" (cancelled)="drawer.close()" />
+      } @else if (opened() === 'suspend') {
+        <hr-reason-form
+          [label]="suspendLabel"
+          [placeholder]="suspendPlaceholder"
+          [go]="suspendGo"
+          [busy]="busy()"
+          [problem]="actionProblem()"
+          (submitted)="suspend(tenant, $event)"
+          (cancelled)="drawer.close()"
+        />
+      } @else if (opened() === 'invite') {
+        <form class="editor" (submit)="onInvite($event, tenant)" novalidate>
+          <div class="fields">
+            <div class="f">
+              <label for="invite-email" i18n="@@platform-admin.tenant.invite.email">Email</label>
+              <input
+                id="invite-email"
+                class="field"
+                type="email"
+                autocomplete="off"
+                dir="ltr"
+                [formField]="inviteForm.administratorEmail"
+              />
+              @if (
+                inviteForm.administratorEmail().touched() &&
+                inviteForm.administratorEmail().errors().length > 0
+              ) {
+                <p class="field-error" role="alert">
+                  @for (error of inviteForm.administratorEmail().errors(); track error.kind) {
+                    <span>{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="invite-name" i18n="@@platform-admin.tenant.invite.name">Name</label>
+              <input
+                id="invite-name"
+                class="field"
+                type="text"
+                autocomplete="off"
+                dir="auto"
+                [formField]="inviteForm.administratorDisplayName"
+              />
+              @if (
+                inviteForm.administratorDisplayName().touched() &&
+                inviteForm.administratorDisplayName().errors().length > 0
+              ) {
+                <p class="field-error" role="alert">
+                  @for (error of inviteForm.administratorDisplayName().errors(); track error.kind) {
+                    <span>{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+          </div>
+          @if (actionProblem(); as text) {
+            <p class="field-error" role="alert">{{ text }}</p>
+          }
+          <div class="acts">
+            <button
+              type="submit"
+              class="btn solid"
+              [disabled]="busy()"
+              i18n="@@platform-admin.tenant.invite.go"
+            >
+              Send invitation
+            </button>
+            <button
+              type="button"
+              class="btn"
+              (click)="drawer.close()"
+              i18n="@@platform-admin.tenant.invite.cancel"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      } @else if (opened() === 'subscribe') {
+        <hr-subscription-editor
+          [tenant]="tenant"
+          [propertyId]="subscribe() ?? null"
+          (done)="changed()"
+          (cancelled)="drawer.close()"
+        />
+      } @else if (endingLine(tenant); as line) {
+        <hr-reason-form
+          [label]="unsubscribeLabel"
+          [placeholder]="unsubscribePlaceholder"
+          [go]="unsubscribeGo"
+          [busy]="busy()"
+          [problem]="actionProblem()"
+          (submitted)="endLine(tenant, line, $event)"
+          (cancelled)="drawer.close()"
+        />
+      }
+    </hr-drawer>
+  </div>
 } @else {
-  <p class="empty" role="status" i18n="@@platform-admin.tenant.loading">Loading…</p>
+  <div class="c-page">
+    <p class="c-state-h" role="status" i18n="@@platform-admin.tenant.loading">Loading…</p>
+  </div>
 }

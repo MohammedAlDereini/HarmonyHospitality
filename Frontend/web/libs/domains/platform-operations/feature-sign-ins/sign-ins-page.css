@@ -1,0 +1,106 @@
+/* The sign-ins page's own shapes; page, filters, cards, chips and tables come from console-ui.css. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  min-width: 0;
+}
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  min-width: 0;
+}
+table.signins td.when {
+  white-space: nowrap;
+}
+table.signins td.place {
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.who {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+.two {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.two .nm {
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 18px;
+}
+.c-kpi .bone {
+  display: block;
+  border-radius: 4px;
+  background: var(--sunk);
+}
+.c-kpi .bone.k {
+  width: 40%;
+  height: 12px;
+}
+.c-kpi .bone.v {
+  width: 30%;
+  height: 28px;
+}
+.c-kpi .bone.d {
+  width: 70%;
+  height: 12px;
+}
+.c-skel .w1 {
+  width: 8%;
+}
+.c-skel .w2 {
+  width: 18%;
+}
+.c-skel .w3 {
+  width: 28%;
+}
+.sessions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sessions li {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: var(--row);
+  padding: var(--s2) var(--s4);
+  border-block-start: 1px solid var(--rule);
+  color: var(--ink-3);
+}
+.sessions li hr-icon.ok {
+  color: var(--dot-ok);
+}
+.sessions .two {
+  flex: 1;
+}
+.sessions .sub {
+  font-size: 12px;
+  line-height: 16px;
+}
+.policy {
+  padding: var(--s4);
+}
+.policy dd {
+  color: var(--ink-2);
+}
+@media (max-width: 1100px) {
+  .c-grid.wide-narrow {
+    grid-template-columns: 1fr;
+  }
+}

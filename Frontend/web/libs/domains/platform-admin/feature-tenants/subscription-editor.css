@@ -1,4 +1,5 @@
-/* The subscription form inside the drawer: the fields one under the other, the flag, the buttons at the end. */
+/* The Add-module form inside the drawer (platform console design, C3b): the module, the scope as two cards, the
+   numbers and dates in pairs, the renewal switch, the flag note and the sentence that says what Add will do. */
 .fields {
   display: flex;
   flex-direction: column;
@@ -11,35 +12,98 @@
   min-width: 0;
 }
 .f label {
-  font-size: 0.9rem;
+  font-size: 12px;
   color: var(--ink-2);
 }
 .f .field {
   width: 100%;
   min-width: 0;
 }
-.perm,
-.check {
+.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s3);
+}
+.scope {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: var(--s2);
-  min-height: var(--control-md);
-  font-size: 0.9rem;
-  color: var(--ink);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.scope legend {
+  padding: 0;
+  margin-block-end: var(--s1);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.scope .card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-surface, 8px);
+  background: var(--surface);
   cursor: pointer;
 }
-.perm input,
-.check input {
-  margin: 0;
+.scope .card.on {
+  border-color: var(--accent);
+  background: var(--sunk);
 }
-.note {
-  margin: 0 0 var(--s3);
-  font-size: 0.85rem;
+.scope .card input {
+  margin: 3px 0 0;
+  accent-color: var(--accent);
+}
+.scope .t,
+.switch-row .t,
+.c-msg .t {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.scope .t b,
+.switch-row .t b,
+.c-msg .t b {
+  font-size: 13px;
+  color: var(--ink);
+}
+.scope .s,
+.switch-row .s {
+  font-size: 12px;
+  line-height: 16px;
   color: var(--ink-3);
-  line-height: 1.4;
+}
+.switch-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  cursor: pointer;
+}
+.switch-row .c-switch {
+  flex: none;
+  margin-block-start: 2px;
+}
+.what {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  padding: var(--s3) var(--s4);
+  border-radius: var(--radius-surface, 8px);
+  background: var(--sunk);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-2);
+}
+.what .k {
+  font-size: 12px;
+  color: var(--ink-3);
 }
 .acts {
   display: flex;
+  justify-content: flex-end;
   gap: var(--s2);
   margin-block-start: var(--s5);
   padding-block-start: var(--s4);

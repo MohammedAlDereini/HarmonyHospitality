@@ -10,15 +10,12 @@
     <span i18n="@@administration.roles.add">Add role</span>
   </button>
 </ng-template>
-<header class="page-head">
-  <div>
-    <h1 i18n="@@administration.roles.title">Roles</h1>
-    <p class="lead" i18n="@@administration.roles.lead">
-      What each kind of person may do here. A role carries a privilege level and a set of
-      permissions; system roles ship with the platform and never change.
-    </p>
-  </div>
-</header>
+<hr-page-head i18n-title="@@administration.roles.title" title="Roles">
+  <p class="lead" slot="lead" i18n="@@administration.roles.lead">
+    What each kind of person may do here. A role carries a privilege level and a set of permissions;
+    system roles ship with the platform and never change.
+  </p>
+</hr-page-head>
 @if (store.problem(); as problem) {
   <p class="empty" role="alert">
     {{ problem }}&ngsp;<button

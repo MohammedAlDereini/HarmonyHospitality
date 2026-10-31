@@ -9,7 +9,7 @@ import {
 } from '@harmony/platform-admin/domain';
 import { messageOf } from '@harmony/platform/errors';
 import { ApiClient, ApiResult, Envelope, IntentKey, fromError } from '@harmony/platform/http';
-import { PageRequest, Paged } from '@harmony/shared/domain';
+import { DESCENDING, PageRequest, Paged, SortOrder } from '@harmony/shared/domain';
 import { Observable, firstValueFrom } from 'rxjs';
 
 export const tenantsPath = '/api/Tenant/get-all';
@@ -24,12 +24,27 @@ export const tenantPath = (id: string): string => `/api/Tenant/${id}`;
 /** Identity accepts 1 to 100 rows a page. */
 export const TENANTS_PAGE_SIZE = 25;
 const FIRST_PAGE = 1;
-const noFilters: TenantFilters = { search: '', status: null, page: FIRST_PAGE };
+/** The list opens on the customers that can still sign in; Terminated is a choice away (C2). */
+const noFilters: TenantFilters = {
+  search: '',
+  statuses: [TenantStatus.active, TenantStatus.suspended],
+  tier: null,
+  countryCode: null,
+  moduleCode: null,
+  page: FIRST_PAGE,
+};
+/** Newest customers first, as the console lists them ("by onboarded"). */
+/** Newest customers first: the framework sorts the creation instant (the onboarding day is that instant's day). */
+const newestFirst: readonly SortOrder[] = [{ memberName: 'CreatedDate', sortOrder: DESCENDING }];
 
 /** The request Identity reads (GetPagedTenantsQuery). */
 interface TenantsRequest extends PageRequest {
+  readonly sortOrder: readonly SortOrder[];
   readonly searchText: string | null;
-  readonly status: TenantStatus | null;
+  readonly statuses: readonly TenantStatus[] | null;
+  readonly tier: number | null;
+  readonly countryCode: string | null;
+  readonly moduleCode: string | null;
 }
 
 /**
@@ -46,14 +61,22 @@ export class TenantsStore {
     const body: TenantsRequest = {
       pageNumber: filters.page,
       pageSize: TENANTS_PAGE_SIZE,
+      sortOrder: newestFirst,
       searchText: filters.search === '' ? null : filters.search,
-      status: filters.status,
+      statuses: filters.statuses.length === 0 ? null : filters.statuses,
+      tier: filters.tier,
+      countryCode: filters.countryCode,
+      moduleCode: filters.moduleCode,
     };
     return { url: tenantsPath, method: 'POST', body };
   });
 
-  readonly rows = computed<readonly Tenant[]>(() => this.page.value()?.data?.results ?? []);
-  readonly total = computed(() => this.page.value()?.data?.totalCount ?? 0);
+  readonly rows = computed<readonly Tenant[]>(() =>
+    this.page.hasValue() ? (this.page.value().data?.results ?? []) : [],
+  );
+  readonly total = computed(() =>
+    this.page.hasValue() ? (this.page.value().data?.totalCount ?? 0) : 0,
+  );
   readonly loading = this.page.isLoading;
   /** One sentence when the read failed, in the person's language; null while all is well. */
   readonly problem = computed(() => {
@@ -65,8 +88,22 @@ export class TenantsStore {
     this.filters.update((filters) => ({ ...filters, search: text.trim(), page: FIRST_PAGE }));
   }
 
-  showStatus(status: TenantStatus | null): void {
-    this.filters.update((filters) => ({ ...filters, status, page: FIRST_PAGE }));
+  /** The statuses to keep; empty for every status. */
+  showStatuses(statuses: readonly TenantStatus[]): void {
+    this.filters.update((filters) => ({ ...filters, statuses, page: FIRST_PAGE }));
+  }
+
+  showTier(tier: number | null): void {
+    this.filters.update((filters) => ({ ...filters, tier, page: FIRST_PAGE }));
+  }
+
+  showCountry(countryCode: string | null): void {
+    this.filters.update((filters) => ({ ...filters, countryCode, page: FIRST_PAGE }));
+  }
+
+  /** Only customers with an enabled line for this module. */
+  showModule(moduleCode: string | null): void {
+    this.filters.update((filters) => ({ ...filters, moduleCode, page: FIRST_PAGE }));
   }
 
   goTo(page: number): void {

@@ -1,0 +1,196 @@
+/* The permission matrix (platform console design, C7). The page language is console-ui.css; the matrix's own
+   cells, the side cards and the role menus live here. */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: var(--s4);
+  align-items: start;
+}
+table.matrix th.role {
+  text-align: center;
+  vertical-align: top;
+  position: relative;
+  /* Room on both sides: the role menu (a 32 px button, 4 px from the edge) sits in the end corner and must
+     not cover the name. */
+  padding-inline: 38px;
+}
+table.matrix th.role .pick {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: var(--radius-control, 6px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+table.matrix th.role .pick:hover,
+table.matrix th.role.chosen .pick {
+  background: var(--sunk);
+}
+table.matrix th.role .t {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  text-transform: none;
+  letter-spacing: 0;
+}
+table.matrix th.role .s {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-3);
+  text-transform: none;
+  letter-spacing: 0;
+}
+table.matrix th.role .more-wrap {
+  position: absolute;
+  inset-block-start: 4px;
+  inset-inline-end: 4px;
+}
+table.matrix tr.group th {
+  padding: 6px 12px;
+  background: var(--sunk);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: start;
+}
+table.matrix td.perm .nm {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+table.matrix td.perm .sub {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+table.matrix td.grant {
+  text-align: center;
+  width: 120px;
+}
+table.matrix td.grant.chosen {
+  background: color-mix(in srgb, var(--sunk) 60%, transparent);
+}
+table.matrix td.grant .tick {
+  color: var(--ok);
+}
+table.matrix td.grant .none {
+  color: var(--ink-4);
+}
+table.matrix td.grant input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+.people {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--s4);
+}
+.people li {
+  border-block-start: 1px solid var(--rule);
+}
+.people .who {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  color: inherit;
+  text-decoration: none;
+}
+.people .two {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.people .nm {
+  font-size: 13px;
+  font-weight: 600;
+}
+.people .sub {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.c-card-b.foot a {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.note {
+  margin: var(--s1) 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+.changes b {
+  font-size: 14px;
+}
+.changes .acts {
+  display: flex;
+  gap: var(--s2);
+  margin-block-start: var(--s3);
+}
+.c-msg .t {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.c-msg .t b {
+  color: var(--ink);
+}
+.row-menu {
+  margin: 0;
+  padding: 6px;
+  min-width: 160px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-surface, 8px);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-overlay);
+  display: none;
+  flex-direction: column;
+}
+.row-menu:popover-open {
+  display: flex;
+}
+.row-menu button {
+  display: block;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--radius-control, 6px);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: start;
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+.row-menu button:hover {
+  background: var(--sunk);
+}
+@media (max-width: 1100px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}

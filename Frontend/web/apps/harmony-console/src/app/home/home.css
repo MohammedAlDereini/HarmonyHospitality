@@ -1,0 +1,115 @@
+/* The home's own shapes; the page, cards, KPIs and chips come from console-ui.css. */
+.needs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.needs li {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: var(--row);
+  padding: var(--s1) var(--s4);
+  border-block-start: 1px solid var(--rule);
+}
+.needs .txt {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  min-width: 0;
+}
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 220px;
+}
+.chart .grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+.chart .bar {
+  fill: var(--chart-bar);
+}
+.chart .bar.current {
+  fill: var(--chart-highlight);
+}
+.chart .val,
+.chart .lbl {
+  font: 12px var(--sans);
+  fill: var(--ink-4);
+}
+.chart .val {
+  fill: var(--ink-3);
+}
+.chart-note {
+  margin-block-start: var(--s3);
+}
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lines li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  min-height: var(--row);
+  padding: var(--s2) var(--s4);
+  border-block-start: 1px solid var(--rule);
+}
+.two {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.two .nm {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.two .sub {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-3);
+}
+.code {
+  font-family: var(--mono, var(--sans));
+  font-size: 12px;
+}
+.trail .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dot-neutral);
+  flex: none;
+}
+.trail .dot[data-s='ok'] {
+  background: var(--dot-ok);
+}
+.trail .dot[data-s='warn'] {
+  background: var(--dot-warn);
+}
+.trail .dot[data-s='stop'] {
+  background: var(--dot-stop);
+}
+.trail .dot[data-s='info'] {
+  background: var(--dot-info);
+}
+.trail .dot[data-s='long'] {
+  background: var(--dot-long);
+}

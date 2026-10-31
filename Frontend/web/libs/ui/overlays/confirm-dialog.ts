@@ -66,9 +66,27 @@ export class ConfirmDialog {
 
   /** The dialog closed, by a button, by Escape or by the browser: the waiting caller gets the answer, once. */
   protected onClose(): void {
+    // A native close that lands while the dialog already shows the next question belongs to the last one: ignored.
+    if (this.box().nativeElement.open) return;
     const settle = this.settle;
     this.settle = null;
     settle?.(this.outcome);
     this.outcome = false;
+    this.keepFocusOnThePage();
+  }
+
+  /**
+   * The browser gives focus back to the opener; when the answer removed it (a deleted row's button), focus would fall
+   * to the top of the document. The page's main landmark takes it instead, so the next Tab stays where the work is.
+   */
+  private keepFocusOnThePage(): void {
+    const document = this.box().nativeElement.ownerDocument;
+    const view = document.defaultView;
+    if (view === null) return;
+    view.requestAnimationFrame(() => {
+      const active = document.activeElement;
+      if (active !== null && active !== document.body && active.isConnected) return;
+      document.getElementById('main')?.focus();
+    });
   }
 }

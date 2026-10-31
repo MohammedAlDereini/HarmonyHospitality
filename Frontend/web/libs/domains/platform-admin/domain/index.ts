@@ -11,6 +11,7 @@ export type {
   PropertyContact,
   PropertyDraft,
   PropertyFilters,
+  PropertyState,
   PropertyLine,
   PropertyUpdate,
 } from './property';

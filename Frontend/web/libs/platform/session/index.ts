@@ -9,6 +9,9 @@ export { sessionReady } from './session-ready.guard';
 export { sessionRoutes } from './session-routes';
 export { SignedInPage } from './signed-in-page';
 export { SignedOutPage } from './signed-out-page';
+export { ForgotPasswordPage, forgotPasswordPath } from './forgot-password-page';
+export { SetPasswordPage, resetPasswordPath } from './set-password-page';
+export type { SetPasswordMode } from './set-password-page';
 export {
   CONFIRMATION_REQUIRED,
   IdentityConfirmation,

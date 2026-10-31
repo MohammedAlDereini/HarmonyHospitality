@@ -10,21 +10,28 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormField, form, pattern, required, submit } from '@angular/forms/signals';
-import { GroupsStore } from '@harmony/platform-admin/data-access';
+import { GroupsStore, ReferenceStore } from '@harmony/platform-admin/data-access';
 import {
+  BrandDetail,
   GroupMember,
   GroupUpdate,
   Property,
   PropertyGroup,
+  ReferenceRow,
   groupTitle,
   isBrandType,
   propertyTitle,
 } from '@harmony/platform-admin/domain';
+import { TenantChoicesStore } from '@harmony/platform-operations/data-access';
 import { IfAllowed, Permission } from '@harmony/platform/access';
 import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
+import { Icon } from '@harmony/ui/icons';
 import { ConfirmDialog, Drawer, Toasts } from '@harmony/ui/overlays';
+import { PageHead, PopAt } from '@harmony/ui/shell';
 
 // A whole number, 0 or more. Matches "0" and "120"; rejects "-1" and "12a".
 // Tester: https://regex101.com/?regex=%5E%5Cs*%5B0-9%5D%2B%5Cs*%24&testString=120
@@ -32,9 +39,30 @@ const wholeNumber = /^\s*[0-9]+\s*$/;
 // A percentage with up to two decimals. Matches "5.5"; rejects "5.555" and "x".
 // Tester: https://regex101.com/?regex=%5E%5Cs*%5B0-9%5D%7B1%2C3%7D(%5C.%5B0-9%5D%7B1%2C2%7D)%3F%5Cs*%24&testString=5.5
 const percent = /^\s*[0-9]{1,3}(\.[0-9]{1,2})?\s*$/;
-/** The calendar day of an ISO instant: "2026-10-26T08:00:00+00:00" → "2026-10-26". */
-const DAY_LENGTH = 10;
 const wording = (code: string): string => errorMessage(code) ?? kindMessage('invalid');
+
+/** The page's tabs (C15); Brand only when the group is one. */
+export type GroupTab = 'overview' | 'hotels' | 'brand' | 'standards';
+const tabs: readonly GroupTab[] = ['overview', 'hotels', 'brand', 'standards'];
+const isTab = (value: string): value is GroupTab => (tabs as readonly string[]).includes(value);
+const dateFormat: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+};
+
+/** A reference row's text under a key; '' when the row has none. */
+const textOf = (row: ReferenceRow, key: string): string => {
+  const value = row[key];
+  return typeof value === 'string' ? value : '';
+};
+
+/** "01 Jan 2024 – 31 Dec 2028" (each day through `day`), or '' when the brand has no agreement dates. */
+const agreementOf = (brand: BrandDetail, day: (iso: string) => string): string =>
+  brand.agreementStartsOn === null && brand.agreementEndsOn === null
+    ? ''
+    : `${brand.agreementStartsOn === null ? '…' : day(brand.agreementStartsOn)} – ${brand.agreementEndsOn === null ? '…' : day(brand.agreementEndsOn)}`;
 
 /** What the edit form holds; numbers travel as text until sent. */
 interface UpdateValues {
@@ -89,13 +117,24 @@ const empty: UpdateValues = {
 };
 
 /**
- * One hotel group: what it is, the brand's own columns when it is a brand, the part the console may change (never
- * the code or the type), and the hotels in it with their periods: join one in a drawer, end one after a confirm
- * (architecture 6, platform-admin).
+ * One hotel group (platform console design, C15): the head says what it is, whose it is and how many hotels carry it;
+ * the overview holds the brand's own columns when it is a brand, what the group is about, and the standards the
+ * design proposes (not built, said so); the hotels in it with their periods follow: join one in a drawer, end one
+ * after a confirm. The part the console may change (never the code or the type) is edited in the drawer.
  */
 @Component({
   selector: 'hr-group-page',
-  imports: [FormField, IfAllowed, Drawer, ConfirmDialog],
+  imports: [
+    NgTemplateOutlet,
+    RouterLink,
+    FormField,
+    IfAllowed,
+    Icon,
+    PageHead,
+    PopAt,
+    Drawer,
+    ConfirmDialog,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './group-page.html',
   styleUrl: './group-page.css',
@@ -103,22 +142,34 @@ const empty: UpdateValues = {
 export class GroupPage {
   /** From the route (:id), bound by the router. */
   readonly id = input.required<string>();
+  /** ?tab=: the tab to open on. */
+  readonly tab = input<string>();
 
   private readonly store = inject(GroupsStore);
+  private readonly reference = inject(ReferenceStore);
+  private readonly tenants = inject(TenantChoicesStore);
   private readonly toasts = inject(Toasts);
   private readonly editorDrawer = viewChild.required<Drawer>('editorDrawer');
   private readonly memberDrawer = viewChild.required<Drawer>('memberDrawer');
   private readonly endAsk = viewChild.required<ConfirmDialog>('endAsk');
   private readonly locale = $localize.locale ?? 'en';
+  private readonly dates = new Intl.DateTimeFormat(
+    this.locale === 'en' ? 'en-GB' : this.locale,
+    dateFormat,
+  );
+  private readonly cities = this.reference.choices('City');
+  private readonly types = this.reference.choices('PropertyGroupType');
 
   protected readonly manageTenants = Permission.ManageTenants;
   protected readonly group = signal<PropertyGroup | null>(null);
   protected readonly loading = signal(true);
   protected readonly problem = signal<string | null>(null);
+  protected readonly current = signal<GroupTab>('overview');
   protected readonly editing = signal(false);
   protected readonly editProblem = signal<string | null>(null);
   protected readonly joining = signal(false);
   protected readonly joinProblem = signal<string | null>(null);
+  /** The customer's hotels: the cities of the members, and what the Add-hotel drawer offers. */
   protected readonly hotels = signal<readonly Property[]>([]);
   protected readonly chosenHotel = signal('');
   protected readonly isBrand = computed(() => {
@@ -132,6 +183,9 @@ export class GroupPage {
     );
     return this.hotels().filter((hotel) => !current.has(hotel.id));
   });
+  protected readonly past = computed(
+    () => (this.group()?.members ?? []).filter((member) => !member.isCurrent).length,
+  );
 
   /** The editable copy of what may change; a fresh group resets it. */
   private readonly model = linkedSignal<UpdateValues>(() => {
@@ -166,17 +220,57 @@ export class GroupPage {
   });
 
   constructor() {
+    this.cities.load();
+    this.types.load();
     effect(() => {
       const id = this.id();
       untracked(() => {
         void this.read(id);
       });
     });
+    effect(() => {
+      const wanted = this.tab();
+      untracked(() => {
+        if (wanted !== undefined && isTab(wanted)) this.current.set(wanted);
+      });
+    });
   }
+
+  // ── the head ────────────────────────────────────────────────────────────────
 
   protected name(group: PropertyGroup): string {
     return groupTitle(group, this.locale);
   }
+
+  /** "Levant Hotels Group (LEV)": the customer the group belongs to. */
+  protected tenantLabel(group: PropertyGroup): string {
+    const row = this.tenants.rows().find((candidate) => candidate.id === group.tenantId);
+    if (row === undefined) return '';
+    const name =
+      this.locale.startsWith('ar') && row.legalNameAr !== '' ? row.legalNameAr : row.legalNameEn;
+    return `${name} (${row.code})`;
+  }
+
+  protected typeName(group: PropertyGroup): string {
+    const row = this.types.rows().find((candidate) => textOf(candidate, 'code') === group.typeCode);
+    return row === undefined ? group.typeCode : this.referenceName(row);
+  }
+
+  protected stateWord(group: PropertyGroup): string {
+    return group.isActive
+      ? $localize`:@@platform-admin.group.active:Active`
+      : $localize`:@@platform-admin.group.inactive:Inactive`;
+  }
+
+  protected agreement(brand: BrandDetail): string {
+    return agreementOf(brand, (iso) => this.dates.format(new Date(`${iso}T00:00:00Z`)));
+  }
+
+  protected show(tab: GroupTab): void {
+    this.current.set(tab);
+  }
+
+  // ── the hotels ──────────────────────────────────────────────────────────────
 
   protected hotelName(member: GroupMember): string {
     return propertyTitle(
@@ -185,13 +279,23 @@ export class GroupPage {
     );
   }
 
+  /** The member's city, from the customer's hotels; '' until they are read. */
+  protected cityOf(member: GroupMember): string {
+    const hotel = this.hotels().find((candidate) => candidate.id === member.propertyId);
+    if (hotel === undefined) return '';
+    const row = this.cities.rows().find((candidate) => textOf(candidate, 'id') === hotel.cityId);
+    return row === undefined ? '' : this.referenceName(row);
+  }
+
   protected hotelLabel(hotel: Property): string {
     return `${hotel.code} · ${propertyTitle(hotel, this.locale)}`;
   }
 
-  protected day(instant: string): string {
-    return instant.slice(0, DAY_LENGTH);
+  protected day(instant: string | null): string {
+    return instant === null ? '—' : this.dates.format(new Date(instant));
   }
+
+  // ── the doors ───────────────────────────────────────────────────────────────
 
   protected reload(): void {
     void this.read(this.id());
@@ -203,12 +307,11 @@ export class GroupPage {
     this.editorDrawer().open();
   }
 
-  protected async openJoin(group: PropertyGroup): Promise<void> {
+  protected openJoin(): void {
     this.joinProblem.set(null);
     this.chosenHotel.set('');
     this.joining.set(true);
     this.memberDrawer().open();
-    this.hotels.set(await this.store.hotelsOf(group.tenantId));
   }
 
   protected onSave(event: Event, group: PropertyGroup): void {
@@ -273,6 +376,7 @@ export class GroupPage {
     if (result.kind === 'ok') {
       this.group.set(result.data);
       this.problem.set(null);
+      this.hotels.set(await this.store.hotelsOf(result.data.tenantId));
     } else {
       this.problem.set(messageOf(result));
     }
@@ -300,5 +404,10 @@ export class GroupPage {
     }
     this.editProblem.set(messageOf(result));
     return undefined;
+  }
+
+  private referenceName(row: ReferenceRow): string {
+    const arabic = textOf(row, 'nameAr');
+    return this.locale.startsWith('ar') && arabic !== '' ? arabic : textOf(row, 'nameEn');
   }
 }

@@ -57,7 +57,7 @@ const allowed = {
   shared: ['shared'],
 };
 const typeKey = (lib) =>
-  lib.id === 'ui/shell'
+  lib.id === 'ui/shell' || lib.id === 'ui/console-shell'
     ? 'shell'
     : lib.group === 'domain' && lib.type === 'ui'
       ? 'ui-domain'
@@ -65,11 +65,17 @@ const typeKey = (lib) =>
 
 // The app walls (architecture 3 and 4.1): platform people never act inside a hotel; hotel staff never see the platform.
 // Tenant administration (people, roles) is the platform tenant's own administration too: the console shows it for platform people.
-const consoleDomains = new Set(['platform-admin', 'identity', 'administration']);
+const consoleDomains = new Set([
+  'platform-admin',
+  'platform-operations',
+  'identity',
+  'administration',
+]);
+const platformDomains = new Set(['platform-admin', 'platform-operations']);
 const appWall = (from, to) =>
   (from.app === 'harmony-web' &&
-    to.domain === 'platform-admin' &&
-    'harmony-web never imports platform-admin') ||
+    platformDomains.has(to.domain) &&
+    'harmony-web never imports a platform domain') ||
   (from.app === 'harmony-console' &&
     to.domain &&
     !consoleDomains.has(to.domain) &&

@@ -143,12 +143,16 @@ export class PersonPage {
   /** Ending stops the role at the next call; the row stays, ended, as part of the record. */
   protected async endAssignment(user: UserAccount, assignment: HotelRoleAssignment): Promise<void> {
     if (!(await this.endDialog().ask())) return;
-    await this.press(this.store.endAssignment(user, assignment, newIntentKey()));
+    await this.press(this.store.endAssignment(user, assignment, newIntentKey()), () => {
+      this.toasts.show($localize`:@@administration.person.toast.role-ended:Role ended.`);
+    });
   }
 
   protected async revokeGrant(user: UserAccount, grant: HotelAccessGrant): Promise<void> {
     if (!(await this.revokeDialog().ask())) return;
-    await this.press(this.store.revokeGrant(user, grant, newIntentKey()));
+    await this.press(this.store.revokeGrant(user, grant, newIntentKey()), () => {
+      this.toasts.show($localize`:@@administration.person.toast.access-revoked:Access revoked.`);
+    });
   }
 
   protected linkedByText(linkedBy: string): string {
@@ -159,40 +163,69 @@ export class PersonPage {
 
   /** The administrator keeps the person on a Harmony password, whatever the company login covers. */
   protected keepPassword(user: UserAccount): void {
-    void this.press(this.store.setPasswordSignIn(user, true, newIntentKey()));
+    void this.press(this.store.setPasswordSignIn(user, true, newIntentKey()), () => {
+      this.toasts.show(
+        $localize`:@@administration.person.toast.kept-password:Kept on a Harmony password.`,
+      );
+    });
   }
 
   protected followCompany(user: UserAccount): void {
-    void this.press(this.store.setPasswordSignIn(user, false, newIntentKey()));
+    void this.press(this.store.setPasswordSignIn(user, false, newIntentKey()), () => {
+      this.toasts.show(
+        $localize`:@@administration.person.toast.company-sign-in:The company sign-in applies from the next sign-in.`,
+      );
+    });
   }
 
   protected async endLink(user: UserAccount, link: CompanyLink): Promise<void> {
     if (!(await this.endLinkDialog().ask())) return;
-    await this.press(this.store.endLink(user, link, newIntentKey()));
+    await this.press(this.store.endLink(user, link, newIntentKey()), () => {
+      this.toasts.show($localize`:@@administration.person.toast.link-ended:Company link ended.`);
+    });
   }
 
   protected resetTwoFactor(user: UserAccount): void {
-    void this.press(this.store.resetTwoFactor(user, newIntentKey()));
+    void this.press(this.store.resetTwoFactor(user, newIntentKey()), () => {
+      this.toasts.show(
+        $localize`:@@administration.person.toast.two-step-reset:Two-step reset: the person sets it up again at the next sign-in.`,
+      );
+    });
   }
 
   protected endExemption(user: UserAccount): void {
-    void this.press(this.store.endExemption(user, newIntentKey()));
+    void this.press(this.store.endExemption(user, newIntentKey()), () => {
+      this.toasts.show(
+        $localize`:@@administration.person.toast.exemption-ended:Exemption ended: two-step applies again.`,
+      );
+    });
   }
 
   protected signOut(user: UserAccount, device: Device): void {
-    void this.press(this.store.signOutDevice(user, device, newIntentKey()));
+    void this.press(this.store.signOutDevice(user, device, newIntentKey()), () => {
+      this.toasts.show(
+        $localize`:@@administration.person.toast.device-signed-out:Signed out of that device.`,
+      );
+    });
   }
 
   protected removePasskey(user: UserAccount, passkey: Passkey): void {
-    void this.press(this.store.removePasskey(user, passkey, newIntentKey()));
+    void this.press(this.store.removePasskey(user, passkey, newIntentKey()), () => {
+      this.toasts.show($localize`:@@administration.person.toast.passkey-removed:Passkey removed.`);
+    });
   }
 
   /** One press: nothing else until it settles; a refusal is worded once. */
-  private async press(call: Promise<ApiResult<unknown>>): Promise<void> {
+  /** One press: nothing else until it settles; a refusal is worded once; success runs what follows. */
+  private async press(call: Promise<ApiResult<unknown>>, then?: () => void): Promise<void> {
     this.actionProblem.set(null);
     this.busy.set(true);
     const result = await call;
     this.busy.set(false);
-    if (result.kind !== 'ok') this.actionProblem.set(messageOf(result));
+    if (result.kind !== 'ok') {
+      this.actionProblem.set(messageOf(result));
+      return;
+    }
+    then?.();
   }
 }

@@ -1,11 +1,8 @@
-<header class="page-head">
-  <div>
-    <h1 i18n="@@administration.invitations.title">Invitations</h1>
-    <p class="lead" i18n="@@administration.invitations.lead">
-      People who have not chosen their password yet. A link works for 24 hours.
-    </p>
-  </div>
-</header>
+<hr-page-head i18n-title="@@administration.invitations.title" title="Invitations">
+  <p class="lead" slot="lead" i18n="@@administration.invitations.lead">
+    People who have not chosen their password yet. A link works for 24 hours.
+  </p>
+</hr-page-head>
 @if (problem(); as text) {
   <p class="empty" role="alert">{{ text }}</p>
 }

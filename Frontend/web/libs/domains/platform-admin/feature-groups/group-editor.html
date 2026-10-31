@@ -2,9 +2,15 @@
   <div class="fields">
     <div class="f">
       <label for="grp-tenant" i18n="@@platform-admin.groups.field.tenant">Tenant</label>
-      <select id="grp-tenant" #firstBox class="field" [formField]="form.tenantId">
+      <select
+        id="grp-tenant"
+        #firstBox
+        class="field"
+        [formField]="form.tenantId"
+        [attr.aria-invalid]="form.tenantId().touched() && form.tenantId().invalid() ? 'true' : null"
+      >
         <option value="" i18n="@@platform-admin.groups.field.tenant.choose">Choose a tenant</option>
-        @for (tenant of tenants.rows(); track tenant.id) {
+        @for (tenant of tenantChoices(); track tenant.id) {
           <option [value]="tenant.id">{{ tenantLabel(tenant) }}</option>
         }
       </select>
@@ -18,12 +24,22 @@
     </div>
     <div class="f">
       <label for="grp-type" i18n="@@platform-admin.groups.field.type">Type</label>
-      <select id="grp-type" class="field" [formField]="form.typeCode">
+      <select
+        id="grp-type"
+        class="field"
+        [formField]="form.typeCode"
+        [attr.aria-invalid]="form.typeCode().touched() && form.typeCode().invalid() ? 'true' : null"
+      >
         <option value="" i18n="@@platform-admin.groups.field.choose">Choose</option>
         @for (row of types.rows(); track code(row)) {
           <option [value]="code(row)">{{ label(row) }}</option>
         }
       </select>
+      @if (types.rows().length === 0 && !types.loading()) {
+        <p class="hint" data-none i18n="@@platform-admin.groups.type.none">
+          No group type exists yet: add one under Reference data › Property group types.
+        </p>
+      }
       <p class="hint" id="grp-type-hint" i18n="@@platform-admin.groups.field.type.hint">
         Fixed once saved. A Brand group carries the brand's own columns below.
       </p>
@@ -44,6 +60,7 @@
         autocomplete="off"
         dir="ltr"
         [formField]="form.code"
+        [attr.aria-invalid]="form.code().touched() && form.code().invalid() ? 'true' : null"
       />
       <p class="hint" id="grp-code-hint" i18n="@@platform-admin.groups.field.code.hint">
         2 to 32 letters, digits, . - _ like RITZ-CARLTON. Fixed once saved.
@@ -66,6 +83,7 @@
         lang="en"
         dir="ltr"
         [formField]="form.nameEn"
+        [attr.aria-invalid]="form.nameEn().touched() && form.nameEn().invalid() ? 'true' : null"
       />
       @if (form.nameEn().touched() && form.nameEn().errors().length > 0) {
         <p class="field-error" role="alert">
@@ -85,6 +103,7 @@
         lang="ar"
         dir="rtl"
         [formField]="form.nameAr"
+        [attr.aria-invalid]="form.nameAr().touched() && form.nameAr().invalid() ? 'true' : null"
       />
       @if (form.nameAr().touched() && form.nameAr().errors().length > 0) {
         <p class="field-error" role="alert">
@@ -105,6 +124,9 @@
         autocomplete="off"
         dir="auto"
         [formField]="form.description"
+        [attr.aria-invalid]="
+          form.description().touched() && form.description().invalid() ? 'true' : null
+        "
       />
       @if (form.description().touched() && form.description().errors().length > 0) {
         <p class="field-error" role="alert">
@@ -123,6 +145,9 @@
         inputmode="numeric"
         dir="ltr"
         [formField]="form.precedence"
+        [attr.aria-invalid]="
+          form.precedence().touched() && form.precedence().invalid() ? 'true' : null
+        "
       />
       <p class="hint" id="grp-precedence-hint" i18n="@@platform-admin.groups.field.precedence.hint">
         0 to 1000; higher wins a standards tie.
@@ -146,6 +171,9 @@
         inputmode="numeric"
         dir="ltr"
         [formField]="form.displayOrder"
+        [attr.aria-invalid]="
+          form.displayOrder().touched() && form.displayOrder().invalid() ? 'true' : null
+        "
       />
       @if (form.displayOrder().touched() && form.displayOrder().errors().length > 0) {
         <p class="field-error" role="alert">
@@ -166,6 +194,9 @@
         autocomplete="off"
         dir="ltr"
         [formField]="form.externalIdentifier"
+        [attr.aria-invalid]="
+          form.externalIdentifier().touched() && form.externalIdentifier().invalid() ? 'true' : null
+        "
       />
       @if (form.externalIdentifier().touched() && form.externalIdentifier().errors().length > 0) {
         <p class="field-error" role="alert">
@@ -188,6 +219,9 @@
           autocomplete="off"
           dir="auto"
           [formField]="form.franchisorName"
+          [attr.aria-invalid]="
+            form.franchisorName().touched() && form.franchisorName().invalid() ? 'true' : null
+          "
         />
         @if (form.franchisorName().touched() && form.franchisorName().errors().length > 0) {
           <p class="field-error" role="alert">
@@ -206,6 +240,9 @@
           autocomplete="off"
           dir="ltr"
           [formField]="form.websiteUrl"
+          [attr.aria-invalid]="
+            form.websiteUrl().touched() && form.websiteUrl().invalid() ? 'true' : null
+          "
         />
         @if (form.websiteUrl().touched() && form.websiteUrl().errors().length > 0) {
           <p class="field-error" role="alert">
@@ -224,6 +261,9 @@
           autocomplete="off"
           dir="ltr"
           [formField]="form.themeReference"
+          [attr.aria-invalid]="
+            form.themeReference().touched() && form.themeReference().invalid() ? 'true' : null
+          "
         />
         @if (form.themeReference().touched() && form.themeReference().errors().length > 0) {
           <p class="field-error" role="alert">
@@ -242,6 +282,9 @@
           class="field"
           type="date"
           [formField]="form.agreementStartsOn"
+          [attr.aria-invalid]="
+            form.agreementStartsOn().touched() && form.agreementStartsOn().invalid() ? 'true' : null
+          "
         />
       </div>
       <div class="f">
@@ -253,6 +296,9 @@
           class="field"
           type="date"
           [formField]="form.agreementEndsOn"
+          [attr.aria-invalid]="
+            form.agreementEndsOn().touched() && form.agreementEndsOn().invalid() ? 'true' : null
+          "
         />
         @if (form.agreementEndsOn().touched() && form.agreementEndsOn().errors().length > 0) {
           <p class="field-error" role="alert">
@@ -273,6 +319,9 @@
           inputmode="decimal"
           dir="ltr"
           [formField]="form.royaltyPercent"
+          [attr.aria-invalid]="
+            form.royaltyPercent().touched() && form.royaltyPercent().invalid() ? 'true' : null
+          "
         />
         @if (form.royaltyPercent().touched() && form.royaltyPercent().errors().length > 0) {
           <p class="field-error" role="alert">

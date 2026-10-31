@@ -27,81 +27,178 @@
         </p>
       }
     </div>
-    <div class="f">
-      <label for="sub-property" i18n="@@platform-admin.subscriptions.field.property"
-        >Property</label
-      >
-      <select id="sub-property" class="field" [formField]="form.propertyId">
-        <option value="" i18n="@@platform-admin.subscriptions.field.property.whole">
-          The whole tenant
-        </option>
-        @for (property of properties.rows(); track property.id) {
-          <option [value]="property.id">{{ propertyLabel(property) }}</option>
-        }
-      </select>
-    </div>
-    <div class="f">
-      <label for="sub-starts" i18n="@@platform-admin.subscriptions.field.starts-on"
-        >Starts on</label
-      >
-      <input
-        id="sub-starts"
-        class="field"
-        type="date"
-        [formField]="form.startsOn"
-        [attr.aria-invalid]="form.startsOn().touched() && form.startsOn().invalid() ? 'true' : null"
-        [attr.aria-describedby]="form.startsOn().errors().length > 0 ? 'sub-starts-error' : null"
-      />
-      @if (form.startsOn().touched() && form.startsOn().errors().length > 0) {
-        <p id="sub-starts-error" class="field-error" role="alert">
-          @for (error of form.startsOn().errors(); track error.kind) {
-            <span>{{ error.message }}</span>
+
+    <fieldset class="scope">
+      <legend i18n="@@platform-admin.subscriptions.field.scope">Scope</legend>
+      <label class="card" [class.on]="!oneHotel()">
+        <input
+          type="radio"
+          name="scope"
+          value="tenant"
+          data-scope="tenant"
+          [checked]="!oneHotel()"
+          (change)="chooseScope(false)"
+        />
+        <span class="t">
+          <b i18n="@@platform-admin.subscriptions.scope.chain">Chain-wide</b>
+          <span class="s" i18n="@@platform-admin.subscriptions.scope.chain.text"
+            >Every hotel of the tenant, now and in the future ·
+            {{ tenant().licensedRooms }} rooms</span
+          >
+        </span>
+      </label>
+      <label class="card" [class.on]="oneHotel()">
+        <input
+          type="radio"
+          name="scope"
+          value="hotel"
+          data-scope="hotel"
+          [checked]="oneHotel()"
+          [disabled]="properties.rows().length === 0"
+          (change)="chooseScope(true)"
+        />
+        <span class="t">
+          <b i18n="@@platform-admin.subscriptions.scope.one">One hotel</b>
+          @if (chosenHotel(); as hotel) {
+            <span class="s">{{ hotelNote(hotel) }}</span>
+          } @else if (properties.rows().length === 0) {
+            <span class="s" i18n="@@platform-admin.subscriptions.scope.no-hotel"
+              >The tenant has no hotel yet.</span
+            >
+          } @else {
+            <span class="s" i18n="@@platform-admin.subscriptions.scope.one.text"
+              >The line names the hotel and its rooms.</span
+            >
           }
-        </p>
+        </span>
+      </label>
+      @if (oneHotel()) {
+        <div class="f">
+          <label class="vh" for="sub-property" i18n="@@platform-admin.subscriptions.field.property"
+            >Property</label
+          >
+          <select id="sub-property" class="field" [formField]="form.propertyId">
+            @for (property of properties.rows(); track property.id) {
+              <option [value]="property.id">{{ propertyLabel(property) }}</option>
+            }
+          </select>
+        </div>
       }
+    </fieldset>
+
+    <div class="two">
+      <div class="f">
+        <label for="sub-rooms" i18n="@@platform-admin.subscriptions.field.rooms-licensed"
+          >Rooms licensed</label
+        >
+        <input
+          id="sub-rooms"
+          class="field"
+          type="text"
+          inputmode="numeric"
+          dir="ltr"
+          placeholder="—"
+          [formField]="form.rooms"
+        />
+      </div>
+      <div class="f">
+        <label for="sub-terminals" i18n="@@platform-admin.subscriptions.field.terminals"
+          >Terminals</label
+        >
+        <input
+          id="sub-terminals"
+          class="field"
+          type="text"
+          inputmode="numeric"
+          dir="ltr"
+          placeholder="—"
+          [formField]="form.terminals"
+        />
+      </div>
     </div>
-    <div class="f">
-      <label for="sub-ends" i18n="@@platform-admin.subscriptions.field.ends-on">Ends on</label>
-      <input id="sub-ends" class="field" type="date" [formField]="form.endsOn" />
+    <div class="two">
+      <div class="f">
+        <label for="sub-starts" i18n="@@platform-admin.subscriptions.field.starts-on"
+          >Starts on</label
+        >
+        <input
+          id="sub-starts"
+          class="field"
+          type="date"
+          [formField]="form.startsOn"
+          [attr.aria-invalid]="
+            form.startsOn().touched() && form.startsOn().invalid() ? 'true' : null
+          "
+          [attr.aria-describedby]="form.startsOn().errors().length > 0 ? 'sub-starts-error' : null"
+        />
+        @if (form.startsOn().touched() && form.startsOn().errors().length > 0) {
+          <p id="sub-starts-error" class="field-error" role="alert">
+            @for (error of form.startsOn().errors(); track error.kind) {
+              <span>{{ error.message }}</span>
+            }
+          </p>
+        }
+      </div>
+      <div class="f">
+        <label for="sub-ends" i18n="@@platform-admin.subscriptions.field.ends-on">Ends on</label>
+        <input
+          id="sub-ends"
+          class="field"
+          type="date"
+          i18n-placeholder="@@platform-admin.subscriptions.field.ends-on.open"
+          placeholder="Open-ended"
+          [formField]="form.endsOn"
+        />
+      </div>
     </div>
-    <div class="f">
-      <label for="sub-rooms" i18n="@@platform-admin.subscriptions.field.rooms">Rooms</label>
-      <input
-        id="sub-rooms"
-        class="field"
-        type="text"
-        inputmode="numeric"
-        dir="ltr"
-        [formField]="form.rooms"
-      />
-    </div>
-    <div class="f">
-      <label for="sub-terminals" i18n="@@platform-admin.subscriptions.field.terminals"
-        >Terminals</label
-      >
-      <input
-        id="sub-terminals"
-        class="field"
-        type="text"
-        inputmode="numeric"
-        dir="ltr"
-        [formField]="form.terminals"
-      />
-    </div>
-    <label class="perm">
-      <input type="checkbox" [formField]="form.renewsAutomatically" />
-      <span i18n="@@platform-admin.subscriptions.field.renews">Renews automatically</span>
+
+    <label class="switch-row">
+      <span class="c-switch">
+        <input
+          type="checkbox"
+          #renewsBox
+          data-field="renews"
+          [checked]="form.renewsAutomatically().value()"
+          (change)="toggleRenews(renewsBox.checked)"
+        />
+      </span>
+      <span class="t">
+        <b i18n="@@platform-admin.subscriptions.field.renews">Renews automatically</b>
+        <span class="s" i18n="@@platform-admin.subscriptions.field.renews.text"
+          >Default on: the calendar never cuts service. Off makes it a fixed term that ends on the
+          end date.</span
+        >
+      </span>
     </label>
+
+    <div class="c-msg" data-s="info" role="note">
+      <hr-icon class="ic" name="info" size="18" />
+      <div class="t">
+        <b i18n="@@platform-admin.subscriptions.flag.title">Rooms are a flag, not a gate</b>
+        <span i18n="@@platform-admin.subscriptions.flag.text"
+          >The hotel declares its physical rooms. If it later runs more rooms than licensed, Harmony
+          flags it on the tenant and in the trail; it never refuses the hotel.</span
+        >
+      </div>
+    </div>
+
+    @if (replacing()) {
+      <p class="hint" data-replacing i18n="@@platform-admin.subscriptions.replacing">
+        This scope already holds a line for that module: Add replaces it, rooms and terminals
+        included.
+      </p>
+    }
+    @if (summary(); as summary) {
+      <div class="what" data-summary>
+        <span class="k" i18n="@@platform-admin.subscriptions.what">What happens on Add</span>
+        <span>{{ summary }}</span>
+      </div>
+    }
   </div>
+  @if (problem(); as text) {
+    <p class="field-error" role="alert">{{ text }}</p>
+  }
   <div class="acts">
-    <button
-      type="submit"
-      class="btn solid"
-      [disabled]="form().submitting()"
-      i18n="@@platform-admin.subscriptions.new.go"
-    >
-      Subscribe
-    </button>
     <button
       type="button"
       class="btn"
@@ -110,8 +207,13 @@
     >
       Cancel
     </button>
+    <button
+      type="submit"
+      class="btn solid"
+      [disabled]="form().submitting()"
+      i18n="@@platform-admin.subscriptions.new.go"
+    >
+      Add module
+    </button>
   </div>
-  @if (problem(); as text) {
-    <p class="field-error" role="alert">{{ text }}</p>
-  }
 </form>

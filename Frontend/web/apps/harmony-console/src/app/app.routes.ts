@@ -9,10 +9,9 @@ export const routes: Routes = [
   {
     path: '',
     canMatch: [sessionReady],
-    loadComponent: async () => (await import('@harmony/ui/shell')).Shell,
+    loadComponent: async () => (await import('@harmony/ui/console-shell')).ConsoleShell,
     children: [
-      { path: '', loadComponent: async () => (await import('./home')).Home },
-      { path: 'hello', loadComponent: async () => (await import('./hello')).Hello },
+      { path: '', loadComponent: async () => (await import('./home/home')).Home },
       {
         path: 'tenants',
         canMatch: [allowed(Permission.ViewTenants)],
@@ -35,17 +34,46 @@ export const routes: Routes = [
         loadChildren: async () =>
           (await import('@harmony/platform-admin/feature-reference-data')).routes,
       },
+      // Onboarding is the new-tenant wizard (C5): the rail's link opens it.
+      { path: 'onboarding', redirectTo: '/tenants/new' },
+      {
+        path: 'trail',
+        canMatch: [allowed(Permission.ViewTenants)],
+        data: { crumb: $localize`:@@harmony-console.crumb.operations:Operations` },
+        loadChildren: async () =>
+          (await import('@harmony/platform-operations/feature-trail')).routes,
+      },
+      {
+        path: 'sign-ins',
+        canMatch: [allowed(Permission.ViewTenants)],
+        data: { crumb: $localize`:@@harmony-console.crumb.operations:Operations` },
+        loadChildren: async () =>
+          (await import('@harmony/platform-operations/feature-sign-ins')).routes,
+      },
+      {
+        path: 'health',
+        canMatch: [allowed(Permission.ViewSettings)],
+        data: { crumb: $localize`:@@harmony-console.crumb.operations:Operations` },
+        loadChildren: async () =>
+          (await import('@harmony/platform-operations/feature-health')).routes,
+      },
+      {
+        path: 'settings',
+        canMatch: [allowed(Permission.ViewSettings)],
+        data: { crumb: $localize`:@@administration.crumb:Administration` },
+        loadChildren: async () => (await import('./settings/routes')).consoleRoutes,
+      },
       {
         path: 'people',
         canMatch: [allowed(Permission.ViewUsers)],
         data: { crumb: $localize`:@@administration.crumb:Administration` },
-        loadChildren: async () => (await import('@harmony/administration/feature-users')).routes,
+        loadChildren: async () => (await import('./people/routes')).consoleRoutes,
       },
       {
         path: 'roles',
         canMatch: [allowed(Permission.ViewRoles)],
         data: { crumb: $localize`:@@administration.crumb:Administration` },
-        loadChildren: async () => (await import('@harmony/administration/feature-roles')).routes,
+        loadChildren: async () => (await import('./roles/routes')).consoleRoutes,
       },
     ],
   },

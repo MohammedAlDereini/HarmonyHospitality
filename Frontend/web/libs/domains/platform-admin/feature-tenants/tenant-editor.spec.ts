@@ -23,6 +23,14 @@ const ritz: Tenant = {
   onboardedOn: '2026-10-24',
   isPlatform: false,
   subscriptions: [],
+  hotels: 0,
+  roomsInUse: 0,
+  licensedRooms: 0,
+  moduleCodes: [],
+  people: 0,
+  peopleWithPassword: 0,
+  twoStepExceptions: 0,
+  administrator: null,
 };
 const jordan = { code: 'JO', nameEn: 'Jordan', nameAr: 'الأردن' };
 const dinar = { code: 'JOD', nameEn: 'Jordanian dinar', nameAr: 'دينار' };

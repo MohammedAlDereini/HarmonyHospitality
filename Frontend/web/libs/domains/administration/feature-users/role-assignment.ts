@@ -89,6 +89,8 @@ export class RoleAssignment {
       this.done.emit();
       return;
     }
+    // Refused: the boxes go back to what the account holds, under the refusal's words.
+    this.selected.set(new Set(this.user().roleIds));
     this.problem.set(messageOf(result));
   }
 }

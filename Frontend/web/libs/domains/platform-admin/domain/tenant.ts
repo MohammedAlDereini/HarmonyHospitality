@@ -27,6 +27,28 @@ export interface SubscriptionLine {
   readonly isHeld: boolean;
 }
 
+/** Identity's AdministrativeState of an account, sent by name. */
+export type AdministratorState = 'Active' | 'Suspended' | 'Terminated';
+
+/** The account holding the customer's ADMINISTRATOR role (TenantAdministratorModel), and where its invitation stands. */
+export interface TenantAdministrator {
+  readonly userAccountId: string;
+  readonly displayName: string;
+  readonly email: string | null;
+  readonly state: AdministratorState;
+  /** The newest invitation is still open: no first password yet. */
+  readonly invitationPending: boolean;
+  /** The newest invitation ran out unredeemed. */
+  readonly invitationExpired: boolean;
+  readonly invitedOn: string | null;
+  /** Two-step sign-in is set up on the account, and which second step. */
+  readonly twoStepEnrolled: boolean;
+  readonly twoStepMethod: string;
+  /** The last session's start and methods; null when never signed in, or on the list. */
+  readonly lastSignInUtc: string | null;
+  readonly lastSignInMethods: string | null;
+}
+
 /** One row of POST /api/Tenant/get-all and GET /api/Tenant/{id} (TenantModel); only what screens read. */
 export interface Tenant {
   readonly id: string;
@@ -43,6 +65,18 @@ export interface Tenant {
   /** The one platform tenant: us, never a customer. */
   readonly isPlatform: boolean;
   readonly subscriptions: readonly SubscriptionLine[];
+  /** The list's company (C2): hotels in every state, rooms declared by the active ones, rooms licensed today. */
+  readonly hotels: number;
+  readonly roomsInUse: number;
+  readonly licensedRooms: number;
+  /** Module codes with an enabled line, each once, in order. */
+  readonly moduleCodes: readonly string[];
+  /** The customer's people, how many keep a password, how many are on the two-step exception list. */
+  readonly people: number;
+  readonly peopleWithPassword: number;
+  readonly twoStepExceptions: number;
+  /** Null when the customer has no administrator account (none yet, or born before invitations were kept). */
+  readonly administrator: TenantAdministrator | null;
 }
 
 /** The tenant's name in the person's language. */
@@ -77,9 +111,13 @@ export interface SubscriptionDraft {
   readonly renewsAutomatically: boolean;
 }
 
-/** What the tenant list is filtered by; page is 1-based. */
+/** What the tenant list is filtered by (the console's facets); page is 1-based. */
 export interface TenantFilters {
   readonly search: string;
-  readonly status: TenantStatus | null;
+  /** Empty: every status. */
+  readonly statuses: readonly TenantStatus[];
+  readonly tier: number | null;
+  readonly countryCode: string | null;
+  readonly moduleCode: string | null;
   readonly page: number;
 }

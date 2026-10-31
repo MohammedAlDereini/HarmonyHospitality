@@ -1,0 +1,89 @@
+<div class="c-page">
+  <hr-page-head i18n-title="@@platform-admin.reference.title" title="Reference data">
+    <p class="lead" slot="lead" i18n="@@platform-admin.reference.index.lead.counts">
+      {{ tiles.length }} shared tables · kept by the platform team · {{ totalRows() }} rows · a
+      hotel only reads them
+    </p>
+  </hr-page-head>
+
+  <form class="c-filters" (submit)="$event.preventDefault()">
+    <div class="search">
+      <hr-icon class="ic" name="find" size="16" />
+      <label class="vh" for="tables-search" i18n="@@platform-admin.reference.index.search"
+        >Search</label
+      >
+      <input
+        id="tables-search"
+        #search
+        class="field"
+        type="search"
+        autocomplete="off"
+        dir="auto"
+        i18n-placeholder="@@platform-admin.reference.index.search-placeholder"
+        placeholder="Search a table"
+        [value]="this.search()"
+        (input)="onSearch(search.value)"
+      />
+    </div>
+    <span class="count" i18n="@@platform-admin.reference.index.count"
+      >{{ tiles.length }} tables · {{ emptyCount() }} still empty</span
+    >
+  </form>
+
+  @if (allKnown() && emptyCount() > 0) {
+    <div class="c-msg" data-s="info" role="status">
+      <hr-icon class="ic" name="info" size="18" />
+      <div class="t">
+        @if (emptyCount() === tiles.length) {
+          <b i18n="@@platform-admin.reference.index.fresh.title"
+            >Every table is empty: this is a fresh installation</b
+          >
+        } @else {
+          <b i18n="@@platform-admin.reference.index.still-empty.title">{emptyCount(), plural,
+            =1 {Still empty: 1 table}
+            other {Still empty: {{ emptyCount() }} tables}
+          }</b>
+        }
+        <span i18n="@@platform-admin.reference.index.order"
+          >Each table checks the rows it points at already exist: start with currencies and time
+          zones, then countries, then the rest.</span
+        >
+      </div>
+    </div>
+  }
+
+  <div class="tiles">
+    @for (tile of shown(); track tile.table.key) {
+      <a class="tile c-card" [routerLink]="[tile.table.key]">
+        <div
+          class="n"
+          [class.zero]="tile.count.total() === 0"
+          [class.dim]="typeof tile.count.total() !== 'number'"
+        >
+          @switch (tile.count.total()) {
+            @case (null) {
+              <ng-container i18n="@@platform-admin.reference.index.counting">…</ng-container>
+            }
+            @case ('scoped') {
+              <ng-container i18n="@@platform-admin.reference.index.per-category"
+                >per category</ng-container
+              >
+            }
+            @case ('denied') {
+              <ng-container i18n="@@platform-admin.reference.index.no-access"
+                >No access</ng-container
+              >
+            }
+            @default {
+              <span class="num">{{ tile.count.total() }}</span>
+            }
+          }
+        </div>
+        <div class="t">{{ tile.table.title }}</div>
+        <div class="d">{{ tile.table.description }}</div>
+      </a>
+    } @empty {
+      <p class="c-state-h" i18n="@@platform-admin.reference.index.none">No table matches.</p>
+    }
+  </div>
+</div>

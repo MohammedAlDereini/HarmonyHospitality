@@ -1,0 +1,363 @@
+<div class="c-page">
+  <hr-people-head current="directory" />
+
+  @if (store.secret(); as shown) {
+    <div class="c-msg secret" data-s="warn" role="alert" data-secret>
+      <hr-icon class="ic" name="attention" size="18" />
+      <div class="t">
+        <b i18n="@@administration.console.directory.secret.title"
+          >Copy the new secret now: Harmony shows it only this once</b
+        >
+        <span i18n="@@administration.console.directory.secret.text"
+          >Put these into Entra ID or Okta, then press “I copied them”.</span
+        >
+        <dl class="c-facts">
+          <dt i18n="@@administration.directory.scim-url">Address (Tenant URL)</dt>
+          <dd>
+            <code dir="ltr">{{ shown.scimUrl }}</code
+            >&ngsp;<button
+              type="button"
+              class="btn ghost"
+              (click)="copy(shown.scimUrl)"
+              i18n="@@administration.directory.copy"
+            >
+              Copy
+            </button>
+          </dd>
+          <dt i18n="@@administration.directory.token-url">Token address (OAuth)</dt>
+          <dd>
+            <code dir="ltr">{{ shown.tokenUrl }}</code
+            >&ngsp;<button
+              type="button"
+              class="btn ghost"
+              (click)="copy(shown.tokenUrl)"
+              i18n="@@administration.directory.copy"
+            >
+              Copy
+            </button>
+          </dd>
+          <dt i18n="@@administration.directory.client-id">Client id</dt>
+          <dd>
+            <code dir="ltr">{{ shown.clientId }}</code
+            >&ngsp;<button
+              type="button"
+              class="btn ghost"
+              (click)="copy(shown.clientId)"
+              i18n="@@administration.directory.copy"
+            >
+              Copy
+            </button>
+          </dd>
+          <dt i18n="@@administration.directory.secret">Client secret</dt>
+          <dd>
+            <code dir="ltr" data-secret-value>{{ shown.secret }}</code
+            >&ngsp;<button
+              type="button"
+              class="btn ghost"
+              (click)="copy(shown.secret)"
+              i18n="@@administration.directory.copy"
+            >
+              Copy
+            </button>
+          </dd>
+          <dt i18n="@@administration.directory.secret-token">
+            Secret token (Okta, or Entra without OAuth)
+          </dt>
+          <dd>
+            <code dir="ltr">{{ shown.secretToken }}</code
+            >&ngsp;<button
+              type="button"
+              class="btn ghost"
+              (click)="copy(shown.secretToken)"
+              i18n="@@administration.directory.copy"
+            >
+              Copy
+            </button>
+          </dd>
+        </dl>
+      </div>
+      <button
+        type="button"
+        class="btn"
+        data-act="copied"
+        (click)="store.forgetSecret()"
+        i18n="@@administration.directory.copied"
+      >
+        I copied them
+      </button>
+    </div>
+  }
+
+  @if (problem(); as text) {
+    <p class="c-msg" data-s="stop" role="alert">{{ text }}</p>
+  }
+
+  @if (store.problem(); as text) {
+    <section class="c-card">
+      <div class="c-empty" role="alert">
+        <span class="ring"><hr-icon name="critical" size="20" /></span>
+        <b>{{ text }}</b>
+        <button
+          type="button"
+          class="btn"
+          (click)="store.reload()"
+          i18n="@@administration.directory.try-again"
+        >
+          Try again
+        </button>
+      </div>
+    </section>
+  } @else if (store.loading() && store.connection() === null) {
+    <section class="c-card">
+      <p class="c-state-h" role="status" i18n="@@administration.directory.loading">Loading…</p>
+    </section>
+  } @else if (store.connection(); as connection) {
+    <section class="c-card" data-connection>
+      <div class="c-card-h">
+        <h3 i18n="@@administration.directory.connection">Connection</h3>
+        <span class="chip" [attr.data-s]="connection.isEnabled ? 'ok' : null"
+          ><span class="dot"></span>
+          @if (connection.isEnabled) {
+            <ng-container i18n="@@administration.directory.on">On</ng-container>
+          } @else {
+            <ng-container i18n="@@administration.directory.off">Off</ng-container>
+          }
+        </span>
+        <span class="r" *hrIfAllowed="manageUsers">
+          <button
+            type="button"
+            class="btn"
+            data-act="new-secret"
+            [disabled]="busy()"
+            (click)="newSecret()"
+          >
+            <hr-icon name="refresh" size="16" />
+            <span i18n="@@administration.directory.new-secret">Make a new secret</span>
+          </button>
+          @if (connection.isEnabled) {
+            <button
+              type="button"
+              class="btn"
+              data-act="switch-off"
+              [disabled]="busy()"
+              (click)="switchTo(false)"
+              i18n="@@administration.directory.switch-off"
+            >
+              Switch off
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn solid"
+              data-act="switch-on"
+              [disabled]="busy()"
+              (click)="switchTo(true)"
+              i18n="@@administration.directory.switch-on"
+            >
+              Switch on
+            </button>
+          }
+        </span>
+      </div>
+      <div class="c-card-b">
+        <dl class="c-facts">
+          <dt i18n="@@administration.directory.scim-url">Address (Tenant URL)</dt>
+          <dd>
+            <code dir="ltr">{{ connection.scimUrl }}</code>
+          </dd>
+          <dt i18n="@@administration.directory.token-url">Token address (OAuth)</dt>
+          <dd>
+            <code dir="ltr">{{ connection.tokenUrl }}</code>
+          </dd>
+          <dt i18n="@@administration.directory.client-id">Client id</dt>
+          <dd>
+            <code dir="ltr">{{ connection.clientId }}</code>
+          </dd>
+          <dt i18n="@@administration.directory.secret-made">Secret made</dt>
+          <dd class="num">{{ stamp(connection.secretIssuedAtUtc) }}</dd>
+          <dt i18n="@@administration.console.directory.people-managed">People managed</dt>
+          <dd class="num">{{ connection.people }}</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section class="c-card" data-groups>
+      <div class="c-card-h">
+        <h3>
+          <ng-container i18n="@@administration.directory.groups">Groups</ng-container>&ngsp;<span
+            class="chip"
+            ><span class="dot"></span>{{ store.groups().length }}</span
+          >
+        </h3>
+      </div>
+      @if (store.groups().length === 0) {
+        <div class="c-card-b">
+          <p class="note" i18n="@@administration.directory.groups.none">
+            No group yet: your directory pushes them on its next cycle.
+          </p>
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table class="data groups">
+            <thead>
+              <tr>
+                <th scope="col" i18n="@@administration.console.directory.column.group">
+                  Directory group
+                </th>
+                <th scope="col" class="num" i18n="@@administration.directory.members">Members</th>
+                <th scope="col" i18n="@@administration.console.directory.column.role">
+                  Gives the role
+                </th>
+                <th scope="col" i18n="@@administration.directory.where">Where</th>
+                <th scope="col" class="acts" *hrIfAllowed="assignRoles">
+                  <span class="vh" i18n="@@administration.console.directory.column.actions"
+                    >Actions</span
+                  >
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (group of store.groups(); track group.id) {
+                <tr class="grow" data-group>
+                  <td class="tenant">
+                    <span class="nm"
+                      ><bdi>{{ group.displayName }}</bdi></span
+                    >
+                    @if (sourceOf(group); as source) {
+                      &ngsp;<span class="sub" dir="ltr">{{ source }}</span>
+                    }
+                  </td>
+                  <td class="num">{{ group.members }}</td>
+                  <td>
+                    @if (roleOf(group); as role) {
+                      <bdi>{{ role }}</bdi>
+                    } @else {
+                      <span class="chip"
+                        ><span class="dot"></span
+                        ><ng-container i18n="@@administration.console.directory.gives-nothing"
+                          >Gives nothing</ng-container
+                        ></span
+                      >
+                    }
+                  </td>
+                  <td class="muted">
+                    <bdi>{{ whereOf(group) }}</bdi>
+                  </td>
+                  <td class="acts" *hrIfAllowed="assignRoles">
+                    <button
+                      type="button"
+                      class="btn"
+                      data-act="map-group"
+                      (click)="startMapping(group)"
+                      [attr.aria-expanded]="mapping()?.id === group.id"
+                      i18n="@@administration.directory.change"
+                    >
+                      Change
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  } @else {
+    <section class="c-card" data-closed>
+      <div class="c-card-b">
+        <p class="note" i18n="@@administration.directory.none">
+          No company directory is connected. Open the connection, then give its address and secret
+          to your Microsoft Entra ID or Okta.
+        </p>
+        <button
+          *hrIfAllowed="manageUsers"
+          type="button"
+          class="btn solid"
+          data-act="open"
+          [disabled]="busy()"
+          (click)="open()"
+          i18n="@@administration.directory.open"
+        >
+          Open the connection
+        </button>
+      </div>
+    </section>
+  }
+
+  <hr-drawer
+    #mapDrawer
+    i18n-heading="@@administration.console.directory.map.title"
+    heading="What the group gives"
+    (closed)="mapping.set(null)"
+  >
+    @if (mapping(); as group) {
+      <form class="editor" (submit)="saveMapping($event, group)" novalidate data-map-editor>
+        <p class="note">
+          <bdi>{{ group.displayName }}</bdi> ·
+          <ng-container i18n="@@administration.console.directory.map.lead"
+            >A group without a role gives nothing. A person in several groups holds every role they
+            give.</ng-container
+          >
+        </p>
+        <div class="f">
+          <label for="map-role" i18n="@@administration.directory.role">Role</label>
+          <select id="map-role" class="field" [formField]="form.roleId">
+            <option value="" i18n="@@administration.directory.no-role-option">
+              No role (gives nothing)
+            </option>
+            @for (role of roles.roles(); track role.id) {
+              <option [value]="role.id">{{ roleLabel(role.id) }}</option>
+            }
+          </select>
+        </div>
+        <div class="f">
+          <label for="map-where" i18n="@@administration.directory.where">Where</label>
+          <select id="map-where" class="field" [formField]="form.where">
+            <option value="" i18n="@@administration.directory.every-hotel-option">
+              Every hotel
+            </option>
+            @for (hotel of hotels.list(); track hotel.id) {
+              <option [value]="hotelChoice(hotel.id)">{{ hotelLabel(hotel.id) }}</option>
+            }
+            @for (choice of store.groupChoices(); track choice.id) {
+              <option [value]="groupChoice(choice.id)">{{ choiceLabel(choice.id) }}</option>
+            }
+          </select>
+        </div>
+        @if (mapProblem(); as text) {
+          <p class="field-error" role="alert">{{ text }}</p>
+        }
+        <div class="acts">
+          <button
+            type="submit"
+            class="btn solid"
+            [disabled]="busy()"
+            i18n="@@administration.directory.save"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            class="btn"
+            (click)="mapDrawer.close()"
+            i18n="@@administration.directory.cancel"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    }
+  </hr-drawer>
+
+  <hr-confirm-dialog
+    #secretDialog
+    i18n-heading="@@administration.directory.new-secret.heading"
+    heading="Make a new secret?"
+    i18n-message="@@administration.directory.new-secret.ask"
+    message="The old secret and every token made from it stop working now. Your directory is refused until you give it the new one."
+    i18n-go="@@administration.directory.new-secret.go"
+    go="Make a new secret"
+    i18n-stay="@@administration.directory.new-secret.stay"
+    stay="Not now"
+  />
+</div>

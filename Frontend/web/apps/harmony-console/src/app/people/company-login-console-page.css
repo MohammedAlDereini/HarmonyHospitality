@@ -1,0 +1,59 @@
+/* The platform's company login (platform console design, C21): the page language is console-ui.css; the provider
+   cards' own parts live here. */
+.c-msg .t {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.c-msg .t b {
+  color: var(--ink);
+}
+.providers {
+  align-items: start;
+}
+.c-card.not-added {
+  border-style: dashed;
+}
+.note {
+  margin: 0 0 var(--s3);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+.muted {
+  color: var(--ink-3);
+}
+a.ext {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink);
+  word-break: break-all;
+}
+table.domains td.muted {
+  color: var(--ink-3);
+}
+table.domains td.acts {
+  width: 120px;
+  text-align: end;
+}
+.add-domain label {
+  display: block;
+  margin-block-end: var(--s1);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.add-domain .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.add-domain .row .field {
+  flex: 1;
+  min-width: 200px;
+}
+.field-error {
+  margin: var(--s1) 0 0;
+  font-size: 12px;
+  color: var(--stop);
+}

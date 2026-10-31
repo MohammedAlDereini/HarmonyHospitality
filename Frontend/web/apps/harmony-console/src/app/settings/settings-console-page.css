@@ -1,0 +1,100 @@
+/* The platform's settings (platform console design, C11). The page language is console-ui.css; the rail of
+   services and the setting rows live here. */
+.columns {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: var(--s4);
+  align-items: start;
+}
+.groups {
+  display: flex;
+  flex-direction: column;
+  padding: var(--s2);
+}
+.groups button {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--radius-control, 6px);
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  text-align: start;
+  cursor: pointer;
+}
+.groups button:hover {
+  background: var(--sunk);
+  color: var(--ink);
+}
+.groups button[aria-current='page'] {
+  background: var(--sunk);
+  color: var(--ink);
+  font-weight: 600;
+}
+.groups .t {
+  flex: 1;
+}
+.groups .n {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.c-card-h .two {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.c-card-h .sub {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 220px;
+  align-items: center;
+  gap: var(--s4);
+  padding: var(--s3) var(--s4);
+  border-block-start: 1px solid var(--rule);
+}
+.row.changed {
+  background: color-mix(in srgb, var(--warn-bg) 60%, transparent);
+}
+.row.inactive .text {
+  opacity: 0.6;
+}
+.row .text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.row .text b {
+  font-size: 13px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.row .sub {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.row .field {
+  width: 100%;
+  min-width: 0;
+}
+.row .c-switch {
+  justify-self: end;
+}
+.c-msg[data-changes] .btn {
+  margin-inline-start: auto;
+}
+@media (max-width: 960px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

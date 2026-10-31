@@ -39,6 +39,8 @@ const amman: Property = {
   isActive: true,
   licensedRooms: null,
   roomsAboveLicence: false,
+  tenantCode: null,
+  moduleCodes: [],
   subscriptions: [],
   contacts: [],
 };
@@ -97,6 +99,10 @@ describe('PropertiesStore', () => {
       tenantId: null,
       searchText: null,
       isActive: null,
+      countryCode: null,
+      propertyTypeCode: null,
+      state: null,
+      aboveLicenceOnly: false,
     });
     request.flush({ data: { results: [amman], totalCount: 1 } });
     await settle();

@@ -7,6 +7,7 @@ import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
 import { IdentityConfirmation } from '@harmony/platform/session';
 import { ConfirmDialog, Toasts } from '@harmony/ui/overlays';
+import { PageHead } from '@harmony/ui/shell';
 
 /** A domain name has at most this many characters (FederatedAuthorityDomain.DomainMaxLength). */
 const DOMAIN_MAX_LENGTH = 253;
@@ -27,7 +28,7 @@ interface DomainDraft {
  */
 @Component({
   selector: 'hr-company-login-page',
-  imports: [FormField, IfAllowed, ConfirmDialog],
+  imports: [FormField, IfAllowed, ConfirmDialog, PageHead],
   providers: [CompanyLoginStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './company-login-page.html',

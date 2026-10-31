@@ -90,6 +90,8 @@ export interface GroupUpdate {
 export interface GroupFilters {
   readonly tenantId: string | null;
   readonly typeCode: string | null;
+  /** Only active (true) or only inactive (false) groups; null for both. */
+  readonly isActive: boolean | null;
   readonly search: string;
   readonly page: number;
 }

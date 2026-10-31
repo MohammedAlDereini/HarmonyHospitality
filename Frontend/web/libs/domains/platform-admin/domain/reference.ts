@@ -35,6 +35,8 @@ export interface ReferenceField {
   /** The server's rule mirrored for speed; its code gives the wording. */
   readonly pattern?: RegExp;
   readonly patternCode?: string;
+  /** The code whose wording asks for this field when it is empty; without it the English-name wording is used. */
+  readonly requiredCode?: string;
   /** The row's key: typed once, never changed. */
   readonly isKey?: true;
   readonly createOnly?: true;

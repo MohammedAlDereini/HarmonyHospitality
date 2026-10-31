@@ -1,47 +1,136 @@
-/* One tenant: the header row, the actions, the subscription lines as a table (ui/data), the writes in the drawer. */
-.head h1 {
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 16px;
-}
-.head .obj {
-  margin-inline-start: var(--s4);
-}
-.code {
-  flex: none;
-  min-width: 2.5rem;
-  padding: 2px 8px;
-  border: 1px solid var(--rule-2);
-  border-radius: var(--radius-control);
+/* One customer (platform console design, C3). The page language is console-ui.css; only the head's own parts and the
+   drawer's invitation form live here. */
+.code-tile {
+  display: inline-grid;
+  place-items: center;
+  min-width: 56px;
+  height: 56px;
+  margin-inline-end: var(--s4);
+  padding: 0 10px;
+  border-radius: var(--radius-surface, 8px);
   background: var(--sunk);
-  font-size: 12px;
-  font-weight: 700;
-  text-align: center;
-}
-.line {
-  margin: 0;
-  padding: var(--s2) var(--s6);
-  font-size: 13px;
   color: var(--ink-2);
-}
-.acts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s2);
-  padding: var(--s2) var(--s6);
-}
-.part {
-  padding: var(--s3) 0 0;
-  border-block-start: 1px solid var(--rule);
-}
-.part h2 {
-  margin: 0 var(--s6) var(--s2);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  color: var(--ink);
+  letter-spacing: 0.04em;
+  vertical-align: middle;
 }
-table.data td .nm {
+.after {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-inline-start: var(--s3);
+  vertical-align: middle;
+}
+.after .ar {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+.cards .who {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  margin-block-end: var(--s4);
+}
+.cards .who .two {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.cards .who .nm {
+  font-size: 13px;
   font-weight: 600;
+}
+.cards .who .sub {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.c-facts dd[data-s='warn'] {
+  color: var(--warn);
+}
+.c-facts dd[data-s='stop'] {
+  color: var(--stop);
+}
+.note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+.tlink {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.tlink:hover {
+  text-decoration: underline;
+}
+table.data td.tenant .nm {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+table.data td.tenant .nm:hover {
+  text-decoration: underline;
+}
+table.data td.tenant .sub {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+table.data td.muted {
+  color: var(--ink-3);
+}
+table.data td.rooms .over {
+  margin-inline-start: 6px;
+  color: var(--warn);
+  font-weight: 500;
+}
+.more-wrap {
+  display: inline-flex;
+}
+.row-menu {
+  margin: 0;
+  padding: 6px;
+  min-width: 180px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-surface, 8px);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-overlay);
+  display: none;
+  flex-direction: column;
+}
+.row-menu:popover-open {
+  display: flex;
+}
+.row-menu a,
+.row-menu button {
+  display: block;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--radius-control, 6px);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+.row-menu a:hover,
+.row-menu button:hover {
+  background: var(--sunk);
 }
 /* The invitation form inside the drawer, like every other editor. */
 .editor .fields {
@@ -56,17 +145,13 @@ table.data td .nm {
   min-width: 0;
 }
 .editor .f label {
-  font-size: 0.9rem;
+  font-size: 12px;
   color: var(--ink-2);
 }
-.editor .f .field {
-  width: 100%;
-  min-width: 0;
-}
 .editor .acts {
-  padding: var(--s4) 0 0;
-  margin-block-start: var(--s5);
-  border-block-start: 1px solid var(--rule);
+  display: flex;
+  gap: var(--s2);
+  margin-block-start: var(--s4);
 }
 .field-error {
   margin: 0;

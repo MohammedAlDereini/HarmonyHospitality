@@ -1,0 +1,41 @@
+<button
+  #chip
+  type="button"
+  class="chip-btn"
+  [class.on]="narrowed()"
+  [attr.popovertarget]="id"
+  [attr.aria-haspopup]="'dialog'"
+>
+  <span class="lbl">{{ label() }}:</span>&ngsp;<span class="val">{{ summary() }}</span>
+  <svg class="caret" viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
+    <path
+      d="M3.5 5.25 7 8.75l3.5-3.5"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+</button>
+<div class="pop" popover [id]="id" [hrPopAt]="chip" role="dialog" [attr.aria-label]="label()">
+  <ul class="opts">
+    @for (option of options(); track option.value) {
+      <li>
+        <label>
+          <input
+            [type]="multiple() ? 'checkbox' : 'radio'"
+            [name]="id"
+            [value]="option.value"
+            [checked]="isChosen(option)"
+            (change)="toggle(option, $any($event.target).checked)"
+          />
+          <span>{{ option.label }}</span>
+        </label>
+      </li>
+    }
+  </ul>
+  @if (narrowed()) {
+    <button type="button" class="clear" (click)="clear()" i18n="@@ui.data.facet.clear">Any</button>
+  }
+</div>

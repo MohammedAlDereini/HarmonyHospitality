@@ -11,7 +11,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormField, form, pattern, required, submit } from '@angular/forms/signals';
-import { PropertiesStore, ReferenceStore, TenantsStore } from '@harmony/platform-admin/data-access';
+import { PropertiesStore, ReferenceStore } from '@harmony/platform-admin/data-access';
+import { TenantChoicesStore } from '@harmony/platform-operations/data-access';
 import { PropertyDraft, ReferenceRow, Tenant, tenantName } from '@harmony/platform-admin/domain';
 import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
@@ -65,6 +66,7 @@ const fieldOfCode: Readonly<Record<string, TextField>> = {
   '10609': 'defaultCurrency',
   '10610': 'defaultLanguageCode',
   '10611': 'totalRooms',
+  '10621': 'addressLine',
   '10613': 'addressLine',
   '10614': 'postalCode',
   '10615': 'externalIdentifier',
@@ -114,7 +116,11 @@ export class PropertyEditor {
 
   private readonly store = inject(PropertiesStore);
   private readonly reference = inject(ReferenceStore);
-  protected readonly tenants = inject(TenantsStore);
+  /** Every customer by code, whatever the Tenants page is filtered to; the platform itself owns no hotel. */
+  private readonly tenants = inject(TenantChoicesStore);
+  protected readonly tenantChoices = computed(() =>
+    this.tenants.rows().filter((tenant) => !tenant.isPlatform),
+  );
   private readonly firstBox = viewChild.required<ElementRef<HTMLSelectElement>>('firstBox');
   private readonly locale = $localize.locale ?? 'en';
   protected readonly types = this.reference.choices('PropertyType');
@@ -130,17 +136,26 @@ export class PropertyEditor {
 
   private readonly model = signal<PropertyValues>(empty);
   protected readonly form = form(this.model, (path) => {
-    required(path.tenantId, { message: wording('10501') });
+    required(path.tenantId, {
+      message: $localize`:@@platform-admin.property-editor.tenant-required:Choose a tenant.`,
+    });
     required(path.code, { message: wording('10601') });
     pattern(path.code, propertyCode, { message: wording('10602') });
     required(path.nameEn, { message: wording('10603') });
     required(path.nameAr, { message: wording('10605') });
     required(path.propertyTypeCode, { message: wording('10607') });
     required(path.cityId, { message: wording('10608') });
-    required(path.defaultCurrency, { message: wording('10609') });
-    required(path.defaultLanguageCode, { message: wording('10610') });
-    required(path.totalRooms, { message: wording('10611') });
-    pattern(path.totalRooms, roomsText, { message: wording('10611') });
+    required(path.addressLine, { message: wording('10621') });
+    required(path.defaultCurrency, { message: wording('10510') });
+    required(path.defaultLanguageCode, {
+      message: $localize`:@@platform-admin.property-editor.language-required:Choose a language.`,
+    });
+    required(path.totalRooms, {
+      message: $localize`:@@platform-admin.property-editor.rooms-required:Give the number of rooms.`,
+    });
+    pattern(path.totalRooms, roomsText, {
+      message: $localize`:@@platform-admin.rooms.whole-number:Give the rooms as a whole number, 1 or more.`,
+    });
     required(path.legalEnvironmentCode, { message: wording('10612') });
     required(path.taxEnvironmentCode, { message: wording('10612') });
     required(path.accountingEnvironmentCode, { message: wording('10612') });
@@ -171,10 +186,12 @@ export class PropertyEditor {
   }
 
   protected label(row: ReferenceRow): string {
+    const arabic = String(row['nameAr'] ?? '');
+    if (this.locale.startsWith('ar') && arabic !== '') return arabic;
     return String(row['nameEn'] ?? row['code'] ?? '');
   }
 
-  protected tenantLabel(tenant: Tenant): string {
+  protected tenantLabel(tenant: Pick<Tenant, 'code' | 'legalNameEn' | 'legalNameAr'>): string {
     return `${tenant.code} · ${tenantName(tenant, this.locale)}`;
   }
 

@@ -1,0 +1,351 @@
+<a class="skip" href="#main" (click)="skipToMain($event)" i18n="@@ui.shell.skip"
+  >Skip to main content</a
+>
+<header class="topbar">
+  <button
+    type="button"
+    class="tb-ic tb-menu"
+    (click)="openPalette()"
+    i18n-aria-label="@@ui.shell.menu"
+    aria-label="Menu"
+  >
+    <hr-icon name="menu" size="20" />
+  </button>
+  <div class="tb-brand">
+    <hr-console-lockup class="tb-lockup" />
+    @if (pageTitle(); as title) {
+      <span class="tb-title">{{ title }}</span>
+    }
+  </div>
+  <span class="tb-space"></span>
+  <button
+    type="button"
+    class="tb-search"
+    (click)="openPalette()"
+    aria-keyshortcuts="Control+K"
+    i18n-aria-label="@@ui.console.search.label"
+    aria-label="Find a place"
+  >
+    <hr-icon name="find" size="16" />
+    <span class="lbl" i18n="@@ui.console.search.placeholder">Find a place</span>
+    <kbd aria-hidden="true">Ctrl K</kbd>
+  </button>
+  <span class="tb-space"></span>
+  <span class="tb-env" data-env>
+    <span class="dot" aria-hidden="true"></span>
+    <span>{{ environment() }}</span>
+  </span>
+  <button
+    type="button"
+    class="tb-ic"
+    popovertarget="needs-pop"
+    aria-expanded="false"
+    i18n-aria-label="@@ui.console.needs.label"
+    aria-label="What needs you"
+    #bellButton
+  >
+    <hr-icon name="bell" size="18" />
+    @if (waiting() > 0) {
+      <span class="badge num">{{ waiting() }}</span>
+    }
+  </button>
+  <button
+    type="button"
+    class="tb-ic tb-help"
+    popovertarget="help-pop"
+    aria-expanded="false"
+    i18n-aria-label="@@ui.console.help.label"
+    aria-label="Help"
+    #helpButton
+  >
+    <hr-icon name="help" size="18" />
+  </button>
+  @if (session.user(); as person) {
+    <button
+      type="button"
+      class="tb-me"
+      popovertarget="me-pop"
+      aria-expanded="false"
+      i18n-aria-label="@@ui.shell.account"
+      aria-label="Account and preferences"
+      #meButton
+    >
+      <span class="av" aria-hidden="true">{{ initials() }}</span>
+      <bdi class="nm">{{ person.name }}</bdi>
+      <hr-icon class="car" name="chevron" size="14" />
+    </button>
+  }
+</header>
+<div class="frame">
+  <nav
+    class="side"
+    [class.folded]="folded()"
+    i18n-aria-label="@@ui.console.nav.label"
+    aria-label="Console places"
+  >
+    @for (section of places.sections(); track section.heading) {
+      <div class="sn-g">{{ section.heading }}</div>
+      @for (place of section.items; track place.link.join('/')) {
+        <a
+          class="sn-i"
+          [routerLink]="place.link"
+          routerLinkActive
+          ariaCurrentWhenActive="page"
+          [routerLinkActiveOptions]="{ exact: place.exact === true }"
+          [attr.title]="folded() ? place.label : null"
+        >
+          <hr-icon [name]="place.icon" size="18" />
+          <span class="lbl">{{ place.label }}</span>
+          @if (place.count !== undefined && place.count > 0) {
+            <span class="cnt num">{{ place.count }}</span>
+          }
+        </a>
+      }
+    }
+    <span class="sn-space"></span>
+    @for (place of places.bottom(); track place.link.join('/')) {
+      <a
+        class="sn-i"
+        [routerLink]="place.link"
+        routerLinkActive
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: place.exact === true }"
+        [attr.title]="folded() ? place.label : null"
+      >
+        <hr-icon [name]="place.icon" size="18" />
+        <span class="lbl">{{ place.label }}</span>
+      </a>
+    }
+    <button
+      type="button"
+      class="sn-i sn-fold"
+      (click)="toggleRail()"
+      [attr.aria-expanded]="!collapsed()"
+      [attr.aria-label]="collapsed() ? expandLabel : collapseLabel"
+    >
+      <hr-icon [name]="collapsed() ? 'expand' : 'collapse'" size="18" [mirrored]="true" />
+      <span class="lbl">{{ collapsed() ? expandLabel : collapseLabel }}</span>
+    </button>
+  </nav>
+  <main class="work" id="main" tabindex="-1" #main>
+    @if (update.stale()) {
+      <div class="strip strip-update" role="alert">
+        <span i18n="@@ui.shell.update-required"
+          >A newer Harmony is required. Reload to continue; unsaved work on this page is lost.</span
+        >
+        <button type="button" class="btn" (click)="update.reload()" i18n="@@ui.shell.reload-now">
+          Reload now
+        </button>
+      </div>
+    } @else if (update.newer()) {
+      <div class="strip strip-update-soft" role="status">
+        <span i18n="@@ui.shell.update-available"
+          >A newer Harmony is available. Reload when it suits you.</span
+        >
+        <button type="button" class="btn quiet" (click)="update.reload()" i18n="@@ui.shell.reload">
+          Reload
+        </button>
+      </div>
+    }
+    @if (session.state() === 'expired') {
+      <div class="strip strip-session" role="status">
+        <span i18n="@@ui.shell.session-ended"
+          >Your session has ended. Sign in again to continue; the work on this page is kept.</span
+        >
+        <button type="button" class="btn" (click)="signInAgain()" i18n="@@ui.shell.sign-in-again">
+          Sign in again
+        </button>
+      </div>
+    }
+    @if (session.state() === 'unavailable') {
+      <div class="strip strip-down" role="status">
+        <span i18n="@@ui.shell.not-responding"
+          >Harmony is not responding. Check your connection.</span
+        >
+        <button type="button" class="btn" (click)="tryAgain()" i18n="@@ui.shell.try-again">
+          Try again
+        </button>
+      </div>
+    }
+    @if (notice.current(); as failure) {
+      <div class="strip strip-failure" role="alert">
+        <span
+          >{{ failure.message }} <span i18n="@@ui.shell.reference">Reference</span>&ngsp;<span
+            class="num"
+            >{{ failure.reference }}</span
+          ></span
+        >
+        <button type="button" class="btn" (click)="notice.reload()" i18n="@@ui.shell.reload">
+          Reload
+        </button>
+        <button
+          type="button"
+          class="btn quiet"
+          (click)="notice.dismiss()"
+          i18n="@@ui.shell.dismiss"
+        >
+          Dismiss
+        </button>
+      </div>
+    }
+    <div class="page">
+      <router-outlet />
+    </div>
+  </main>
+</div>
+<nav class="bottombar" i18n-aria-label="@@ui.console.nav.phone" aria-label="Console places">
+  @for (place of places.phone(); track place.link.join('/')) {
+    <a
+      [routerLink]="place.link"
+      routerLinkActive
+      ariaCurrentWhenActive="page"
+      [routerLinkActiveOptions]="{ exact: place.exact === true }"
+    >
+      <hr-icon [name]="place.icon" size="22" />
+      <span>{{ place.label }}</span>
+    </a>
+  }
+</nav>
+
+<div
+  class="pop wide"
+  id="needs-pop"
+  popover
+  [hrPopAt]="bellAnchor()"
+  i18n-aria-label="@@ui.console.needs.label"
+  aria-label="What needs you"
+>
+  <h3 class="pop-h" i18n="@@ui.console.needs.heading">Needs you now</h3>
+  @for (item of attention(); track item.id) {
+    <a class="pop-i needs-i" [routerLink]="item.link">
+      <span class="chip" [attr.data-s]="item.tone"><span class="dot"></span>{{ item.kind }}</span>
+      <span class="needs-t">{{ item.text }}</span>
+    </a>
+  } @empty {
+    <p class="pop-note" i18n="@@ui.console.needs.none">Nothing needs you right now.</p>
+  }
+</div>
+
+<div
+  class="pop wide"
+  id="help-pop"
+  popover
+  [hrPopAt]="helpAnchor()"
+  i18n-aria-label="@@ui.console.help.label"
+  aria-label="Help"
+>
+  <h3 class="pop-h" i18n="@@ui.console.help.heading">Help</h3>
+  <a class="pop-i" [routerLink]="['/health']" i18n="@@ui.console.help.health">Platform health</a>
+  <a class="pop-i" href="/docs" i18n="@@ui.console.help.docs">API documentation</a>
+  <p class="pop-note">
+    <span i18n="@@ui.console.help.release">Console release</span>&ngsp;<span class="num">{{
+      release
+    }}</span>
+  </p>
+</div>
+
+<div
+  class="pop wide"
+  id="me-pop"
+  popover
+  [hrPopAt]="meAnchor()"
+  i18n-aria-label="@@ui.shell.account"
+  aria-label="Account and preferences"
+>
+  @if (session.user(); as person) {
+    <div class="pop-who">
+      <b
+        ><bdi>{{ person.name }}</bdi></b
+      >
+      <span i18n="@@ui.shell.signed-in">Signed in</span>
+    </div>
+  }
+  <div class="pop-sec">
+    <div class="pref">
+      <span i18n="@@ui.shell.theme">Theme</span>
+      <div class="seg" role="group" i18n-aria-label="@@ui.shell.theme" aria-label="Theme">
+        <button
+          type="button"
+          [attr.aria-pressed]="look.theme() === 'light'"
+          (click)="look.setTheme('light')"
+          i18n="@@ui.shell.theme.light"
+        >
+          Light
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="look.theme() === 'dark'"
+          (click)="look.setTheme('dark')"
+          i18n="@@ui.shell.theme.dark"
+        >
+          Dark
+        </button>
+      </div>
+    </div>
+    <div class="pref">
+      <span i18n="@@ui.shell.density">Density</span>
+      <div class="seg" role="group" i18n-aria-label="@@ui.shell.density" aria-label="Density">
+        <button
+          type="button"
+          [attr.aria-pressed]="look.density() === 'comfortable'"
+          (click)="look.setDensity('comfortable')"
+          i18n="@@ui.shell.density.comfortable"
+        >
+          Comfortable
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="look.density() === 'standard'"
+          (click)="look.setDensity('standard')"
+          i18n="@@ui.shell.density.standard"
+        >
+          Standard
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="look.density() === 'compact'"
+          (click)="look.setDensity('compact')"
+          i18n="@@ui.shell.density.compact"
+        >
+          Compact
+        </button>
+      </div>
+    </div>
+    <div class="pref">
+      <span i18n="@@ui.shell.language">Language</span>
+      <div class="seg" role="group" i18n-aria-label="@@ui.shell.language" aria-label="Language">
+        <a [href]="languageLink('en')" [attr.aria-current]="arabic ? null : 'true'">English</a>
+        <a [href]="languageLink('ar')" lang="ar" [attr.aria-current]="arabic ? 'true' : null"
+          >العربية</a
+        >
+      </div>
+    </div>
+  </div>
+  <div class="pop-sec">
+    <button type="button" class="pop-i" (click)="session.signOut()" i18n="@@ui.shell.sign-out">
+      Sign out
+    </button>
+  </div>
+</div>
+
+<hr-nav-panel
+  id="nav-panel"
+  popover
+  [items]="places.items()"
+  i18n-aria-label="@@ui.shell.nav.label"
+  aria-label="All places"
+/>
+<hr-confirm-dialog
+  #leave
+  tone="stop"
+  i18n-heading="@@ui.shell.leave-heading"
+  heading="Sign in on this page?"
+  i18n-message="@@ui.shell.leave-message"
+  message="The sign-in window could not open. Changes not saved on this page will be lost."
+  i18n-go="@@ui.shell.leave-go"
+  go="Sign in here"
+  i18n-stay="@@ui.shell.leave-stay"
+  stay="Stay on this page"
+/>
+<hr-toasts />
+<hr-confirm-identity />

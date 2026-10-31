@@ -14,12 +14,14 @@ const stateTone: Readonly<Record<AccountState, Tone | null>> = {
   [AccountState.terminated]: 'stop',
 };
 
-export const stateLabel = (user: UserAccount): string => stateWording[user.state];
+export const stateLabel = (user: Pick<UserAccount, 'state'>): string => stateWording[user.state];
 
-export const toneOf = (user: UserAccount): Tone | null => stateTone[user.state];
+export const toneOf = (user: Pick<UserAccount, 'state'>): Tone | null => stateTone[user.state];
 
 /** Exempt beats the authenticator: a person on the list is never asked for a code. */
-export const twoStepLabel = (user: UserAccount): string => {
+export const twoStepLabel = (
+  user: Pick<UserAccount, 'twoFactorEnabled' | 'twoStepExemptReason'>,
+): string => {
   if (user.twoStepExemptReason !== null)
     return $localize`:@@administration.users.two-step.exempt:Exempt`;
   return user.twoFactorEnabled

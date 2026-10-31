@@ -10,6 +10,7 @@ import { SettingsStore } from '@harmony/administration/data-access';
 import { EffectiveSetting } from '@harmony/administration/domain';
 import { AccessStore, Permission } from '@harmony/platform/access';
 import { Drawer, Toasts } from '@harmony/ui/overlays';
+import { PageHead } from '@harmony/ui/shell';
 import { SettingDetail } from './setting-detail';
 import { outcomeLabel, sourceLabel } from './wording';
 
@@ -20,7 +21,7 @@ import { outcomeLabel, sourceLabel } from './wording';
  */
 @Component({
   selector: 'hr-settings-page',
-  imports: [Drawer, SettingDetail],
+  imports: [Drawer, SettingDetail, PageHead],
   providers: [SettingsStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './settings-page.html',

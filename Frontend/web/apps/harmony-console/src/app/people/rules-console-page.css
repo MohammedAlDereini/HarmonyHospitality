@@ -1,0 +1,76 @@
+/* The platform's security rules (platform console design, C20): the page language is console-ui.css; the rule rows
+   and the days form live here. */
+.c-card-b.rule {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s4);
+}
+/* A bare toggle beside the words, not the filters' bordered pill. */
+.rule .c-switch {
+  flex: none;
+  margin-block-start: 2px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.rule .t {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+.rule .t b {
+  color: var(--ink);
+}
+.note {
+  margin: 0 0 var(--s3);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+.days label {
+  display: block;
+  margin-block-end: var(--s1);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.days .row {
+  display: flex;
+  gap: var(--s2);
+}
+.days .row .field {
+  flex: 1;
+  min-width: 0;
+}
+.field-error {
+  margin: var(--s1) 0 0;
+  font-size: 12px;
+  color: var(--stop);
+}
+table.waiting td.tenant .nm {
+  display: block;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+table.waiting td.tenant .sub {
+  display: block;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+table.waiting td.muted {
+  color: var(--ink-3);
+}
+table.waiting td.acts {
+  width: 220px;
+  text-align: end;
+  white-space: nowrap;
+}
+table.waiting td.acts .btn + .btn {
+  margin-inline-start: var(--s2);
+}

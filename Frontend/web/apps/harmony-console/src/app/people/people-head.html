@@ -1,0 +1,60 @@
+<hr-page-head i18n-title="@@administration.console.people.title" title="People">
+  <p class="lead" slot="lead">
+    @if (census(); as census) {
+      <ng-container i18n="@@administration.console.people.lead.counts"
+        >{census.total, plural,
+          =1 {1 platform account}
+          other {{{ census.total }} platform accounts}
+        }
+        · {{ census.active }} active · {{ census.suspended }} suspended ·
+        {{ census.terminated }} terminated ·
+        {waiting(), plural,
+          =0 {no invitation waiting}
+          =1 {1 invitation waiting}
+          other {{{ waiting() }} invitations waiting}
+        }</ng-container
+      >
+    } @else {
+      <ng-container i18n="@@administration.console.people.lead"
+        >The platform's own people: who may sign in to the console, how they sign in, and since
+        when.</ng-container
+      >
+    }
+  </p>
+  <ng-container ngProjectAs="[slot=actions]">
+    @if (current() === 'people') {
+      <button
+        type="button"
+        class="btn"
+        (click)="exportCsv()"
+        [disabled]="users.rows().length === 0"
+      >
+        <hr-icon name="download" size="16" />
+        <span i18n="@@administration.console.people.export">Export</span>
+      </button>
+    }
+  </ng-container>
+  <button
+    slot="actions"
+    *hrIfAllowed="manageUsers"
+    type="button"
+    class="btn solid"
+    data-act="new-person"
+    (click)="openCreator()"
+    [attr.aria-expanded]="creating()"
+  >
+    <hr-icon name="plus" size="16" />
+    <span i18n="@@administration.console.people.add">New person</span>
+  </button>
+</hr-page-head>
+<hr-people-tabs [current]="current()" />
+<hr-drawer
+  #creator
+  i18n-heading="@@administration.console.people.new.title"
+  heading="New person"
+  (closed)="creating.set(false)"
+>
+  @if (creating()) {
+    <hr-account-creator (done)="created()" (cancelled)="creator.close()" />
+  }
+</hr-drawer>

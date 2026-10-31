@@ -6,6 +6,7 @@ import { InstantFormatter } from '@harmony/platform/context';
 import { messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
 import { ConfirmDialog, Toasts } from '@harmony/ui/overlays';
+import { PageHead } from '@harmony/ui/shell';
 
 const dateAndTime: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'short' };
 
@@ -15,7 +16,7 @@ const dateAndTime: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle
  */
 @Component({
   selector: 'hr-invitations-page',
-  imports: [IfAllowed, ConfirmDialog],
+  imports: [IfAllowed, ConfirmDialog, PageHead],
   providers: [InvitationsStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './invitations-page.html',

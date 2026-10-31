@@ -1,12 +1,9 @@
-<header class="page-head">
-  <div>
-    <h1 i18n="@@administration.directory.title">Company directory</h1>
-    <p class="lead" i18n="@@administration.directory.lead">
-      Your Microsoft Entra ID or Okta adds and removes your staff in Harmony (SCIM). You give each
-      of its groups a role here; its members hold exactly that.
-    </p>
-  </div>
-</header>
+<hr-page-head i18n-title="@@administration.directory.title" title="Company directory">
+  <p class="lead" slot="lead" i18n="@@administration.directory.lead">
+    Your Microsoft Entra ID or Okta adds and removes your staff in Harmony (SCIM). You give each of
+    its groups a role here; its members hold exactly that.
+  </p>
+</hr-page-head>
 @if (problem(); as text) {
   <p class="empty" role="alert">{{ text }}</p>
 }

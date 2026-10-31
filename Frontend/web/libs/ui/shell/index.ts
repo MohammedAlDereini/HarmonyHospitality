@@ -1,9 +1,14 @@
 export { Shell } from './shell';
+export { ConfirmIdentityDialog } from './confirm-identity-dialog';
+export type { Crumbs } from './crumbs';
+export { crumbsOf } from './crumbs';
+export { PopAt } from './pop-at.directive';
 export { NotFoundPage } from './not-found-page';
 export { HarmonyTitles, provideHarmonyTitles } from './harmony-titles';
 export { LookStore } from './look-store';
 export type { NavItem } from './nav-panel';
 export { NavPanel } from './nav-panel';
 export { PageActions, PageActionsTemplate } from './page-actions';
+export { PAGE_ACTIONS_IN_HEAD, PageHead } from './page-head';
 export type { DockLink, ShellPlaces } from './places';
 export { SHELL_PLACES } from './places';

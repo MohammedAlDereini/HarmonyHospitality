@@ -1,0 +1,286 @@
+<div class="c-page">
+  <hr-page-head [title]="greeting()">
+    <p class="lead" slot="lead">
+      <span class="num">{{ today() }}</span>
+      · <span i18n="@@harmony-console.home.lead.platform">Platform operations</span>
+      @if (tenants(); as summary) {
+        ·
+        <span i18n="@@harmony-console.home.lead.tenants"
+          >{summary.active, plural,
+            =1 {1 active tenant}
+            other {{{ summary.active }} active tenants}
+          }
+          in
+          {summary.countries, plural,
+            =1 {1 country}
+            other {{{ summary.countries }} countries}
+          }</span
+        >
+      }
+    </p>
+    <button slot="actions" type="button" class="btn" (click)="refresh()">
+      <hr-icon name="refresh" size="16" />
+      <span i18n="@@harmony-console.home.refresh">Refresh</span>
+    </button>
+    @if (canSeeTenants()) {
+      <a slot="actions" class="btn solid" routerLink="/tenants/new">
+        <hr-icon name="plus" size="16" />
+        <span i18n="@@harmony-console.home.new-tenant">New tenant</span>
+      </a>
+    }
+  </hr-page-head>
+
+  <section class="c-card">
+    <div class="c-card-h">
+      <h2 i18n="@@harmony-console.home.needs">Needs you now</h2>
+      @if (attention.items().length > 0) {
+        <span class="chip" data-s="stop"
+          ><span class="dot"></span>{{ attention.items().length }}</span
+        >
+      }
+      <span class="r" i18n="@@harmony-console.home.needs.order">Most pressing first</span>
+    </div>
+    @if (attention.items().length === 0) {
+      <p class="c-state-h" i18n="@@harmony-console.home.needs.none">Nothing needs you right now.</p>
+    } @else {
+      <ul class="needs">
+        @for (item of attention.items(); track item.id) {
+          <li>
+            <span class="chip" [attr.data-s]="item.tone"
+              ><span class="dot"></span>{{ item.kind }}</span
+            >
+            <span class="txt"
+              ><bdi>{{ item.text }}</bdi></span
+            >
+            <a class="btn ghost" [routerLink]="item.link" i18n="@@harmony-console.home.needs.open"
+              >Open</a
+            >
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  @if (canSeeTenants()) {
+    <div class="c-kpis">
+      <div class="c-kpi">
+        <span class="k" i18n="@@harmony-console.home.kpi.tenants">Active tenants</span>
+        <span class="v num">{{ tenants()?.active ?? '–' }}</span>
+        @if (tenants(); as summary) {
+          <span class="d" [attr.data-s]="summary.suspended > 0 ? 'stop' : 'ok'">
+            <hr-icon [name]="summary.onboardedThisMonth > 0 ? 'up' : 'flat'" size="14" />
+            <span i18n="@@harmony-console.home.kpi.tenants.note"
+              >+{{ summary.onboardedThisMonth }} this month ·
+              {summary.suspended, plural,
+                =0 {none suspended}
+                =1 {1 suspended}
+                other {{{ summary.suspended }} suspended}
+              }</span
+            >
+          </span>
+        }
+      </div>
+      <div class="c-kpi">
+        <span class="k" i18n="@@harmony-console.home.kpi.properties">Properties</span>
+        <span class="v num">{{ properties()?.active ?? '–' }}</span>
+        @if (properties(); as summary) {
+          <span class="d" data-s="ok">
+            <hr-icon [name]="summary.createdThisMonth > 0 ? 'up' : 'flat'" size="14" />
+            <span i18n="@@harmony-console.home.kpi.properties.note"
+              >+{{ summary.createdThisMonth }} this month ·
+              {summary.openingSoon, plural,
+                =0 {none opening soon}
+                =1 {1 opening soon}
+                other {{{ summary.openingSoon }} opening soon}
+              }</span
+            >
+          </span>
+        }
+      </div>
+      <div class="c-kpi">
+        <span class="k" i18n="@@harmony-console.home.kpi.rooms">Licensed rooms</span>
+        <span class="v num">{{ properties()?.licensedRooms ?? '–' }}</span>
+        @if (properties(); as summary) {
+          <span class="d" [attr.data-s]="summary.aboveLicence > 0 ? 'stop' : null">
+            <hr-icon name="flat" size="14" />
+            <span i18n="@@harmony-console.home.kpi.rooms.note"
+              >{{ summary.totalRooms }} declared ·
+              {summary.aboveLicence, plural,
+                =0 {none above licence}
+                =1 {1 hotel above licence}
+                other {{{ summary.aboveLicence }} hotels above licence}
+              }</span
+            >
+          </span>
+        }
+      </div>
+      <div class="c-kpi">
+        <span class="k" i18n="@@harmony-console.home.kpi.sign-ins">Sign-ins today</span>
+        <span class="v num">{{ attention.countsKnown() ? attention.signedInToday() : '–' }}</span>
+        @if (attention.countsKnown()) {
+          <span class="d" [attr.data-s]="attention.refusedToday() > 0 ? 'stop' : 'ok'">
+            <hr-icon name="flat" size="14" />
+            <span i18n="@@harmony-console.home.kpi.sign-ins.note"
+              >{attention.refusedToday(), plural,
+                =0 {none refused}
+                =1 {1 refused}
+                other {{{ attention.refusedToday() }} refused}
+              }
+              · since midnight UTC</span
+            >
+          </span>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="c-grid wide-narrow">
+    @if (canSeeTenants()) {
+      <section class="c-card">
+        <div class="c-card-h">
+          <h2 i18n="@@harmony-console.home.chart">New tenants per month</h2>
+          <span class="r"
+            ><a routerLink="/tenants" i18n="@@harmony-console.home.chart.open"
+              >Open tenants</a
+            ></span
+          >
+        </div>
+        <div class="c-card-b">
+          @if (summaries.tenantsProblem(); as problem) {
+            <p class="c-state-h" role="alert">{{ problem }}</p>
+          } @else if (bars().length === 0) {
+            <p class="c-state-h" role="status" i18n="@@harmony-console.home.chart.loading">
+              Loading…
+            </p>
+          } @else {
+            <svg
+              class="chart"
+              role="img"
+              i18n-aria-label="@@harmony-console.home.chart.label"
+              aria-label="Customers onboarded in each of the last twelve months"
+              [attr.viewBox]="'0 0 ' + chartWidth() + ' ' + chartHeight"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <line
+                class="grid"
+                x1="0"
+                [attr.x2]="chartWidth()"
+                [attr.y1]="baseline"
+                [attr.y2]="baseline"
+              />
+              @for (bar of bars(); track bar.month) {
+                <g>
+                  <text
+                    class="val"
+                    [attr.x]="bar.centre"
+                    [attr.y]="bar.y - valueGap"
+                    text-anchor="middle"
+                  >
+                    {{ bar.count }}
+                  </text>
+                  <rect
+                    class="bar"
+                    [class.current]="bar.current"
+                    [attr.x]="bar.x"
+                    [attr.y]="bar.y"
+                    [attr.width]="barWidth"
+                    [attr.height]="bar.height"
+                    rx="3"
+                  />
+                  <text class="lbl" [attr.x]="bar.centre" [attr.y]="labelLine" text-anchor="middle">
+                    {{ bar.label }}
+                  </text>
+                </g>
+              }
+            </svg>
+            <p class="c-note chart-note" i18n="@@harmony-console.home.chart.note">
+              Last 12 months ·
+              {onboardedInYear(), plural,
+                =1 {1 tenant onboarded}
+                other {{{ onboardedInYear() }} tenants onboarded}
+              }
+              · the last bar is the current month
+            </p>
+          }
+        </div>
+      </section>
+    }
+
+    <div class="right">
+      @if (canSeeHealth()) {
+        <section class="c-card">
+          <div class="c-card-h">
+            <h2 i18n="@@harmony-console.home.health">Platform health</h2>
+            @if (healthAttention() > 0) {
+              <span class="chip" data-s="warn"
+                ><span class="dot"></span>{{ healthAttention() }}</span
+              >
+            }
+            <span class="r"
+              ><a routerLink="/health" i18n="@@harmony-console.home.health.open"
+                >Open health</a
+              ></span
+            >
+          </div>
+          @if (health.problem(); as problem) {
+            <p class="c-state-h" role="alert">{{ problem }}</p>
+          } @else if (healthLines().length === 0) {
+            <p class="c-state-h" role="status" i18n="@@harmony-console.home.health.loading">
+              Reading the health checks…
+            </p>
+          } @else {
+            <ul class="lines">
+              @for (line of healthLines(); track line.name) {
+                <li>
+                  <span class="two">
+                    <span class="nm">{{ line.name }}</span>
+                    <span class="sub">{{ line.note }}</span>
+                  </span>
+                  <span class="chip" [attr.data-s]="tone(line.status)"
+                    ><span class="dot"></span>{{ statusWord(line.status) }}</span
+                  >
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+
+      @if (canSeeTenants()) {
+        <section class="c-card">
+          <div class="c-card-h">
+            <h2 i18n="@@harmony-console.home.trail">Recent trail</h2>
+            <span class="r"
+              ><a routerLink="/trail" i18n="@@harmony-console.home.trail.open"
+                >Open audit log</a
+              ></span
+            >
+          </div>
+          @if (attention.recentTrail().length === 0) {
+            <p class="c-state-h" i18n="@@harmony-console.home.trail.none">Nothing recorded yet.</p>
+          } @else {
+            <ul class="lines trail">
+              @for (row of attention.recentTrail(); track row.id) {
+                <li>
+                  <span class="dot" [attr.data-s]="trailTone(row)" aria-hidden="true"></span>
+                  <span class="two">
+                    <span class="nm"
+                      ><span class="code" dir="ltr">{{ row.action }}</span>
+                      @if (row.tenantCode; as code) {
+                        · <span dir="ltr">{{ code }}</span>
+                      }
+                    </span>
+                    <span class="sub"
+                      ><bdi>{{ actor(row) }}</bdi> · <span class="num">{{ time(row) }}</span> ·
+                      {{ day(row) }}</span
+                    >
+                  </span>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+    </div>
+  </div>
+</div>

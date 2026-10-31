@@ -1,1 +1,87 @@
-/* The tenants as a table (ui/data); nothing of its own. */
+/* The tenants list (platform console design, C2): the page language is console-ui.css; only the row's own parts live here. */
+table.tenants td.tenant .nm {
+  display: block;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+table.tenants td.tenant .nm:hover {
+  text-decoration: underline;
+}
+table.tenants td.tenant .sub {
+  display: block;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-3);
+}
+table.tenants td.muted {
+  color: var(--ink-3);
+}
+table.tenants td.rooms .over {
+  margin-inline-start: 6px;
+  color: var(--warn);
+  font-weight: 500;
+}
+table.tenants td.acts {
+  width: 40px;
+  text-align: end;
+}
+.row-menu {
+  margin: 0;
+  padding: 6px;
+  min-width: 180px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-surface, 8px);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-overlay);
+  display: none;
+  flex-direction: column;
+}
+.row-menu:popover-open {
+  display: flex;
+}
+.row-menu a,
+.row-menu button {
+  display: block;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--radius-control, 6px);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+.row-menu a:hover,
+.row-menu button:hover {
+  background: var(--sunk);
+}
+.row-menu button:disabled {
+  color: var(--ink-4);
+  cursor: default;
+}
+/* Dates and numbers never break; the note under the administrator's name is cut with an ellipsis, as the
+   frame draws it, instead of wrapping. */
+table.tenants td.num {
+  white-space: nowrap;
+}
+table.tenants td.who .two {
+  min-width: 0;
+}
+table.tenants td.who .sub {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

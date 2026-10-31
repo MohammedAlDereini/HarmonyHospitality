@@ -10,15 +10,13 @@
     <span i18n="@@administration.users.add">Add user</span>
   </button>
 </ng-template>
-<header class="page-head">
-  <div>
-    <h1 i18n="@@administration.users.title">Users</h1>
-    <p class="lead" i18n="@@administration.users.lead">
-      Who may sign in here, how they sign in, and since when. A suspended account can come back; a
-      terminated one cannot.
-    </p>
-  </div>
+<hr-page-head i18n-title="@@administration.users.title" title="Users">
+  <p class="lead" slot="lead" i18n="@@administration.users.lead">
+    Who may sign in here, how they sign in, and since when. A suspended account can come back; a
+    terminated one cannot.
+  </p>
   <nav
+    slot="aside"
     class="head-links"
     i18n-aria-label="@@administration.users.more"
     aria-label="Sign-in and security"
@@ -52,7 +50,7 @@
       >Approvals and rules</a
     >
   </nav>
-</header>
+</hr-page-head>
 <form class="toolbar" (submit)="onSearch($event, search.value)">
   <div class="tf wide">
     <label for="users-search" i18n="@@administration.users.search">Search</label>

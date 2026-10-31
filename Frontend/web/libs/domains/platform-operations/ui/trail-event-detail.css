@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+.ev-top {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  flex-wrap: wrap;
+  margin-block-end: var(--s3);
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.ev-detail {
+  margin: 0 0 var(--s4);
+  font-size: 14px;
+  line-height: 20px;
+}
+.code {
+  font-family: var(--mono, var(--sans));
+  font-size: 12px;
+}
+.ev-acts {
+  display: flex;
+  gap: var(--s2);
+  flex-wrap: wrap;
+  margin-block-start: var(--s5);
+}

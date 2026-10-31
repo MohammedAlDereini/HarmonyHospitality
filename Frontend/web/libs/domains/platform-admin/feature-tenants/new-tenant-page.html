@@ -1,0 +1,935 @@
+<div class="c-page wizard">
+  <hr-page-head [title]="title()">
+    <p class="lead" slot="lead" i18n="@@platform-admin.wizard.lead">
+      Draft kept in this tab · nothing is saved on the platform until Finish
+    </p>
+    <button slot="actions" type="button" class="btn" data-act="discard" (click)="discard()">
+      <hr-icon name="x" size="16" />
+      <span i18n="@@platform-admin.wizard.discard">Discard draft</span>
+    </button>
+  </hr-page-head>
+
+  <section class="c-card">
+    <ol class="c-steps">
+      @for (step of steps; track step; let i = $index; let last = $last) {
+        <li class="c-step" [attr.data-state]="stateOf(step)" [attr.data-step]="step">
+          <button
+            type="button"
+            class="step-btn"
+            [disabled]="stateOf(step) !== 'done'"
+            (click)="go(step)"
+          >
+            <span class="n">
+              @if (stateOf(step) === 'done') {
+                <hr-icon name="check" size="12" />
+              } @else {
+                {{ i + 1 }}
+              }
+            </span>
+            <span>{{ stepTitle[step] }}</span>
+          </button>
+        </li>
+        @if (!last) {
+          <li class="line" aria-hidden="true"></li>
+        }
+      }
+    </ol>
+  </section>
+
+  @if (problem(); as text) {
+    <div class="c-msg" data-s="stop" role="alert">
+      <hr-icon class="ic" name="critical" size="18" />
+      <span>{{ text }}</span>
+      @if (tenantMadeId(); as id) {
+        <a class="btn" [routerLink]="['/tenants', id]" i18n="@@platform-admin.wizard.open-tenant"
+          >Open the tenant</a
+        >
+      }
+    </div>
+  }
+
+  <div class="columns">
+    <section class="c-card step-card">
+      @if (current() === 'company') {
+        <div class="c-card-h"><h3 i18n="@@platform-admin.wizard.step.company">Company</h3></div>
+        <div class="c-card-b">
+          <p class="note" i18n="@@platform-admin.wizard.company.lead">
+            The legal company Harmony contracts with. The code is fixed once saved; it names the
+            tenant in URLs and on documents.
+          </p>
+          <div class="grid">
+            <div class="f">
+              <label for="tenant-code" i18n="@@platform-admin.tenants.field.code">Code</label>
+              <input
+                id="tenant-code"
+                class="field"
+                type="text"
+                autocomplete="off"
+                dir="ltr"
+                [formField]="form.code"
+                [attr.aria-invalid]="form.code().touched() && form.code().invalid() ? 'true' : null"
+              />
+              <span class="hint" i18n="@@platform-admin.wizard.company.code.hint"
+                >2 to 32 letters, digits, dots, dashes or underscores</span
+              >
+              @if (form.code().touched() && form.code().errors().length > 0) {
+                <p class="field-error" role="alert">{{ form.code().errors()[0]?.message }}</p>
+              }
+            </div>
+            <div class="f">
+              <label for="tenant-external" i18n="@@platform-admin.tenants.field.external"
+                >External identifier</label
+              >
+              <input
+                id="tenant-external"
+                class="field"
+                type="text"
+                autocomplete="off"
+                dir="ltr"
+                [formField]="form.externalIdentifier"
+                [attr.aria-invalid]="
+                  form.externalIdentifier().touched() && form.externalIdentifier().invalid()
+                    ? 'true'
+                    : null
+                "
+              />
+            </div>
+            <div class="f">
+              <label for="tenant-name-en" i18n="@@platform-admin.tenants.field.name-en"
+                >Legal name (English)</label
+              >
+              <input
+                id="tenant-name-en"
+                class="field"
+                type="text"
+                autocomplete="off"
+                lang="en"
+                dir="ltr"
+                [formField]="form.legalNameEn"
+                [attr.aria-invalid]="
+                  form.legalNameEn().touched() && form.legalNameEn().invalid() ? 'true' : null
+                "
+              />
+              @if (form.legalNameEn().touched() && form.legalNameEn().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  {{ form.legalNameEn().errors()[0]?.message }}
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="tenant-name-ar" i18n="@@platform-admin.tenants.field.name-ar"
+                >Legal name (Arabic)</label
+              >
+              <input
+                id="tenant-name-ar"
+                class="field"
+                type="text"
+                autocomplete="off"
+                lang="ar"
+                dir="rtl"
+                [formField]="form.legalNameAr"
+                [attr.aria-invalid]="
+                  form.legalNameAr().touched() && form.legalNameAr().invalid() ? 'true' : null
+                "
+              />
+              @if (form.legalNameAr().touched() && form.legalNameAr().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  {{ form.legalNameAr().errors()[0]?.message }}
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="tenant-country" i18n="@@platform-admin.tenants.field.country"
+                >Country</label
+              >
+              <select
+                id="tenant-country"
+                class="field"
+                [formField]="form.countryCode"
+                [attr.aria-invalid]="
+                  form.countryCode().touched() && form.countryCode().invalid() ? 'true' : null
+                "
+              >
+                <option value="" i18n="@@platform-admin.tenants.field.country.choose">
+                  Choose a country
+                </option>
+                @for (row of countries.rows(); track code(row)) {
+                  <option [value]="code(row)">{{ code(row) }} · {{ label(row) }}</option>
+                }
+              </select>
+              @if (form.countryCode().touched() && form.countryCode().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  {{ form.countryCode().errors()[0]?.message }}
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="tenant-currency" i18n="@@platform-admin.tenants.field.currency"
+                >Currency</label
+              >
+              <select
+                id="tenant-currency"
+                class="field"
+                [formField]="form.defaultCurrency"
+                [attr.aria-invalid]="
+                  form.defaultCurrency().touched() && form.defaultCurrency().invalid()
+                    ? 'true'
+                    : null
+                "
+              >
+                <option value="" i18n="@@platform-admin.tenants.field.currency.choose">
+                  Choose a currency
+                </option>
+                @for (row of currencies.rows(); track code(row)) {
+                  <option [value]="code(row)">{{ code(row) }} · {{ label(row) }}</option>
+                }
+              </select>
+              @if (form.defaultCurrency().touched() && form.defaultCurrency().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  {{ form.defaultCurrency().errors()[0]?.message }}
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="tenant-tier" i18n="@@platform-admin.tenants.field.tier">Tier</label>
+              <select
+                id="tenant-tier"
+                class="field"
+                [formField]="form.tier"
+                [attr.aria-invalid]="form.tier().touched() && form.tier().invalid() ? 'true' : null"
+              >
+                @for (tier of tiers; track tier) {
+                  <option [value]="tier">{{ tier }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+      } @else if (current() === 'administrator') {
+        <div class="c-card-h">
+          <h3 i18n="@@platform-admin.wizard.step.administrator">Administrator</h3>
+        </div>
+        <div class="c-card-b">
+          <p class="note" i18n="@@platform-admin.wizard.administrator.lead">
+            The first person of the tenant. Finish sends them an invitation with a 24-hour link;
+            they choose their own password and then invite the rest.
+          </p>
+          <div class="grid">
+            <div class="f">
+              <label for="tenant-admin-name" i18n="@@platform-admin.tenants.field.admin-name"
+                >Administrator's name</label
+              >
+              <input
+                id="tenant-admin-name"
+                class="field"
+                type="text"
+                autocomplete="off"
+                dir="auto"
+                [formField]="form.administratorDisplayName"
+                [attr.aria-invalid]="
+                  form.administratorDisplayName().touched() &&
+                  form.administratorDisplayName().invalid()
+                    ? 'true'
+                    : null
+                "
+              />
+              @if (
+                form.administratorDisplayName().touched() &&
+                form.administratorDisplayName().errors().length > 0
+              ) {
+                <p class="field-error" role="alert">
+                  {{ form.administratorDisplayName().errors()[0]?.message }}
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="tenant-admin-email" i18n="@@platform-admin.tenants.field.admin-email"
+                >Administrator's email</label
+              >
+              <input
+                id="tenant-admin-email"
+                class="field"
+                type="email"
+                autocomplete="off"
+                dir="ltr"
+                [formField]="form.administratorEmail"
+                [attr.aria-invalid]="
+                  form.administratorEmail().touched() && form.administratorEmail().invalid()
+                    ? 'true'
+                    : null
+                "
+              />
+              @if (
+                form.administratorEmail().touched() && form.administratorEmail().errors().length > 0
+              ) {
+                <p class="field-error" role="alert">
+                  {{ form.administratorEmail().errors()[0]?.message }}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+      } @else if (current() === 'hotel') {
+        <div class="c-card-h"><h3 i18n="@@platform-admin.wizard.step.hotel">First hotel</h3></div>
+        <div class="c-card-b">
+          <p class="note" i18n="@@platform-admin.wizard.hotel.lead">
+            Optional. A tenant may be born without hotels; its administrator can add them later from
+            the web app. Codes are unique within the tenant.
+          </p>
+          <label class="c-switch wanted">
+            <input
+              type="checkbox"
+              #wantBox
+              data-act="want-hotel"
+              [checked]="model().hotelWanted"
+              (change)="wantHotel(wantBox.checked)"
+            />
+            <span i18n="@@platform-admin.wizard.hotel.want">Add a first hotel now</span>
+          </label>
+          @if (model().hotelWanted) {
+            <div class="grid">
+              <div class="f">
+                <label for="prop-code" i18n="@@platform-admin.wizard.hotel.code">Hotel code</label>
+                <input
+                  id="prop-code"
+                  class="field"
+                  type="text"
+                  autocomplete="off"
+                  dir="ltr"
+                  [formField]="form.hotelCode"
+                  [attr.aria-invalid]="
+                    form.hotelCode().touched() && form.hotelCode().invalid() ? 'true' : null
+                  "
+                />
+                <span class="hint" i18n="@@platform-admin.wizard.hotel.code.hint"
+                  >Unique in the tenant · used in URLs and on documents</span
+                >
+                @if (form.hotelCode().touched() && form.hotelCode().errors().length > 0) {
+                  <p class="field-error" role="alert">
+                    {{ form.hotelCode().errors()[0]?.message }}
+                  </p>
+                }
+              </div>
+              <div class="f">
+                <label for="prop-external" i18n="@@platform-admin.properties.field.external"
+                  >External identifier</label
+                >
+                <input
+                  id="prop-external"
+                  class="field"
+                  type="text"
+                  autocomplete="off"
+                  dir="ltr"
+                  [formField]="form.hotelExternal"
+                  [attr.aria-invalid]="
+                    form.hotelExternal().touched() && form.hotelExternal().invalid() ? 'true' : null
+                  "
+                />
+              </div>
+              <div class="f">
+                <label for="prop-name-en" i18n="@@platform-admin.property.field.name-en"
+                  >Name (English)</label
+                >
+                <input
+                  id="prop-name-en"
+                  class="field"
+                  type="text"
+                  autocomplete="off"
+                  lang="en"
+                  dir="ltr"
+                  [formField]="form.hotelNameEn"
+                  [attr.aria-invalid]="
+                    form.hotelNameEn().touched() && form.hotelNameEn().invalid() ? 'true' : null
+                  "
+                />
+                @if (form.hotelNameEn().touched() && form.hotelNameEn().errors().length > 0) {
+                  <p class="field-error" role="alert">
+                    {{ form.hotelNameEn().errors()[0]?.message }}
+                  </p>
+                }
+              </div>
+              <div class="f">
+                <label for="prop-name-ar" i18n="@@platform-admin.property.field.name-ar"
+                  >Name (Arabic)</label
+                >
+                <input
+                  id="prop-name-ar"
+                  class="field"
+                  type="text"
+                  autocomplete="off"
+                  lang="ar"
+                  dir="rtl"
+                  [formField]="form.hotelNameAr"
+                  [attr.aria-invalid]="
+                    form.hotelNameAr().touched() && form.hotelNameAr().invalid() ? 'true' : null
+                  "
+                />
+                @if (form.hotelNameAr().touched() && form.hotelNameAr().errors().length > 0) {
+                  <p class="field-error" role="alert">
+                    {{ form.hotelNameAr().errors()[0]?.message }}
+                  </p>
+                }
+              </div>
+              <div class="f">
+                <label for="prop-type" i18n="@@platform-admin.wizard.hotel.type"
+                  >Property type</label
+                >
+                <select
+                  id="prop-type"
+                  class="field"
+                  [formField]="form.propertyTypeCode"
+                  [attr.aria-invalid]="
+                    form.propertyTypeCode().touched() && form.propertyTypeCode().invalid()
+                      ? 'true'
+                      : null
+                  "
+                >
+                  <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+                  @for (row of types.rows(); track code(row)) {
+                    <option [value]="code(row)">{{ label(row) }}</option>
+                  }
+                </select>
+                @if (
+                  form.propertyTypeCode().touched() && form.propertyTypeCode().errors().length > 0
+                ) {
+                  <p class="field-error" role="alert">
+                    {{ form.propertyTypeCode().errors()[0]?.message }}
+                  </p>
+                }
+              </div>
+              <div class="f">
+                <label for="prop-city" i18n="@@platform-admin.wizard.hotel.city">City</label>
+                <select
+                  id="prop-city"
+                  class="field"
+                  [formField]="form.cityId"
+                  [attr.aria-invalid]="
+                    form.cityId().touched() && form.cityId().invalid() ? 'true' : null
+                  "
+                >
+                  <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+                  @for (row of cities.rows(); track code(row)) {
+                    <option [value]="code(row)">{{ label(row) }}</option>
+                  }
+                </select>
+                @if (form.cityId().touched() && form.cityId().errors().length > 0) {
+                  <p class="field-error" role="alert">{{ form.cityId().errors()[0]?.message }}</p>
+                }
+              </div>
+              <div class="f">
+                <label for="prop-address" i18n="@@platform-admin.wizard.hotel.address"
+                  >Address line</label
+                >
+                <input
+                  id="prop-address"
+                  class="field"
+                  type="text"
+                  autocomplete="off"
+                  dir="auto"
+                  [formField]="form.addressLine"
+                  [attr.aria-invalid]="
+                    form.addressLine().touched() && form.addressLine().invalid() ? 'true' : null
+                  "
+                />
+                @if (form.addressLine().touched() && form.addressLine().errors().length > 0) {
+                  <p class="field-error" role="alert">
+                    {{ form.addressLine().errors()[0]?.message }}
+                  </p>
+                }
+              </div>
+              <div class="f">
+                <label for="prop-postal" i18n="@@platform-admin.property.field.postal"
+                  >Postal code</label
+                >
+                <input
+                  id="prop-postal"
+                  class="field"
+                  type="text"
+                  autocomplete="off"
+                  dir="ltr"
+                  [formField]="form.postalCode"
+                  [attr.aria-invalid]="
+                    form.postalCode().touched() && form.postalCode().invalid() ? 'true' : null
+                  "
+                />
+              </div>
+              <div class="f">
+                <label for="prop-currency" i18n="@@platform-admin.wizard.hotel.currency"
+                  >Default currency</label
+                >
+                <select
+                  id="prop-currency"
+                  class="field"
+                  [formField]="form.hotelCurrency"
+                  [attr.aria-invalid]="
+                    form.hotelCurrency().touched() && form.hotelCurrency().invalid() ? 'true' : null
+                  "
+                >
+                  <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+                  @for (row of currencies.rows(); track code(row)) {
+                    <option [value]="code(row)">{{ code(row) }} · {{ label(row) }}</option>
+                  }
+                </select>
+                @if (form.hotelCurrency().touched() && form.hotelCurrency().errors().length > 0) {
+                  <p class="field-error" role="alert">
+                    {{ form.hotelCurrency().errors()[0]?.message }}
+                  </p>
+                }
+              </div>
+              <div class="f">
+                <label for="prop-language" i18n="@@platform-admin.wizard.hotel.language"
+                  >Default language</label
+                >
+                <select
+                  id="prop-language"
+                  class="field"
+                  [formField]="form.defaultLanguageCode"
+                  [attr.aria-invalid]="
+                    form.defaultLanguageCode().touched() && form.defaultLanguageCode().invalid()
+                      ? 'true'
+                      : null
+                  "
+                >
+                  <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+                  @for (row of languages.rows(); track code(row)) {
+                    <option [value]="code(row)">{{ label(row) }}</option>
+                  }
+                </select>
+                @if (
+                  form.defaultLanguageCode().touched() &&
+                  form.defaultLanguageCode().errors().length > 0
+                ) {
+                  <p class="field-error" role="alert">
+                    {{ form.defaultLanguageCode().errors()[0]?.message }}
+                  </p>
+                }
+              </div>
+              <div class="f">
+                <label for="prop-rooms" i18n="@@platform-admin.wizard.hotel.rooms"
+                  >Total rooms (physical)</label
+                >
+                <input
+                  id="prop-rooms"
+                  class="field"
+                  type="text"
+                  inputmode="numeric"
+                  dir="ltr"
+                  [formField]="form.totalRooms"
+                  [attr.aria-invalid]="
+                    form.totalRooms().touched() && form.totalRooms().invalid() ? 'true' : null
+                  "
+                />
+                <span class="hint" i18n="@@platform-admin.wizard.hotel.rooms.hint"
+                  >The module lines in step 4 should license at least this many</span
+                >
+                @if (form.totalRooms().touched() && form.totalRooms().errors().length > 0) {
+                  <p class="field-error" role="alert">
+                    {{ form.totalRooms().errors()[0]?.message }}
+                  </p>
+                }
+              </div>
+              <div class="f">
+                <label for="prop-opens" i18n="@@platform-admin.wizard.hotel.opens">Opens on</label>
+                <input
+                  id="prop-opens"
+                  class="field"
+                  type="date"
+                  [formField]="form.opensOn"
+                  [attr.aria-invalid]="
+                    form.opensOn().touched() && form.opensOn().invalid() ? 'true' : null
+                  "
+                />
+                <span class="hint" i18n="@@platform-admin.wizard.hotel.opens.hint"
+                  >Leave empty for a hotel already open</span
+                >
+              </div>
+              <div class="f">
+                <label for="prop-legal" i18n="@@platform-admin.wizard.hotel.legal"
+                  >Legal regime</label
+                >
+                <select
+                  id="prop-legal"
+                  class="field"
+                  [formField]="form.legalEnvironmentCode"
+                  [attr.aria-invalid]="
+                    form.legalEnvironmentCode().touched() && form.legalEnvironmentCode().invalid()
+                      ? 'true'
+                      : null
+                  "
+                >
+                  <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+                  @for (row of legal(); track code(row)) {
+                    <option [value]="code(row)">{{ label(row) }}</option>
+                  }
+                </select>
+              </div>
+              <div class="f">
+                <label for="prop-tax" i18n="@@platform-admin.wizard.hotel.tax">Tax regime</label>
+                <select
+                  id="prop-tax"
+                  class="field"
+                  [formField]="form.taxEnvironmentCode"
+                  [attr.aria-invalid]="
+                    form.taxEnvironmentCode().touched() && form.taxEnvironmentCode().invalid()
+                      ? 'true'
+                      : null
+                  "
+                >
+                  <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+                  @for (row of tax(); track code(row)) {
+                    <option [value]="code(row)">{{ label(row) }}</option>
+                  }
+                </select>
+              </div>
+              <div class="f">
+                <label for="prop-accounting" i18n="@@platform-admin.wizard.hotel.accounting"
+                  >Accounting regime</label
+                >
+                <select
+                  id="prop-accounting"
+                  class="field"
+                  [formField]="form.accountingEnvironmentCode"
+                  [attr.aria-invalid]="
+                    form.accountingEnvironmentCode().touched() &&
+                    form.accountingEnvironmentCode().invalid()
+                      ? 'true'
+                      : null
+                  "
+                >
+                  <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+                  @for (row of accounting(); track code(row)) {
+                    <option [value]="code(row)">{{ label(row) }}</option>
+                  }
+                </select>
+              </div>
+              <div class="f">
+                <label for="prop-accommodation" i18n="@@platform-admin.wizard.hotel.accommodation"
+                  >Accommodation regime</label
+                >
+                <select
+                  id="prop-accommodation"
+                  class="field"
+                  [formField]="form.accommodationEnvironmentCode"
+                  [attr.aria-invalid]="
+                    form.accommodationEnvironmentCode().touched() &&
+                    form.accommodationEnvironmentCode().invalid()
+                      ? 'true'
+                      : null
+                  "
+                >
+                  <option value="" i18n="@@platform-admin.reference.field.choose">Choose</option>
+                  @for (row of accommodation(); track code(row)) {
+                    <option [value]="code(row)">{{ label(row) }}</option>
+                  }
+                </select>
+                @if (regimeError(); as text) {
+                  <p class="field-error" role="alert">{{ text }}</p>
+                }
+              </div>
+              <div class="f">
+                <label for="prop-starts" i18n="@@platform-admin.wizard.hotel.starts"
+                  >Subscription starts on</label
+                >
+                <input
+                  id="prop-starts"
+                  class="field"
+                  type="date"
+                  [formField]="form.startsOn"
+                  [attr.aria-invalid]="
+                    form.startsOn().touched() && form.startsOn().invalid() ? 'true' : null
+                  "
+                />
+                @if (form.startsOn().touched() && form.startsOn().errors().length > 0) {
+                  <p class="field-error" role="alert">{{ form.startsOn().errors()[0]?.message }}</p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (current() === 'modules') {
+        <div class="c-card-h"><h3 i18n="@@platform-admin.wizard.step.modules">Modules</h3></div>
+        <div class="c-card-b">
+          @if (!model().hotelWanted) {
+            <p class="note" i18n="@@platform-admin.wizard.modules.no-hotel">
+              No hotel in this draft: module lines are bought on the tenant's page once it exists,
+              per hotel or chain-wide.
+            </p>
+          } @else {
+            <p class="note" i18n="@@platform-admin.wizard.modules.lead">
+              The lines the first hotel starts with. Rooms are a flag, not a gate: a hotel running
+              more rooms than licensed is flagged, never refused.
+            </p>
+            @if (lines().length > 0) {
+              <ul class="lines">
+                @for (line of lines(); track line.moduleCode) {
+                  <li>
+                    <span class="nm" dir="ltr">{{ moduleName(line.moduleCode) }}</span>
+                    <span class="sub">
+                      {{ line.rooms ?? '—' }}
+                      <ng-container i18n="@@platform-admin.wizard.line.rooms">rooms</ng-container> ·
+                      {{ line.terminals ?? '—' }}
+                      <ng-container i18n="@@platform-admin.wizard.line.terminals"
+                        >terminals</ng-container
+                      >
+                      ·
+                      @if (line.renewsAutomatically) {
+                        <ng-container i18n="@@platform-admin.wizard.line.renews"
+                          >renews</ng-container
+                        >
+                      } @else {
+                        <ng-container i18n="@@platform-admin.wizard.line.fixed"
+                          >fixed term</ng-container
+                        >
+                      }
+                    </span>
+                    <button
+                      type="button"
+                      class="btn ghost"
+                      data-act="remove-line"
+                      (click)="removeLine(line.moduleCode)"
+                    >
+                      <hr-icon name="x" size="14" />
+                      <span i18n="@@platform-admin.wizard.line.remove">Remove</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+            <div class="grid line-form">
+              <div class="f">
+                <label for="line-module" i18n="@@platform-admin.subscriptions.field.module"
+                  >Module</label
+                >
+                <select
+                  id="line-module"
+                  class="field"
+                  #lineModule
+                  [value]="line().moduleCode"
+                  (change)="lineChange('moduleCode', lineModule.value)"
+                >
+                  <option value="" i18n="@@platform-admin.subscriptions.field.module.choose">
+                    Choose a module
+                  </option>
+                  @for (row of modules.rows(); track code(row)) {
+                    <option [value]="code(row)">{{ code(row) }} · {{ label(row) }}</option>
+                  }
+                </select>
+              </div>
+              <div class="f">
+                <label for="line-rooms" i18n="@@platform-admin.subscriptions.field.rooms-licensed"
+                  >Rooms licensed</label
+                >
+                <input
+                  id="line-rooms"
+                  class="field"
+                  type="text"
+                  inputmode="numeric"
+                  dir="ltr"
+                  #lineRooms
+                  [value]="line().rooms"
+                  (input)="lineChange('rooms', lineRooms.value)"
+                />
+              </div>
+              <div class="f">
+                <label for="line-terminals" i18n="@@platform-admin.subscriptions.field.terminals"
+                  >Terminals</label
+                >
+                <input
+                  id="line-terminals"
+                  class="field"
+                  type="text"
+                  inputmode="numeric"
+                  dir="ltr"
+                  #lineTerminals
+                  [value]="line().terminals"
+                  (input)="lineChange('terminals', lineTerminals.value)"
+                />
+              </div>
+              <label class="c-switch">
+                <input
+                  type="checkbox"
+                  #lineRenews
+                  [checked]="line().renewsAutomatically"
+                  (change)="lineChange('renewsAutomatically', lineRenews.checked)"
+                />
+                <span i18n="@@platform-admin.subscriptions.field.renews">Renews automatically</span>
+              </label>
+              <div class="f end">
+                <button
+                  type="button"
+                  class="btn"
+                  data-act="add-line"
+                  [disabled]="line().moduleCode === '' || lineProblem() !== null"
+                  (click)="addLine()"
+                >
+                  <hr-icon name="plus" size="16" />
+                  <span i18n="@@platform-admin.wizard.line.add">Add line</span>
+                </button>
+              </div>
+              @if (lineProblem(); as text) {
+                <p class="field-error" role="alert">{{ text }}</p>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="c-card-h">
+          <h3 i18n="@@platform-admin.wizard.step.review">Review and finish</h3>
+        </div>
+        <div class="c-card-b">
+          <p class="note" i18n="@@platform-admin.wizard.review.lead">
+            Finish creates the tenant and mails the administrator. If a hotel was given it is
+            created next, with its lines.
+          </p>
+          <ng-container *ngTemplateOutlet="facts" />
+        </div>
+      }
+      <div class="c-card-b nav">
+        @if (index() > 0) {
+          <button
+            type="button"
+            class="btn"
+            data-act="back"
+            (click)="back()"
+            [disabled]="finishing()"
+            i18n="@@platform-admin.wizard.back"
+          >
+            Back
+          </button>
+        }
+        <span class="spacer"></span>
+        @if (current() === 'review') {
+          <button
+            type="button"
+            class="btn solid"
+            data-act="finish"
+            (click)="finish()"
+            [disabled]="finishing()"
+            i18n="@@platform-admin.wizard.finish"
+          >
+            Finish
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="btn solid"
+            data-act="next"
+            (click)="next()"
+            i18n="@@platform-admin.wizard.next"
+          >
+            Next
+          </button>
+        }
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="c-card" data-so-far>
+        <div class="c-card-h"><h3 i18n="@@platform-admin.wizard.so-far">So far</h3></div>
+        <div class="c-card-b">
+          <ng-container *ngTemplateOutlet="facts" />
+        </div>
+      </section>
+      <div class="c-msg" data-s="info" role="note">
+        <hr-icon class="ic" name="info" size="18" />
+        <div class="t">
+          <b i18n="@@platform-admin.wizard.sends.title">What Finish sends</b>
+          <span i18n="@@platform-admin.wizard.sends.text"
+            >Tenant/Create with the administrator (one save, invitation mail), then Property/Create
+            with the module lines. If the mail fails, the tenant still exists and the invitation can
+            be re-sent.</span
+          >
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <ng-template #facts>
+    <dl class="c-facts">
+      <dt i18n="@@platform-admin.wizard.fact.company">Company</dt>
+      <dd>
+        @if (model().code.trim()) {
+          <span dir="ltr">{{ model().code.trim() }}</span> ·
+          <bdi>{{ model().legalNameEn.trim() }}</bdi>
+          @if (model().legalNameAr.trim()) {
+            · <bdi lang="ar">{{ model().legalNameAr.trim() }}</bdi>
+          }
+        } @else {
+          <span class="muted" i18n="@@platform-admin.wizard.fact.pending.company">Step 1</span>
+        }
+      </dd>
+      <dt i18n="@@platform-admin.wizard.fact.country">Country</dt>
+      <dd>
+        @if (model().countryCode) {
+          <bdi>{{ countryName() }}</bdi> · <span dir="ltr">{{ model().defaultCurrency }}</span>
+        } @else {
+          <span class="muted" i18n="@@platform-admin.wizard.fact.pending.company">Step 1</span>
+        }
+      </dd>
+      <dt i18n="@@platform-admin.wizard.fact.tier">Tier</dt>
+      <dd i18n="@@platform-admin.wizard.fact.tier.value">{{ model().tier }} of 5</dd>
+      <dt i18n="@@platform-admin.wizard.fact.administrator">Administrator</dt>
+      <dd>
+        @if (model().administratorDisplayName.trim()) {
+          <bdi>{{ model().administratorDisplayName.trim() }}</bdi> ·
+          <span dir="ltr">{{ model().administratorEmail.trim() }}</span>
+        } @else {
+          <span class="muted" i18n="@@platform-admin.wizard.fact.pending.administrator"
+            >Step 2</span
+          >
+        }
+      </dd>
+      <dt i18n="@@platform-admin.wizard.fact.invitation">Invitation</dt>
+      <dd i18n="@@platform-admin.wizard.fact.invitation.value">Sent on Finish · 24-hour link</dd>
+      <dt i18n="@@platform-admin.wizard.fact.hotel">First hotel</dt>
+      <dd>
+        @if (model().hotelWanted && model().hotelCode.trim()) {
+          <span dir="ltr">{{ model().hotelCode.trim() }}</span>
+          @if (model().totalRooms.trim()) {
+            ·
+            <ng-container i18n="@@platform-admin.wizard.fact.hotel.rooms"
+              >{{ model().totalRooms.trim() }} rooms</ng-container
+            >
+          }
+          @if (model().opensOn) {
+            ·
+            <ng-container i18n="@@platform-admin.wizard.fact.hotel.opens"
+              >opens {{ day(model().opensOn) }}</ng-container
+            >
+          }
+          @if (cityName(); as city) {
+            · <bdi>{{ city }}</bdi>
+          }
+        } @else if (index() < 3) {
+          <span class="muted" i18n="@@platform-admin.wizard.fact.pending.hotel">Step 3</span>
+        } @else {
+          <span class="muted" i18n="@@platform-admin.wizard.fact.hotel.none">None</span>
+        }
+      </dd>
+      <dt i18n="@@platform-admin.wizard.fact.modules">Modules</dt>
+      <dd>
+        @if (lines().length > 0) {
+          <span dir="ltr">{{ lineCodes() }}</span>
+        } @else if (index() < 4) {
+          <span class="muted" i18n="@@platform-admin.wizard.fact.pending.modules"
+            >Chosen in step 4</span
+          >
+        } @else {
+          <span class="muted" i18n="@@platform-admin.wizard.fact.modules.none">None</span>
+        }
+      </dd>
+    </dl>
+  </ng-template>
+
+  <hr-confirm-dialog
+    tone="stop"
+    i18n-heading="@@platform-admin.wizard.discard.heading"
+    heading="Discard this draft?"
+    i18n-message="@@platform-admin.wizard.discard.message"
+    message="Nothing was saved on the platform. The draft goes."
+    i18n-go="@@platform-admin.wizard.discard.go"
+    go="Discard"
+    i18n-stay="@@platform-admin.wizard.discard.stay"
+    stay="Keep writing"
+  />
+</div>

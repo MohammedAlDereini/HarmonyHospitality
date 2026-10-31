@@ -4,6 +4,7 @@ import {
   Property,
   PropertyDraft,
   PropertyFilters,
+  PropertyState,
   PropertyUpdate,
 } from '@harmony/platform-admin/domain';
 import { messageOf } from '@harmony/platform/errors';
@@ -18,13 +19,25 @@ export const propertyPath = (id: string): string => `/api/Property/${id}`;
 /** Identity accepts 1 to 100 rows a page. */
 export const PROPERTIES_PAGE_SIZE = 25;
 const FIRST_PAGE = 1;
-const noFilters: PropertyFilters = { tenantId: null, search: '', page: FIRST_PAGE };
+const noFilters: PropertyFilters = {
+  tenantId: null,
+  search: '',
+  countryCode: null,
+  state: null,
+  typeCode: null,
+  aboveLicence: false,
+  page: FIRST_PAGE,
+};
 
 /** The request Identity reads (GetPagedPropertiesQuery). */
 interface PropertiesRequest extends PageRequest {
   readonly tenantId: string | null;
   readonly searchText: string | null;
   readonly isActive: boolean | null;
+  readonly countryCode: string | null;
+  readonly propertyTypeCode: string | null;
+  readonly state: PropertyState | null;
+  readonly aboveLicenceOnly: boolean;
 }
 
 /** Every customer's properties (architecture 7.8): one resource keyed by the filters; writes read the list again. */
@@ -41,12 +54,20 @@ export class PropertiesStore {
       tenantId: filters.tenantId,
       searchText: filters.search === '' ? null : filters.search,
       isActive: null,
+      countryCode: filters.countryCode,
+      propertyTypeCode: filters.typeCode,
+      state: filters.state,
+      aboveLicenceOnly: filters.aboveLicence,
     };
     return { url: propertiesPath, method: 'POST', body };
   });
 
-  readonly rows = computed<readonly Property[]>(() => this.page.value()?.data?.results ?? []);
-  readonly total = computed(() => this.page.value()?.data?.totalCount ?? 0);
+  readonly rows = computed<readonly Property[]>(() =>
+    this.page.hasValue() ? (this.page.value().data?.results ?? []) : [],
+  );
+  readonly total = computed(() =>
+    this.page.hasValue() ? (this.page.value().data?.totalCount ?? 0) : 0,
+  );
   readonly loading = this.page.isLoading;
   readonly problem = computed(() => {
     const error = this.page.error();
@@ -59,6 +80,23 @@ export class PropertiesStore {
 
   ofTenant(tenantId: string | null): void {
     this.filters.update((filters) => ({ ...filters, tenantId, page: FIRST_PAGE }));
+  }
+
+  showCountry(countryCode: string | null): void {
+    this.filters.update((filters) => ({ ...filters, countryCode, page: FIRST_PAGE }));
+  }
+
+  showState(state: PropertyState | null): void {
+    this.filters.update((filters) => ({ ...filters, state, page: FIRST_PAGE }));
+  }
+
+  showType(typeCode: string | null): void {
+    this.filters.update((filters) => ({ ...filters, typeCode, page: FIRST_PAGE }));
+  }
+
+  /** Only the hotels above their licence, or every hotel. */
+  onlyAboveLicence(aboveLicence: boolean): void {
+    this.filters.update((filters) => ({ ...filters, aboveLicence, page: FIRST_PAGE }));
   }
 
   goTo(page: number): void {

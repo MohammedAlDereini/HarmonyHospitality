@@ -1,135 +1,301 @@
-<ng-template hrPageActions>
-  <button
-    *hrIfAllowed="manageTenants"
-    type="button"
-    class="pbtn primary"
-    (click)="openCreator()"
-    [attr.aria-expanded]="creating()"
-  >
-    <hr-icon name="plus" size="13" />
-    <span i18n="@@platform-admin.tenants.add">Add tenant</span>
-  </button>
-</ng-template>
-<header class="page-head">
-  <div>
-    <h1 i18n="@@platform-admin.tenants.title">Tenants</h1>
-    <p class="lead" i18n="@@platform-admin.tenants.lead">
-      The platform's customers: who runs hotels on Harmony, their tier and status. Each tenant has
-      its own administrator, roles and properties.
-    </p>
-  </div>
-</header>
-<form class="toolbar" (submit)="onSearch($event, search.value)">
-  <div class="tf wide">
-    <label for="tenants-search" i18n="@@platform-admin.tenants.search">Search</label>
-    <input
-      id="tenants-search"
-      #search
-      class="field"
-      type="search"
-      autocomplete="off"
-      dir="auto"
-      i18n-placeholder="@@platform-admin.tenants.search-placeholder"
-      placeholder="Code or name"
-      [value]="store.filters().search"
-    />
-  </div>
-  <div class="tf">
-    <label for="tenants-status" i18n="@@platform-admin.tenants.filter">Status</label>
-    <select
-      id="tenants-status"
-      #statusBox
-      class="field"
-      [value]="statusValue()"
-      (change)="onStatus(statusBox.value)"
-    >
-      @for (choice of choices; track choice.value) {
-        <option [value]="choice.value">{{ choice.label }}</option>
+<div class="c-page">
+  <hr-page-head i18n-title="@@platform-admin.tenants.title" title="Tenants">
+    <p class="lead" slot="lead">
+      @if (summary(); as summary) {
+        <ng-container i18n="@@platform-admin.tenants.lead.counts"
+          >{summary.active + summary.suspended + summary.terminated, plural,
+            =1 {1 customer}
+            other {{{ summary.active + summary.suspended + summary.terminated }} customers}
+          }
+          · {{ summary.active }} active · {{ summary.suspended }} suspended ·
+          {{ summary.terminated }} terminated</ng-container
+        >
+      } @else {
+        <ng-container i18n="@@platform-admin.tenants.lead"
+          >The platform's customers: who runs hotels on Harmony, their tier and status. Each tenant
+          has its own administrator, roles and properties.</ng-container
+        >
       }
-    </select>
-  </div>
-  <div class="tacts">
-    <button type="submit" class="btn" i18n="@@platform-admin.tenants.find">Find</button>
-  </div>
-</form>
-@if (store.problem(); as problem) {
-  <p class="empty" role="alert">
-    {{ problem }}&ngsp;<button
+    </p>
+    <button
+      slot="actions"
       type="button"
       class="btn"
-      (click)="store.reload()"
-      i18n="@@platform-admin.tenants.try-again"
+      (click)="exportCsv()"
+      [disabled]="store.rows().length === 0"
     >
-      Try again
+      <hr-icon name="download" size="16" />
+      <span i18n="@@platform-admin.tenants.export">Export</span>
     </button>
-  </p>
-} @else if (store.loading()) {
-  <p class="empty" role="status" i18n="@@platform-admin.tenants.loading">Loading…</p>
-} @else if (store.rows().length === 0) {
-  <p class="empty" i18n="@@platform-admin.tenants.none">No tenants match.</p>
-} @else {
-  <div class="table-wrap">
-    <table class="data">
-      <thead>
-        <tr>
-          <th scope="col" i18n="@@platform-admin.tenants.column.code">Code</th>
-          <th scope="col" i18n="@@platform-admin.tenants.column.name">Name</th>
-          <th scope="col" i18n="@@platform-admin.tenants.column.country-currency">
-            Country · currency
-          </th>
-          <th scope="col" class="num" i18n="@@platform-admin.tenants.column.tier">Tier</th>
-          <th scope="col" i18n="@@platform-admin.tenants.column.status">Status</th>
-          <th scope="col" i18n="@@platform-admin.tenants.column.onboarded">Onboarded</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (tenant of store.rows(); track tenant.id) {
-          <tr class="trow">
-            <td class="key" dir="ltr">{{ tenant.code }}</td>
-            <td>
-              <a class="nm-link" [routerLink]="[tenant.id]"
-                ><bdi>{{ name(tenant) }}</bdi></a
-              >
-              @if (tenant.isPlatform) {
-                <span class="sub" i18n="@@platform-admin.tenants.platform"
-                  >The platform itself</span
-                >
-              }
-            </td>
-            <td dir="ltr">{{ tenant.countryCode ?? '' }} · {{ tenant.defaultCurrency ?? '' }}</td>
-            <td class="num">{{ tenant.tier }}</td>
-            <td>
-              <span
-                class="pill"
-                [class.on]="tone(tenant) === 'ok'"
-                [class.warn]="tone(tenant) === 'warn'"
-                [class.stop]="tone(tenant) === 'stop'"
-                [class.off]="tone(tenant) === null"
-                [attr.data-s]="tone(tenant)"
-                >{{ status(tenant) }}</span
-              >
-            </td>
-            <td class="num">{{ tenant.onboardedOn }}</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-  <hr-pager
-    [page]="page()"
-    [pageSize]="pageSize"
-    [total]="store.total()"
-    [loading]="store.loading()"
-    (pageChange)="store.goTo($event)"
-  />
-}
-<hr-drawer
-  #drawer
-  i18n-heading="@@platform-admin.tenants.new.title"
-  heading="New tenant"
-  (closed)="creating.set(false)"
->
-  @if (creating()) {
-    <hr-tenant-editor (done)="saved()" (cancelled)="drawer.close()" />
+    <a
+      slot="actions"
+      *hrIfAllowed="manageTenants"
+      class="btn solid"
+      routerLink="/tenants/new"
+      data-act="new-tenant"
+    >
+      <hr-icon name="plus" size="16" />
+      <span i18n="@@platform-admin.tenants.add">New tenant</span>
+    </a>
+  </hr-page-head>
+
+  <form class="c-filters" (submit)="onSearch($event, search.value)">
+    <div class="search">
+      <hr-icon class="ic" name="find" size="16" />
+      <label class="vh" for="tenants-search" i18n="@@platform-admin.tenants.search">Search</label>
+      <input
+        id="tenants-search"
+        #search
+        class="field"
+        type="search"
+        autocomplete="off"
+        dir="auto"
+        i18n-placeholder="@@platform-admin.tenants.search-placeholder"
+        placeholder="Search code, name or administrator"
+        [value]="store.filters().search"
+      />
+    </div>
+    <hr-facet
+      i18n-label="@@platform-admin.tenants.facet.status"
+      label="Status"
+      [options]="statusOptions"
+      [value]="statusValues()"
+      [multiple]="true"
+      (valueChange)="onStatuses($event)"
+    />
+    <hr-facet
+      i18n-label="@@platform-admin.tenants.facet.tier"
+      label="Tier"
+      [options]="tierOptions"
+      [value]="tierValue()"
+      (valueChange)="onTier($event)"
+    />
+    <hr-facet
+      i18n-label="@@platform-admin.tenants.facet.country"
+      label="Country"
+      [options]="countryOptions()"
+      [value]="countryValue()"
+      (valueChange)="onCountry($event)"
+    />
+    <hr-facet
+      i18n-label="@@platform-admin.tenants.facet.modules"
+      label="Modules"
+      [options]="moduleOptions()"
+      [value]="moduleValue()"
+      (valueChange)="onModule($event)"
+    />
+    <button type="submit" class="btn ghost" i18n="@@platform-admin.tenants.find">Find</button>
+    <span class="count" i18n="@@platform-admin.tenants.count"
+      >{{ store.rows().length }} of {{ store.total() }} · by onboarded</span
+    >
+  </form>
+
+  @if (actionProblem(); as problem) {
+    <p class="c-msg" data-s="stop" role="alert">{{ problem }}</p>
   }
-</hr-drawer>
+
+  <section class="c-card">
+    @if (store.problem(); as problem) {
+      <div class="c-empty" role="alert">
+        <span class="ring"><hr-icon name="critical" size="20" /></span>
+        <b>{{ problem }}</b>
+        <button
+          type="button"
+          class="btn"
+          (click)="store.reload()"
+          i18n="@@platform-admin.tenants.try-again"
+        >
+          Try again
+        </button>
+      </div>
+    } @else if (store.loading() && store.rows().length === 0) {
+      <p class="c-state-h" role="status" i18n="@@platform-admin.tenants.loading">Loading…</p>
+    } @else if (store.rows().length === 0) {
+      <div class="c-empty">
+        <span class="ring"><hr-icon name="tenants" size="20" /></span>
+        <b i18n="@@platform-admin.tenants.none">No tenants match</b>
+        <p i18n="@@platform-admin.tenants.none-hint">Widen a facet, or clear the search.</p>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="data tenants">
+          <thead>
+            <tr>
+              <th scope="col" i18n="@@platform-admin.tenants.column.tenant">Tenant</th>
+              <th scope="col" i18n="@@platform-admin.tenants.column.status">Status</th>
+              <th scope="col" i18n="@@platform-admin.tenants.column.tier">Tier</th>
+              <th scope="col" i18n="@@platform-admin.tenants.column.country-currency">
+                Country · currency
+              </th>
+              <th scope="col" class="num" i18n="@@platform-admin.tenants.column.hotels">Hotels</th>
+              <th scope="col" class="num" i18n="@@platform-admin.tenants.column.rooms">
+                Rooms licensed · in use
+              </th>
+              <th scope="col" i18n="@@platform-admin.tenants.column.modules">Modules</th>
+              <th scope="col" i18n="@@platform-admin.tenants.column.onboarded">Onboarded</th>
+              <th scope="col" i18n="@@platform-admin.tenants.column.administrator">
+                Administrator
+              </th>
+              <th scope="col">
+                <span class="vh" i18n="@@platform-admin.tenants.column.actions">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (tenant of store.rows(); track tenant.id) {
+              <tr class="trow">
+                <td class="tenant">
+                  <a class="nm" [routerLink]="[tenant.id]"
+                    ><span class="code" dir="ltr">{{ tenant.code }}</span> ·
+                    <bdi>{{ tenant.legalNameEn }}</bdi></a
+                  >
+                  @if (tenant.isPlatform) {
+                    <span class="sub" i18n="@@platform-admin.tenants.platform"
+                      >The platform itself</span
+                    >
+                  } @else {
+                    <span class="sub"
+                      ><bdi lang="ar">{{ tenant.legalNameAr }}</bdi></span
+                    >
+                  }
+                </td>
+                <td>
+                  <span class="chip" [attr.data-s]="chipTone(tenant)"
+                    ><span class="dot"></span>{{ statusWord(tenant) }}</span
+                  >
+                </td>
+                <td class="num">{{ tenant.tier }}</td>
+                <td class="muted" dir="ltr">
+                  {{ tenant.countryCode ?? '' }} · {{ tenant.defaultCurrency ?? '' }}
+                </td>
+                <td class="num">{{ tenant.hotels }}</td>
+                <td class="num rooms">
+                  <span class="num">{{ rooms(tenant) }}</span
+                  >&ngsp;
+                  @if (over(tenant); as over) {
+                    <span class="over" i18n="@@platform-admin.tenants.rooms.over"
+                      >▲ {{ over }}</span
+                    >
+                  }
+                </td>
+                <td class="muted" dir="ltr">{{ moduleList(tenant) }}</td>
+                <td class="muted num">{{ onboarded(tenant) }}</td>
+                <td class="who">
+                  <span
+                    class="c-av"
+                    [class.none]="tenant.administrator === null"
+                    aria-hidden="true"
+                    >{{ initials(tenant) }}</span
+                  >
+                  <span class="two">
+                    <span class="nm"
+                      ><bdi>{{ administratorName(tenant) }}</bdi></span
+                    >
+                    <span class="sub" dir="auto">{{ administratorNote(tenant) }}</span>
+                  </span>
+                </td>
+                <td class="acts">
+                  <button
+                    #more
+                    type="button"
+                    class="btn icon"
+                    [attr.popovertarget]="'tenant-menu-' + tenant.id"
+                    i18n-aria-label="@@platform-admin.tenants.more"
+                    aria-label="More actions"
+                  >
+                    <hr-icon name="more" size="16" />
+                  </button>
+                  <div
+                    class="row-menu"
+                    popover
+                    [id]="'tenant-menu-' + tenant.id"
+                    [hrPopAt]="more"
+                    role="menu"
+                  >
+                    <a
+                      role="menuitem"
+                      [routerLink]="[tenant.id]"
+                      i18n="@@platform-admin.tenants.menu.open"
+                      >Open</a
+                    >
+                    <ng-container *hrIfAllowed="manageTenants">
+                      <button
+                        type="button"
+                        role="menuitem"
+                        (click)="edit(tenant)"
+                        i18n="@@platform-admin.tenants.menu.edit"
+                      >
+                        Edit
+                      </button>
+                      @if (isActive(tenant) && !tenant.isPlatform) {
+                        <button
+                          type="button"
+                          role="menuitem"
+                          (click)="askSuspend(tenant)"
+                          i18n="@@platform-admin.tenants.menu.suspend"
+                        >
+                          Suspend
+                        </button>
+                      } @else if (isSuspended(tenant)) {
+                        <button
+                          type="button"
+                          role="menuitem"
+                          [disabled]="busy()"
+                          (click)="reinstate(tenant)"
+                          i18n="@@platform-admin.tenants.menu.reinstate"
+                        >
+                          Reinstate
+                        </button>
+                      }
+                      <a
+                        role="menuitem"
+                        [routerLink]="[tenant.id]"
+                        [queryParams]="{ invite: 1 }"
+                        i18n="@@platform-admin.tenants.menu.invite"
+                        >Invite administrator</a
+                      >
+                    </ng-container>
+                    <a
+                      role="menuitem"
+                      [routerLink]="['/properties']"
+                      [queryParams]="{ tenant: tenant.id }"
+                      i18n="@@platform-admin.tenants.menu.properties"
+                      >Properties</a
+                    >
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="c-foot">
+        <span i18n="@@platform-admin.tenants.rows-per-page">Rows per page: {{ pageSize }}</span>
+        <span class="spacer"></span>
+        <hr-pager
+          [page]="page()"
+          [pageSize]="pageSize"
+          [total]="store.total()"
+          [loading]="store.loading()"
+          (pageChange)="store.goTo($event)"
+        />
+      </div>
+    }
+  </section>
+
+  <hr-drawer #drawer [heading]="drawerHeading()" (closed)="drawerClosed()">
+    @if (opened() === 'edit' && chosen(); as tenant) {
+      <hr-tenant-editor [tenant]="tenant" (done)="saved()" (cancelled)="drawer.close()" />
+    } @else if (opened() === 'suspend' && chosen(); as tenant) {
+      <hr-reason-form
+        [label]="suspendLabel"
+        [placeholder]="suspendPlaceholder"
+        [go]="suspendGo"
+        [busy]="busy()"
+        [problem]="actionProblem()"
+        (submitted)="suspend(tenant, $event)"
+        (cancelled)="drawer.close()"
+      />
+    }
+  </hr-drawer>
+</div>

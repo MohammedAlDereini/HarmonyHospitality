@@ -20,6 +20,8 @@ const sami: UserAccount = {
   displayName: 'Sami Odeh',
   twoFactorEnabled: false,
   twoStepExemptReason: 'night desk',
+  lastSignInUtc: null,
+  lastSignInDevice: null,
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',

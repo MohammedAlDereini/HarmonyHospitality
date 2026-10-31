@@ -8,6 +8,7 @@ import { IdentityConfirmation } from '@harmony/platform/session';
 import { errorMessage, kindMessage, messageOf } from '@harmony/platform/errors';
 import { ApiResult, newIntentKey } from '@harmony/platform/http';
 import { ConfirmDialog, Toasts } from '@harmony/ui/overlays';
+import { PageHead } from '@harmony/ui/shell';
 import { scopeOf } from './hotel-access-editor';
 import { sentForApproval, sentForApprovalToast } from './pending-approval';
 
@@ -37,7 +38,7 @@ const whereOf = (group: DirectoryGroup): string => {
  */
 @Component({
   selector: 'hr-directory-page',
-  imports: [FormField, IfAllowed, ConfirmDialog],
+  imports: [FormField, IfAllowed, ConfirmDialog, PageHead],
   providers: [DirectoryStore, RolesStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './directory-page.html',

@@ -33,6 +33,8 @@ export class FlagsStore {
   readonly release = computed(() => this.current()?.release ?? null);
   readonly minimumClientVersion = computed(() => this.current()?.minimumClientVersion ?? null);
   readonly known = computed(() => this.current() !== undefined);
+  /** Every flag of this ring with its state, for the console's health page; empty until the door answered. */
+  readonly flags = computed<Readonly<Record<string, boolean>>>(() => this.current()?.flags ?? {});
 
   /** True while the named flag is on for this ring; false when off, unknown, or not yet read. */
   on(name: string): Signal<boolean> {

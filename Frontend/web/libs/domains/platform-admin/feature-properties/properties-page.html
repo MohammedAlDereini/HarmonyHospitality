@@ -1,115 +1,253 @@
-<ng-template hrPageActions>
-  <button
-    *hrIfAllowed="manageTenants"
-    type="button"
-    class="pbtn primary"
-    (click)="openCreator()"
-    [attr.aria-expanded]="creating()"
-  >
-    <hr-icon name="plus" size="13" />
-    <span i18n="@@platform-admin.properties.add">Add property</span>
-  </button>
-</ng-template>
-<header class="page-head">
-  <div>
-    <h1 i18n="@@platform-admin.properties.title">Properties</h1>
-    <p class="lead" i18n="@@platform-admin.properties.lead">
-      Every hotel on the platform: its code, where it stands, its rooms, currency and language, and
-      whether it is open for business.
+<div class="c-page">
+  <hr-page-head i18n-title="@@platform-admin.properties.title" title="Properties">
+    <p class="lead" slot="lead">
+      @if (summary(); as summary) {
+        <ng-container i18n="@@platform-admin.properties.lead.counts"
+          >{summary.total, plural, =1 {1 hotel} other {{{ summary.total }} hotels}} ·
+          {{ summary.active }} active · {{ summary.openingSoon }} opening soon ·
+          {{ summary.aboveLicence }} above licence</ng-container
+        >
+      } @else {
+        <ng-container i18n="@@platform-admin.properties.lead"
+          >Every hotel on the platform: its code, where it stands, its rooms, currency and language,
+          and whether it is open for business.</ng-container
+        >
+      }
     </p>
-  </div>
-</header>
-<form class="toolbar" (submit)="onSearch($event, search.value)">
-  <div class="tf wide">
-    <label for="properties-search" i18n="@@platform-admin.properties.search">Search</label>
-    <input
-      id="properties-search"
-      #search
-      class="field"
-      type="search"
-      autocomplete="off"
-      dir="auto"
-      i18n-placeholder="@@platform-admin.properties.search-placeholder"
-      placeholder="Code or name"
-      [value]="store.filters().search"
-    />
-  </div>
-  <div class="tacts">
-    <button type="submit" class="btn" i18n="@@platform-admin.properties.find">Find</button>
-  </div>
-</form>
-@if (store.problem(); as problem) {
-  <p class="empty" role="alert">
-    {{ problem }}&ngsp;<button
+    <button
+      slot="actions"
       type="button"
       class="btn"
-      (click)="store.reload()"
-      i18n="@@platform-admin.properties.try-again"
+      (click)="exportCsv()"
+      [disabled]="store.rows().length === 0"
     >
-      Try again
+      <hr-icon name="download" size="16" />
+      <span i18n="@@platform-admin.properties.export">Export</span>
     </button>
-  </p>
-} @else if (store.loading()) {
-  <p class="empty" role="status" i18n="@@platform-admin.properties.loading">Loading…</p>
-} @else if (store.rows().length === 0) {
-  <p class="empty" i18n="@@platform-admin.properties.none">No properties match.</p>
-} @else {
-  <div class="table-wrap">
-    <table class="data">
-      <thead>
-        <tr>
-          <th scope="col" i18n="@@platform-admin.properties.column.code">Code</th>
-          <th scope="col" i18n="@@platform-admin.properties.column.name">Name</th>
-          <th scope="col" class="num" i18n="@@platform-admin.properties.column.rooms">Rooms</th>
-          <th scope="col" i18n="@@platform-admin.properties.column.currency-language">
-            Currency · language
-          </th>
-          <th scope="col" i18n="@@platform-admin.properties.column.state">State</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (property of store.rows(); track property.id) {
-          <tr class="prow">
-            <td class="key" dir="ltr">{{ property.code }}</td>
-            <td>
-              <a class="nm-link" [routerLink]="[property.id]"
-                ><bdi>{{ name(property) }}</bdi></a
-              >
-              <span class="sub" dir="ltr"
-                >{{ property.countryCode }} · {{ property.timeZoneId }}</span
-              >
-            </td>
-            <td class="num">{{ property.totalRooms }}</td>
-            <td dir="ltr">{{ property.defaultCurrency }} · {{ property.defaultLanguageCode }}</td>
-            <td>
-              @if (property.isActive) {
-                <span class="pill on" i18n="@@platform-admin.properties.active">Active</span>
-              } @else {
-                <span class="pill warn" data-s="warn" i18n="@@platform-admin.properties.inactive"
-                  >Inactive</span
-                >
-              }
-            </td>
-          </tr>
+    <button
+      slot="actions"
+      *hrIfAllowed="manageTenants"
+      type="button"
+      class="btn solid"
+      (click)="openCreator()"
+      [attr.aria-expanded]="creating()"
+    >
+      <hr-icon name="plus" size="16" />
+      <span i18n="@@platform-admin.properties.add">New property</span>
+    </button>
+  </hr-page-head>
+
+  <form class="c-filters" (submit)="onSearch($event, search.value)">
+    <div class="search">
+      <hr-icon class="ic" name="find" size="16" />
+      <label class="vh" for="properties-search" i18n="@@platform-admin.properties.search"
+        >Search</label
+      >
+      <input
+        id="properties-search"
+        #search
+        class="field"
+        type="search"
+        autocomplete="off"
+        dir="auto"
+        i18n-placeholder="@@platform-admin.properties.search-placeholder"
+        placeholder="Search code or name"
+        [value]="store.filters().search"
+      />
+    </div>
+    <hr-facet
+      i18n-label="@@platform-admin.properties.facet.tenant"
+      label="Tenant"
+      [options]="tenantOptions()"
+      [value]="tenantValue()"
+      (valueChange)="onTenant($event)"
+    />
+    <hr-facet
+      i18n-label="@@platform-admin.properties.facet.country"
+      label="Country"
+      [options]="countryOptions()"
+      [value]="countryValue()"
+      (valueChange)="onCountry($event)"
+    />
+    <hr-facet
+      i18n-label="@@platform-admin.properties.facet.state"
+      label="State"
+      [options]="stateOptions"
+      [value]="stateValue()"
+      (valueChange)="onState($event)"
+    />
+    <hr-facet
+      i18n-label="@@platform-admin.properties.facet.type"
+      label="Type"
+      [options]="typeOptions()"
+      [value]="typeValue()"
+      (valueChange)="onType($event)"
+    />
+    <label class="c-switch">
+      <input
+        type="checkbox"
+        #above
+        [checked]="aboveLicence()"
+        (change)="onAboveLicence(above.checked)"
+      />
+      <span i18n="@@platform-admin.properties.above-licence">Above licence only</span>
+    </label>
+    <button type="submit" class="btn ghost" i18n="@@platform-admin.properties.find">Find</button>
+    <span class="count" i18n="@@platform-admin.properties.count"
+      >{{ store.rows().length }} of {{ store.total() }} · by code</span
+    >
+  </form>
+
+  <section class="c-card">
+    @if (store.problem(); as problem) {
+      <div class="c-empty" role="alert">
+        <span class="ring"><hr-icon name="critical" size="20" /></span>
+        <b>{{ problem }}</b>
+        <button
+          type="button"
+          class="btn"
+          (click)="store.reload()"
+          i18n="@@platform-admin.properties.try-again"
+        >
+          Try again
+        </button>
+      </div>
+    } @else if (store.loading() && store.rows().length === 0) {
+      <p class="c-state-h" role="status" i18n="@@platform-admin.properties.loading">Loading…</p>
+    } @else if (store.rows().length === 0) {
+      <div class="c-empty">
+        <span class="ring"><hr-icon name="properties" size="20" /></span>
+        @if (narrowed()) {
+          <b i18n="@@platform-admin.properties.none">No properties match</b>
+          <p i18n="@@platform-admin.properties.none-hint">Widen a facet, or clear the search.</p>
+        } @else {
+          <b i18n="@@platform-admin.properties.none-yet">No properties yet</b>
+          <p i18n="@@platform-admin.properties.none-yet-hint">New property adds the first.</p>
         }
-      </tbody>
-    </table>
-  </div>
-  <hr-pager
-    [page]="page()"
-    [pageSize]="pageSize"
-    [total]="store.total()"
-    [loading]="store.loading()"
-    (pageChange)="store.goTo($event)"
-  />
-}
-<hr-drawer
-  #drawer
-  i18n-heading="@@platform-admin.properties.new.title"
-  heading="New property"
-  (closed)="creating.set(false)"
->
-  @if (creating()) {
-    <hr-property-editor [tenantId]="tenantId()" (done)="saved()" (cancelled)="drawer.close()" />
-  }
-</hr-drawer>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="data properties">
+          <thead>
+            <tr>
+              <th scope="col" i18n="@@platform-admin.properties.column.hotel">Hotel</th>
+              <th scope="col" i18n="@@platform-admin.properties.column.tenant">Tenant</th>
+              <th scope="col" i18n="@@platform-admin.properties.column.where">City · time zone</th>
+              <th scope="col" i18n="@@platform-admin.properties.column.type">Type</th>
+              <th scope="col" class="num" i18n="@@platform-admin.properties.column.rooms">
+                Rooms licensed · in use
+              </th>
+              <th scope="col" i18n="@@platform-admin.properties.column.modules">Modules</th>
+              <th scope="col" i18n="@@platform-admin.properties.column.span">Opens · closes</th>
+              <th scope="col" i18n="@@platform-admin.properties.column.state">State</th>
+              <th scope="col">
+                <span class="vh" i18n="@@platform-admin.properties.column.actions">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (property of store.rows(); track property.id) {
+              <tr class="prow">
+                <td class="tenant">
+                  <a class="nm" [routerLink]="[property.id]"
+                    ><span dir="ltr">{{ property.code }}</span> ·
+                    <bdi>{{ property.nameEn }}</bdi></a
+                  >
+                  <span class="sub"
+                    ><bdi lang="ar">{{ property.nameAr }}</bdi></span
+                  >
+                </td>
+                <td class="muted" dir="ltr">
+                  @if (property.tenantCode; as code) {
+                    <a class="plain" [routerLink]="['/tenants', property.tenantId]">{{ code }}</a>
+                  } @else {
+                    —
+                  }
+                </td>
+                <td class="muted">{{ where(property) }}</td>
+                <td class="muted">{{ typeName(property) }}</td>
+                <td class="num rooms">
+                  <span class="num">{{ rooms(property) }}</span
+                  >&ngsp;
+                  @if (over(property); as over) {
+                    <span class="over">▲ {{ over }}</span>
+                  }
+                </td>
+                <td class="muted" dir="ltr">{{ modules(property) }}</td>
+                <td class="muted num">{{ span(property) }}</td>
+                <td>
+                  <span class="chip" [attr.data-s]="stateTone(property)"
+                    ><span class="dot"></span>{{ stateWord(property) }}</span
+                  >
+                </td>
+                <td class="acts">
+                  <span class="more-wrap">
+                    <button
+                      #more
+                      type="button"
+                      class="btn icon"
+                      [attr.popovertarget]="'property-menu-' + property.id"
+                      i18n-aria-label="@@platform-admin.properties.more"
+                      aria-label="More actions"
+                    >
+                      <hr-icon name="more" size="16" />
+                    </button>
+                    <div
+                      class="row-menu"
+                      popover
+                      [id]="'property-menu-' + property.id"
+                      [hrPopAt]="more"
+                      role="menu"
+                    >
+                      <a
+                        role="menuitem"
+                        [routerLink]="[property.id]"
+                        i18n="@@platform-admin.properties.menu.open"
+                        >Open</a
+                      >
+                      <a
+                        role="menuitem"
+                        [routerLink]="['/tenants', property.tenantId]"
+                        i18n="@@platform-admin.properties.menu.tenant"
+                        >Tenant</a
+                      >
+                      <a
+                        role="menuitem"
+                        [routerLink]="['/tenants', property.tenantId]"
+                        [queryParams]="{ tab: 'subscriptions' }"
+                        i18n="@@platform-admin.properties.menu.modules"
+                        >Subscription lines</a
+                      >
+                    </div>
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="c-foot">
+        <span i18n="@@platform-admin.properties.rows-per-page">Rows per page: {{ pageSize }}</span>
+        <span class="spacer"></span>
+        <hr-pager
+          [page]="page()"
+          [pageSize]="pageSize"
+          [total]="store.total()"
+          [loading]="store.loading()"
+          (pageChange)="store.goTo($event)"
+        />
+      </div>
+    }
+  </section>
+
+  <hr-drawer
+    #drawer
+    i18n-heading="@@platform-admin.properties.new.title"
+    heading="New property"
+    (closed)="creating.set(false)"
+  >
+    @if (creating()) {
+      <hr-property-editor [tenantId]="tenantId()" (done)="saved()" (cancelled)="drawer.close()" />
+    }
+  </hr-drawer>
+</div>

@@ -1,0 +1,220 @@
+<div class="c-page">
+  <hr-page-head i18n-title="@@platform-operations.trail.title" title="Audit log">
+    <p class="lead" slot="lead" i18n="@@platform-operations.trail.lead">
+      {{ windowLabel() }} ·
+      {store.total(), plural, =0 {no events} =1 {1 event} other {{{ store.total() }} events}} ·
+      every customer, in UTC
+    </p>
+    <button
+      slot="actions"
+      type="button"
+      class="btn"
+      (click)="exportCsv()"
+      [disabled]="store.rows().length === 0"
+    >
+      <hr-icon name="download" size="16" />
+      <span i18n="@@platform-operations.trail.export">Export CSV</span>
+    </button>
+  </hr-page-head>
+
+  <form class="c-filters" (submit)="onSearch($event, search.value)">
+    <div class="search">
+      <hr-icon class="ic" name="find" size="16" />
+      <label class="vh" for="trail-search" i18n="@@platform-operations.trail.search">Search</label>
+      <input
+        id="trail-search"
+        #search
+        class="field"
+        type="search"
+        autocomplete="off"
+        dir="auto"
+        i18n-placeholder="@@platform-operations.trail.search-placeholder"
+        placeholder="Search code, target or reference"
+        [value]="store.filters().search"
+      />
+    </div>
+    <div class="sel" [class.on]="window() !== 'all'">
+      <label class="vh" for="trail-window" i18n="@@platform-operations.trail.window">Date</label>
+      <select
+        id="trail-window"
+        #windowBox
+        class="field"
+        [value]="window()"
+        (change)="onWindow(windowBox.value)"
+      >
+        @for (choice of windows; track choice.value) {
+          <option [value]="choice.value" [selected]="choice.value === window()">
+            {{ choice.label }}
+          </option>
+        }
+      </select>
+      <hr-icon class="ic" name="chevron" size="14" />
+    </div>
+    <div class="sel" [class.on]="actorValue() !== ''">
+      <label class="vh" for="trail-actor" i18n="@@platform-operations.trail.actor">Actor</label>
+      <select
+        id="trail-actor"
+        #actorBox
+        class="field"
+        [value]="actorValue()"
+        (change)="onActor(actorBox.value)"
+      >
+        <option value="" i18n="@@platform-operations.trail.actor.any">Actor: any</option>
+        <option [value]="system" i18n="@@platform-operations.trail.actor.system">system</option>
+        @for (choice of actorChoices(); track choice.id) {
+          <option [value]="choice.id">{{ choice.displayName }}</option>
+        }
+      </select>
+      <hr-icon class="ic" name="chevron" size="14" />
+    </div>
+    <div class="sel" [class.on]="tenantValue() !== ''">
+      <label class="vh" for="trail-tenant" i18n="@@platform-operations.trail.tenant">Tenant</label>
+      <select
+        id="trail-tenant"
+        #tenantBox
+        class="field"
+        [value]="tenantValue()"
+        (change)="onTenant(tenantBox.value)"
+      >
+        <option value="" i18n="@@platform-operations.trail.tenant.any">Tenant: any</option>
+        @for (choice of tenants.rows(); track choice.id) {
+          <option [value]="choice.id">{{ choice.code }} · {{ tenantName(choice) }}</option>
+        }
+      </select>
+      <hr-icon class="ic" name="chevron" size="14" />
+    </div>
+    <div class="sel" [class.on]="familyValue() !== ''">
+      <label class="vh" for="trail-family" i18n="@@platform-operations.trail.family">Event</label>
+      <select
+        id="trail-family"
+        #familyBox
+        class="field"
+        [value]="familyValue()"
+        (change)="onFamily(familyBox.value)"
+      >
+        <option value="" i18n="@@platform-operations.trail.family.any">Event: any</option>
+        @for (family of families; track family) {
+          <option [value]="family">{{ familyName(family) }}</option>
+        }
+      </select>
+      <hr-icon class="ic" name="chevron" size="14" />
+    </div>
+    <button type="submit" class="btn ghost" i18n="@@platform-operations.trail.find">Find</button>
+    <span class="count" i18n="@@platform-operations.trail.count"
+      >{{ store.rows().length }} of {{ store.total() }}</span
+    >
+  </form>
+
+  <section class="c-card">
+    @if (store.problem(); as problem) {
+      <div class="c-empty" role="alert">
+        <span class="ring"><hr-icon name="critical" size="20" /></span>
+        <b>{{ problem }}</b>
+        <button
+          type="button"
+          class="btn"
+          (click)="store.reload()"
+          i18n="@@platform-operations.trail.try-again"
+        >
+          Try again
+        </button>
+      </div>
+    } @else if (store.loading() && store.rows().length === 0) {
+      <p class="c-state-h" role="status" i18n="@@platform-operations.trail.loading">
+        Loading the trail…
+      </p>
+      <div class="c-skel" aria-hidden="true">
+        @for (bone of skeleton; track $index) {
+          <div class="row">
+            <span class="bone w1"></span><span class="bone w4"></span><span class="bone w2"></span
+            ><span class="bone w1"></span>
+          </div>
+        }
+      </div>
+    } @else if (store.rows().length === 0) {
+      <div class="c-empty">
+        <span class="ring"><hr-icon name="audit" size="20" /></span>
+        <b i18n="@@platform-operations.trail.none">No events match</b>
+        <p i18n="@@platform-operations.trail.none-hint">Widen the date, or clear a filter.</p>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="data trail">
+          <thead>
+            <tr>
+              <th scope="col" i18n="@@platform-operations.trail.column.when">When (UTC)</th>
+              <th scope="col" i18n="@@platform-operations.trail.column.event">Event</th>
+              <th scope="col" i18n="@@platform-operations.trail.column.actor">Actor</th>
+              <th scope="col" i18n="@@platform-operations.trail.column.tenant">Tenant</th>
+              <th scope="col" i18n="@@platform-operations.trail.column.target">Target</th>
+              <th scope="col">
+                <span class="vh" i18n="@@platform-operations.trail.column.open">Open</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of store.rows(); track row.id) {
+              <tr [attr.aria-selected]="selected()?.id === row.id">
+                <td class="when">
+                  <span class="nm num">{{ time(row) }}</span>
+                  <span class="sub">{{ day(row) }}</span>
+                </td>
+                <td class="event">
+                  <span class="nm code" dir="ltr">{{ row.action }}</span>
+                  <span class="sub"
+                    ><bdi>{{ summary(row) }}</bdi></span
+                  >
+                </td>
+                <td>
+                  <span class="who">
+                    <span class="c-av" [class.none]="isSystem(row)" aria-hidden="true">{{
+                      initials(row)
+                    }}</span>
+                    <span class="two">
+                      <span class="nm"
+                        ><bdi>{{ actorName(row) }}</bdi></span
+                      >
+                      <span class="sub" dir="ltr">{{ actorWhere(row) }}</span>
+                    </span>
+                  </span>
+                </td>
+                <td class="code" dir="ltr">{{ row.tenantCode ?? '' }}</td>
+                <td class="target">
+                  <bdi>{{ target(row) }}</bdi>
+                </td>
+                <td class="acts">
+                  <button
+                    type="button"
+                    class="btn icon"
+                    (click)="open(row)"
+                    i18n-aria-label="@@platform-operations.trail.open"
+                    aria-label="Open event"
+                  >
+                    <hr-icon name="chevron" size="14" [mirrored]="true" />
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="c-foot">
+        <span i18n="@@platform-operations.trail.newest-first">Newest first</span>
+        <span class="spacer"></span>
+        <hr-pager
+          [page]="page()"
+          [pageSize]="pageSize"
+          [total]="store.total()"
+          [loading]="store.loading()"
+          (pageChange)="store.goTo($event)"
+        />
+      </div>
+    }
+  </section>
+</div>
+
+<hr-drawer #drawer [heading]="selected()?.action ?? ''" (closed)="selected.set(null)">
+  @if (selected(); as event) {
+    <hr-trail-event-detail [event]="event" [ownTenant]="ownTenant()" />
+  }
+</hr-drawer>

@@ -1,0 +1,145 @@
+/* The platform console's tokens, from the Figma "Harmony Platform Console" (10 Foundations, Light and Dark), laid over
+   tokens.css by the console app only: the hotel app keeps the prototype's values. Colour lives here and nowhere else
+   in the console's own styles. Figma's Inter is a stand-in for Segoe UI, so the font stacks stay. */
+:root {
+  --canvas: #fafbfc; /* surface/canvas */
+  --surface: #ffffff; /* surface/default */
+  --sunk: #ebeef2; /* surface/muted */
+  --elev: #f5f7f9; /* a hovered row */
+  --shell: #101923; /* shell/bg */
+  --shell-2: #1d2a35; /* shell/selected, shell/field, shell/bg-hover */
+  --shell-ink: #edf2f5; /* shell/fg */
+  --shell-dim: #9ca8b3; /* shell/fg-muted */
+  --shell-rule: #2a3744; /* shell/border */
+  --shell-rule-2: #3a4857;
+  --shell-field: #1d2a35;
+  --shell-field-ink: #9ca8b3;
+  --shell-field-rule: #2a3744;
+  --shell-accent: #b39b78; /* shell/accent, the active marker */
+
+  --ink: #141a23; /* text/primary */
+  --ink-2: #384252; /* icon/primary */
+  --ink-3: #5f6b7c; /* text/secondary */
+  --ink-4: #858f9e; /* text/tertiary */
+  --rule: #e1e5eb; /* border/subtle */
+  --rule-2: #d3d9e1; /* border/default */
+  --control-border: #898e94; /* D31 stays: inputs keep a 3:1 boundary */
+
+  --brand: #b39b78; /* shell/accent, sand */
+  --brand-2: #b39b78;
+  --brand-soft: #f5f0e8; /* surface/selected, wool */
+  --brand-text: #5e5345; /* text/brand, text/link, taupe */
+  --accent: #101923; /* accent/default: the primary button */
+  --on-accent: #ffffff;
+  --accent-soft: #ede6d8; /* accent/subtle-hover: the avatar */
+  --danger: #c02a3e; /* danger/default */
+  --on-danger: #ffffff;
+
+  --stop: #9c1f31; /* text/critical */
+  --stop-bg: #fdeeef;
+  --warn: #a04912; /* text/attention */
+  --warn-bg: #fff3ea;
+  --ok: #1b612c; /* text/done */
+  --ok-bg: #ecf7ee;
+  --info: #195386; /* text/today */
+  --info-bg: #eaf3fc;
+  --vip: #5c3592; /* text/special */
+  --vip-bg: #f4effc;
+  --long: #664a00; /* text/longterm */
+  --long-bg: #fff8e1;
+  --neutral: #5f6b7c;
+  --neutral-bg: #ebeef2;
+  --dot-ok: #2e9445;
+  --dot-warn: #e8762b;
+  --dot-stop: #d93a4e;
+  --dot-info: #2b7cc4;
+  --dot-long: #e5ae12;
+  --dot-neutral: #4d5869;
+  --dot-vip: #7a52b5;
+  --on-stop: #ffffff;
+
+  --chart-bar: #b39b78;
+  --chart-grid: #e1e5eb;
+  --chart-highlight: #101923;
+  --avatar: #ede6d8;
+  --avatar-ink: #5e5345;
+  --focus: #4c89aa;
+
+  --radius-control: 6px; /* radius/md */
+  --radius-surface: 8px; /* radius/lg */
+  --radius-overlay: 12px; /* radius/xl */
+  --control-md: 36px; /* size/control */
+  --bar: 48px; /* size/topbar */
+  --row: 40px; /* size/row */
+  --nav-item: 36px; /* size/nav-item */
+  --side-nav: 240px;
+  --side-rail: 56px;
+  --page: 24px; /* space/page */
+  --section: 20px; /* space/section */
+  --shadow-pop:
+    0 4px 12px rgba(13, 18, 24, 0.12), 0 1px 3px rgba(13, 18, 24, 0.06); /* elevation/2 */
+  --shadow-overlay:
+    0 16px 40px rgba(13, 18, 24, 0.2), 0 2px 8px rgba(13, 18, 24, 0.08); /* elevation/3 */
+  --scrim: rgba(13, 18, 24, 0.44);
+}
+
+html[data-theme='dark'] {
+  --canvas: #0d1218;
+  --surface: #141a23;
+  --sunk: #252e3b;
+  --elev: #1a222c;
+  --shell: #0b1118;
+  --shell-2: #1d2a35;
+  --shell-ink: #edf2f5;
+  --shell-dim: #9ca8b3;
+  --shell-rule: #2a3744;
+  --shell-rule-2: #3a4857;
+  --shell-field: #1d2a35;
+  --shell-field-ink: #9ca8b3;
+  --shell-field-rule: #2a3744;
+  --shell-accent: #b39b78;
+
+  --ink: #f4f6f8;
+  --ink-2: #d3d9e1;
+  --ink-3: #b6bfcb;
+  --ink-4: #5f6b7c;
+  --rule: #252e3b;
+  --rule-2: #384252;
+  --control-border: #646e78; /* D31 */
+
+  --brand: #b39b78;
+  --brand-2: #b39b78;
+  --brand-soft: #27313e;
+  --brand-text: #cdb896;
+  --accent: #b39b78;
+  --on-accent: #101923;
+  --accent-soft: #27313e;
+  --danger: #c02a3e;
+  --on-danger: #ffffff;
+
+  --stop: #f6b3ba;
+  --stop-bg: #4a121b;
+  --warn: #ffc7a0;
+  --warn-bg: #4a2510;
+  --ok: #a9dbb3;
+  --ok-bg: #10301a;
+  --info: #a6ccf1;
+  --info-bg: #0e2a45;
+  --vip: #d9c3ff;
+  --vip-bg: #2d1f4a;
+  --long: #ffdf7a;
+  --long-bg: #3d2e00;
+  --neutral: #b6bfcb;
+  --neutral-bg: #252e3b;
+  --dot-neutral: #858f9e;
+  --on-stop: #ffffff;
+
+  --chart-bar: #8a7a5c;
+  --chart-grid: #252e3b;
+  --chart-highlight: #b39b78;
+  --avatar: #27313e;
+  --avatar-ink: #cdb896;
+  --shadow-pop: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-overlay: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.35);
+  --scrim: rgba(0, 0, 0, 0.55);
+}

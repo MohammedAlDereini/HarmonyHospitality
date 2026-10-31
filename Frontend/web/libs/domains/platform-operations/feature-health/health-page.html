@@ -1,0 +1,199 @@
+<div class="c-page">
+  <hr-page-head i18n-title="@@platform-operations.health.title" title="Platform health">
+    <p class="lead" slot="lead">
+      @if (report(); as report) {
+        <span i18n="@@platform-operations.health.lead"
+          >All services · checked {{ checkedAt() }} ·
+          {attention().length, plural,
+            =0 {nothing needs attention}
+            =1 {1 attention item}
+            other {{{ attention().length }} attention items}
+          }</span
+        >
+      } @else if (health.problem(); as problem) {
+        <span>{{ problem }}</span>
+      } @else {
+        <span i18n="@@platform-operations.health.lead.loading">Reading the health checks…</span>
+      }
+    </p>
+    <label slot="actions" class="c-switch">
+      <input type="checkbox" [checked]="live()" (change)="toggleLive()" />
+      <span i18n="@@platform-operations.health.live">Live updates</span>
+    </label>
+    <button slot="actions" type="button" class="btn" (click)="refresh()">
+      <hr-icon name="refresh" size="16" />
+      <span i18n="@@platform-operations.health.refresh">Refresh</span>
+    </button>
+  </hr-page-head>
+
+  @if (health.problem(); as problem) {
+    <div class="c-msg" data-s="stop" role="alert">
+      <hr-icon class="ic" name="critical" size="18" />
+      <div class="t">
+        <b i18n="@@platform-operations.health.failed">The health could not be read</b>
+        <span>{{ problem }}</span>
+      </div>
+      <button
+        type="button"
+        class="act"
+        (click)="refresh()"
+        i18n="@@platform-operations.health.try-again"
+      >
+        Try again
+      </button>
+    </div>
+  } @else if (report()?.status === 'Unreachable') {
+    <div class="c-msg" data-s="stop" role="alert">
+      <hr-icon class="ic" name="critical" size="18" />
+      <div class="t">
+        <b i18n="@@platform-operations.health.unreachable">Identity is not answering</b>
+        <span i18n="@@platform-operations.health.unreachable.text"
+          >The console BFF asked for the health checks inside the network and got no report. The BFF
+          itself is up: this page came from it.</span
+        >
+      </div>
+    </div>
+  }
+
+  <section class="c-card">
+    <div class="c-card-h">
+      <h2 i18n="@@platform-operations.health.map">Services map</h2>
+      <span class="chip" data-s="ok"
+        ><span class="dot"></span
+        ><span i18n="@@platform-operations.health.map.live">{liveCount(), plural,
+          =1 {1 live}
+          other {{{ liveCount() }} live}
+        }</span></span
+      >
+      <span class="r" i18n="@@platform-operations.health.map.order"
+        >Build order 2 → 4 → 3 → 5 → 6 → 7 → 8 → 13, then 10 → 11 → 14 → 9 → 12</span
+      >
+    </div>
+    <div class="map">
+      @for (service of services(); track service.name) {
+        <div class="svc" [attr.data-state]="service.state">
+          <div class="svc-h">
+            <b>
+              @if (service.number !== null) {
+                <span class="num">{{ service.number }}</span> ·
+              }
+              {{ service.name }}</b
+            >
+            <span class="chip" [attr.data-s]="stateTone(service.state)"
+              ><span class="dot"></span>{{ stateWord(service.state) }}</span
+            >
+          </div>
+          <p>
+            {{ service.scope }}
+            @if (service.note !== '') {
+              · <span class="num">{{ service.note }}</span>
+            }
+          </p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="c-grid three">
+    <section class="c-card">
+      <div class="c-card-h">
+        <h2 i18n="@@platform-operations.health.messaging">Messaging</h2>
+        @if (attention().length > 0) {
+          <span class="chip" data-s="warn"><span class="dot"></span>{{ attention().length }}</span>
+        }
+      </div>
+      @if (messagingChecks().length === 0) {
+        <p class="c-state-h" i18n="@@platform-operations.health.messaging.none">
+          No messaging check is registered on this deployment.
+        </p>
+      } @else {
+        <ul class="checks">
+          @for (entry of messagingChecks(); track entry.name) {
+            <li>
+              <span class="two">
+                <span class="nm">{{ entry.name }}</span>
+                @if (entry.description; as description) {
+                  <span class="sub">{{ description }}</span>
+                }
+              </span>
+              <span class="chip" [attr.data-s]="tone(entry.status)"
+                ><span class="dot"></span>{{ word(entry.status) }}</span
+              >
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="c-card">
+      <div class="c-card-h">
+        <h2 i18n="@@platform-operations.health.release">Releases and rings</h2>
+      </div>
+      <dl class="c-facts release">
+        <dt i18n="@@platform-operations.health.release.ring">Ring</dt>
+        <dd class="num">{{ flags.ring() ?? report()?.host?.ring ?? '' }}</dd>
+        <dt i18n="@@platform-operations.health.release.release">Release</dt>
+        <dd class="num">{{ flags.release() ?? report()?.host?.release ?? '' }}</dd>
+        <dt i18n="@@platform-operations.health.release.floor">Minimum client version</dt>
+        <dd class="num">
+          {{ flags.minimumClientVersion() ?? report()?.host?.minimumClientVersion ?? '' }}
+        </dd>
+        <dt i18n="@@platform-operations.health.release.environment">Environment</dt>
+        <dd>{{ report()?.host?.environment ?? '' }}</dd>
+      </dl>
+      <div class="c-card-h flags-h"><h3 i18n="@@platform-operations.health.flags">Flags</h3></div>
+      @if (flagList().length === 0) {
+        <p class="c-state-h" i18n="@@platform-operations.health.flags.none">
+          No flag is declared for this ring.
+        </p>
+      } @else {
+        <ul class="checks flags">
+          @for (flag of flagList(); track flag.name) {
+            <li>
+              <span class="nm" dir="ltr">{{ flag.name }}</span>
+              <span class="chip" [attr.data-s]="flag.on ? 'ok' : null"
+                ><span class="dot"></span>
+                @if (flag.on) {
+                  <span i18n="@@platform-operations.health.flags.on">On</span>
+                } @else {
+                  <span i18n="@@platform-operations.health.flags.off">Off</span>
+                }
+              </span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="c-card">
+      <div class="c-card-h">
+        <h2 i18n="@@platform-operations.health.checks">Health checks</h2>
+        <span class="r num">{{ entries().length }}</span>
+      </div>
+      @if (entries().length === 0) {
+        <p class="c-state-h" i18n="@@platform-operations.health.checks.none">
+          No check has answered yet.
+        </p>
+      } @else {
+        <ul class="checks">
+          @for (entry of entries(); track entry.name) {
+            <li>
+              <span class="two">
+                <span class="nm">{{ entry.name }}</span>
+                <span class="sub num"
+                  >{{ took(entry) }}
+                  @if (entry.description; as description) {
+                    · {{ description }}
+                  }
+                </span>
+              </span>
+              <span class="chip" [attr.data-s]="tone(entry.status)"
+                ><span class="dot"></span>{{ word(entry.status) }}</span
+              >
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</div>

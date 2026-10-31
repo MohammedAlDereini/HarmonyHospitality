@@ -15,7 +15,8 @@ let nextId = 0;
  * The tall panel at the end of the page where a row is added or changed (the platform app's drawer, architecture 8.3
  * overlays): a native modal dialog pinned to the inline-end edge, full height, the page dimmed behind it. The browser
  * owns the top layer, the focus trap, Escape, light dismiss (closedby="any": a click on the scrim) and the return
- * of focus. The page puts the form inside and reads `closed` to drop it.
+ * of focus; the first field of the form gets focus unless the form placed it itself. The page puts the form
+ * inside and reads `closed` to drop it.
  *
  *   <hr-drawer #drawer heading="Add currency" lead="…" (closed)="creating.set(false)">
  *     @if (creating()) { <hr-row-editor … /> }
@@ -45,6 +46,25 @@ export class Drawer {
     if (typeof dialog.showModal === 'function') dialog.showModal();
     else dialog.setAttribute('open', '');
     this.isOpen.set(true);
+    this.focusFirstField();
+  }
+
+  /**
+   * The browser lands on the first focusable thing in the dialog, the Close button in the header; a form that has
+   * not placed focus itself gets it on its first field once the page has rendered the form inside.
+   */
+  private focusFirstField(): void {
+    const dialog = this.box().nativeElement;
+    const view = dialog.ownerDocument.defaultView;
+    if (view === null) return;
+    view.requestAnimationFrame(() => {
+      const active = dialog.ownerDocument.activeElement;
+      if (!active?.classList.contains('drawer-x')) return;
+      const first = dialog.querySelector<HTMLElement>(
+        '.drawer-b :is(input, select, textarea):not([readonly]):not([disabled]):not([type="hidden"])',
+      );
+      first?.focus();
+    });
   }
 
   /**
@@ -59,9 +79,13 @@ export class Drawer {
     this.onClose();
   }
 
-  /** The native close (Escape, the scrim) or the programmatic one: settles once. */
+  /**
+   * The native close (Escape, the scrim) or the programmatic one: settles once. A native close that arrives while the
+   * dialog is showing again belongs to an earlier close and is ignored, so the page's state for the new one survives.
+   */
   protected onClose(): void {
     if (!this.isOpen()) return;
+    if (this.box().nativeElement.open) return;
     this.isOpen.set(false);
     this.closed.emit();
   }

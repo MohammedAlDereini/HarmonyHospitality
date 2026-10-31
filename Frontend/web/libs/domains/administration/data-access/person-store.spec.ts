@@ -51,6 +51,8 @@ const rana: UserAccount = {
   displayName: 'Rana Qasem',
   twoFactorEnabled: false,
   twoStepExemptReason: null,
+  lastSignInUtc: null,
+  lastSignInDevice: null,
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',

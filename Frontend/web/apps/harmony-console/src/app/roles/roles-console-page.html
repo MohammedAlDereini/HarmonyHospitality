@@ -1,0 +1,302 @@
+<div class="c-page">
+  <hr-page-head i18n-title="@@administration.roles.title" title="Roles">
+    <p class="lead" slot="lead" i18n="@@administration.console.roles.lead">
+      Platform tenant · {{ store.roles().length }} roles · {{ people().length }} people · changes
+      publish to Redis at once
+    </p>
+    <button
+      slot="actions"
+      *hrIfAllowed="createRole"
+      type="button"
+      class="btn solid"
+      data-act="new-role"
+      (click)="openCreator()"
+      [attr.aria-expanded]="drawer()?.kind === 'create'"
+    >
+      <hr-icon name="plus" size="16" />
+      <span i18n="@@administration.console.roles.add">New role</span>
+    </button>
+  </hr-page-head>
+
+  @if (actionProblem(); as text) {
+    <p class="c-msg" data-s="stop" role="alert">{{ text }}</p>
+  }
+
+  @if (store.problem(); as problem) {
+    <section class="c-card">
+      <div class="c-empty" role="alert">
+        <span class="ring"><hr-icon name="critical" size="20" /></span>
+        <b>{{ problem }}</b>
+        <button
+          type="button"
+          class="btn"
+          (click)="store.load()"
+          i18n="@@administration.roles.try-again"
+        >
+          Try again
+        </button>
+      </div>
+    </section>
+  } @else if (store.loading() && store.roles().length === 0) {
+    <section class="c-card">
+      <p class="c-state-h" role="status" i18n="@@administration.roles.loading">Loading…</p>
+    </section>
+  } @else if (store.roles().length === 0) {
+    <section class="c-card">
+      <p class="c-state-h" i18n="@@administration.roles.none">No roles yet.</p>
+    </section>
+  } @else {
+    <div class="columns">
+      <section class="c-card matrix-card">
+        <div class="table-wrap">
+          <table class="data matrix">
+            <thead>
+              <tr>
+                <th scope="col" i18n="@@administration.console.roles.column.permission">
+                  Permission
+                </th>
+                @for (role of columns(); track role.id) {
+                  <th scope="col" class="role" [class.chosen]="chosen()?.id === role.id">
+                    <button type="button" class="pick" (click)="choose(role)">
+                      <span class="t">
+                        @if (role.isSystemRole) {
+                          <hr-icon name="roles" size="12" />
+                        }
+                        <bdi>{{ name(role) }}</bdi>
+                      </span>
+                      <span class="s">
+                        @if (role.isSystemRole) {
+                          <ng-container i18n="@@administration.console.roles.system"
+                            >System · locked</ng-container
+                          >
+                        } @else {
+                          <ng-container
+                            i18n="@@administration.console.roles.custom"
+                            >{peopleIn(role), plural,
+                              =0 {Custom · nobody yet}
+                              =1 {Custom · 1 person}
+                              other {Custom · {{ peopleIn(role) }} people}
+                            }</ng-container
+                          >
+                        }
+                      </span>
+                    </button>
+                    @if (!role.isSystemRole) {
+                      <span class="more-wrap">
+                        <button
+                          #more
+                          type="button"
+                          class="btn icon"
+                          [attr.popovertarget]="'role-menu-' + role.id"
+                          i18n-aria-label="@@administration.console.roles.more"
+                          aria-label="More actions"
+                        >
+                          <hr-icon name="more" size="14" />
+                        </button>
+                        <div
+                          class="row-menu"
+                          popover
+                          [id]="'role-menu-' + role.id"
+                          [hrPopAt]="more"
+                          role="menu"
+                        >
+                          <button
+                            *hrIfAllowed="editRole"
+                            type="button"
+                            role="menuitem"
+                            data-act="edit"
+                            (click)="openEditor(role)"
+                            i18n="@@administration.roles.edit"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            *hrIfAllowed="deleteRole"
+                            type="button"
+                            role="menuitem"
+                            data-act="delete"
+                            [disabled]="removing() === role.id"
+                            (click)="askDelete(role)"
+                            i18n="@@administration.roles.delete"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </span>
+                    }
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (block of blocks(); track block.area) {
+                <tr class="group">
+                  <th scope="rowgroup" [attr.colspan]="columns().length + 1">
+                    {{ block.title }}
+                  </th>
+                </tr>
+                @for (entry of block.entries; track entry.id) {
+                  <tr class="prow" [attr.data-permission]="entry.permissionValue">
+                    <td class="perm">
+                      <span class="nm" dir="ltr">{{ entry.permissionValue }}</span>
+                      &ngsp;<span class="sub"
+                        ><bdi>{{ entry.description ?? label(entry) }}</bdi></span
+                      >
+                    </td>
+                    @for (role of columns(); track role.id) {
+                      <td class="grant" [class.chosen]="chosen()?.id === role.id">
+                        @if (role.isSystemRole) {
+                          @if (has(role, entry)) {
+                            <hr-icon class="tick" name="check" size="16" />
+                          } @else {
+                            <span class="none" aria-hidden="true">—</span>
+                          }
+                        } @else {
+                          <input
+                            type="checkbox"
+                            [attr.data-role]="role.code"
+                            [attr.data-permission]="entry.permissionValue"
+                            [attr.aria-label]="name(role) + ' · ' + entry.permissionValue"
+                            [checked]="has(role, entry)"
+                            [disabled]="!mayGrant() || saving()"
+                            (change)="toggle(role, entry)"
+                          />
+                        }
+                      </td>
+                    }
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <aside class="side">
+        @if (chosen(); as role) {
+          <section class="c-card" data-role-card>
+            <div class="c-card-h">
+              <h3>
+                <bdi>{{ name(role) }}</bdi
+                >&ngsp;<span class="chip"
+                  ><span class="dot"></span>{{ chosenPeople().length }}</span
+                >
+              </h3>
+              <span class="r">
+                <a
+                  class="btn ghost"
+                  routerLink="/people"
+                  [queryParams]="{ role: role.id }"
+                  i18n="@@administration.console.roles.assign"
+                  >Assign people</a
+                >
+              </span>
+            </div>
+            @if (chosenPeople().length === 0) {
+              <div class="c-card-b">
+                <p class="note" i18n="@@administration.console.roles.nobody">
+                  Nobody holds this role yet.
+                </p>
+              </div>
+            } @else {
+              <ul class="people">
+                @for (person of shownPeople(); track person.id) {
+                  <li>
+                    <a class="who" [routerLink]="['/people/account', person.id]">
+                      <span class="c-av" aria-hidden="true">{{ initials(person) }}</span>
+                      <span class="two">
+                        <span class="nm"
+                          ><bdi>{{ person.displayName }}</bdi></span
+                        >
+                        <span class="sub"
+                          ><bdi>{{ personNote(person) }}</bdi></span
+                        >
+                      </span>
+                    </a>
+                  </li>
+                }
+              </ul>
+              @if (morePeople(); as more) {
+                <div class="c-card-b foot">
+                  <a
+                    routerLink="/people"
+                    [queryParams]="{ role: role.id }"
+                    i18n="@@administration.console.roles.more-people"
+                    >{more, plural, =1 {1 more person} other {{{ more }} more people}}</a
+                  >
+                </div>
+              }
+            }
+          </section>
+        }
+        <div class="c-msg" data-s="info" role="note">
+          <hr-icon class="ic" name="info" size="18" />
+          <div class="t">
+            <b i18n="@@administration.console.roles.never-hotel.title"
+              >Platform people never enter a hotel</b
+            >
+            <span i18n="@@administration.console.roles.never-hotel.text"
+              >These roles carry no hotel permission and the token's tenant is the platform. A
+              platform person who needs to help a hotel is invited into that tenant by its
+              administrator, as a separate account.</span
+            >
+          </div>
+        </div>
+        @if (changes(); as changes) {
+          <section class="c-card changes" data-changes>
+            <div class="c-card-b">
+              <b i18n="@@administration.console.roles.changes">{changes, plural,
+                =1 {1 change not saved}
+                other {{{ changes }} changes not saved}
+              }</b>
+              <p class="note">{{ changeSummary() }}</p>
+              <div class="acts">
+                <button
+                  type="button"
+                  class="btn"
+                  data-act="discard"
+                  (click)="discard()"
+                  [disabled]="saving()"
+                  i18n="@@administration.console.roles.discard"
+                >
+                  Discard
+                </button>
+                <button
+                  type="button"
+                  class="btn solid"
+                  data-act="save-changes"
+                  (click)="save()"
+                  [disabled]="saving()"
+                  i18n="@@administration.console.roles.save"
+                >
+                  Save changes
+                </button>
+              </div>
+            </div>
+          </section>
+        }
+      </aside>
+    </div>
+  }
+
+  <hr-drawer #editorDrawer [heading]="editorHeading()" (closed)="drawer.set(null)">
+    @if (drawer(); as open) {
+      @if (open.kind === 'create') {
+        <hr-role-editor (done)="saved()" (cancelled)="editorDrawer.close()" />
+      } @else {
+        <hr-role-editor [role]="open.role" (done)="saved()" (cancelled)="editorDrawer.close()" />
+      }
+    }
+  </hr-drawer>
+  <hr-confirm-dialog
+    tone="stop"
+    i18n-heading="@@administration.roles.delete.heading"
+    heading="Delete this role?"
+    i18n-message="@@administration.roles.delete.ask"
+    message="Delete this role? This cannot be undone."
+    i18n-go="@@administration.roles.delete.go"
+    go="Delete role"
+    i18n-stay="@@administration.roles.cancel"
+    stay="Cancel"
+  />
+</div>

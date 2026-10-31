@@ -1,13 +1,10 @@
-<header class="page-head">
-  <div>
-    <h1 i18n="@@administration.settings.title">Settings</h1>
-    <p class="lead" i18n="@@administration.settings.lead">
-      What each setting is at this hotel, and where the value comes from: this hotel, one of its
-      groups, the whole customer, or the default. A hotel's own value wins; then the group with the
-      highest precedence; then the customer; then the default.
-    </p>
-  </div>
-</header>
+<hr-page-head i18n-title="@@administration.settings.title" title="Settings">
+  <p class="lead" slot="lead" i18n="@@administration.settings.lead">
+    What each setting is at this hotel, and where the value comes from: this hotel, one of its
+    groups, the whole customer, or the default. A hotel's own value wins; then the group with the
+    highest precedence; then the customer; then the default.
+  </p>
+</hr-page-head>
 @if (store.problem(); as problem) {
   <p class="empty" role="alert">
     {{ problem }}&ngsp;<button

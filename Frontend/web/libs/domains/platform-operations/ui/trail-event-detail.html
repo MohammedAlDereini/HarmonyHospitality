@@ -1,0 +1,56 @@
+@let row = event();
+<div class="ev-top">
+  <span class="chip" [attr.data-s]="tone()"><span class="dot"></span>{{ wording() }}</span>
+  <span class="num">{{ when() }}</span>
+</div>
+@if (row.detail; as detail) {
+  <p class="ev-detail">
+    <bdi>{{ detail }}</bdi>
+  </p>
+}
+<dl class="c-facts">
+  <dt i18n="@@platform-operations.trail.fact.actor">Actor</dt>
+  <dd>
+    <bdi>{{ actorName() }}</bdi> · <span dir="ltr">{{ actorWhere() }}</span>
+  </dd>
+  <dt i18n="@@platform-operations.trail.fact.tenant">Tenant</dt>
+  <dd>
+    <span dir="ltr">{{ row.tenantCode ?? '' }}</span>
+    @if (row.tenantNameEn; as nameEn) {
+      · {{ nameEn }}
+    }
+    @if (row.tenantNameAr; as nameAr) {
+      · <bdi lang="ar">{{ nameAr }}</bdi>
+    }
+  </dd>
+  <dt i18n="@@platform-operations.trail.fact.person">Person</dt>
+  <dd>
+    <bdi>{{ row.userDisplayName ?? '' }}</bdi>
+  </dd>
+  <dt i18n="@@platform-operations.trail.fact.address">From</dt>
+  <dd dir="ltr">{{ row.sourceAddress ?? '' }}</dd>
+  <dt i18n="@@platform-operations.trail.fact.device">Device</dt>
+  <dd>
+    <bdi>{{ row.device ?? '' }}</bdi>
+  </dd>
+  <dt i18n="@@platform-operations.trail.fact.code">Event code</dt>
+  <dd class="code" dir="ltr">{{ row.action }}</dd>
+  <dt i18n="@@platform-operations.trail.fact.id">Reference</dt>
+  <dd class="code num" dir="ltr">{{ row.id }}</dd>
+</dl>
+<div class="ev-acts">
+  <button type="button" class="btn" (click)="copy()">
+    <hr-icon name="copy" size="16" />
+    <span i18n="@@platform-operations.trail.copy">Copy JSON</span>
+  </button>
+  <a class="btn" [routerLink]="['/tenants', row.tenantId]">
+    <hr-icon name="external" size="16" />
+    <span i18n="@@platform-operations.trail.open-tenant">Open tenant</span>
+  </a>
+  @if (ownPerson()) {
+    <a class="btn" [routerLink]="['/people', 'account', row.userAccountId]">
+      <hr-icon name="people" size="16" />
+      <span i18n="@@platform-operations.trail.open-person">Open person</span>
+    </a>
+  }
+</div>

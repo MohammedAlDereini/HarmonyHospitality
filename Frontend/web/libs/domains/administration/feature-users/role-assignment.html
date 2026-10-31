@@ -1,5 +1,19 @@
 <section class="part" aria-labelledby="roles-heading">
-  <h2 id="roles-heading" i18n="@@administration.person.roles">Roles</h2>
+  <div class="hd">
+    <h2 id="roles-heading" i18n="@@administration.person.roles">Roles</h2>
+    @if (mayAssign() && roles.problem() === null) {
+      <button
+        type="button"
+        class="btn"
+        data-act="save-roles"
+        (click)="save()"
+        [disabled]="saving() || !changed()"
+        i18n="@@administration.person.roles.save"
+      >
+        Save roles
+      </button>
+    }
+  </div>
   @if (roles.problem(); as text) {
     <p class="field-error" role="alert">
       {{ text }}&ngsp;<button
@@ -29,20 +43,6 @@
         </label>
       }
     </fieldset>
-    @if (mayAssign()) {
-      <div class="acts">
-        <button
-          type="button"
-          class="btn solid"
-          data-act="save-roles"
-          (click)="save()"
-          [disabled]="saving() || !changed()"
-          i18n="@@administration.person.roles.save"
-        >
-          Save roles
-        </button>
-      </div>
-    }
     @if (problem(); as text) {
       <p class="field-error" role="alert">{{ text }}</p>
     }

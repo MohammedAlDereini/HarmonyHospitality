@@ -1,0 +1,980 @@
+@if (store.problem(); as problem) {
+  <div class="c-page">
+    <div class="c-empty" role="alert">
+      <span class="ring"><hr-icon name="critical" size="20" /></span>
+      <b>{{ problem }}</b>
+      <button
+        type="button"
+        class="btn"
+        (click)="store.reload()"
+        i18n="@@administration.console.person.try-again"
+      >
+        Try again
+      </button>
+    </div>
+  </div>
+} @else if (store.person(); as person) {
+  <div class="c-page person">
+    <hr-page-head [title]="person.displayName">
+      <span slot="before-title" class="c-av big" aria-hidden="true">{{ initials(person) }}</span>
+      <span slot="after-title" class="after">
+        <span class="chip" [attr.data-s]="stateTone(person)" data-status
+          ><span class="dot"></span>{{ stateOf(person) }}</span
+        >
+        <span class="chip" [attr.data-s]="twoStepTone(person)" data-two-step
+          ><span class="dot"></span><b>{{ twoStepWord(person) }}</b></span
+        >
+      </span>
+      <p class="lead" slot="lead">
+        <span dir="ltr"
+          ><bdi>{{ person.email ?? person.userName }}</bdi></span
+        >
+        @if (rolesOf(person); as roles) {
+          · <bdi>{{ roles }}</bdi>
+        }
+        @if (signInWord(); as method) {
+          · {{ method }}
+        }
+        · {{ lastSignIn(person) }}
+      </p>
+      <button
+        slot="actions"
+        *hrIfAllowed="assignRoles"
+        type="button"
+        class="btn"
+        data-act="edit-roles"
+        (click)="editRoles()"
+        [disabled]="person.isDirectoryManaged"
+      >
+        <hr-icon name="pencil" size="16" />
+        <span i18n="@@administration.console.person.edit-roles">Edit roles</span>
+      </button>
+      <button
+        slot="actions"
+        *hrIfAllowed="manageUsers"
+        type="button"
+        class="btn"
+        [attr.data-act]="person.state === 'Suspended' ? 'reinstate' : 'suspend'"
+        [hidden]="person.state === 'Terminated' || person.isDirectoryManaged"
+        [disabled]="busy()"
+        (click)="person.state === 'Suspended' ? reinstate(person) : openState('suspend')"
+      >
+        @if (person.state === 'Suspended') {
+          <ng-container i18n="@@administration.users.reinstate">Reinstate</ng-container>
+        } @else {
+          <ng-container i18n="@@administration.users.suspend">Suspend</ng-container>
+        }
+      </button>
+      <span slot="actions" *hrIfAllowed="manageUsers" class="more-wrap">
+        <button
+          #moreButton
+          type="button"
+          class="btn icon"
+          popovertarget="person-more"
+          i18n-aria-label="@@administration.console.person.more"
+          aria-label="More actions"
+        >
+          <hr-icon name="more" size="16" />
+        </button>
+        <div class="row-menu" popover id="person-more" [hrPopAt]="moreButton" role="menu">
+          @if (person.twoStepExemptReason !== null) {
+            <button
+              type="button"
+              role="menuitem"
+              data-act="end-exemption"
+              [disabled]="busy()"
+              (click)="endExemption(person)"
+              i18n="@@administration.person.two-step.end-exemption"
+            >
+              End exemption
+            </button>
+          } @else {
+            <button
+              type="button"
+              role="menuitem"
+              data-act="exempt"
+              (click)="openState('exempt')"
+              i18n="@@administration.person.two-step.exempt-go"
+            >
+              Exempt from two-step
+            </button>
+          }
+          @if (person.twoFactorEnabled) {
+            <button
+              type="button"
+              role="menuitem"
+              data-act="reset-two-step"
+              [disabled]="busy()"
+              (click)="resetTwoFactor(person)"
+              i18n="@@administration.person.two-step.reset"
+            >
+              Reset two-step
+            </button>
+          }
+          @if (person.state !== 'Terminated' && !person.isDirectoryManaged) {
+            <button
+              type="button"
+              role="menuitem"
+              data-act="terminate"
+              (click)="openState('terminate')"
+              i18n="@@administration.users.terminate"
+            >
+              Terminate
+            </button>
+          }
+          <a role="menuitem" routerLink="/people" i18n="@@administration.console.person.menu.people"
+            >All people</a
+          >
+        </div>
+      </span>
+    </hr-page-head>
+
+    @if (person.isDirectoryManaged) {
+      <div class="c-msg" data-s="info" role="status" data-directory>
+        <hr-icon class="ic" name="info" size="18" />
+        <span i18n="@@administration.person.directory"
+          >This person comes from your company directory: their name, state and roles change there,
+          through the directory's groups.</span
+        >
+      </div>
+    }
+    @if (actionProblem(); as problem) {
+      <p class="c-msg" data-s="stop" role="alert">{{ problem }}</p>
+    }
+
+    <nav
+      class="c-tabs"
+      role="tablist"
+      i18n-aria-label="@@administration.console.person.tabs"
+      aria-label="Sections"
+    >
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'overview'"
+        (click)="show('overview')"
+        i18n="@@administration.console.person.tab.overview"
+      >
+        Overview
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'devices'"
+        (click)="show('devices')"
+      >
+        <ng-container i18n="@@administration.console.person.tab.devices">Devices</ng-container
+        >&ngsp;<span class="n">· {{ store.deviceRows().length }}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'passkeys'"
+        (click)="show('passkeys')"
+      >
+        <ng-container i18n="@@administration.console.person.tab.passkeys">Passkeys</ng-container
+        >&ngsp;<span class="n">· {{ store.passkeyRows().length }}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'sign-ins'"
+        (click)="show('sign-ins')"
+      >
+        <ng-container i18n="@@administration.console.person.tab.sign-ins">Sign-ins</ng-container
+        >&ngsp;<span class="n">· {{ store.sessionRows().length }}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'trail'"
+        (click)="show('trail')"
+      >
+        <ng-container i18n="@@administration.console.person.tab.trail">Security trail</ng-container
+        >&ngsp;<span class="n">· {{ store.eventRows().length }}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'hotel-roles'"
+        (click)="show('hotel-roles')"
+      >
+        <ng-container i18n="@@administration.console.person.tab.hotel-roles"
+          >Hotel roles</ng-container
+        >&ngsp;<span class="n">· {{ currentAssignments() }}</span>
+      </button>
+    </nav>
+
+    @if (current() === 'overview') {
+      <div class="c-grid three cards">
+        <section class="c-card roles-card" #rolesCard>
+          <div class="c-card-b">
+            @if (person.isDirectoryManaged) {
+              <h3 i18n="@@administration.person.roles">Roles</h3>
+              <p class="note">
+                <bdi>{{ rolesOf(person) }}</bdi>
+              </p>
+            } @else {
+              <hr-role-assignment [user]="person" (done)="store.reload()" />
+            }
+          </div>
+        </section>
+        <section class="c-card">
+          <div class="c-card-h">
+            <h3 i18n="@@administration.console.person.card.sign-in">Sign-in</h3>
+          </div>
+          <div class="c-card-b">
+            @if (store.signInProblem(); as text) {
+              <p class="field-error" role="alert">{{ text }}</p>
+            }
+            <dl class="c-facts">
+              <dt i18n="@@administration.console.person.fact.two-step">Two-step</dt>
+              <dd>{{ twoStepFact(person) }}</dd>
+              <dt i18n="@@administration.console.person.fact.password">Password</dt>
+              <dd>{{ passwordFact() }}</dd>
+              <dt i18n="@@administration.console.person.fact.company">Company account</dt>
+              <dd>
+                @if (store.signInState(); as signIn) {
+                  @if (signIn.links.length === 0) {
+                    <ng-container i18n="@@administration.console.person.fact.none-linked"
+                      >None linked</ng-container
+                    >
+                  } @else {
+                    @for (link of signIn.links; track link.id) {
+                      <span class="link-row" data-link>
+                        <span
+                          >{{ linkWord(link) }}
+                          @if (!link.isOpen) {
+                            <ng-container i18n="@@administration.console.person.link.ended">
+                              · ended</ng-container
+                            >
+                          }
+                        </span>
+                        @if (link.isOpen) {
+                          <button
+                            *hrIfAllowed="manageUsers"
+                            type="button"
+                            class="btn ghost"
+                            data-act="end-link"
+                            [disabled]="busy()"
+                            (click)="endLink(person, link)"
+                            i18n="@@administration.person.sign-in.end-link"
+                          >
+                            End link
+                          </button>
+                        }
+                      </span>
+                    }
+                  }
+                } @else {
+                  …
+                }
+              </dd>
+              <dt i18n="@@administration.console.person.fact.trusted">Trusted devices</dt>
+              <dd class="num">
+                <ng-container i18n="@@administration.console.person.fact.trusted-of"
+                  >{{ trustedDevices() }} of {{ store.deviceRows().length }}</ng-container
+                >
+              </dd>
+            </dl>
+            <div class="acts" *hrIfAllowed="manageUsers">
+              @if (person.twoStepExemptReason !== null) {
+                <button
+                  type="button"
+                  class="btn"
+                  data-act="end-exemption"
+                  [disabled]="busy()"
+                  (click)="endExemption(person)"
+                  i18n="@@administration.person.two-step.end-exemption"
+                >
+                  End exemption
+                </button>
+              } @else {
+                @if (person.twoFactorEnabled) {
+                  <button
+                    type="button"
+                    class="btn"
+                    data-act="reset-two-step"
+                    [disabled]="busy()"
+                    (click)="resetTwoFactor(person)"
+                    i18n="@@administration.person.two-step.reset"
+                  >
+                    Reset two-step
+                  </button>
+                }
+                <button
+                  type="button"
+                  class="btn"
+                  data-act="exempt"
+                  (click)="openState('exempt')"
+                  [attr.aria-expanded]="editing() === 'exempt'"
+                  i18n="@@administration.person.two-step.exempt-go"
+                >
+                  Exempt from two-step
+                </button>
+              }
+              @if (store.signInState(); as signIn) {
+                @if (signIn.passwordSignIn) {
+                  <button
+                    type="button"
+                    class="btn"
+                    data-act="follow-company"
+                    [disabled]="busy()"
+                    (click)="followCompany(person)"
+                    i18n="@@administration.person.sign-in.follow"
+                  >
+                    Use the company sign-in
+                  </button>
+                } @else if (signIn.coveredBy !== null) {
+                  <button
+                    type="button"
+                    class="btn"
+                    data-act="keep-password"
+                    [disabled]="busy()"
+                    (click)="keepPassword(person)"
+                    i18n="@@administration.person.sign-in.keep"
+                  >
+                    Keep on a Harmony password
+                  </button>
+                }
+              }
+            </div>
+          </div>
+        </section>
+        <section class="c-card">
+          <div class="c-card-h">
+            <h3>
+              <ng-container i18n="@@administration.console.person.card.grants"
+                >Access for a while</ng-container
+              >&ngsp;<span class="chip"><span class="dot"></span>{{ activeGrants().length }}</span>
+            </h3>
+            <span class="r">
+              <button
+                *hrIfAllowed="assignRoles"
+                type="button"
+                class="btn"
+                data-act="grant-access"
+                (click)="openGrant()"
+                [attr.aria-expanded]="granting()"
+              >
+                <hr-icon name="plus" size="16" />
+                <span i18n="@@administration.console.person.grant">Grant</span>
+              </button>
+            </span>
+          </div>
+          <div class="c-card-b">
+            @if (store.accessProblem(); as text) {
+              <p class="field-error" role="alert">{{ text }}</p>
+            } @else if (activeGrants().length === 0) {
+              <p class="note" i18n="@@administration.console.person.grants.none">
+                None right now. A role lent for hours or days, with a reason; it ends by itself, 30
+                days at the latest.
+              </p>
+            } @else {
+              @for (grant of activeGrants(); track grant.id) {
+                <dl class="c-facts grant" data-grant>
+                  <dt dir="ltr">{{ grantTitle(grant) }}</dt>
+                  <dd class="num">{{ grantUntil(grant) }}</dd>
+                  <dt i18n="@@administration.console.person.grant.reason">Reason</dt>
+                  <dd>
+                    <bdi>{{ grant.reason }}</bdi>
+                  </dd>
+                  <dt i18n="@@administration.console.person.grant.given-by">Given by</dt>
+                  <dd>
+                    <bdi>{{ givenBy(grant) }}</bdi>
+                  </dd>
+                </dl>
+                <div class="acts" *hrIfAllowed="assignRoles">
+                  <button
+                    type="button"
+                    class="btn danger"
+                    data-act="revoke-grant"
+                    [disabled]="busy()"
+                    (click)="revokeGrant(person, grant)"
+                    i18n="@@administration.person.grants.revoke"
+                  >
+                    Revoke
+                  </button>
+                </div>
+              }
+            }
+          </div>
+        </section>
+      </div>
+      <ng-container *ngTemplateOutlet="devicesCard; context: { $implicit: person }" />
+    } @else if (current() === 'devices') {
+      <ng-container *ngTemplateOutlet="devicesCard; context: { $implicit: person }" />
+    } @else if (current() === 'passkeys') {
+      <section class="c-card">
+        <div class="c-card-h">
+          <h3>
+            <ng-container i18n="@@administration.person.passkeys">Passkeys</ng-container>&ngsp;<span
+              class="chip"
+              ><span class="dot"></span>{{ store.passkeyRows().length }}</span
+            >
+          </h3>
+        </div>
+        @if (store.passkeysProblem(); as text) {
+          <div class="c-card-b">
+            <p class="field-error" role="alert">{{ text }}</p>
+          </div>
+        } @else if (store.passkeyRows().length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@administration.person.passkeys.none">No passkey yet.</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@administration.console.person.passkey.name">Passkey</th>
+                  <th scope="col" i18n="@@administration.console.person.passkey.backed-up">
+                    Backed up
+                  </th>
+                  <th scope="col" i18n="@@administration.person.passkeys.created">Created</th>
+                  <th scope="col" i18n="@@administration.person.passkeys.last-used">Last used</th>
+                  <th scope="col" class="acts" *hrIfAllowed="manageUsers">
+                    <span class="vh" i18n="@@administration.console.person.column.actions"
+                      >Actions</span
+                    >
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (passkey of store.passkeyRows(); track passkey.id) {
+                  <tr class="krow">
+                    <td>
+                      <span class="nm"
+                        ><bdi>{{ passkey.name }}</bdi></span
+                      >
+                    </td>
+                    <td class="muted">
+                      @if (passkey.isBackedUp) {
+                        <ng-container i18n="@@administration.console.person.passkey.yes"
+                          >Yes</ng-container
+                        >
+                      } @else {
+                        <ng-container i18n="@@administration.console.person.passkey.no"
+                          >No</ng-container
+                        >
+                      }
+                    </td>
+                    <td class="muted num">{{ stamp(passkey.createdUtc) }}</td>
+                    <td class="muted num">
+                      @if (passkey.lastUsedUtc; as used) {
+                        {{ stamp(used) }}
+                      } @else {
+                        <ng-container i18n="@@administration.person.passkeys.never"
+                          >Never</ng-container
+                        >
+                      }
+                    </td>
+                    <td class="acts" *hrIfAllowed="manageUsers">
+                      <button
+                        type="button"
+                        class="btn ghost"
+                        data-act="remove-passkey"
+                        [disabled]="busy()"
+                        (click)="removePasskey(person, passkey)"
+                      >
+                        <hr-icon name="x" size="14" />
+                        <span i18n="@@administration.person.passkeys.remove">Remove</span>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    } @else if (current() === 'sign-ins') {
+      <section class="c-card">
+        <div class="c-card-h">
+          <h3>
+            <ng-container i18n="@@administration.person.sign-ins">Sign-ins</ng-container>&ngsp;<span
+              class="chip"
+              ><span class="dot"></span>{{ store.sessionRows().length }}</span
+            >
+          </h3>
+        </div>
+        @if (store.sessionRows().length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@administration.person.sign-ins.none">
+              No sign-in recorded yet.
+            </p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@administration.person.sign-ins.started">Started</th>
+                  <th scope="col" i18n="@@administration.console.person.session.provider">
+                    Provider
+                  </th>
+                  <th scope="col" i18n="@@administration.console.person.session.methods">
+                    Methods
+                  </th>
+                  <th scope="col" i18n="@@administration.person.sign-ins.two-step">Two-step</th>
+                  <th scope="col" i18n="@@administration.console.person.session.ended">Ended</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (record of store.sessionRows(); track record.startedAtUtc) {
+                  <tr class="nrow" data-session>
+                    <td class="num">{{ stamp(record.startedAtUtc) }}</td>
+                    <td class="muted" dir="ltr">{{ record.provider }}</td>
+                    <td class="muted" dir="ltr">{{ record.methods }}</td>
+                    <td>
+                      <span class="chip" [attr.data-s]="record.multiFactorSatisfied ? 'ok' : null"
+                        ><span class="dot"></span>
+                        @if (record.multiFactorSatisfied) {
+                          <ng-container i18n="@@administration.person.sign-ins.two-step-yes"
+                            >Yes</ng-container
+                          >
+                        } @else {
+                          <ng-container i18n="@@administration.person.sign-ins.two-step-no"
+                            >No</ng-container
+                          >
+                        }
+                      </span>
+                    </td>
+                    <td class="muted num">
+                      @if (record.endedAtUtc; as ended) {
+                        {{ stamp(ended) }}
+                        @if (record.endReason; as reason) {
+                          <span dir="ltr"> · {{ reason }}</span>
+                        }
+                      } @else {
+                        <ng-container i18n="@@administration.person.sign-ins.open"
+                          >Still signed in</ng-container
+                        >
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    } @else if (current() === 'trail') {
+      <section class="c-card">
+        <div class="c-card-h">
+          <h3>
+            <ng-container i18n="@@administration.person.trail">Security trail</ng-container
+            >&ngsp;<span class="chip"><span class="dot"></span>{{ store.eventRows().length }}</span>
+          </h3>
+        </div>
+        @if (store.eventsProblem(); as text) {
+          <div class="c-card-b">
+            <p class="field-error" role="alert">{{ text }}</p>
+          </div>
+        } @else if (store.eventRows().length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@administration.person.trail.none">Nothing recorded yet.</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@administration.console.person.event.action">Event</th>
+                  <th scope="col" i18n="@@administration.person.trail.when">When</th>
+                  <th scope="col" i18n="@@administration.person.trail.address">Address</th>
+                  <th scope="col" i18n="@@administration.person.trail.device">Device</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (event of store.eventRows(); track $index) {
+                  <tr class="erow">
+                    <td class="tenant">
+                      <span class="nm" dir="ltr">{{ event.action }}</span>
+                      @if (event.detail; as detail) {
+                        &ngsp;<span class="sub"
+                          ><bdi>{{ detail }}</bdi></span
+                        >
+                      }
+                    </td>
+                    <td class="muted num">{{ stamp(event.occurredAtUtc) }}</td>
+                    <td class="muted" dir="ltr">{{ event.sourceAddress ?? '—' }}</td>
+                    <td class="muted">
+                      <bdi>{{ event.device ?? '—' }}</bdi>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    } @else if (current() === 'hotel-roles') {
+      <section class="c-card">
+        <div class="c-card-h">
+          <h3>
+            <ng-container i18n="@@administration.person.hotel-roles"
+              >Roles at a hotel or group</ng-container
+            >&ngsp;<span class="chip"><span class="dot"></span>{{ currentAssignments() }}</span>
+          </h3>
+          <span class="r">
+            @if (!person.isDirectoryManaged) {
+              <button
+                *hrIfAllowed="assignRoles"
+                type="button"
+                class="btn solid"
+                data-act="assign-role"
+                (click)="openAssign()"
+                [attr.aria-expanded]="assigning()"
+              >
+                <hr-icon name="plus" size="16" />
+                <span i18n="@@administration.console.person.give-role">Give a role</span>
+              </button>
+            }
+          </span>
+        </div>
+        <div class="c-card-b">
+          <p class="note" i18n="@@administration.person.hotel-roles.lead">
+            Held at one hotel or one group only, on top of the roles above. A group's role reaches
+            every hotel in it.
+          </p>
+        </div>
+        @if (store.accessProblem(); as text) {
+          <div class="c-card-b">
+            <p class="field-error" role="alert">{{ text }}</p>
+          </div>
+        } @else if (store.assignmentRows().length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@administration.person.hotel-roles.none">None yet.</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@administration.console.person.assignment.role">Role</th>
+                  <th scope="col" i18n="@@administration.person.hotel-roles.where">Where</th>
+                  <th scope="col" i18n="@@administration.person.hotel-roles.ends">Ends</th>
+                  <th scope="col" i18n="@@administration.person.hotel-roles.state">State</th>
+                  <th scope="col" class="acts" *hrIfAllowed="assignRoles">
+                    <span class="vh" i18n="@@administration.console.person.column.actions"
+                      >Actions</span
+                    >
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (assignment of store.assignmentRows(); track assignment.id) {
+                  <tr
+                    class="arow"
+                    [attr.data-current]="assignment.isCurrent"
+                    [class.past]="!assignment.isCurrent"
+                  >
+                    <td class="tenant" dir="ltr">
+                      <span class="nm">{{ assignment.roleCode }}</span>
+                      &ngsp;<span class="sub">{{ assignment.scopeCode }}</span>
+                    </td>
+                    <td class="muted">{{ whereWord(assignment) }}</td>
+                    <td class="muted num">
+                      @if (assignment.endsAtUtc; as ends) {
+                        {{ stamp(ends) }}
+                      } @else {
+                        <ng-container i18n="@@administration.person.hotel-roles.no-end"
+                          >No end</ng-container
+                        >
+                      }
+                    </td>
+                    <td>
+                      <span class="chip" [attr.data-s]="assignment.isCurrent ? 'ok' : null"
+                        ><span class="dot"></span>
+                        @if (assignment.isCurrent) {
+                          <ng-container i18n="@@administration.person.hotel-roles.current"
+                            >Current</ng-container
+                          >
+                        } @else {
+                          <ng-container i18n="@@administration.person.hotel-roles.ended"
+                            >Ended</ng-container
+                          >
+                        }
+                      </span>
+                    </td>
+                    <td class="acts" *hrIfAllowed="assignRoles">
+                      @if (assignment.isCurrent && !person.isDirectoryManaged) {
+                        <button
+                          type="button"
+                          class="btn ghost"
+                          data-act="end-assignment"
+                          [disabled]="busy()"
+                          (click)="endAssignment(person, assignment)"
+                        >
+                          <hr-icon name="x" size="14" />
+                          <span i18n="@@administration.person.hotel-roles.end">End</span>
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+      <section class="c-card">
+        <div class="c-card-h">
+          <h3>
+            <ng-container i18n="@@administration.console.person.grants.history"
+              >Access lent for a while</ng-container
+            >&ngsp;<span class="chip"><span class="dot"></span>{{ store.grantRows().length }}</span>
+          </h3>
+        </div>
+        @if (store.grantRows().length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@administration.person.grants.none">None yet.</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@administration.console.person.assignment.role">Role</th>
+                  <th scope="col" i18n="@@administration.person.grants.until">Until</th>
+                  <th scope="col" i18n="@@administration.console.person.grant.reason">Reason</th>
+                  <th scope="col" i18n="@@administration.console.person.grant.given-by">
+                    Given by
+                  </th>
+                  <th scope="col" i18n="@@administration.person.grants.state">State</th>
+                  <th scope="col" class="acts" *hrIfAllowed="assignRoles">
+                    <span class="vh" i18n="@@administration.console.person.column.actions"
+                      >Actions</span
+                    >
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (grant of store.grantRows(); track grant.id) {
+                  <tr
+                    class="grow"
+                    [attr.data-active]="grant.isActive"
+                    [class.past]="!grant.isActive"
+                  >
+                    <td class="tenant" dir="ltr">
+                      <span class="nm">{{ grant.roleCode }}</span>
+                      &ngsp;<span class="sub">{{ grant.scopeCode }}</span>
+                    </td>
+                    <td class="muted num">{{ stamp(grant.toUtc) }}</td>
+                    <td class="muted">
+                      <bdi>{{ grant.reason }}</bdi>
+                    </td>
+                    <td class="muted">
+                      <bdi>{{ givenBy(grant) }}</bdi>
+                    </td>
+                    <td>
+                      <span class="chip" [attr.data-s]="grant.isActive ? 'ok' : null"
+                        ><span class="dot"></span>{{ grantState(grant) }}</span
+                      >
+                    </td>
+                    <td class="acts" *hrIfAllowed="assignRoles">
+                      @if (grant.isActive) {
+                        <button
+                          type="button"
+                          class="btn ghost"
+                          data-act="revoke-grant"
+                          [disabled]="busy()"
+                          (click)="revokeGrant(person, grant)"
+                          i18n="@@administration.person.grants.revoke"
+                        >
+                          Revoke
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
+
+    <ng-template #devicesCard let-person>
+      <section class="c-card">
+        <div class="c-card-h">
+          <h3>
+            <ng-container i18n="@@administration.person.devices">Devices</ng-container>&ngsp;<span
+              class="chip"
+              ><span class="dot"></span>{{ store.deviceRows().length }}</span
+            >
+          </h3>
+        </div>
+        @if (store.devicesProblem(); as text) {
+          <div class="c-card-b">
+            <p class="field-error" role="alert">{{ text }}</p>
+          </div>
+        } @else if (store.deviceRows().length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@administration.person.devices.none">
+              No device has signed in yet.
+            </p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@administration.console.person.device.device">Device</th>
+                  <th scope="col" i18n="@@administration.console.person.device.address">Address</th>
+                  <th scope="col" i18n="@@administration.console.person.device.trust">Trust</th>
+                  <th scope="col" i18n="@@administration.person.devices.now">Now</th>
+                  <th scope="col" i18n="@@administration.person.devices.last-seen">Last seen</th>
+                  <th scope="col" class="acts" *hrIfAllowed="manageUsers">
+                    <span class="vh" i18n="@@administration.console.person.column.actions"
+                      >Actions</span
+                    >
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (device of store.deviceRows(); track device.id) {
+                  <tr class="drow">
+                    <td>
+                      <span class="nm"
+                        ><bdi>{{ device.label }}</bdi></span
+                      >
+                    </td>
+                    <td class="muted" dir="ltr">{{ device.lastAddress ?? '—' }}</td>
+                    <td>
+                      <span
+                        class="chip"
+                        [attr.data-s]="device.trustedAtUtc !== null ? 'ok' : 'warn'"
+                        [attr.data-trusted]="device.trustedAtUtc !== null ? '' : null"
+                        ><span class="dot"></span>
+                        @if (device.trustedAtUtc !== null) {
+                          <ng-container i18n="@@administration.person.devices.trusted"
+                            >Trusted</ng-container
+                          >
+                        } @else {
+                          <ng-container i18n="@@administration.console.person.device.not-trusted"
+                            >Not trusted</ng-container
+                          >
+                        }
+                      </span>
+                    </td>
+                    <td>
+                      <span class="chip" [attr.data-s]="device.signedIn ? 'ok' : null"
+                        ><span class="dot"></span>
+                        @if (device.signedIn) {
+                          <ng-container i18n="@@administration.person.devices.signed-in"
+                            >Signed in</ng-container
+                          >
+                        } @else {
+                          <ng-container i18n="@@administration.person.devices.signed-out"
+                            >Signed out</ng-container
+                          >
+                        }
+                      </span>
+                    </td>
+                    <td class="muted num">{{ stamp(device.lastSeenUtc) }}</td>
+                    <td class="acts" *hrIfAllowed="manageUsers">
+                      @if (device.signedIn) {
+                        <button
+                          type="button"
+                          class="btn ghost"
+                          data-act="sign-out-device"
+                          [disabled]="busy()"
+                          (click)="signOut(person, device)"
+                        >
+                          <hr-icon name="x" size="14" />
+                          <span i18n="@@administration.person.devices.sign-out">Sign out</span>
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    </ng-template>
+
+    <hr-drawer #stateDrawer [heading]="stateHeading()" (closed)="editing.set(null)">
+      @if (editing(); as mode) {
+        <hr-account-state-editor
+          [user]="person"
+          [mode]="mode"
+          (done)="stateDone()"
+          (cancelled)="stateDrawer.close()"
+        />
+      }
+    </hr-drawer>
+    <hr-drawer
+      #assignDrawer
+      i18n-heading="@@administration.person.drawer.assign"
+      heading="Give a role at a hotel or group"
+      (closed)="assigning.set(false)"
+    >
+      @if (assigning()) {
+        <hr-hotel-access-editor
+          [user]="person"
+          mode="assign"
+          (done)="onAssigned()"
+          (cancelled)="assignDrawer.close()"
+        />
+      }
+    </hr-drawer>
+    <hr-drawer
+      #grantDrawer
+      i18n-heading="@@administration.person.drawer.grant"
+      heading="Grant access for a while"
+      (closed)="granting.set(false)"
+    >
+      @if (granting()) {
+        <hr-hotel-access-editor
+          [user]="person"
+          mode="grant"
+          (done)="onGranted()"
+          (cancelled)="grantDrawer.close()"
+        />
+      }
+    </hr-drawer>
+    <hr-confirm-dialog
+      #endDialog
+      i18n-heading="@@administration.person.hotel-roles.end.heading"
+      heading="End this role here?"
+      i18n-message="@@administration.person.hotel-roles.end.ask"
+      message="The person loses the role at this hotel or group from their next call. The row stays as part of the record."
+      i18n-go="@@administration.person.hotel-roles.end.go"
+      go="End role"
+      i18n-stay="@@administration.person.hotel-roles.end.stay"
+      stay="Keep it"
+    />
+    <hr-confirm-dialog
+      #revokeDialog
+      tone="stop"
+      i18n-heading="@@administration.person.grants.revoke.heading"
+      heading="Revoke this access?"
+      i18n-message="@@administration.person.grants.revoke.ask"
+      message="The loan ends now; the person loses the role from their next call."
+      i18n-go="@@administration.person.grants.revoke.go"
+      go="Revoke"
+      i18n-stay="@@administration.person.grants.revoke.stay"
+      stay="Keep it"
+    />
+    <hr-confirm-dialog
+      #endLinkDialog
+      tone="stop"
+      i18n-heading="@@administration.person.sign-in.end-link.heading"
+      heading="End this company link?"
+      i18n-message="@@administration.person.sign-in.end-link.ask"
+      message="That company account cannot sign in here again, and the person is signed out everywhere now."
+      i18n-go="@@administration.person.sign-in.end-link.go"
+      go="End link"
+      i18n-stay="@@administration.person.sign-in.end-link.stay"
+      stay="Keep it"
+    />
+  </div>
+} @else {
+  <div class="c-page">
+    <p class="c-state-h" role="status" i18n="@@administration.person.loading">Loading…</p>
+  </div>
+}

@@ -1,287 +1,611 @@
 @if (problem(); as problem) {
-  <p class="empty" role="alert">
-    {{ problem }}&ngsp;<button
-      type="button"
-      class="btn"
-      (click)="reload()"
-      i18n="@@platform-admin.property.try-again"
-    >
-      Try again
-    </button>
-  </p>
+  <div class="c-page">
+    <div class="c-empty" role="alert">
+      <span class="ring"><hr-icon name="critical" size="20" /></span>
+      <b>{{ problem }}</b>
+      <button
+        type="button"
+        class="btn"
+        (click)="reload()"
+        i18n="@@platform-admin.property.try-again"
+      >
+        Try again
+      </button>
+    </div>
+  </div>
 } @else if (property(); as property) {
-  <div class="sec-h head">
-    <span class="code num" dir="ltr">{{ property.code }}</span>
-    <h1>
-      <bdi>{{ name(property) }}</bdi>
-    </h1>
-    <div class="obj">
-      <b dir="ltr">{{ property.propertyTypeCode }}</b>
-      <span i18n="@@platform-admin.property.type">Type</span>
-    </div>
-    <div class="obj">
-      <b dir="ltr">{{ property.countryCode }} · {{ property.timeZoneId }}</b>
-      <span i18n="@@platform-admin.property.where">Country · zone</span>
-    </div>
-    <div class="obj">
-      <b dir="ltr">{{ property.defaultCurrency }} · {{ property.defaultLanguageCode }}</b>
-      <span i18n="@@platform-admin.property.currency-language">Currency · language</span>
-    </div>
-    <div class="obj">
-      <b class="num">{{ property.totalRooms }}</b>
-      <span i18n="@@platform-admin.property.rooms">Rooms</span>
-    </div>
-    <div class="obj" [attr.data-s]="property.isActive ? null : 'warn'">
-      @if (property.isActive) {
-        <b i18n="@@platform-admin.property.active">Active</b>
-      } @else {
-        <b i18n="@@platform-admin.property.inactive">Inactive</b>
-      }
-      <span i18n="@@platform-admin.property.state">State</span>
-    </div>
-  </div>
-  <p class="line">
-    <bdi>{{ property.addressLine }}</bdi>
-    @if (property.postalCode; as postal) {
-      <span dir="ltr">· {{ postal }}</span>
-    }
-  </p>
-  <div class="acts" *hrIfAllowed="manageProperties">
-    <button
-      type="button"
-      class="btn"
-      data-act="edit"
-      (click)="openEditor()"
-      [attr.aria-expanded]="editing()"
-      i18n="@@platform-admin.property.edit"
-    >
-      Edit
-    </button>
-  </div>
-  <section class="part" aria-labelledby="lines-heading">
-    <h2 id="lines-heading">
-      <span i18n="@@platform-admin.property.lines">Subscriptions</span>&ngsp;<span class="num">{{
-        property.subscriptions.length
-      }}</span>
-    </h2>
-    @if (property.subscriptions.length === 0) {
-      <p class="line" i18n="@@platform-admin.property.lines.none">No module yet.</p>
-    } @else {
-      <div class="table-wrap">
-        <table class="data">
-          <thead>
-            <tr>
-              <th scope="col" i18n="@@platform-admin.property.line.module">Module</th>
-              <th scope="col" i18n="@@platform-admin.property.line.scope">Scope</th>
-              <th scope="col" i18n="@@platform-admin.property.line.state">State</th>
-              <th scope="col" i18n="@@platform-admin.property.line.period">Period</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (line of property.subscriptions; track line.id) {
-              <tr class="lrow">
-                <td class="key" dir="ltr">{{ line.moduleCode }}</td>
-                <td>{{ scopeOf(line) }}</td>
-                <td>
-                  @if (line.isEnabled) {
-                    <span class="pill on" i18n="@@platform-admin.property.line.enabled"
-                      >Enabled</span
-                    >
-                  } @else {
-                    <span class="pill off" i18n="@@platform-admin.property.line.disabled"
-                      >Disabled</span
-                    >
-                  }
-                </td>
-                <td class="num">
-                  {{ line.startsOn }}
-                  @if (line.endsOn; as endsOn) {
-                    – {{ endsOn }}
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-  </section>
-  <section class="part" aria-labelledby="contacts-heading">
-    <h2 id="contacts-heading">
-      <span i18n="@@platform-admin.property.contacts">Contacts</span>&ngsp;<span class="num">{{
-        property.contacts.length
-      }}</span>
-    </h2>
-    @if (property.contacts.length === 0) {
-      <p class="line" i18n="@@platform-admin.property.contacts.none">No contact yet.</p>
-    } @else {
-      <div class="table-wrap">
-        <table class="data">
-          <thead>
-            <tr>
-              <th scope="col" i18n="@@platform-admin.property.contact.name">Name</th>
-              <th scope="col" i18n="@@platform-admin.property.contact.email">Email</th>
-              <th scope="col" i18n="@@platform-admin.property.contact.telephone">Telephone</th>
-              <th scope="col" i18n="@@platform-admin.property.contact.kind">Kind</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (contact of property.contacts; track contact.id) {
-              <tr class="crow">
-                <td>
-                  <span class="nm"
-                    ><bdi>{{ contact.name }}</bdi></span
-                  >
-                  @if (contact.role; as role) {
-                    <span class="sub"
-                      ><bdi>{{ role }}</bdi></span
-                    >
-                  }
-                </td>
-                <td dir="ltr">{{ contact.email ?? '' }}</td>
-                <td dir="ltr">{{ contact.telephone ?? '' }}</td>
-                <td>
-                  @if (contact.isPrimary) {
-                    <span class="pill yes" i18n="@@platform-admin.property.contact.primary"
-                      >Primary</span
-                    >
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-  </section>
-  <hr-drawer
-    #drawer
-    i18n-heading="@@platform-admin.property.edit.title"
-    heading="Edit property"
-    (closed)="editing.set(false)"
-  >
-    @if (editing()) {
-      <form class="editor" (submit)="onSave($event, property)" novalidate>
-        <div class="fields">
-          <div class="f">
-            <label for="edit-name-en" i18n="@@platform-admin.property.field.name-en"
-              >Name (English)</label
-            >
-            <input
-              id="edit-name-en"
-              class="field"
-              type="text"
-              autocomplete="off"
-              lang="en"
-              dir="ltr"
-              [formField]="form.nameEn"
-            />
-            @if (form.nameEn().touched() && form.nameEn().errors().length > 0) {
-              <p class="field-error" role="alert">
-                @for (error of form.nameEn().errors(); track error.kind) {
-                  <span>{{ error.message }}</span>
-                }
-              </p>
-            }
-          </div>
-          <div class="f">
-            <label for="edit-name-ar" i18n="@@platform-admin.property.field.name-ar"
-              >Name (Arabic)</label
-            >
-            <input
-              id="edit-name-ar"
-              class="field"
-              type="text"
-              autocomplete="off"
-              lang="ar"
-              dir="rtl"
-              [formField]="form.nameAr"
-            />
-            @if (form.nameAr().touched() && form.nameAr().errors().length > 0) {
-              <p class="field-error" role="alert">
-                @for (error of form.nameAr().errors(); track error.kind) {
-                  <span>{{ error.message }}</span>
-                }
-              </p>
-            }
-          </div>
-          <div class="f">
-            <label for="edit-address" i18n="@@platform-admin.property.field.address">Address</label>
-            <input
-              id="edit-address"
-              class="field"
-              type="text"
-              autocomplete="off"
-              dir="auto"
-              [formField]="form.addressLine"
-            />
-          </div>
-          <div class="f">
-            <label for="edit-postal" i18n="@@platform-admin.property.field.postal"
-              >Postal code</label
-            >
-            <input
-              id="edit-postal"
-              class="field"
-              type="text"
-              autocomplete="off"
-              dir="ltr"
-              [formField]="form.postalCode"
-            />
-          </div>
-          <div class="f">
-            <label for="edit-rooms" i18n="@@platform-admin.property.field.rooms">Rooms</label>
-            <input
-              id="edit-rooms"
-              class="field"
-              type="text"
-              inputmode="numeric"
-              dir="ltr"
-              [formField]="form.totalRooms"
-            />
-            @if (form.totalRooms().touched() && form.totalRooms().errors().length > 0) {
-              <p class="field-error" role="alert">
-                @for (error of form.totalRooms().errors(); track error.kind) {
-                  <span>{{ error.message }}</span>
-                }
-              </p>
-            }
-          </div>
-          <div class="f">
-            <label for="edit-opens" i18n="@@platform-admin.property.field.opens-on">Opens on</label>
-            <input id="edit-opens" class="field" type="date" [formField]="form.opensOn" />
-          </div>
-          <div class="f">
-            <label for="edit-closes" i18n="@@platform-admin.property.field.closes-on"
-              >Closes on</label
-            >
-            <input id="edit-closes" class="field" type="date" [formField]="form.closesOn" />
-          </div>
-        </div>
-        @if (editProblem(); as text) {
-          <p class="field-error" role="alert">{{ text }}</p>
+  <div class="c-page hotel">
+    <hr-page-head [title]="property.nameEn">
+      <span slot="before-title" class="code-tile" dir="ltr">{{ property.code }}</span>
+      <span slot="after-title" class="after">
+        @if (property.nameAr) {
+          <span class="ar" lang="ar" dir="rtl">{{ property.nameAr }}</span>
         }
-        <div class="acts">
-          <button
-            type="submit"
-            class="btn solid"
-            [disabled]="form().submitting()"
-            i18n="@@platform-admin.property.edit.go"
+        <span class="chip" [attr.data-s]="stateTone(property)" data-status
+          ><span class="dot"></span>{{ stateWord(property) }}</span
+        >
+        @if (over(property); as over) {
+          <span class="chip" data-s="warn"
+            ><span class="dot"></span
+            ><ng-container i18n="@@platform-admin.property.over-chip"
+              >{{ over }} rooms above licence</ng-container
+            ></span
           >
-            Save
-          </button>
-          <button
-            type="button"
-            class="btn"
-            (click)="drawer.close()"
-            i18n="@@platform-admin.property.edit.cancel"
+        }
+      </span>
+      <p class="lead" slot="lead">
+        @if (tenantName(property); as tenant) {
+          <a [routerLink]="['/tenants', property.tenantId]"
+            ><bdi>{{ tenant }}</bdi> (<span dir="ltr">{{ tenantCode(property) }}</span
+            >)</a
           >
-            Cancel
-          </button>
+          ·
+        }
+        {{ typeName(property) }}
+        @if (cityName(property); as city) {
+          · {{ city }}
+        }
+        · <span dir="ltr">{{ property.timeZoneId }}</span> ·
+        <span dir="ltr">{{ property.defaultCurrency }}</span> · {{ languageName(property) }} ·
+        <bdi>{{ property.addressLine }}</bdi>
+        @if (property.postalCode; as postal) {
+          · <span dir="ltr">{{ postal }}</span>
+        }
+      </p>
+      <button
+        slot="actions"
+        *hrIfAllowed="manageProperties"
+        type="button"
+        class="btn"
+        data-act="edit"
+        (click)="openEditor()"
+        [attr.aria-expanded]="editing()"
+      >
+        <hr-icon name="pencil" size="16" />
+        <span i18n="@@platform-admin.property.edit">Edit</span>
+      </button>
+      <a
+        slot="actions"
+        *hrIfAllowed="manageProperties"
+        class="btn"
+        [routerLink]="['/tenants', property.tenantId]"
+        [queryParams]="{ tab: 'subscriptions', subscribe: property.id }"
+      >
+        <hr-icon name="plus" size="16" />
+        <span i18n="@@platform-admin.property.add-module">Add module</span>
+      </a>
+      <span slot="actions" class="more-wrap">
+        <button
+          #moreButton
+          type="button"
+          class="btn icon"
+          popovertarget="property-more"
+          i18n-aria-label="@@platform-admin.property.more"
+          aria-label="More actions"
+        >
+          <hr-icon name="more" size="16" />
+        </button>
+        <div class="row-menu" popover id="property-more" [hrPopAt]="moreButton" role="menu">
+          <a
+            role="menuitem"
+            [routerLink]="['/tenants', property.tenantId]"
+            i18n="@@platform-admin.property.menu.tenant"
+            >Tenant</a
+          >
+          <a
+            role="menuitem"
+            [routerLink]="['/properties']"
+            [queryParams]="{ tenant: property.tenantId }"
+            i18n="@@platform-admin.property.menu.siblings"
+            >The customer's hotels</a
+          >
         </div>
-      </form>
+      </span>
+    </hr-page-head>
+
+    @if (over(property); as over) {
+      <div class="c-msg" data-s="warn" role="status">
+        <hr-icon class="ic" name="attention" size="18" />
+        <span>
+          <b i18n="@@platform-admin.property.licence-gap.title"
+            >{{ over }} rooms above the licence.</b
+          >
+          <ng-container i18n="@@platform-admin.property.licence-gap.text"
+            >The hotel declares {{ property.totalRooms }} rooms on a {{ licensed(property) }}-room
+            line. Harmony flags it on the customer and in the trail; it never refuses the
+            hotel.</ng-container
+          >
+        </span>
+        <a
+          *hrIfAllowed="manageProperties"
+          class="btn"
+          [routerLink]="['/tenants', property.tenantId]"
+          [queryParams]="{ tab: 'subscriptions', subscribe: property.id }"
+          i18n="@@platform-admin.property.licence-gap.raise"
+          >Raise the line</a
+        >
+      </div>
     }
-  </hr-drawer>
+
+    <nav
+      class="c-tabs"
+      role="tablist"
+      i18n-aria-label="@@platform-admin.property.tabs"
+      aria-label="Sections"
+    >
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'overview'"
+        (click)="show('overview')"
+        i18n="@@platform-admin.property.tab.overview"
+      >
+        Overview
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'subscriptions'"
+        (click)="show('subscriptions')"
+      >
+        <ng-container i18n="@@platform-admin.property.tab.subscriptions">Subscriptions</ng-container
+        >&ngsp;<span class="n">· {{ property.subscriptions.length }}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'contacts'"
+        (click)="show('contacts')"
+      >
+        <ng-container i18n="@@platform-admin.property.tab.contacts">Contacts</ng-container
+        >&ngsp;<span class="n">· {{ property.contacts.length }}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'groups'"
+        (click)="show('groups')"
+      >
+        <ng-container i18n="@@platform-admin.property.tab.groups">Groups</ng-container>&ngsp;<span
+          class="n"
+          >· {{ currentMemberships().length }}</span
+        >
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="current() === 'trail'"
+        (click)="show('trail')"
+        i18n="@@platform-admin.property.tab.trail"
+      >
+        Trail
+      </button>
+    </nav>
+
+    @if (current() === 'overview') {
+      <div class="c-grid three cards">
+        <section class="c-card">
+          <div class="c-card-h"><h3 i18n="@@platform-admin.property.card.licence">Licence</h3></div>
+          <div class="c-card-b">
+            <dl class="c-facts">
+              <dt i18n="@@platform-admin.property.fact.licensed">Rooms licensed</dt>
+              <dd class="num">{{ licensed(property) }}</dd>
+              <dt i18n="@@platform-admin.property.fact.in-use">Rooms in use</dt>
+              <dd class="num">
+                {{ property.totalRooms }}
+                @if (over(property); as over) {
+                  <span class="over">&ngsp;▲ {{ over }}</span>
+                }
+              </dd>
+              <dt i18n="@@platform-admin.property.fact.terminals">Terminals</dt>
+              <dd>{{ terminals(property) }}</dd>
+              <dt i18n="@@platform-admin.property.fact.span">Opens · closes</dt>
+              <dd class="num">{{ date(property.opensOn) }} · {{ date(property.closesOn) }}</dd>
+              <dt i18n="@@platform-admin.property.fact.regimes">Regimes</dt>
+              <dd dir="ltr">{{ regimes(property) }}</dd>
+            </dl>
+          </div>
+        </section>
+        <section class="c-card">
+          <div class="c-card-h">
+            <h3 i18n="@@platform-admin.property.card.contacts">Contacts</h3>
+            <span class="chip"><span class="dot"></span>{{ property.contacts.length }}</span>
+          </div>
+          <div class="c-card-b">
+            @if (property.contacts.length === 0) {
+              <p class="note" i18n="@@platform-admin.property.contacts.none">No contact yet.</p>
+            } @else {
+              <dl class="c-facts">
+                @for (contact of property.contacts; track contact.id) {
+                  <dt>
+                    <bdi>{{ contact.name }}</bdi>
+                  </dt>
+                  <dd>
+                    <bdi>{{ contact.role ?? '' }}</bdi>
+                    @if (contact.isPrimary) {
+                      <ng-container i18n="@@platform-admin.property.contact.primary">
+                        · primary</ng-container
+                      >
+                    }
+                    @if (contact.email; as email) {
+                      &ngsp;<span class="sub" dir="ltr">{{ email }}</span>
+                    }
+                  </dd>
+                }
+              </dl>
+            }
+          </div>
+        </section>
+        <section class="c-card">
+          <div class="c-card-h">
+            <h3 i18n="@@platform-admin.property.card.groups">Groups</h3>
+            <span class="chip"><span class="dot"></span>{{ currentMemberships().length }}</span>
+          </div>
+          <div class="c-card-b">
+            <dl class="c-facts">
+              @for (membership of currentMemberships(); track membership.group.id) {
+                <dt>
+                  <a [routerLink]="['/groups', membership.group.id]" dir="ltr">{{
+                    membership.group.code
+                  }}</a>
+                </dt>
+                <dd>
+                  <span dir="ltr">{{ membership.group.typeCode }}</span>
+                  <ng-container i18n="@@platform-admin.property.groups.since">
+                    · since {{ instant(membership.fromUtc) }}</ng-container
+                  >
+                </dd>
+              }
+              <dt i18n="@@platform-admin.property.fact.brand">Brand</dt>
+              <dd>
+                @if (brand(); as brand) {
+                  <a [routerLink]="['/groups', brand.id]"
+                    ><bdi>{{ brand.nameEn }}</bdi></a
+                  >
+                } @else {
+                  <ng-container i18n="@@platform-admin.property.brand.none">none</ng-container>
+                }
+              </dd>
+            </dl>
+          </div>
+        </section>
+      </div>
+      <ng-container *ngTemplateOutlet="lines; context: { $implicit: property }" />
+      <hr-trail-card
+        [title]="trailTitle"
+        [rows]="trailRows()"
+        [problem]="trail.problem()"
+        [allParams]="{ tenant: property.tenantId, search: property.code }"
+      />
+    } @else if (current() === 'subscriptions') {
+      <ng-container *ngTemplateOutlet="lines; context: { $implicit: property }" />
+    } @else if (current() === 'contacts') {
+      <section class="c-card">
+        <div class="c-card-h"><h3 i18n="@@platform-admin.property.contacts">Contacts</h3></div>
+        @if (property.contacts.length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@platform-admin.property.contacts.none">No contact yet.</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@platform-admin.property.contact.name">Name</th>
+                  <th scope="col" i18n="@@platform-admin.property.contact.role">Role</th>
+                  <th scope="col" i18n="@@platform-admin.property.contact.email">Email</th>
+                  <th scope="col" i18n="@@platform-admin.property.contact.telephone">Telephone</th>
+                  <th scope="col" i18n="@@platform-admin.property.contact.kind">Kind</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (contact of property.contacts; track contact.id) {
+                  <tr class="crow">
+                    <td>
+                      <span class="nm"
+                        ><bdi>{{ contact.name }}</bdi></span
+                      >
+                    </td>
+                    <td class="muted">
+                      <bdi>{{ contact.role ?? '' }}</bdi>
+                    </td>
+                    <td class="muted" dir="ltr">{{ contact.email ?? '' }}</td>
+                    <td class="muted" dir="ltr">{{ contact.telephone ?? '' }}</td>
+                    <td>
+                      @if (contact.isPrimary) {
+                        <span class="chip" data-s="ok"
+                          ><span class="dot"></span
+                          ><ng-container i18n="@@platform-admin.property.contact.primary-chip"
+                            >Primary</ng-container
+                          ></span
+                        >
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    } @else if (current() === 'groups') {
+      <section class="c-card">
+        <div class="c-card-h"><h3 i18n="@@platform-admin.property.groups.title">Groups</h3></div>
+        @if (memberships().length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@platform-admin.property.groups.none">
+              This hotel belongs to no group.
+            </p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@platform-admin.property.groups.column.group">Group</th>
+                  <th scope="col" i18n="@@platform-admin.property.groups.column.type">Type</th>
+                  <th scope="col" i18n="@@platform-admin.property.groups.column.from">From</th>
+                  <th scope="col" i18n="@@platform-admin.property.groups.column.to">To</th>
+                  <th scope="col" i18n="@@platform-admin.property.groups.column.state">State</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (membership of memberships(); track membership.group.id + membership.fromUtc) {
+                  <tr [class.past]="!membership.isCurrent">
+                    <td class="tenant">
+                      <a class="nm" [routerLink]="['/groups', membership.group.id]"
+                        ><span dir="ltr">{{ membership.group.code }}</span> ·
+                        <bdi>{{ membership.group.nameEn }}</bdi></a
+                      >
+                    </td>
+                    <td class="muted" dir="ltr">{{ membership.group.typeCode }}</td>
+                    <td class="muted num">{{ instant(membership.fromUtc) }}</td>
+                    <td class="muted num">{{ instant(membership.toUtc) }}</td>
+                    <td>
+                      <span class="chip" [attr.data-s]="membership.isCurrent ? 'ok' : null"
+                        ><span class="dot"></span>{{ membershipState(membership) }}</span
+                      >
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    } @else if (current() === 'trail') {
+      <hr-trail-card
+        [title]="trailTitle"
+        [rows]="trailRows()"
+        [problem]="trail.problem()"
+        [allParams]="{ tenant: property.tenantId, search: property.code }"
+      />
+    }
+
+    <ng-template #lines let-property>
+      <section class="c-card">
+        <div class="c-card-h">
+          <h3>
+            <ng-container i18n="@@platform-admin.property.lines">Subscription lines</ng-container
+            >&ngsp;<span class="chip"
+              ><span class="dot"></span>{{ property.subscriptions.length }}</span
+            >
+          </h3>
+          <span class="r">
+            <a
+              *hrIfAllowed="manageProperties"
+              class="btn solid"
+              [routerLink]="['/tenants', property.tenantId]"
+              [queryParams]="{ tab: 'subscriptions', subscribe: property.id }"
+            >
+              <hr-icon name="plus" size="16" />
+              <span i18n="@@platform-admin.property.add-module">Add module</span>
+            </a>
+          </span>
+        </div>
+        @if (property.subscriptions.length === 0) {
+          <div class="c-card-b">
+            <p class="note" i18n="@@platform-admin.property.lines.none">No module yet.</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data lines">
+              <thead>
+                <tr>
+                  <th scope="col" i18n="@@platform-admin.property.line.module">Module</th>
+                  <th scope="col" i18n="@@platform-admin.property.line.scope">Scope</th>
+                  <th scope="col" i18n="@@platform-admin.property.line.state">State</th>
+                  <th scope="col" i18n="@@platform-admin.property.line.period">Period</th>
+                  <th scope="col" class="num" i18n="@@platform-admin.property.line.rooms">Rooms</th>
+                  <th scope="col" class="num" i18n="@@platform-admin.property.line.terminals">
+                    Terminals
+                  </th>
+                  <th scope="col" i18n="@@platform-admin.property.line.renewal">Renewal</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (line of property.subscriptions; track line.id) {
+                  <tr class="lrow">
+                    <td class="tenant key" dir="ltr">
+                      <span class="nm">{{ moduleName(line) }}</span>
+                      &ngsp;<span class="sub">{{ lineSub(line) }}</span>
+                    </td>
+                    <td>{{ scopeOf(line) }}</td>
+                    <td>
+                      <span class="chip" [attr.data-s]="lineTone(line)"
+                        ><span class="dot"></span>{{ lineState(line) }}</span
+                      >
+                    </td>
+                    <td class="muted num">{{ period(line) }}</td>
+                    <td class="num rooms">
+                      {{ line.rooms ?? '—' }}
+                      @if (lineOver(line, property); as over) {
+                        <span class="over" i18n="@@platform-admin.property.line.over"
+                          >&ngsp;▲ {{ over }} in use</span
+                        >
+                      }
+                    </td>
+                    <td class="num">{{ line.terminals ?? '—' }}</td>
+                    <td class="muted">
+                      @if (line.renewsAutomatically) {
+                        <ng-container i18n="@@platform-admin.property.line.renews"
+                          >Renews</ng-container
+                        >
+                      } @else {
+                        <ng-container i18n="@@platform-admin.property.line.fixed"
+                          >Fixed term</ng-container
+                        >
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    </ng-template>
+
+    <hr-drawer
+      #drawer
+      i18n-heading="@@platform-admin.property.edit.title"
+      heading="Edit property"
+      (closed)="editing.set(false)"
+    >
+      @if (editing()) {
+        <form class="editor" (submit)="onSave($event, property)" novalidate>
+          <div class="fields">
+            <div class="f">
+              <label for="edit-name-en" i18n="@@platform-admin.property.field.name-en"
+                >Name (English)</label
+              >
+              <input
+                id="edit-name-en"
+                class="field"
+                type="text"
+                autocomplete="off"
+                lang="en"
+                dir="ltr"
+                [formField]="form.nameEn"
+              />
+              @if (form.nameEn().touched() && form.nameEn().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  @for (error of form.nameEn().errors(); track error.kind) {
+                    <span>{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="edit-name-ar" i18n="@@platform-admin.property.field.name-ar"
+                >Name (Arabic)</label
+              >
+              <input
+                id="edit-name-ar"
+                class="field"
+                type="text"
+                autocomplete="off"
+                lang="ar"
+                dir="rtl"
+                [formField]="form.nameAr"
+              />
+              @if (form.nameAr().touched() && form.nameAr().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  @for (error of form.nameAr().errors(); track error.kind) {
+                    <span>{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="edit-address" i18n="@@platform-admin.property.field.address"
+                >Address</label
+              >
+              <input
+                id="edit-address"
+                class="field"
+                type="text"
+                autocomplete="off"
+                dir="auto"
+                [formField]="form.addressLine"
+              />
+              @if (form.addressLine().touched() && form.addressLine().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  {{ form.addressLine().errors()[0]?.message }}
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="edit-postal" i18n="@@platform-admin.property.field.postal"
+                >Postal code</label
+              >
+              <input
+                id="edit-postal"
+                class="field"
+                type="text"
+                autocomplete="off"
+                dir="ltr"
+                [formField]="form.postalCode"
+              />
+            </div>
+            <div class="f">
+              <label for="edit-rooms" i18n="@@platform-admin.property.field.rooms">Rooms</label>
+              <input
+                id="edit-rooms"
+                class="field"
+                type="text"
+                inputmode="numeric"
+                dir="ltr"
+                [formField]="form.totalRooms"
+              />
+              @if (form.totalRooms().touched() && form.totalRooms().errors().length > 0) {
+                <p class="field-error" role="alert">
+                  @for (error of form.totalRooms().errors(); track error.kind) {
+                    <span>{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+            <div class="f">
+              <label for="edit-opens" i18n="@@platform-admin.property.field.opens-on"
+                >Opens on</label
+              >
+              <input id="edit-opens" class="field" type="date" [formField]="form.opensOn" />
+            </div>
+            <div class="f">
+              <label for="edit-closes" i18n="@@platform-admin.property.field.closes-on"
+                >Closes on</label
+              >
+              <input id="edit-closes" class="field" type="date" [formField]="form.closesOn" />
+            </div>
+          </div>
+          @if (editProblem(); as text) {
+            <p class="field-error" role="alert">{{ text }}</p>
+          }
+          <div class="acts">
+            <button
+              type="submit"
+              class="btn solid"
+              [disabled]="form().submitting()"
+              i18n="@@platform-admin.property.edit.go"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              class="btn"
+              (click)="drawer.close()"
+              i18n="@@platform-admin.property.edit.cancel"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      }
+    </hr-drawer>
+  </div>
 } @else {
-  <p class="empty" role="status" i18n="@@platform-admin.property.loading">Loading…</p>
+  <div class="c-page">
+    <p class="c-state-h" role="status" i18n="@@platform-admin.property.loading">Loading…</p>
+  </div>
 }

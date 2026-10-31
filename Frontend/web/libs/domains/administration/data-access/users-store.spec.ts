@@ -26,6 +26,8 @@ const ahmad: UserAccount = {
   displayName: 'Ahmad Saleh',
   twoFactorEnabled: true,
   twoStepExemptReason: null,
+  lastSignInUtc: null,
+  lastSignInDevice: null,
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',
@@ -66,6 +68,9 @@ describe('UsersStore', () => {
       pageNumber: 1,
       pageSize: USERS_PAGE_SIZE,
       searchText: null,
+      state: null,
+      twoStep: null,
+      roleId: null,
     });
     request.flush({ data: { results: [ahmad], totalCount: TOTAL } });
     await settle();
@@ -86,6 +91,9 @@ describe('UsersStore', () => {
       pageNumber: 1,
       pageSize: USERS_PAGE_SIZE,
       searchText: 'ahmad',
+      state: null,
+      twoStep: null,
+      roleId: null,
     });
   });
 
@@ -109,7 +117,13 @@ describe('UsersStore', () => {
     await settle();
     http.expectOne(usersPath).flush({ data: { results: [], totalCount: 0 } });
     TestBed.inject(PropertyScope).reset();
-    expect(store.filters()).toEqual({ search: '', page: 1 });
+    expect(store.filters()).toEqual({
+      search: '',
+      state: null,
+      twoStep: null,
+      roleId: null,
+      page: 1,
+    });
     await settle();
     http.expectOne(usersPath).flush({ data: { results: [], totalCount: 0 } });
   });

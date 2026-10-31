@@ -15,6 +15,8 @@ export type ApiResult<T> =
 
 /** The receipt gate's "still running" code: the same intent, sent again too early (11.5). */
 export const inFlight = '000.06';
+/** The framework's code for a row saved by someone else since it was read (DbBaseContext). */
+const concurrencyConflict = 'ConcurrencyConflict';
 /** The receipt gate's "key reused for another intent" code (11.5). */
 export const keyReused = '000.07';
 /** The BFF could not be reached at all: one code for every network failure. */
@@ -22,6 +24,10 @@ export const unreachable = 'unreachable';
 
 export function fromResponse<T>(response: HttpResponse<Envelope<T>>): ApiResult<T> {
   const codes = codesOf(response.body);
+  // A row changed under the caller: Identity answers 202 with the framework's concurrency code; a conflict, not a refusal.
+  if (codes.includes(concurrencyConflict)) {
+    return { kind: 'conflict', status: response.status, codes };
+  }
   if (response.status === HttpStatus.accepted || codes.length > 0) {
     return { kind: 'refused', status: response.status, codes };
   }

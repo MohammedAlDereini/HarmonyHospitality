@@ -24,7 +24,13 @@ const hotelsPath = '/api/Property/get-all';
 export const GROUPS_PAGE_SIZE = 25;
 const HOTEL_CHOICES_SIZE = 100;
 const FIRST_PAGE = 1;
-const noFilters: GroupFilters = { tenantId: null, typeCode: null, search: '', page: FIRST_PAGE };
+const noFilters: GroupFilters = {
+  tenantId: null,
+  typeCode: null,
+  isActive: null,
+  search: '',
+  page: FIRST_PAGE,
+};
 
 /** The request Identity reads (GetPagedPropertyGroupsQuery). */
 interface GroupsRequest extends PageRequest {
@@ -64,7 +70,7 @@ export class GroupsStore {
       tenantId: filters.tenantId,
       typeCode: filters.typeCode,
       searchText: filters.search === '' ? null : filters.search,
-      isActive: null,
+      isActive: filters.isActive,
     };
     return { url: groupsPath, method: 'POST', body };
   });
@@ -87,6 +93,11 @@ export class GroupsStore {
 
   ofType(typeCode: string | null): void {
     this.filters.update((filters) => ({ ...filters, typeCode, page: FIRST_PAGE }));
+  }
+
+  /** Only active (true) or only inactive (false) groups; null shows both. */
+  showState(isActive: boolean | null): void {
+    this.filters.update((filters) => ({ ...filters, isActive, page: FIRST_PAGE }));
   }
 
   goTo(page: number): void {

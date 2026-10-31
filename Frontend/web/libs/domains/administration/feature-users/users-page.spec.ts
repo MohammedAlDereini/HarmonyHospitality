@@ -26,6 +26,8 @@ const ahmad: UserAccount = {
   displayName: 'Ahmad Saleh',
   twoFactorEnabled: true,
   twoStepExemptReason: null,
+  lastSignInUtc: null,
+  lastSignInDevice: null,
   state: AccountState.active,
   stateReason: null,
   createdDate: '2026-10-24T08:00:00Z',
@@ -40,11 +42,19 @@ const lina: UserAccount = {
   displayName: 'Lina Haddad',
   twoFactorEnabled: false,
   twoStepExemptReason: 'night desk',
+  lastSignInUtc: null,
+  lastSignInDevice: null,
   state: AccountState.suspended,
 };
 
 class FakeStore {
-  readonly filters = signal<UserFilters>({ search: '', page: 1 });
+  readonly filters = signal<UserFilters>({
+    search: '',
+    state: null,
+    twoStep: null,
+    roleId: null,
+    page: 1,
+  });
   readonly rows = signal<readonly UserAccount[]>([]);
   readonly total = signal(0);
   readonly loading = signal(false);
@@ -132,7 +142,7 @@ describe('UsersPage', () => {
     expect(next?.disabled).toBe(false);
     next?.click();
     expect(store.pages).toEqual([SECOND_PAGE]);
-    store.filters.set({ search: '', page: LAST_PAGE });
+    store.filters.set({ search: '', state: null, twoStep: null, roleId: null, page: LAST_PAGE });
     await render();
     expect(page.querySelectorAll<HTMLButtonElement>('hr-pager .btn')[1]?.disabled).toBe(true);
   });

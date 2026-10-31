@@ -11,7 +11,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormField, form, pattern, required, submit } from '@angular/forms/signals';
-import { GroupsStore, ReferenceStore, TenantsStore } from '@harmony/platform-admin/data-access';
+import { GroupsStore, ReferenceStore } from '@harmony/platform-admin/data-access';
+import { TenantChoicesStore } from '@harmony/platform-operations/data-access';
 import {
   GroupDraft,
   ReferenceRow,
@@ -115,14 +116,20 @@ export class GroupEditor {
 
   private readonly store = inject(GroupsStore);
   private readonly reference = inject(ReferenceStore);
-  protected readonly tenants = inject(TenantsStore);
+  /** Every customer by code, whatever the Tenants page is filtered to; the platform itself owns no hotel. */
+  private readonly tenants = inject(TenantChoicesStore);
+  protected readonly tenantChoices = computed(() =>
+    this.tenants.rows().filter((tenant) => !tenant.isPlatform),
+  );
   private readonly firstBox = viewChild.required<ElementRef<HTMLSelectElement>>('firstBox');
   private readonly locale = $localize.locale ?? 'en';
   protected readonly types = this.reference.choices('PropertyGroupType');
 
   private readonly model = signal<GroupValues>(empty);
   protected readonly form = form(this.model, (path) => {
-    required(path.tenantId, { message: wording('10501') });
+    required(path.tenantId, {
+      message: $localize`:@@platform-admin.group-editor.tenant-required:Choose a tenant.`,
+    });
     required(path.typeCode, { message: wording('10708') });
     required(path.code, { message: wording('10702') });
     pattern(path.code, groupCode, { message: wording('10703') });
@@ -151,10 +158,12 @@ export class GroupEditor {
   }
 
   protected label(row: ReferenceRow): string {
+    const arabic = String(row['nameAr'] ?? '');
+    if (this.locale.startsWith('ar') && arabic !== '') return arabic;
     return String(row['nameEn'] ?? row['code'] ?? '');
   }
 
-  protected tenantLabel(tenant: Tenant): string {
+  protected tenantLabel(tenant: Pick<Tenant, 'code' | 'legalNameEn' | 'legalNameAr'>): string {
     return `${tenant.code} · ${tenantName(tenant, this.locale)}`;
   }
 
