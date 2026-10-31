@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Harmony Services Map</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#F3F5F7; --plane:#FFFFFF; --plane-2:#FAFBFC;
+    --ink:#16202B; --ink-2:#44535F; --muted:#6E7E8B;
+    --rule:#D5DDE4; --rule-2:#E7ECF1;
+    --steel:#2C6394; --steel-soft:#E5EEF7;
+    --ochre:#8A5F0F; --ochre-soft:#F8EFDA;
+    --green:#1B6B4C; --green-soft:#E1F1EA;
+    --red:#A62A21; --red-soft:#FBEAE8;
+    --shadow:0 1px 2px rgba(22,32,43,.05),0 8px 24px rgba(22,32,43,.06);
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ground:#0D1319; --plane:#151E26; --plane-2:#1A242D;
+    --ink:#E7EDF3; --ink-2:#B3C1CE; --muted:#8596A4;
+    --rule:#29353F; --rule-2:#212C35;
+    --steel:#82B4DF; --steel-soft:#1A2D3D;
+    --ochre:#D9AC52; --ochre-soft:#2F2716;
+    --green:#63C39A; --green-soft:#11291F;
+    --red:#EE8F87; --red-soft:#311917;
+    --shadow:0 1px 2px rgba(0,0,0,.45),0 8px 24px rgba(0,0,0,.32);
+  }}
+  :root[data-theme="dark"]{
+    --ground:#0D1319; --plane:#151E26; --plane-2:#1A242D;
+    --ink:#E7EDF3; --ink-2:#B3C1CE; --muted:#8596A4;
+    --rule:#29353F; --rule-2:#212C35;
+    --steel:#82B4DF; --steel-soft:#1A2D3D;
+    --ochre:#D9AC52; --ochre-soft:#2F2716;
+    --green:#63C39A; --green-soft:#11291F;
+    --red:#EE8F87; --red-soft:#311917;
+    --shadow:0 1px 2px rgba(0,0,0,.45),0 8px 24px rgba(0,0,0,.32);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1160px;margin:0 auto;padding-inline:20px;padding-block:40px 80px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:20px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel);font-weight:600}
+  h1{font-size:clamp(28px,5vw,40px);line-height:1.08;margin:10px 0 12px;letter-spacing:-.025em;font-weight:600;text-wrap:balance}
+  .sub{color:var(--ink-2);max-width:70ch;margin:0}
+  .counts{display:flex;flex-wrap:wrap;gap:28px;margin-top:22px}
+  .counts div{display:flex;flex-direction:column}
+  .counts b{font-family:var(--mono);font-size:27px;font-weight:600;color:var(--steel);line-height:1.1;font-variant-numeric:tabular-nums}
+  .counts span{font-size:12.5px;color:var(--muted)}
+  section{margin-top:46px}
+  h2{margin:0 0 4px;font-size:13px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--steel);font-weight:600}
+  h3{margin:0 0 10px;font-size:24px;letter-spacing:-.02em;font-weight:600;text-wrap:balance}
+  .lede{color:var(--ink-2);max-width:72ch;margin:0 0 18px}
+  p{max-width:72ch;color:var(--ink-2)}
+  p strong{color:var(--ink);font-weight:600}
+  .wave{margin-top:26px;border:1px solid var(--rule);border-radius:3px;background:var(--plane);box-shadow:var(--shadow);overflow:hidden}
+  .wave > .whead{padding:15px 20px;border-bottom:1px solid var(--rule);background:var(--plane-2);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .wave .wn{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;font-weight:600;color:var(--steel)}
+  .wave .wt{font-size:19px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+  .wave .wd{font-size:13px;color:var(--muted);flex:1;min-width:16ch}
+  .mod{padding:17px 20px;border-bottom:1px solid var(--rule-2)}
+  .mod:last-child{border-bottom:none}
+  .mod h4{margin:0 0 6px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+  .mod .why{margin:0 0 11px;font-size:14px;color:var(--ink-2);max-width:78ch}
+  .mod .why b{color:var(--ink)}
+  .grid2{display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr);gap:14px 22px}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
+  .box{min-width:0}
+  .box .bl{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600;display:block;margin-bottom:5px}
+  .tbls{font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--ink-2);margin:0;white-space:pre-wrap}
+  .tbls b{color:var(--steel);font-weight:600}
+  ul.caps{margin:0;padding-inline-start:18px;color:var(--ink-2);font-size:14px}
+  ul.caps li{margin:0 0 5px}
+  ul.caps b{color:var(--ink);font-weight:600}
+  .tag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--muted);background:var(--plane-2);border:1px solid var(--rule-2);border-radius:2px;padding:0 4px;white-space:nowrap}
+  .inv{margin-top:11px;font-size:13.5px;color:var(--ink-2);border-left:3px solid var(--ochre);padding-left:12px;max-width:78ch}
+  .inv b{color:var(--ink);font-weight:600}
+  pre.map{margin:18px 0 0;padding:15px 17px;overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--plane-2);font-family:var(--mono);font-size:12.5px;line-height:1.65;color:var(--ink-2)}
+  pre.map b{color:var(--steel);font-weight:600}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--steel-soft);color:var(--steel);padding:1px 5px;border-radius:2px}
+  .note{border:1px solid var(--rule);border-left-width:4px;border-radius:3px;background:var(--plane);padding:16px 18px;margin-top:20px}
+  .note.red{border-left-color:var(--red)} .note.green{border-left-color:var(--green)} .note.steel{border-left-color:var(--steel)}
+  .note b{display:block;margin-bottom:5px;font-size:16px;color:var(--ink)}
+  .note p{margin:0 0 8px;font-size:14.5px} .note p:last-child{margin-bottom:0}
+  table.ev{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:8px}
+  table.ev th,table.ev td{text-align:start;padding:6px 8px;border-bottom:1px solid var(--rule-2);vertical-align:top;color:var(--ink-2)}
+  table.ev th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  table.ev td:first-child{font-family:var(--mono);font-size:12.5px;color:var(--ink);white-space:nowrap}
+  footer{margin-top:54px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:12.5px;max-width:76ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Harmony &#183; platform design &#183; the services</span>
+    <h1>Fourteen services, and why not thirty</h1>
+    <p class="sub">The final service structure of Harmony, derived from an exhaustive read of what the three reference systems actually expose: every one of OPERA Cloud's 44 published API specifications (4,000 operations), the 14 operation groups of the Mews Connector API plus its POS, Channel Manager and Booking Engine APIs, and Cloudbeds' ten API families (PMS v1 and v2, Insights, Accounting, Fiscal documents, Group and Guest profiles, Attribute tagging, OTA, Payments). Each Harmony service is a bounded context that one of those catalogues also treats as a unit. Nothing is "later": this is the whole footprint; the build order is only a sequence.</p>
+    <div class="counts">
+      <div><b>14</b><span>services (1 built)</span></div>
+      <div><b>8</b><span>in the hotel core</span></div>
+      <div><b>6</b><span>around the core</span></div>
+      <div><b>3</b><span>reference systems read in full</span></div>
+    </div>
+  </header>
+
+  <!-- ============ EVIDENCE ============ -->
+  <section>
+    <h2>Evidence</h2>
+    <h3>How the industry cuts it</h3>
+    <p class="lede">Read from the vendors' own catalogues, not from marketing pages. The three disagree on granularity (OPERA ships a module per legacy screen; Mews and Cloudbeds ship a module per business capability) but converge on the same capabilities.</p>
+<pre class="map"><b>OPERA Cloud</b> (Oracle's spec folders)   rsv reservations · blk business blocks · fof front desk · csh cashiering · ars receivables
+                                      bof back office (business date) · crm profiles + membership · rtp rate plans · par price/availability
+                                      inv inventory + sell limits · hsk housekeeping · evm sales &amp; events · lms leisure · act sales activities
+                                      chl channel distribution · int/dvm/intcfg interfaces, business events, mappings · expcfg exports
+                                      repcfg reports · medcfg letters/cards/folios · cms Track It · lov 453 code lists · entcfg/rmcfg/fofcfg/
+                                      rsvcfg/crmcfg/evmcfg/blkcfg configuration: chain TEMPLATES copied to HOTELS
+<b>Mews</b> (Connector + POS APIs)       accounts · enterprises (resources, resource categories/features/blocks, tasks, departments,
+                                      outlets, counters) · services (rates, rate groups, restrictions, availability blocks, products,
+                                      vouchers, age categories, cancellation policies, overbooking limits) · reservations (groups,
+                                      companions, sources) · customers (identity documents, photos, titles) · finance (bills, payments,
+                                      preauthorizations, payment requests, cashiers, accounting categories, outlet bills, ledgers,
+                                      exchange rates) · billing automations (routing) · loyalty (programs, tiers, memberships)
+                                      · customer messaging · device integration (printers, key cutters, terminals, fiscal machines)
+                                      · exports · configuration (countries, currencies, tax environments, languages) · POS API
+<b>Cloudbeds</b> (API families)          PMS v1: reservation, room (assign, check-in/out, blocks, types, availability), rate, guest,
+                                      groups, allotment blocks, housekeeping (status, housekeepers, assignments), item, payment,
+                                      adjustment, taxes &amp; fees, house account, hotel, custom fields, emails, dashboard, user, integration
+                                      v2: rate plans, market segmentation, amenities, addons, door locks, events, checks (POS),
+                                      gratuities, smart policies · Accounting (folios, AR ledgers, GL codes, trial balance, deposits)
+                                      · Fiscal documents (invoices, receipts, fiscalization connections) · Insights (datasets, reports,
+                                      schedules, hubs) · Group profile + Guest profile (merges, anonymize, PII) · Attribute tagging
+                                      · OTA build-to-us (ARI, bookings) · Payments tokenization · Pay by link</pre>
+    <div class="note steel">
+      <b>The reading rule</b>
+      <p>A capability became a Harmony service only when at least two of the three treat it as a unit with its own data and lifecycle. A capability that one vendor sells as a product but keeps on another product's data (OPERA's Loyalty on CRM profiles, Cloudbeds' Groups on reservations) stays a module inside the owning service.</p>
+    </div>
+  </section>
+
+  <!-- ============ THE MAP ============ -->
+  <section>
+    <h2>The map</h2>
+    <h3>Fourteen bounded contexts</h3>
+<pre class="map">                              ┌──────────────────────────┐
+                              │ <b>1 Identity &amp; Platform</b> ✓  │  chains, hotels, people, roles, modules
+                              └────────────┬─────────────┘
+          ┌──────────────────┬─────────────┼─────────────┬──────────────────┐
+   ┌──────┴──────┐   ┌───────┴───────┐  ┌──┴───────────┐ │   ┌──────────────┴──────────┐
+   │ <b>2 Property</b>  │   │ <b>3 Rates &amp;</b>     │  │ <b>4 Guests &amp;</b>   │ │   │ <b>13 Integrations &amp;</b>       │
+   │ hotel, rooms│   │ <b>Availability</b>  │  │ <b>Loyalty</b>      │ │   │ <b>Devices</b>                 │
+   │ inventory   │   │ prices, sell  │  │ profiles,    │ │   │ interfaces, webhooks,   │
+   └──────┬──────┘   └───────┬───────┘  │ membership   │ │   │ exports, mappings       │
+          └──────────────────┼──────────┴──┬───────────┘ │   └──────────────┬──────────┘
+                     ┌───────┴─────────────┴───┐        │                  │
+                     │ <b>5 Reservations &amp;</b>        │◄───────┼──── <b>10 Distribution</b> (channels, booking engine)
+                     │ <b>Front Desk</b>               │◄───────┼──── <b>11 Guest Engagement</b> (messages, online check-in, upsell)
+                     │ bookings, blocks, stays  │◄───────┼──── <b>9 Sales, Events &amp; Experiences</b> (leads, function spaces, catering, spa)
+                     └───┬───────────────┬──────┘        │
+              ┌──────────┴───┐     ┌─────┴──────────┐    │
+              │ <b>6 Finance</b>     │◄────┤ <b>8 Housekeeping</b>  │    │
+              │ folios, AR,  │     │ <b>&amp; Maintenance</b>  │    │
+              │ fiscal,      │◄────┼── <b>12 Point of Sale</b>   │
+              │ end of day   │     └────────────────┘    │
+              └──┬───────┬───┘                           │
+                 │       ▼                               │
+                 │  ┌────────────┐                       │
+                 │  │ <b>7 Payments</b> │ cards, terminals,     │
+                 │  │            │ links, refunds (PCI)  │
+                 │  └────────────┘                       │
+                 ▼                                       │
+              <b>14 Reports &amp; Analytics</b> (reads every event) ◄──┘</pre>
+  </section>
+
+  <!-- ============ THE RULES ============ -->
+  <section>
+    <h2>The rules</h2>
+    <h3>What keeps fourteen from becoming thirty</h3>
+    <ul class="caps">
+      <li><b>One owner per fact.</b> A room exists in Property; Reservations, Housekeeping and Rates keep copies fed by events (the way Identity already feeds hotel-role copies to the services). A profile exists in Guests; a reservation holds the profile id and a name snapshot.</li>
+      <li><b>No transaction crosses a service.</b> Check-in is Reservations; the first room charge is Finance; they meet through an event. OPERA's <code>csh/checkOuts</code> does both in one call because it is one database; Harmony does it as a choreography (below).</li>
+      <li><b>Configuration belongs to the service that enforces it.</b> OPERA keeps 453 code lists in one <code>lov</code> service and a <code>…cfg</code> API per domain; Harmony gives each service its own reference tables through the framework's CRUD, with <b>chain templates copied to hotels</b> exactly as OPERA's ChainConfig/HotelConfig pairs do. Identity keeps only the ten shared tables (countries, currencies, time zones, languages…).</li>
+      <li><b>Chain-wide versus per hotel.</b> Guests &amp; Loyalty, Sales accounts and Reports are tenant-level (one guest across the chain, as OPERA's central profiles, Mews portfolio tokens and Cloudbeds multi-property all do). Property, Rates, Reservations, Finance, Housekeeping, POS are per hotel behind the X-Harmony-Property wall Identity already enforces; a chain template at tenant level copies into hotels.</li>
+      <li><b>The business date is Finance's.</b> OPERA keeps it in Back Office with End of Day under Financials; Cloudbeds and Mews close the day in accounting. Finance runs the end-of-day sequence and publishes <code>BusinessDateRolled</code>; nobody else owns a clock.</li>
+      <li><b>Integrations are adapters inside the owning service</b> (a payment terminal is Payments', a key encoder is Reservations', a channel is Distribution's) — but the plumbing they share (webhooks/business events, external-system mappings, device commands, exports, interface monitoring) is one service, 13, as OPERA's <code>int/intcfg/dvm/expcfg</code> and Mews' Device integration + Exports are.</li>
+      <li><b>Modules, not services,</b> for: loyalty (inside Guests), groups and blocks (inside Reservations), commissions, AR and fiscal documents (inside Finance; payments are NOT, see 7), Track It and maintenance (inside Housekeeping), leisure/spa/activities (inside Sales &amp; Events as resource bookings, the Mews way), kiosk/online check-in (inside Guest Engagement), channel manager/booking engine/GDS (inside Distribution).</li>
+    </ul>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section>
+    <h2>Service by service</h2>
+    <h3>Owns, does, never does, tells, shows</h3>
+    <p class="lede">Tags: <span class="tag">O</span> OPERA Cloud, <span class="tag">M</span> Mews, <span class="tag">C</span> Cloudbeds — the catalogue the capability was read from. A capability with one tag is still built when a hotel needs it; the tags are provenance, not priority.</p>
+
+    <!-- 1 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">1 · built</span><span class="wt">Identity &amp; Platform</span><span class="wd">tenant level · docs/identity-aggregates.html</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <p class="why">Tenants (chains) and their subscriptions, hotels and hotel groups/brands, people and their sign-in (passwords, passkeys, two-step, company login, trusted devices, DPoP), roles and permissions at chain / group / hotel level, modules and entitlements, directory sync (SCIM), approvals, the security trail, the ten shared reference tables, the revocation feed, the platform console.</p>
+        <h4>Industry</h4>
+        <p class="why"><span class="tag">O</span> Role Manager, Enterprise Administration (chain and property management, OPERA Controls, subscription matrices), Identity Management · <span class="tag">M</span> Accounts, Enterprises (the chain/property registry), Configuration · <span class="tag">C</span> Identity &amp; Access, Users, Applications, Property (system versions).</p>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">2 · core</span><span class="wt">Property</span><span class="wd">per hotel · the hotel's physical and descriptive setup</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <p class="why">Everything that is true about the building whether or not anyone is booked: the hotel's descriptive record and calendar, its physical inventory, and the counts of what can be sold.</p>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>HotelProfile</b>      details, contacts, amenities, attractions, transport, airports, telephone book, brochure/images, floor plans, restaurants, languages
+<b>HotelCalendar</b>     day types, hotel events, seasons' dates (the price of a season is Rates')
+<b>Building</b>          buildings, building groups, floors, floor plans, sections (housekeeping sections live here, their task sheets in 8)
+<b>RoomClass / RoomType</b>  classes, types, templates, hierarchies, features, bed types, smoking types, amenities, descriptions, room pools
+<b>Room</b>              rooms, components/connecting suites, features, maintenance reasons catalogue, out-of-order / out-of-service (with 8), vacant-status rules
+<b>InventoryCounts</b>   physical counts per type per date, item inventory (cribs, rollaways, rental items), sell limits by date and by channel (with 10)</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Hotel details, categories, types, contacts, amenities, attractions, transportation, airports, telephone book, brochure, images, notes <span class="tag">O entcfg</span> <span class="tag">C getHotelDetails</span> <span class="tag">M enterprises</span></li>
+            <li>Calendar: day types, hotel events, property calendar <span class="tag">O entcfg/calendar</span></li>
+            <li>Buildings, building groups, floors, floor mappings, floor types <span class="tag">O rmcfg</span></li>
+            <li>Room classes, room types (+ templates, AI-generated descriptions), room hierarchies, room pools, central room pools <span class="tag">O rmcfg</span> <span class="tag">M resource categories</span> <span class="tag">C getRoomTypes</span></li>
+            <li>Rooms, features, bed types, smoking, amenities per room, room components/connecting, room ratings <span class="tag">O rmcfg/rsvcfg</span> <span class="tag">M resources + features</span> <span class="tag">C getRooms, amenities</span></li>
+            <li>Out of order / out of service with reasons and dates; room blocks of inventory <span class="tag">O hsk outOfOrder/outOfService</span> <span class="tag">M resource blocks</span> <span class="tag">C postRoomBlock</span></li>
+            <li>Inventory counts and statistics, sell limits by date/range, overbooking protection, item inventory holds <span class="tag">O inv/invasync</span> <span class="tag">M service overbooking limits, availability adjustments</span></li>
+            <li>Pseudo rooms and house accounts' room side (the account itself is Finance) <span class="tag">O interfacePseudoRoom</span> <span class="tag">C house accounts</span></li>
+            <li>Room rotation for owner/condo properties (ownership, points, grades) <span class="tag">O rmr/rmrcfg</span> — a module switched on per hotel</li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> prices and restrictions (3), who is in the room (5), whether the room is clean (8), the day's charges (6). <b>Events out:</b> HotelChanged, RoomTypeChanged, RoomChanged, RoomOutOfOrderSet/Cleared, InventoryCountChanged, SellLimitChanged. <b>Events in:</b> RoomStatusChanged (8, for discrepancy views), BusinessDateRolled (6). <b>Screens:</b> Hotel setup, Rooms &amp; room types, Buildings &amp; floors, Out of order, Inventory calendar; console: templates copied to hotels.</p>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">3 · core</span><span class="wt">Rates &amp; Availability</span><span class="wd">per hotel, chain templates · what is sellable, when, for how much</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>RatePlan</b>          rate classes, categories, codes/plans, seasons, schedules (daily, tiered, LOS), posting rhythms, display sets, rate groups, yield adjustments
+<b>Package</b>           package codes/groups, forecast groups, formula ranges, arrangement codes' pricing side, add-on items
+<b>Policy</b>            cancellation, deposit, guarantee, no-show policies and their schedules; booking rules
+<b>Promotion</b>         promotion groups/codes, coupons, eCoupons, vouchers and voucher codes
+<b>NegotiatedRate</b>    company/agent rate access, rate access exclusions, control segments
+<b>Restriction</b>       CTA/CTD/min-max LOS/closed by type, rate, channel; hurdles; sell messages
+<b>AvailabilityView</b>  the sellable grid: counts from 2 minus blocks (5) minus restrictions; alternate-hotel availability; best available rate</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Rate plan configuration, copy, sync across hotels, mass rate changes, activity log <span class="tag">O rtp/rtpasync</span> <span class="tag">M rates, rate groups, set rates</span> <span class="tag">C rate plans, putRate</span></li>
+            <li>Pricing: daily schedules, occupancy-based, capacity-offset pricing, tiered, BAR/best available, dynamic/advanced base rates <span class="tag">O rtp</span> <span class="tag">M rate pricing, capacity offset</span></li>
+            <li>Packages and add-ons (sell-separate, allowances, forecast groups) <span class="tag">O rtp packages</span> <span class="tag">M products, product pricing</span> <span class="tag">C packages, addons</span></li>
+            <li>Policies: cancellation, deposit, guarantee codes and schedules, smart policies and exceptions <span class="tag">O rsvcfg</span> <span class="tag">M cancellation policies</span> <span class="tag">C smart policies</span></li>
+            <li>Promotions, coupons, vouchers, eCoupons, validation at booking <span class="tag">O rtp promotions, rsvcfg ecoupons</span> <span class="tag">M vouchers</span></li>
+            <li>Negotiated rates per company/agent profile, distribution to hotels <span class="tag">O rtp negotiatedRates</span> <span class="tag">M company contracts</span></li>
+            <li>Restrictions with history, hurdle rates, yield market types, rate strategies, control segments <span class="tag">O par, parasync</span> <span class="tag">M restrictions, rules</span></li>
+            <li>Availability queries: hotel, alternate hotels, analyze rate availability, available upsells, guarantees <span class="tag">O par</span> <span class="tag">M service availability</span> <span class="tag">C getAvailableRoomTypes</span></li>
+            <li>Upsell rules (from type/class to type/class, by occupancy and level) <span class="tag">O rsvcfg upsellRules</span> <span class="tag">M upsells</span></li>
+            <li>Age categories and occupancy pricing <span class="tag">M age categories</span></li>
+            <li>Revenue management hooks: push of rates/restrictions from an RMS, hurdle feeds, budget/forecast entry <span class="tag">O rtpasync, fofcfg budgetForecast</span> <span class="tag">M RMS</span> <span class="tag">C RMS</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> the physical count (2), the booking (5), the posting of the price to a folio (6, which reads the rate at posting time), channel mapping (10). <b>Events out:</b> RatePlanChanged, PriceChanged, RestrictionChanged, PolicyChanged, PackageChanged, PromotionChanged, AvailabilityChanged (the derived grid, for 10). <b>Events in:</b> InventoryCountChanged (2), BlockAllocated/Washed/Cutoff (5), ReservationCreated/Cancelled (5, to recompute), BusinessDateRolled (6). <b>Screens:</b> Rate plans, Pricing calendar, Restrictions, Packages, Policies, Promotions &amp; vouchers, Negotiated rates, Availability grid.</p>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">4 · core</span><span class="wt">Guests &amp; Loyalty</span><span class="wd">chain-wide · one person, one company, across every hotel</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>Profile</b>           guest / contact / employee; company / travel agent / source / group; names (alternate language), titles, gender, nationality, addresses (formats), communications, preferences (groups, exclusive), identification documents, immigration, photos, notes, attachments, keywords, VIP level, credit rating, restrictions/inactive reasons, custom fields, tags
+<b>Relationship</b>      profile links and relationship types, companionship
+<b>MatchAndMerge</b>     match rules, SMART regions, staged/suspended profiles, duplicates, merge with snapshot, unmerge, anonymize/forget
+<b>StayHistory</b>       stays and statistics per profile (a read model fed by 5 and 6), suspended stay records
+<b>Membership</b>        programs, types, classes, levels/tiers, enrollment, cards, points transactions and rules, awards, benefits, certificates/e-certificates, claims, promotions, tier management, statements</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Profiles of every type with search, match, validation, activity log, recently accessed <span class="tag">O crm</span> <span class="tag">M customers, companies</span> <span class="tag">C guest, group profile, guest profile API</span></li>
+            <li>Identification documents, scanning intake, immigration status, photos <span class="tag">O crm, intcfg ID scanning</span> <span class="tag">M identity documents, photos</span> <span class="tag">C postGuestDocument</span></li>
+            <li>Preferences and preference groups, communications, address formats, keyword types, mailing actions <span class="tag">O crmcfg</span></li>
+            <li>Relationships, links, companionships, contact persons <span class="tag">O crm relationships</span> <span class="tag">M companionships, relationships</span> <span class="tag">C ProfilePerson, ContactPerson</span></li>
+            <li>Match and merge: rules, suggested merges, staged profiles from interfaces, duplicates, snapshots, unmerge <span class="tag">O crm stagedProfiles, merges</span> <span class="tag">M merge accounts</span> <span class="tag">C ProfileMerges</span></li>
+            <li>Privacy: forget/anonymize, PII field access, consent, data protection <span class="tag">O validateForgetProfiles</span> <span class="tag">C anonymize, pii field</span></li>
+            <li>Company side: company types, industry codes, contracts, account types, AR link (6), negotiated rate link (3), sales account owners/territories/priorities (shared with 9) <span class="tag">O crmcfg</span> <span class="tag">M company contracts</span></li>
+            <li>Stay history and statistics, future bookings view, profile transactions <span class="tag">O crm stayHistory, profileStatistics</span> <span class="tag">C profile stats, reservations</span></li>
+            <li>Loyalty: programs, membership types/classes/levels, enrollment codes/groups, number generation, points calculation and transactions, awards and redemption, benefits programs, e-certificates, claims, promotions, tier management batches, statements, airline partners <span class="tag">O crm ProfileMembership, crmcfg MembershipConfig</span> <span class="tag">M loyalty programs/tiers/memberships</span></li>
+            <li>Tags and attributes across entities <span class="tag">C attribute tagging</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> the reservation (5), the folio (6) or the card wallet (7 keeps card tokens; the profile holds a reference), the sales activity itself (9). <b>Events out:</b> ProfileCreated/Changed/Merged/Anonymised, MembershipEnrolled, TierChanged, PointsPosted, AwardIssued. <b>Events in:</b> ReservationCreated/CheckedIn/CheckedOut (5, for stay history), FolioClosed/RevenueByBucket (6, for points and statistics), MessageReceived (11). <b>Screens:</b> Guests, Companies &amp; agents, Duplicates, Loyalty members, Programs &amp; tiers; the guest card inside the reservation (5) is this service's component.</p>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">5 · core</span><span class="wt">Reservations &amp; Front Desk</span><span class="wd">per hotel · the booking from offer to departure, and the desk that runs it</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>Reservation</b>       header, stay dates, room type/room, rate plan snapshot and daily rates, guests (primary, sharers, companions, accompanying), status (reserved, waitlist, due in, in house, due out, checked out, cancelled, no show), guarantee/deposit/cancellation policy snapshot, payment method reference, packages and add-ons, inventory items, preferences, traces, alerts, notes, locators, attachments, flex fields, confirmation letters, linked/share/multi-room structure, source/market/origin/booking type, purpose of stay, transport, tickets, eCoupons, upgrade eligibility
+<b>Quote / Call</b>      calls, turnaways, waitlist, sell messages shown, scripts
+<b>Block</b>             business block room side: allocation grid by type/date, wash schedules, cut-off, sub-blocks, tour series, rooming lists, block rates (from 3), posting master link (6), status (5 keeps inventory status; 9 keeps the sales status), borrowed inventory, rate override, room type order
+<b>Stay</b>              check-in record, assigned room, room moves (reasons, scheduled moves), keys issued (via 13), wake-up calls, guest messages, queue, pre-check-in/advance check-in, early departure, checkout record
+<b>ServiceRequest</b>    guest service requests and traces to housekeeping/maintenance (8), transportation requests
+<b>Segmentation codes</b> market codes/groups, source codes/groups, origin, booking types, reservation types, cancellation/discount/move reasons, waitlist codes, entry points, colours, alert codes, locator codes, trace texts, guest message templates (reference data)</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Create/change/cancel/reinstate/copy/split/merge reservations; validations before change; locks; activity log; rate info; policies applicable <span class="tag">O rsv</span> <span class="tag">M reservations</span> <span class="tag">C reservation</span></li>
+            <li>Shares, linked reservations, multi-room, accompanying guests, companions, payee sharer <span class="tag">O rsv shares/linked</span> <span class="tag">M companions</span></li>
+            <li>Waitlist, calls, turnaways, sell messages, scripts, alerts and global alert rules <span class="tag">O rsv, rsvcfg</span></li>
+            <li>Groups and blocks: allocation, wash, cut-off, sub-blocks, tour series, rooming lists (sync and async), rooming list validation, block restrictions, room rate grid, borrow/return inventory, apply changes to, recalculate forecasts <span class="tag">O blk/blkasync/rsvasync</span> <span class="tag">M availability blocks, reservation groups</span> <span class="tag">C groups, allotment blocks</span></li>
+            <li>Arrivals: pre-check-in (online, 11), advance check-in, verify check-in, mass check-in, registration card (via 13 content), ID capture (4) <span class="tag">O fof, guesteng</span> <span class="tag">M start reservation</span> <span class="tag">C postRoomCheckIn</span></li>
+            <li>Room assignment: suggested, automatic, AI, swap/shift, on hold, queue with priority and text messages, unassign <span class="tag">O fof</span> <span class="tag">C postRoomAssign, booking-room</span></li>
+            <li>In house: room moves with reasons and schedules, wake-up calls, guest messages, locators, service requests, daily docket, keys and key options (13), batch card authorizations (7) <span class="tag">O fof, rsv</span> <span class="tag">C guest notes</span></li>
+            <li>Departures: early departure, checkout (choreographed with 6), reinstate checkout, auto/zero-balance checkout eligibility <span class="tag">O csh checkOuts</span> <span class="tag">M process reservation</span> <span class="tag">C postRoomCheckOut</span></li>
+            <li>Packages on the reservation, consumed package quantities, inventory items reserved, tickets issue/refund/reprint, eCoupons, award upgrades, upsell <span class="tag">O rsv</span> <span class="tag">M reservation product</span> <span class="tag">C items, addons</span></li>
+            <li>Mass updates (details, notes, preferences, traces, transportations, housekeeping options, routing, payment instructions) <span class="tag">O rsvasync</span></li>
+            <li>Statistics and pace, reservation indicators, front office statistics, room calendar <span class="tag">O rsv RSVStats, fof FOFStats</span> <span class="tag">C getDashboard</span></li>
+            <li>Confirmation letters and e-mails (templates in 11, rendering in 13) <span class="tag">O rsv confirmationLetters, medcfg</span> <span class="tag">C emails</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> prices (3, snapshotted here), the person (4, referenced), the folio and the deposit money (6), room cleanliness (8), the sales side of a block (9), the channel (10). <b>Events out:</b> ReservationCreated/Changed/Cancelled/Reinstated, NoShowRecorded, WaitlistChanged, BlockCreated/Allocated/CutOff/Washed/Released, RoomingListApplied, PreCheckedIn, CheckedIn, RoomAssigned/Moved, ServiceRequested, WakeUpCallSet, CheckOutRequested, CheckedOut, StayEnded. <b>Events in:</b> RoomChanged/OutOfOrder (2), PriceChanged/RestrictionChanged/PolicyChanged (3), ProfileMerged/Changed (4), FolioSettled/DepositTaken/FolioClosed (6), RoomStatusChanged (8), ChannelBookingReceived (10), OnlineCheckInCompleted/UpsellAccepted (11), SalesBlockStatusChanged (9), KeyIssued (13), BusinessDateRolled (6: no-shows, due-outs). <b>Screens:</b> Today (arrivals, in house, departures, queue), Reservations, New booking (availability + rates + guest), Groups &amp; blocks, Rooming lists, Room plan, Waitlist, Calls &amp; turnaways.</p>
+        <div class="note steel">
+          <b>Check-out, as a choreography</b>
+          <p>Desk presses <em>Check out</em> → 5 asks 6 (sync query) whether every folio window is settled or auto-settleable → 6 settles and answers → 5 writes CheckedOut and publishes StayEnded → 6 closes the folios (FolioClosed), 8 marks the room dirty/vacant, 4 adds the stay to history, 13 revokes keys, 14 counts it. OPERA does this inside one <code>csh/checkOuts</code> call; the observable behaviour is identical.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">6 · core</span><span class="wt">Finance</span><span class="wd">per hotel · cashiering, receivables, fiscal documents, end of day</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>TransactionCatalogue</b> transaction codes, groups, subgroups, generates (taxes), arrangement codes, articles, revenue buckets/types, adjustment and delete reasons, custom charges and exemptions, tax types/brackets/bed tax, collecting-agent taxes, fiscal periods/years, payment methods, credit card types, currency and exchange rates
+<b>Folio</b>             folios/windows per reservation, house account, posting master, AR; postings (charges, payments, adjustments, splits, transfers, diversions), fixed charges, routing instructions applied, package allowances, covers, proforma, folio history/stored folios, folio types/legends/print queues
+<b>Deposit</b>           deposit policies executed, deposit folios, maturity, transition to guest folio, transfers, batch deposits
+<b>PaymentPosting</b>    the folio side of money: payment and refund transactions posted from Payments' events (7), payment methods allowed per folio, cash handling, foreign currency exchange at the desk, cash surcharges
+<b>FiscalDocument</b>    invoices, credit notes, receipts, pro forma, supporting documents, fiscal commands/printing, fiscalization connections per country, document series and numbering, VAT breakdowns, customer VAT folios
+<b>ARAccount</b>         accounts and types, invoices, statements, reminders, aging, credits applied, direct bills, old balances, compress/uncompress, transfers
+<b>Commission</b>        commission codes, bank accounts, agent commissions per reservation, checks/payments, processing instructions
+<b>CashierDay</b>        cashiers, shifts, drop locations, closure and reports, locks; End of Day: no-show posting rules, room &amp; tax posting, auto settlements, zero-balance checkouts, business date roll, EOD reports
+<b>AccountingExport</b>  GL codes and mapping, trial balance, ledgers, revenue export to the back office, comp accounting (authorizers, buckets, redemptions) for casino properties</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Posting: charges, batch charges, articles sale, passer-by sale, adjustments, splits, transfers (window, reservation), diversions, fixed charges, package postings, flexible benefit postings, covers <span class="tag">O csh</span> <span class="tag">M order items, outlet bills, bills</span> <span class="tag">C postCharge, adjustment, items</span></li>
+            <li>Routing and billing automations: window routing, comp routing, pre-configured instructions, contract billing instructions <span class="tag">O csh routingInstructions, fofcfg</span> <span class="tag">M billing automations</span> <span class="tag">C folio autorouting rules</span></li>
+            <li>Deposits and guarantees executed, deposit folios, maturity, transfers <span class="tag">O csh deposit*</span> <span class="tag">C deposits</span></li>
+            <li>Payment postings: a captured card payment, a terminal result or a refund from 7 becomes a folio transaction here; cash, cheque and foreign-currency payments are taken here; eligibility of a deposit refund <span class="tag">O csh payments, foreignCurrencyExchange</span> <span class="tag">M add external payment, alternative payment</span> <span class="tag">C postPayment</span></li>
+            <li>Fiscal: invoices/credit notes/receipts/pro forma, fiscal printers and e-invoicing per country, document rules, series, VAT folios, supporting documents <span class="tag">O csh fiscal*</span> <span class="tag">M fiscal machine commands, tax environments</span> <span class="tag">C fiscal document service</span></li>
+            <li>Accounts receivable: accounts, invoices, statements, reminders, aging, apply credits, direct bills, year views <span class="tag">O ars</span> <span class="tag">M accounts receivable, ledger balances</span> <span class="tag">C AR ledgers</span></li>
+            <li>Commissions to agents: codes, bank accounts, checks, payments, reprint, instructions <span class="tag">O fof Commissions</span> <span class="tag">C manual channel commissions</span></li>
+            <li>Cashiers: shifts, closure, closure reports, locks, drop locations, cashier transactions <span class="tag">O csh cashiers</span> <span class="tag">M cashiers, cashier transactions</span></li>
+            <li>End of day: business date, no-show rules, room &amp; tax, auto settlements, zero-balance checkouts, EOD reports, imbalance checks <span class="tag">O bof businessDate, fofcfg EndOfDayConfig, csh batchJobs</span> <span class="tag">C trial balance</span></li>
+            <li>Accounting export, GL code mapping, revenue buckets, financial postings with net/VAT breakdown, budgets and forecasts <span class="tag">O csh financialPostings, fofcfg budgetForecast</span> <span class="tag">M accounting categories, exports</span> <span class="tag">C accounting API</span></li>
+            <li>Exchange rates (hotel and global), foreign currencies, multicurrency payment <span class="tag">O fofcfg exchangeRates</span> <span class="tag">M exchange rates</span> <span class="tag">C currency settings</span></li>
+            <li>Comp accounting for casino/gaming properties (authorizers, buckets, redemptions, journal) <span class="tag">O csh comp*</span> — a module switched on per hotel</li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> the reservation state (5), the rate itself (3, read at posting), the profile (4), the card, the token, the authorization and the settlement (7), POS checks before they are posted (12), the terminal hardware protocol (13). <b>Events out:</b> ChargePosted, PaymentPosted, SettlementRequested, RefundRequested, DepositTaken, FolioSettled, FolioClosed, InvoiceIssued, ARInvoiceCreated, CommissionCalculated, CashierClosed, BusinessDateRolled, EndOfDayCompleted, RevenueByBucketRecorded. <b>Events in:</b> ReservationCreated/Changed/CheckedIn/CheckOutRequested/StayEnded/NoShowRecorded (5), PriceChanged/PackageChanged (3), ProfileMerged (4), PaymentCaptured/Refunded/Refused (7), CheckClosed (12), InterfacePostingReceived (13: PBX, minibar, pay TV), CateringPostingReady (9). <b>Screens:</b> Billing (folio windows), Deposits, Cashier shift, End of day, Invoices &amp; fiscal, Accounts receivable, Commissions, Accounting export, Transaction codes &amp; taxes.</p>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">7 · core</span><span class="wt">Payments</span><span class="wd">per hotel, chain acquirer contracts · the money itself: cards, terminals, links, refunds — the PCI boundary</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>PaymentMethod</b>     methods and card types, acquirer/provider accounts per hotel and chain, surcharges, multicurrency (guest pays in theirs, hotel receives in its own), payment policies and default-method rules
+<b>Token / Wallet</b>    card tokens per profile and per reservation, vault, 3-D Secure state, consent; never a PAN
+<b>Authorization</b>     pre-authorizations (incl. incremental, manual, batch), releases, authorization history and instructions
+<b>Capture</b>           captures/settlements (single and batch), reversals, refunds (full/partial), bulk settlement status
+<b>PaymentRequest</b>    pay-by-link, e-mail/SMS requests, scheduled payments from policies, payment-method requests, expiry
+<b>TerminalSession</b>   a charge on a physical terminal (command via 13), its result, receipts
+<b>StoredValue</b>       prepaid and gift cards: issue, activate, reload, redeem, cash out, balance
+<b>Reconciliation</b>    provider settlement reports, payouts, chargebacks and disputes, fees, matching against folio postings (6)</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Tokenization and card wallet, authorizations (incl. batch at check-in), captures, reversals, refunds <span class="tag">O csh authorize/ccSettlement/batch, ecommtokenization, tokenexchange (OPI)</span> <span class="tag">M charge credit card, preauthorizations, tokenized cards, refund payment</span> <span class="tag">C payment, tokenization API, void payment</span></li>
+            <li>Payment requests and pay-by-link, scheduled payments from smart policies <span class="tag">M payment requests, payment method request</span> <span class="tag">C pay by link, smart policies</span></li>
+            <li>Terminals (chip &amp; PIN, contactless) through the device layer, receipts <span class="tag">O intcfg credit card readers and terminals</span> <span class="tag">M terminals, payment command</span> <span class="tag">C payment SDK</span></li>
+            <li>Prepaid and gift cards <span class="tag">O csh prepaidCards</span></li>
+            <li>Multicurrency and surcharges <span class="tag">O csh creditcardsurcharge, cashsurcharge</span> <span class="tag">M multicurrency</span></li>
+            <li>Provider reconciliation, payouts, disputes, fees <span class="tag">M automated reconciliation, Mews Payments</span> <span class="tag">C Cloudbeds Payments</span></li>
+            <li>Provider adapters: one interface, many acquirers (the first is decided with L6) <span class="tag">O OPI</span> <span class="tag">M Mews Payments</span> <span class="tag">C Cloudbeds Payments</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> the folio and the posting of the payment on it (6 reacts to PaymentCaptured), the fiscal receipt (6), the reservation's guarantee policy (3/5), the terminal's wire protocol (13). <b>Events out:</b> PaymentAuthorized, PaymentCaptured, PaymentRefused, PaymentRefunded, PaymentReversed, TokenStored, PaymentRequestSent/Paid/Expired, DisputeOpened, SettlementReported. <b>Events in:</b> SettlementRequested/RefundRequested/DepositDue (6), BookingPaymentRequested (10 booking engine, 11 online check-in, 12 POS card payments), TerminalResult (13), ProfileMerged (4), BusinessDateRolled (6). <b>Screens:</b> Payments, Terminals, Payment links, Disputes &amp; settlements, Payment methods setup; console: acquirer contracts.</p>
+        <div class="note steel">
+          <b>Why its own service (decided by the owner, 29 October)</b>
+          <p>All four reference systems ship payments as a product with its own API and its own PCI scope: Oracle's OPI, Mews Payments, Cloudbeds Payments, Apaleo Pay. Keeping the card data, the provider adapters and the PCI audit boundary in one small deployable keeps every other service out of PCI scope.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">8 · core</span><span class="wt">Housekeeping &amp; Maintenance</span><span class="wd">per hotel · the state of every room and the work that changes it</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>RoomStatus</b>        housekeeping status (dirty, clean, pickup, inspected), front-office status mirror, discrepancies, room conditions, cleaning priority, vacant-room status rules, linen/supply codes
+<b>TaskSheet</b>         templates, task codes, credits, sections and section groups, attendants and schedules, auto-generation, mobile companion, start/skip/complete/cancel per room, breaks, lock/merge/move, task sheet sets
+<b>ServiceSchedule</b>   per reservation housekeeping schedules (frequency, turndown, do-not-disturb), guest instructions, service requests from the desk
+<b>MaintenanceOrder</b>  maintenance requests by room with reasons, resolve/unresolve, out-of-service handling (with 2), facility tasks and forecast
+<b>TrackIt</b>           parcels, valet, lost &amp; found, luggage: types, locations, actions, items</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Room status board, overview, statistics, discrepancies, conditions, priorities <span class="tag">O hsk, fof roomStatusStatistics</span> <span class="tag">M resources' occupancy state</span> <span class="tag">C housekeeping status</span></li>
+            <li>Task sheets end to end, attendant scheduling, credits, breaks, mobile start/complete/skip <span class="tag">O hsk, rmcfg</span> <span class="tag">C housekeepers, assignments, inspection list</span></li>
+            <li>Reservation service schedules and guest housekeeping notes, service requests <span class="tag">O hsk reservations/houseKeepingTaskSchedules, serviceRequests</span> <span class="tag">M tasks</span> <span class="tag">C tasks</span></li>
+            <li>Maintenance orders, resolve/unresolve, out of order/out of service completion, facility forecast <span class="tag">O hsk maintenances, outOfServiceRooms</span> <span class="tag">M resource blocks</span></li>
+            <li>Track It: parcels, valet, lost &amp; found, luggage with locations and actions <span class="tag">O cms trackItems, fofcfg trackIt*</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> the room's existence or type (2), who is in it (5), charges for minibar or damages (6). <b>Events out:</b> RoomStatusChanged, RoomInspected, TaskSheetCompleted, MaintenanceOpened/Resolved, OutOfServiceSet/Cleared, TrackItItemLogged. <b>Events in:</b> RoomChanged/OutOfOrder (2), CheckedIn/RoomMoved/StayEnded/ServiceRequested (5), BusinessDateRolled (6: vacant-room rules, new day's sheets). <b>Screens:</b> Room status, Task sheets, Attendants, Maintenance, Track It; a mobile-first view for attendants.</p>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">9 · around the core</span><span class="wt">Sales, Events &amp; Experiences</span><span class="wd">chain-wide sales, per-hotel spaces · group business from lead to banquet, and every bookable thing that is not a bedroom</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>SalesAccount</b>      accounts (company profiles' sales side, 4), contacts, owners/teams, territories, potential, competition, influence, sales manager goals, central sales hotels
+<b>Activity</b>          sales activities (appointments, calls, follow-ups), auto-traces, results, e-mails, attachments, linked activities
+<b>Opportunity / BusinessBlock</b>  leads and property leads, block sales status workflow (inquiry → tentative → definite → actual; lost/refused/cancel reasons, rankings, conversions), contract defaults, owners, revenue forecast and projected revenues, catering status, posting master request (6), alternate dates
+<b>FunctionSpace</b>     spaces (types, locations, dimensions, capacities, combinations, shared spaces), setup styles, rental codes, availability and the function diary
+<b>Event</b>             events per block, event types/status, resources (items, menus, menu items, setup), waitlisted/alternate events, event forecasts, BEOs and change logs, catering package events, postings to Finance
+<b>Catering</b>          menus, menu classes, menu items and item classes, servings, containers, catering packages and prices, revenue groups/types, item inventory and pools (AV, furniture), daily item quantities
+<b>Experience</b>        bookable resources beyond rooms: meeting rooms by the hour, parking, spa/treatments, golf/activities, tours, equipment; experience types/groups, locations, resource features, bookings with check-in/out, schedules</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Sales CRM: activities, auto-traces, goals, account ownership, central sales <span class="tag">O act/actcfg, crm accounts, blkcfg salesManagers</span></li>
+            <li>Business blocks' sales lifecycle, leads, opportunity events, conversions, lost/refused, rankings, wash and cut-off schedules' definition <span class="tag">O blk, blkcfg, rsvcfg block*</span> <span class="tag">C groups</span></li>
+            <li>Function space diary, availability, shared spaces, setup styles, rental <span class="tag">O evm functionalSpace, evmcfg</span> <span class="tag">M spaces as resources</span> <span class="tag">C Spaces, Events</span></li>
+            <li>Events and catering: booking, resources, menus, packages, forecasts, BEO, postings <span class="tag">O evm, evmcfg ResourceConfig</span> <span class="tag">C events, event notes</span></li>
+            <li>Experiences/leisure: experiences, resources, locations, bookings, check-in/out, location notifications <span class="tag">O lms/lmscfg</span> <span class="tag">M services (bookable), products</span> <span class="tag">C addons, amenities</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> room allocation and rooming lists (5, which hears SalesBlockStatusChanged and allocates), the charges (6), the guest profile (4). <b>Events out:</b> LeadCreated, SalesBlockStatusChanged, EventBooked/Changed/Cancelled, SpaceReserved/Released, CateringPostingReady, ExperienceBooked/CheckedIn, ActivityCompleted. <b>Events in:</b> BlockAllocated/Washed/CutOff (5), FolioClosed (6, actuals), ProfileChanged (4), BusinessDateRolled (6). <b>Screens:</b> Sales pipeline, Accounts &amp; contacts, Activities, Business blocks, Function diary, Events &amp; BEOs, Menus &amp; packages, Experiences calendar.</p>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">10 · around the core</span><span class="wt">Distribution</span><span class="wd">per hotel, chain contracts · every door through which a booking arrives from outside</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>Channel</b>           channels and sub-channels, accounts and contracts, parameters/controls, policies, tenants, error codes, billing statements
+<b>ChannelMapping</b>    hotel, room type, rate plan, currency, card type, guarantee, amenity, confirmation letter mappings; global room/rate descriptions; marketing text; total pricing (taxes and fees shown to channels); rate categories/levels; rate-room sequence
+<b>ARIPublication</b>    availability, rates and restrictions published per channel; channel sell limits; rate parity view; inventory snapshots; publication log and reprocessing
+<b>InboundBooking</b>    bookings received (OTA, GDS, booking engine, metasearch), acknowledgements, modifications, cancellations, delivery history, conversion to reservations (5)
+<b>BookingEngine</b>     the direct web/mobile booking flow: offers, availability search, promo codes, extras, payment (7), confirmation; branding per hotel
+<b>Metasearch / Ads</b>  Google Hotel Ads and similar feeds</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Channel configuration, mapping, controls, parity, billing statements <span class="tag">O chl</span> <span class="tag">M channel manager API</span> <span class="tag">C channel manager, OTA build-to-us</span></li>
+            <li>ARI push and pull (availability, rates, restrictions, sell limits) <span class="tag">O chl publish, channelSellLimits</span> <span class="tag">M ARI</span> <span class="tag">C ARIUpdate, ARIFullRefresh</span></li>
+            <li>Inbound bookings, acknowledgement, modify/cancel, linking by external id <span class="tag">O rsv externalSystems</span> <span class="tag">C bookings, callbacks</span></li>
+            <li>Booking engine and metasearch <span class="tag">M booking engine API</span> <span class="tag">C booking engine, digital marketing</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> the price (3), the reservation once created (5), the payment (7). <b>Events out:</b> ChannelBookingReceived/Modified/Cancelled, ARIPublished, ChannelMappingChanged, ParityBreakDetected. <b>Events in:</b> AvailabilityChanged/PriceChanged/RestrictionChanged (3), SellLimitChanged (2), ReservationCreated/Cancelled (5, to acknowledge and to re-publish), BusinessDateRolled (6). <b>Screens:</b> Channels, Mappings, Publication log, Booking engine setup; console: channel contracts.</p>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">11 · around the core</span><span class="wt">Guest Engagement</span><span class="wd">per hotel, chain templates · everything the guest sees and says, before, during and after the stay</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>Communication</b>     templates (confirmation, pre-arrival, registration card, folio e-mail, thank-you) in every language, schedules and triggers, delivery log, letters customised per reservation
+<b>MessageThread</b>     two-way messaging with guests (e-mail, SMS, WhatsApp, in-app), assignment to staff, quick texts
+<b>GuestJourney</b>      online check-in (ID capture → 4, pre-check-in → 5, payment → 7, key → 13), online/self check-out, digital key issuance request, kiosk flows, upsell offers (room upgrades, extras; rules from 3), in-stay purchases, guest portal, feedback/reputation
+<b>Automation</b>        rule-driven actions (VIP perks, birthday treats, loyalty upgrades) over events of the other services</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Templates, scheduled e-mails, customised letters, registration cards, folio e-mails <span class="tag">O medcfg, rsv confirmationLetters, rsvcfg guestMessages</span> <span class="tag">C emails, email schedule</span></li>
+            <li>Messaging threads <span class="tag">M customer messaging</span> <span class="tag">C guest communication (Whistle)</span></li>
+            <li>Online/self check-in and check-out, kiosks, digital keys <span class="tag">O guesteng preCheckIn</span> <span class="tag">M online check-in, kiosks, digital keys</span> <span class="tag">C digital check-in</span></li>
+            <li>Upsell and in-stay purchases <span class="tag">O Reservation Upgrade (Nor1)</span> <span class="tag">M upsells</span></li>
+            <li>Automations and guest marketing segments <span class="tag">M automations, guest intelligence</span> <span class="tag">C guest marketing CRM, reputation</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> the profile (4), the reservation (5), the payment (7), the key encoder (13). <b>Events out:</b> MessageSent/Received, OnlineCheckInCompleted, OnlineCheckOutRequested, UpsellAccepted, CommunicationDelivered/Failed, FeedbackReceived. <b>Events in:</b> ReservationCreated/Changed/CheckedIn/StayEnded (5), PaymentCaptured (7), RoomReady (8), KeyIssued (13), MembershipEnrolled (4). <b>Screens:</b> Inbox, Templates &amp; schedules, Guest journey setup, Upsell offers, Automations; the guest-facing web pages themselves.</p>
+      </div>
+    </div>
+
+    <!-- 12 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">12 · around the core</span><span class="wt">Point of Sale</span><span class="wd">per outlet · Harmony's own EPOS (decided earlier: build, not buy)</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>Outlet</b>            outlets, revenue centres, tables/areas, service periods, tills and till sign-in (L5), printers and kitchen routing (13)
+<b>Catalogue</b>         menus, items, modifiers, prices by period, taxes (from 6's catalogue), combos, stock items
+<b>Check</b>             open checks, seats, items, discounts, service charges, gratuities, splits, voids with reasons, settlement (cash → 6, card via 7/13, room charge → 6), close
+<b>OutletDay</b>         shifts, cash drawer, end-of-shift reports, stock consumption</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Checks, room posting, gratuities, voids, splits, settlements <span class="tag">M POS API, outlet bills, outlet items</span> <span class="tag">C checks, gratuities</span> <span class="tag">O via interface unit charges</span></li>
+            <li>Menus, items, modifiers, periods; table and reservation management for outlets <span class="tag">M POS</span></li>
+            <li>Stock consumption and inventory counts for outlets <span class="tag">M POS inventory</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> the folio (6), the guest (4), the card token (7). <b>Events out:</b> CheckOpened/Closed, CheckPostedToRoom (→ 6), GratuityPosted, StockConsumed. <b>Events in:</b> CheckedIn/RoomAssigned/StayEnded (5, for room-charge eligibility), TransactionCatalogueChanged (6), PaymentCaptured (7), BusinessDateRolled (6). <b>Screens:</b> Till, Tables, Menu setup, Outlet reports.</p>
+      </div>
+    </div>
+
+    <!-- 13 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">13 · around the core</span><span class="wt">Integrations &amp; Devices</span><span class="wd">per hotel and chain · the plumbing every other service uses to reach the outside world</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>ExternalSystem</b>    systems, publishers/subscriptions per hotel, interface rights, data value mappings and conversion codes, default values, UDF mappings
+<b>BusinessEvent</b>     the outbound event catalogue (webhooks): subscriptions, delivery, retries, delivery history
+<b>PropertyInterface</b> PBX/telephone, door locks and key encoders (key options, generation, read, revoke), POS posting, minibar, pay TV, in-room devices, payment terminals, fiscal printers, ID document scanners, printers and print queues, kiosks; interface rooms, room status sync, unit charges, machines, controller registry, logs, failed messages, resync
+<b>DeviceCommand</b>     commands to devices (print, cut key, charge terminal, fiscal print) with state
+<b>Export</b>            export definitions, mappings, schedules, generated files, SFTP/delivery
+<b>Content</b>           document rendering: letters, registration cards, folio/invoice PDFs, e-mail files, images</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>External systems, publishers, business events, data value mapping <span class="tag">O int, intcfg, dvm</span> <span class="tag">M webhooks</span> <span class="tag">C webhooks, integration events, app state</span></li>
+            <li>Property interfaces of every kind, monitoring, resync <span class="tag">O intcfg, fof keyInterfaces, roomKeys</span> <span class="tag">M device integration (printers, key cutters, terminals, fiscal machines)</span> <span class="tag">C door locks</span></li>
+            <li>Exports and scheduled files <span class="tag">O expcfg</span> <span class="tag">M exports</span> <span class="tag">C report export</span></li>
+            <li>Document rendering and content <span class="tag">O medcfg</span> <span class="tag">C fiscal document PDFs</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> the business meaning of what it carries: a key is Reservations' decision, a terminal charge is Payments', a PBX call charge becomes Finance's posting. <b>Events out:</b> KeyIssued/Revoked, TerminalResult, InterfacePostingReceived, DeviceCommandCompleted/Failed, ExportGenerated, WebhookDelivered/Failed, DocumentRendered. <b>Events in:</b> every outbound-worthy event of the others, by subscription. <b>Screens:</b> Interfaces, Devices &amp; printers, Webhooks, Exports, Interface log; console: external systems and mappings.</p>
+      </div>
+    </div>
+
+    <!-- 14 -->
+    <div class="wave">
+      <div class="whead"><span class="wn">14 · around the core</span><span class="wt">Reports &amp; Analytics</span><span class="wd">chain-wide · the read side: nothing here is a source of truth</span></div>
+      <div class="mod">
+        <h4>Owns</h4>
+        <div class="grid2">
+          <div class="box"><span class="bl">Aggregates (first cut)</span><pre class="tbls"><b>Dataset</b>           denormalised read models fed by events: reservations, stays, revenue by bucket/code, occupancy, ADR/RevPAR, pace, pickup, forecast, housekeeping productivity, cashier/EOD, AR aging, loyalty, channel production, sales pipeline, group/catering forecast
+<b>Report</b>            report catalogue (groups, parameters, manager/shift/EOD reports), custom reports and charts, folders, tags, favourites, schedules and delivery, stock reports per property type
+<b>Dashboard</b>         home dashboard tiles, hubs/cards, KPIs per role
+<b>Snapshot</b>          daily statistics frozen at end of day (OPERA's statistics tables), budgets vs actuals</pre></div>
+          <div class="box"><span class="bl">Capabilities</span><ul class="caps">
+            <li>Report catalogue, parameters, generation, scheduling, manager and shift reports, EOD reports <span class="tag">O repcfg, lov rep*</span> <span class="tag">C Insights reports, schedules, stock reports</span></li>
+            <li>Datasets and query, charts, hubs, favourites, search, export <span class="tag">C Insights</span> <span class="tag">M Business Intelligence</span></li>
+            <li>Statistics and pace feeds: reservation, block, inventory, front office, profile, membership, housekeeping, activity <span class="tag">O *Stats services</span> <span class="tag">C dashboard</span></li>
+            <li>Budgets, forecasts, comparison <span class="tag">O budgetForecast, catering budgets</span></li>
+          </ul></div>
+        </div>
+        <p class="inv"><b>Never owns:</b> any fact; it rebuilds from the event stream. <b>Events in:</b> all; <b>out:</b> ReportGenerated, ScheduleDelivered, SnapshotTaken. <b>Screens:</b> Home dashboard, Reports, Explore, Schedules; console: chain roll-ups.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ END OF DAY ============ -->
+  <section>
+    <h2>The night</h2>
+    <h3>End of day as a choreography</h3>
+    <p class="lede">OPERA runs End of Day as one procedure with sixty configuration topics; Cloudbeds and Mews close the day in accounting with no audit step. Harmony keeps the industry's audit guarantees without a night-audit service: Finance owns the sequence, every other service reacts to one event.</p>
+    <table class="ev">
+      <tr><th>Step</th><th>Who</th><th>What</th></tr>
+      <tr><td>1 pre-checks</td><td>6 Finance</td><td>cashiers closed or auto-closed, no open fiscal retries, no reservations pending checkout with balance (asks 5)</td></tr>
+      <tr><td>2 no-shows</td><td>5 Reservations</td><td>due-ins not arrived become no-shows (NoShowRecorded); waitlist expiries; due-outs flagged</td></tr>
+      <tr><td>3 postings</td><td>6 Finance</td><td>no-show posting rules, room &amp; tax for in-house (rate read from the reservation's daily rate), package and fixed charges, catering postings ready (9), interface postings parked (13)</td></tr>
+      <tr><td>4 settlements</td><td>6 Finance → 7 Payments</td><td>auto settlements (captures asked of 7), zero-balance checkouts (tells 5), deposit maturity, AR direct bills</td></tr>
+      <tr><td>5 roll</td><td>6 Finance</td><td>business date + 1 → <code>BusinessDateRolled</code></td></tr>
+      <tr><td>6 reactions</td><td>2, 3, 7, 8, 10, 11, 12, 14</td><td>2 applies day types; 3 makes the day's schedules effective; 7 runs the day's scheduled payment requests and the provider reconciliation; 8 vacant-room rules and fresh task sheets; 10 republishes availability; 11 sends the day's scheduled communications; 12 closes outlet days; 14 freezes the statistics snapshot and runs EOD reports</td></tr>
+      <tr><td>8 done</td><td>6 Finance</td><td><code>EndOfDayCompleted</code> with the report pack; the trail has every step</td></tr>
+    </table>
+  </section>
+
+  <!-- ============ ORDER ============ -->
+  <section>
+    <h2>The road</h2>
+    <h3>Build order, and why</h3>
+<pre class="map"><b>2 Property</b> → <b>4 Guests</b> → <b>3 Rates</b> → <b>5 Reservations &amp; Front Desk</b> → <b>6 Finance</b> → <b>7 Payments</b> → <b>8 Housekeeping</b> → <b>13 Integrations</b>
+                                                                                                        ───── a hotel can go live here ─────
+→ <b>10 Distribution</b> → <b>11 Guest Engagement</b> → <b>14 Reports</b> → <b>9 Sales, Events &amp; Experiences</b> → <b>12 Point of Sale</b></pre>
+    <ul class="caps">
+      <li><b>2 first:</b> every other service points at a room; nothing points back. It also proves the service template (gate, events, screens, suite) on the smallest domain.</li>
+      <li><b>4 second:</b> the first chain-wide service; proves tenant-level data behind the hotel wall, and bookings need a person.</li>
+      <li><b>3 before 5:</b> a booking needs a price and a policy; 3 needs only 2.</li>
+      <li><b>5 then 6 then 7:</b> the booking, the folio, then the money. 5 can run with a stub folio for a few bites; 6 closes the loop with the checkout choreography and the first end of day; 7 adds cards, terminals and links behind the PCI line (cash works from 6 alone).</li>
+      <li><b>8 then 13:</b> room status is operationally essential and hardware-free; keys and terminals need 13, which is the go-live line.</li>
+      <li><b>10, 11, 14:</b> the revenue, the guest and the manager, in that order of money.</li>
+      <li><b>9, 12 last:</b> the largest domains, each a product on its own in the three systems; both sit on everything before them.</li>
+    </ul>
+    <div class="note green">
+      <b>Each service, the same way Identity was built</b>
+      <p>Design doc (aggregates + ERD + events) reviewed first → skeleton from the Identity template (Api/Domain/Handler/Infrastructure, framework pack, hotel wall, module gate, outbox, telemetry, DPoP) → bites with one quick test each → screens en + ar → its e2e suite into the runner → one regression. The user reviews at the design doc and at the end.</p>
+    </div>
+  </section>
+
+  <!-- ============ DECISIONS ============ -->
+  <section>
+    <h2>Decided here</h2>
+    <h3>The calls that shape the count</h3>
+    <ul class="caps">
+      <li><b>Loyalty inside Guests, not a 14th service.</b> Every loyalty fact hangs off the profile; OPERA's separate product still reads and writes CRM profiles. Its aggregates stay their own (Membership root), so it can be split out one day without touching the others.</li>
+      <li><b>Groups and blocks split by side:</b> the room side (allocation, wash, cut-off, rooming lists) in 5; the sales side (lead, status, forecast, catering) in 9. OPERA's single Block API straddles both because it predates the split; Cloudbeds keeps groups in the PMS and events apart.</li>
+      <li><b>Checkout lives in Reservations, settlement in Finance.</b> OPERA's cashiering owns checkout; Harmony's choreography above keeps one owner per fact.</li>
+      <li><b>The business date is Finance's</b> and it is the only clock. Property keeps the calendar (day types, events), not the date.</li>
+      <li><b>Availability is a view in Rates,</b> computed from Property's counts, Reservations' blocks and bookings, and its own restrictions; OPERA's separate <code>par</code> and <code>inv</code> are the same split.</li>
+      <li><b>Experiences (spa, golf, parking, tours) join Events,</b> because both are time-slot bookings of non-room resources with their own calendar; Mews models all of them as one "service" concept.</li>
+      <li><b>Content rendering and devices sit in Integrations,</b> not in each service, so one PDF engine, one printer queue, one key-encoder protocol serve all.</li>
+      <li><b>Room rotation, comp accounting, tour series, catering budgets</b> are modules switched on per hotel, not services; one hotel in a hundred needs them.</li>
+    </ul>
+    <div class="note green">
+      <b>Closed by the owner, 29 October</b>
+      <p><b>Payments is its own service (7).</b> Oracle (OPI), Mews (Mews Payments), Cloudbeds (Cloudbeds Payments) and apaleo (Apaleo Pay) all ship it as a product with its own API and PCI scope; so does Harmony.</p>
+      <p><b>Reservations &amp; Front Desk stays one service (5).</b> The evidence: Mews has no front-desk API at all — check-in and check-out are <code>Start reservation</code> and <code>Process reservation</code>, state changes of the reservation; apaleo the same (<code>reservation-actions/checkin</code>); Cloudbeds keeps both in the one PMS API, with the desk actions (<code>postRoomAssign</code>, <code>postRoomCheckIn</code>, <code>postRoomCheckOut</code>) filed under <em>Room</em> rather than <em>Reservation</em>. Only OPERA separates <code>rsv</code> from <code>fof</code> — and it then puts check-out in <code>csh</code> (cashiering), which shows the split is a screen organisation over one database, not a data boundary. Three of four say one; the one that says two contradicts itself. The Stay aggregate stays clearly apart from Reservation inside 5, so a split remains possible if a central reservations office ever needs it.</p>
+    </div>
+  </section>
+
+  <footer>
+    Sources read in full on 28 October 2026: Oracle's published OPERA Cloud REST specifications (github.com/oracle/hospitality-api-docs, 44 files, 4,000 operations) and the OPERA Cloud 25.4 user guide table of contents; the Mews Connector API operations index and POS API index (docs.mews.com); the Cloudbeds API reference (developers.cloudbeds.com, ten API families) and both vendors' product catalogues; apaleo's API scopes as a fourth check. Harmony's own words only in the names; the vendor names appear as provenance tags.
+  </footer>
+</div>
+</body>
+</html>

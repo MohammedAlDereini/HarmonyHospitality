@@ -534,6 +534,7 @@ flowchart LR
 <b>SecurityAuditEvents</b></pre></div>
         </div>
         <p class="inv"><b>Invariant:</b> nothing is ever updated or deleted. And <code>Action</code> stays a free string &mdash; no reference table, no foreign key. An audit log must record an action from a service version newer than any list you seeded, and a constraint there would drop the record.</p>
+        <p class="why"><b>Who reads it (29 Oct 2026).</b> A customer reads one of its own people's trail at <code>GET UserAccount/{id}/security-events</code>; the tenant filter is the wall. The platform console reads the whole trail at <code>POST SecurityAudit/get-all</code> (paged, filters: search, action or family prefix, a list of actions, tenant, person, window) and <code>GET SecurityAudit/counts</code> (per action, over a window): both lift the tenant filter on purpose, open only for the platform tenant (00073 otherwise) and only with <code>ViewTenants</code>, and every row still names its tenant. The customer's and the person's names are read beside the rows; an actor that is an account of ours is named after the page is cut. The console's home also reads <code>GET Tenant/summary</code> and <code>GET Property/summary</code> (the customers and hotels in numbers, platform tenant only), and the console BFF reads Identity's detailed health checks inside the network at <code>GET /bff/health</code> (platform people only).</p>
       </div>
     </div>
   </section>
